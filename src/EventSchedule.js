@@ -55,7 +55,7 @@ class EventSchedule extends Component {
                               <p>Where: {event.where}</p>
                               {
                                 (event['google-map-id'] || event['facebook-event-id']) ?
-                                  <div className="d-flex">
+                                  <div className='d-flex flex-wrap'>
                                     {
                                       event['google-map-id'] &&
                                       EventSchedule.getMapLink(event['google-map-id'])
@@ -82,14 +82,14 @@ class EventSchedule extends Component {
   }
 
   static getMapLink (eventElement) {
-    return <span style={{ whiteSpace: 'nowrap', paddingRight: "1em" }}>
+    return <span style={{ paddingRight: "1em" }}>
       <a target="_blank" rel="noopener noreferrer" href={`https://goo.gl/maps/${eventElement}`}>
         <i className="fas fa-map-marker-alt" />&nbsp;Meeting Point</a>
     </span>
   }
 
   static getFacebookEventLink (eventElement) {
-    return <span style={{ whiteSpace: 'nowrap' }}>
+    return <span>
       <a target="_blank" rel="noopener noreferrer" href={`https://www.facebook.com/events/${eventElement}`}>
       <i className="fab fa-facebook-square" />&nbsp;Facebook Event</a>
     </span>
