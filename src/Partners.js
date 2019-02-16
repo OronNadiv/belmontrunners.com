@@ -18,14 +18,14 @@ class Partners extends Component {
                       <img className="img-fluid" src="img/partners/smclibraries2.png" alt="" />
                       <div className="hover">
                         <a target="_blank" rel="noopener noreferrer" href="https://www.facebook.com/SMCLibraries">
-                          <i className="fa fa-facebook" />
+                          <i className="fab fa-facebook-f" />
                         </a>
                         <a target="_blank" rel="noopener noreferrer" href="https://twitter.com/SMCLibraries">
-                          <i className="fa fa-twitter" />
+                          <i className="fab fa-twitter" />
                         </a>
                         <a target="_blank" rel="noopener noreferrer"
                            href="https://www.linkedin.com/company/san-mateo-county-library">
-                          <i className="fa fa-linkedin" />
+                          <i className="fab fa-linkedin-in" />
                         </a>
                       </div>
                     </div>
@@ -41,10 +41,10 @@ class Partners extends Component {
                       <div className="hover">
                         <a target="_blank" rel="noopener noreferrer"
                            href="https://www.facebook.com/places/Things-to-do-in-Belmont-California/108517932506370">
-                          <i className="fa fa-facebook" />
+                          <i className="fab fa-facebook-f" />
                         </a>
                         <a target="_blank" rel="noopener noreferrer" href="https://twitter.com/mybelmont">
-                          <i className="fa fa-twitter" />
+                          <i className="fab fa-twitter" />
                         </a>
                       </div>
                     </div>

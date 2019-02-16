@@ -43,7 +43,7 @@ class Team extends Component {
         title: 'Treasurer',
         image: 'shelly.png',
         facebook: 'shelly.b.kim',
-        email: 'shellybkim@gmail.com',
+        email: 'shellybkim@gmail.com'
       }
     ])
 
@@ -59,37 +59,37 @@ class Team extends Component {
                 {
                   member.website &&
                   <a target="_blank" rel="noopener noreferrer" href={`https://${member.website}`}>
-                    <i className="fa fa-link" />
+                    <i className="fas fa-link" />
                   </a>
                 }
                 {
                   member.email &&
                   <a target="_blank" rel="noopener noreferrer" href={`mailto:${member.email}`}>
-                    <i className="fa fa-envelope" />
+                    <i className="fas fa-envelope" />
                   </a>
                 }
                 {
                   member.facebook &&
                   <a target="_blank" rel="noopener noreferrer" href={`https://www.facebook.com/${member.facebook}`}>
-                    <i className="fa fa-facebook" />
+                    <i className="fab fa-facebook-f" />
                   </a>
                 }
                 {
                   member.linkedin &&
                   <a target="_blank" rel="noopener noreferrer" href={`https://www.linkedin.com/in/${member.linkedin}`}>
-                    <i className="fa fa-linkedin" />
+                    <i className="fab fa-linkedin-in" />
                   </a>
                 }
                 {
                   member.twitter &&
                   <a target="_blank" rel="noopener noreferrer" href={`https://twitter.com/${member.twitter}`}>
-                    <i className="fa fa-twitter" />
+                    <i className="fab fa-twitter" />
                   </a>
                 }
                 {
                   member.instagram &&
                   <a target="_blank" rel="noopener noreferrer" href={`https://www.instagram.com/${member.instagram}`}>
-                    <i className="fa fa-instagram" />
+                    <i className="fab fa-instagram" />
                   </a>
                 }
               </div>
