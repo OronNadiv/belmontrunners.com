@@ -52,21 +52,21 @@ class EventSchedule extends Component {
                               <h5>{event.moment.format('MMMM D h:mm a')}</h5>
                               <h4>{event.moment.format("dddd")} {event.subject}</h4>
                               <p>What: {event.what}</p>
-                              <p>Where: {event.where}
-                                {
-                                  (event['google-map-id'] || event['facebook-event-id']) ?
-                                    <div style={{ display: "flex", "flex-flow": "row wrap" }}>
-                                      {
-                                        event['google-map-id'] && EventSchedule.getMapLink(event['google-map-id'])
-                                      }
-                                      {
-                                        event['facebook-event-id'] &&
-                                        EventSchedule.getFacebookEventLink(event['facebook-event-id'])
-                                      }
-                                    </div>
-                                    : <span />
-                                }
-                              </p>
+                              <p>Where: {event.where}</p>
+                              {
+                                (event['google-map-id'] || event['facebook-event-id']) ?
+                                  <div className="d-flex">
+                                    {
+                                      event['google-map-id'] &&
+                                      EventSchedule.getMapLink(event['google-map-id'])
+                                    }
+                                    {
+                                      event['facebook-event-id'] &&
+                                      EventSchedule.getFacebookEventLink(event['facebook-event-id'])
+                                    }
+                                  </div>
+                                  : <span />
+                              }
                             </div>
                           </div>
                         )
@@ -82,14 +82,14 @@ class EventSchedule extends Component {
   }
 
   static getMapLink (eventElement) {
-    return <span style={{ 'white-space': 'nowrap', "padding-right": "1em" }}>
+    return <span style={{ whiteSpace: 'nowrap', paddingRight: "1em" }}>
       <a target="_blank" rel="noopener noreferrer" href={`https://goo.gl/maps/${eventElement}`}>
         <i className="fas fa-map-marker-alt" />&nbsp;Meeting Point</a>
     </span>
   }
 
   static getFacebookEventLink (eventElement) {
-    return <span style={{ 'white-space': 'nowrap' }}>
+    return <span style={{ whiteSpace: 'nowrap' }}>
       <a target="_blank" rel="noopener noreferrer" href={`https://www.facebook.com/events/${eventElement}`}>
       <i className="fab fa-facebook-square" />&nbsp;Facebook Event</a>
     </span>
