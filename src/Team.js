@@ -37,6 +37,13 @@ class Team extends Component {
         name: 'Kelsey Homyk',
         title: 'Activities Director',
         image: 'kelsey.png'
+      },
+      {
+        name: 'Shelly Kim',
+        title: 'Treasurer',
+        image: 'shelly.png',
+        facebook: 'shelly.b.kim',
+        email: 'shellybkim@gmail.com',
       }
     ])
 
