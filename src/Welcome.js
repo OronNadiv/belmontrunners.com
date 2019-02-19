@@ -13,7 +13,7 @@ class Welcome extends Component {
             </div>
             <div className="col-lg-6 offset-lg-1">
               <div className="welcome_text">
-                <h3>Welcome to Belmont Runners Club</h3>
+                <h3>Welcome to Belmont Runners</h3>
                 <p>We are a casual group of runners and walkers looking to build a community of friendly,
                   active locals who enjoy fitness and the great outdoors. Join us for regular group events as we
                   take advantage of our great local trails and roads.

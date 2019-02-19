@@ -411,13 +411,12 @@ button:focus {
 }
 
 .home_banner_area .banner_inner .banner_content h2 {
-  margin-top: 0px;
+  margin: 35px 0;
   font-size: 48px;
   font-weight: bold;
   font-family: "Heebo", sans-serif;
   line-height: 54px;
   text-transform: uppercase;
-  margin-bottom: 15px;
 }
 
 .home_banner_area .banner_inner .banner_content p {
