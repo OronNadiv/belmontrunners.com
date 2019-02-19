@@ -384,7 +384,7 @@ button:focus {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  background: url(../img/banner/home-banner-3.png) no-repeat scroll center center;
+  background: url(../img/banner/welcome2.png) no-repeat scroll center center;
   background-size: cover;
 }
 
@@ -407,6 +407,7 @@ button:focus {
   -ms-flex-item-align: center;
   align-self: center;
   text-align: center;
+  padding-bottom: 52px;
 }
 
 .home_banner_area .banner_inner .banner_content h2 {
