@@ -83,25 +83,25 @@ class Signup extends Component {
 
           <Modal.Body className="modal-body mx-4">
 
-            <div className="md-form mb-5">
+            <div className="mb-2">
               <input type="text" className="form-control validate" name="firstname"
                      onChange={(event) => this.setState({ firstname: event.target.value })} />
               <label data-error="wrong" data-success="right">Your first name</label>
             </div>
 
-            <div className="md-form mb-5">
+            <div className="mb-2">
               <input type="text" className="form-control validate" name="lastname"
                      onChange={(event) => this.setState({ lastname: event.target.value })} />
               <label data-error="wrong" data-success="right">Your last name</label>
             </div>
 
-            <div className="md-form mb-5">
+            <div className="mb-2">
               <input type="email" className="form-control validate" name="email"
                      onChange={(event) => this.setState({ email: event.target.value })} />
               <label data-error="wrong" data-success="right">Your email</label>
             </div>
 
-            <div className="md-form pb-3">
+            <div className="pb-3">
               <input type="password" className="form-control validate" name="password"
                      onChange={(event) => this.setState({ password: event.target.value })}>
               </input>

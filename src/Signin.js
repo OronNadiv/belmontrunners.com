@@ -88,13 +88,13 @@ class Signin extends Component {
 
           <Modal.Body className="modal-body mx-4">
 
-            <div className="md-form mb-5">
+            <div className="mb-2">
               <input type="email" className="form-control validate" name='email'
                      onChange={(event) => this.setState({ email: event.target.value })} />
               <label data-error="wrong" data-success="right">Your email</label>
             </div>
 
-            <div className="md-form pb-3">
+            <div className="pb-3">
               <input type="password" className="form-control validate" name='password'
                      onChange={(event) => this.setState({ password: event.target.value })}>
               </input>
