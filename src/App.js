@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import HeaderArea from './HeaderArea'
+import HeaderArea from './header/HeaderArea'
 import HomeBanner from './HomeBanner'
 import Welcome from './Welcome'
 import EventSchedule from './EventSchedule'

@@ -4,7 +4,7 @@ import Button from 'react-bootstrap/Button'
 
 import firebase from 'firebase'
 import 'firebase/auth'
-import './Signup.css'
+import './Signup.scss'
 import { Link, Redirect } from 'react-router-dom'
 
 class Signup extends Component {

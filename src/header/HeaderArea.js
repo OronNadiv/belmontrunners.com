@@ -1,11 +1,10 @@
 import React, { Component } from 'react'
-// import './HeaderArea.css'
 import { Link, Route } from "react-router-dom"
 import firebase from 'firebase'
 import 'firebase/auth'
-import Signin from './Signin'
-import Signup from './Signup'
-import ForgotPassword from './ForgotPassword'
+import Signin from '../identity/Signin'
+import Signup from '../identity/Signup'
+import ForgotPassword from '../identity/ForgotPassword'
 import $ from 'jquery'
 import Avatar from 'react-avatar'
 
