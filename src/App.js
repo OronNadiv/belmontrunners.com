@@ -11,6 +11,7 @@ import './App.css'
 import { BrowserRouter as Router } from "react-router-dom"
 import firebase from 'firebase'
 import 'firebase/auth'
+import './scss/style.scss'
 
 // import Partners from './Partners'
 
