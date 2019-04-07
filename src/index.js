@@ -1,9 +1,14 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-
+import { Provider } from 'react-redux'
+import configureStore, { history } from './store'
+import './index.css'
 import App from './App'
+import { ConnectedRouter } from 'connected-react-router'
+
 import * as serviceWorker from './serviceWorker'
 import firebase from 'firebase'
+
 const config = {
   apiKey: "AIzaSyC0Xnd3J3pE5pz_mpEPu68hJsZegQ89d_o",
   authDomain: "belmont-runners-1548537264040.firebaseapp.com",
@@ -14,7 +19,14 @@ const config = {
 }
 firebase.initializeApp(config)
 
-ReactDOM.render(<App />, document.getElementById('root'))
+let store = configureStore()
+
+ReactDOM.render(
+  <Provider store={store}>
+    <ConnectedRouter history={history}>
+      <App />
+    </ConnectedRouter>
+  </Provider>, document.getElementById('root'))
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

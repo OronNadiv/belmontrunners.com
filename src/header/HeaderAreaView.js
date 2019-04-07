@@ -1,24 +1,16 @@
 import React, { Component } from 'react'
 import { Link, Route } from "react-router-dom"
-import firebase from 'firebase'
 import 'firebase/auth'
-import Signin from '../identity/Signin'
-import Signup from '../identity/Signup'
+import SignIn from '../identity/SignIn'
+import SignUp from '../identity/SignUp'
 import ForgotPassword from '../identity/ForgotPassword'
 import $ from 'jquery'
-import Avatar from 'react-avatar'
+import { connect } from 'react-redux'
+import PropTypes from 'prop-types'
+import { signOut as signOutAction } from '../identity/identityActions'
+import Profile from './Profile'
 
-class HeaderArea extends Component {
-  constructor () {
-    super()
-    this.state = {
-      user: firebase.auth().currentUser
-    }
-    firebase.auth().onAuthStateChanged((user) => {
-      this.setState({ user })
-    })
-  }
-
+class HeaderAreaView extends Component {
   componentDidMount () {
     const nav_offset_top = $('.header_area').height() + 50
     console.log('nav_offset_top:', nav_offset_top)
@@ -41,52 +33,8 @@ class HeaderArea extends Component {
   }
 
   render () {
-    // return (
-    //   <header className="header_area">
-    //     <div style={{
-    //       display: 'flex',
-    //       flexDirection: 'row-reverse',
-    //       margin: 30
-    //     }}>
-    //       <Route
-    //         exact
-    //         path={'/signin'}
-    //         render={() => <Signin />}
-    //       />
-    //       <Route
-    //         exact
-    //         path={'/signup'}
-    //         render={() => <Signup />}
-    //       />
-    //       <Route
-    //         exact
-    //         path={'/forgotpassword'}
-    //         render={() => <ForgotPassword />}
-    //       />
-    //       {
-    //         this.state.user ?
-    //           <div>
-    //             <a className='text-white-50' style={{ margin: '0 10px' }} href='#'
-    //                onClick={() => firebase.auth().signOut()}>
-    //               Sign out
-    //             </a>
-    //             <span style={{
-    //               margin: '0 10px',
-    //               color: 'white'
-    //             }}>Hello, {firebase.auth().currentUser.displayName}</span>
-    //           </div> :
-    //           <div>
-    //             <Link to="/signin" style={{ marginRight: 30 }} className='text-white'>
-    //               Sign in
-    //             </Link>
-    //             <Link to="/signup">
-    //               <button type="button" className="btn btn-light">Sign up</button>
-    //             </Link>
-    //           </div>
-    //       }
-    //     </div>
-    //   </header>
-    // )
+    const currentUser = this.props.currentUser
+    console.log('currentUser', currentUser)
     return (
       <header className="header_area">
         <div className="main_menu">
@@ -148,12 +96,12 @@ class HeaderArea extends Component {
                   <Route
                     exact
                     path={'/signin'}
-                    render={() => <Signin />}
+                    render={() => <SignIn />}
                   />
                   <Route
                     exact
                     path={'/signup'}
-                    render={() => <Signup />}
+                    render={() => <SignUp />}
                   />
                   <Route
                     exact
@@ -161,24 +109,13 @@ class HeaderArea extends Component {
                     render={() => <ForgotPassword />}
                   />
                   {
-                    this.state.user &&
+                    currentUser &&
                     <li className="nav-item">
-                      <a className='signout-btn text-white-50' href='#'
-                         onClick={() => firebase.auth().signOut()}>
-                        Sign out
-                      </a>
-                      <span style={{
-                        margin: '0 10px',
-                        color: 'white'
-                      }}>Hello, {this.state.user.displayName}</span>
-                        <span className="dropdown-toggle">
-                          <Avatar name={this.state.user.displayName} round color='#6247ea' size={40} />
-                          <span className="caret" />
-                        </span>
+                      <Profile />
                     </li>
                   }
                   {
-                    !this.state.user &&
+                    !currentUser &&
                     <li className="nav-item">
                       <Link to="/signin" style={{ marginRight: 30 }} className='signin-btn text-white'>
                         Sign in
@@ -186,7 +123,7 @@ class HeaderArea extends Component {
                     </li>
                   }
                   {
-                    !this.state.user &&
+                    !currentUser &&
                     <li className="nav-item">
                       <Link to="/signup">
                         <button type="button" className="btn btn-light">Sign up</button>
@@ -201,55 +138,21 @@ class HeaderArea extends Component {
         </div>
       </header>
     )
-    /*
-    return (
-      <div className="header_area">
-        <div className="main_menu">
-          <nav className="navbar navbar-expand-lg navbar-light">
-            <div className="container-fluid box_1620 m-4 d-flex flex-row-reverse">
-              <Route
-                exact
-                path={'/signin'}
-                render={() => <Signin />}
-              />
-              <Route
-                exact
-                path={'/signup'}
-                render={() => <Signup />}
-              />
-              <Route
-                exact
-                path={'/forgotpassword'}
-                render={() => <ForgotPassword />}
-              />
-              {
-                this.state.user ?
-                  <div>
-                    <a className='text-white-50' style={{ margin: '0 10px' }} href='#'
-                       onClick={() => firebase.auth().signOut()}>
-                      Sign out
-                    </a>
-                    <span style={{
-                      margin: '0 10px',
-                      color: 'white'
-                    }}>Hello, {this.state.user.displayName}</span>
-                  </div> :
-                  <div>
-                    <Link to="/signin" style={{ marginRight: 30 }} className='text-white'>
-                      Sign in
-                    </Link>
-                    <Link to="/signup">
-                      <button type="button" className="btn btn-light">Sign up</button>
-                    </Link>
-                  </div>
-              }
-            </div>
-          </nav>
-        </div>
-      </div>
-    )
-     */
   }
 }
 
-export default HeaderArea
+HeaderAreaView.propTypes = {
+  currentUser: PropTypes.object
+}
+
+const mapDispatchToProps = {
+  signOut: signOutAction
+}
+
+const mapStateToProps = (state) => {
+  return {
+    currentUser: state.currentUser.get('data')
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(HeaderAreaView)

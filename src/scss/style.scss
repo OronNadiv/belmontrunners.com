@@ -1,13 +1,3 @@
-/*----------------------------------------------------
-@File: Default Styles
-@Author: Rocky Ahmed
-@URL: http://wethemez.com
-Author E-mail: rockybd1995@gmail.com
-
-This file contains the styling for the actual theme, this
-is the file you need to edit to change the look of the
-theme.
----------------------------------------------------- */
 
 /*=====================================================================
 @Template Name: HostHub Construction 
@@ -37,7 +27,9 @@ Table of Content:
 16/ contact 
 17/ footer
 
-=====================================================================*/ 
+=====================================================================*/
+
+@import '~bootstrap/scss/bootstrap.scss';
 
 /*----------------------------------------------------*/
 @import "variables";
@@ -90,9 +82,4 @@ Table of Content:
 /*----------------------------------------------------*/
 @import "footer";
 /*---------------------------------------------------- */
-
-
-
-
-
 
