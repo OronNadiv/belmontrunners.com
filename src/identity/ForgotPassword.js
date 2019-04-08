@@ -51,9 +51,6 @@ class ForgotPasswordView extends Component {
       }
     } else if (!this.props.isSendingPasswordResetEmail && prevProps.isSendingPasswordResetEmail) {
       this.setState({ showSuccessMessage: true })
-      setTimeout(() => {
-        this.setState({ close: true })
-      }, 5000)
     }
   }
 
@@ -84,42 +81,44 @@ class ForgotPasswordView extends Component {
             </Link>
           </Modal.Header>
 
-          <Modal.Body className="modal-body mx-4">
+          {
+            this.state.showSuccessMessage ?
+              <Modal.Body className="modal-body mx-4">
+                <div className='text-success text-center'>
+                  {RESET_PASSWORD_EMAIL_SENT}
+                </div>
+              </Modal.Body>
+              :
+              <Modal.Body className="modal-body mx-4">
+                <div className="md-form mb-5">
+                  <TextField
+                    label="Your email"
+                    fullWidth
+                    margin="normal"
+                    variant="outlined"
+                    InputLabelProps={{
+                      shrink: true
+                    }}
+                    onChange={(event) => {
+                      this.setState({
+                        invalidEmailMessage: '',
+                        email: event.target.value
+                      })
+                    }}
+                    error={!!this.state.invalidEmailMessage}
+                    helperText={this.state.invalidEmailMessage}
+                  />
+                </div>
 
-            <div className="md-form mb-5">
-              <TextField
-                label="Your email"
-                fullWidth
-                margin="normal"
-                variant="outlined"
-                InputLabelProps={{
-                  shrink: true
-                }}
-                onChange={(event) => {
-                  this.setState({
-                    invalidEmailMessage: '',
-                    email: event.target.value
-                  })
-                }}
-                error={!!this.state.invalidEmailMessage}
-                helperText={this.state.invalidEmailMessage}
-              />
-            </div>
-
-            <div className="text-center mb-3">
-              {
-                !this.state.showSuccessMessage ?
+                <div className="text-center mb-3">
                   <Button type="button" className="btn blue-gradient btn-block btn-rounded z-depth-1a"
                           onClick={() => this.sendPasswordReset()}
                           disabled={this.props.isSendingPasswordResetEmail}>
                     Send password reset email
-                  </Button> :
-                  <div className='text-success text-center'>
-                    {RESET_PASSWORD_EMAIL_SENT}
-                  </div>
-              }
-            </div>
-          </Modal.Body>
+                  </Button>
+                </div>
+              </Modal.Body>
+          }
         </Modal.Dialog>
       </Modal>
     )
