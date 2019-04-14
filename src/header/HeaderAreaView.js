@@ -1,9 +1,6 @@
 import React, { Component } from 'react'
-import { Link, Route } from "react-router-dom"
+import { Link } from "react-router-dom"
 import 'firebase/auth'
-import SignIn from '../identity/SignIn'
-import SignUp from '../identity/SignUp'
-import ForgotPassword from '../identity/ForgotPassword'
 import $ from 'jquery'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
@@ -18,7 +15,7 @@ class HeaderAreaView extends Component {
     function navbarFixed () {
       if ($('.header_area').length) {
         $(window).scroll(function () {
-          var scroll = $(window).scrollTop()
+          const scroll = $(window).scrollTop()
           if (scroll >= nav_offset_top) {
             $(".header_area").addClass("navbar_fixed")
           } else {
@@ -40,8 +37,8 @@ class HeaderAreaView extends Component {
         <div className="main_menu">
           <nav className="navbar navbar-expand-lg navbar-light">
             <div className="container box_1620">
-              <a className="navbar-brand logo_h" href="index.html"><img src="img/logo.png" alt="" />
-              </a>
+              {/*<a className="navbar-brand logo_h" href="index.html"><img src="img/logo.png" alt="" />*/}
+              {/*</a>*/}
               <button className="navbar-toggler" type="button" data-toggle="collapse"
                       data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                       aria-expanded="false" aria-label="Toggle navigation">
@@ -51,15 +48,18 @@ class HeaderAreaView extends Component {
               </button>
               <div className="collapse navbar-collapse offset" id="navbarSupportedContent">
                 <ul className="nav navbar-nav menu_nav ml-auto">
-                  <li className="nav-item active"><a className="nav-link" href="index.html">Home</a></li>
-                  <li className="nav-item">
-                    <a className="nav-link" href="about-us.html">About</a>
-                  </li>
-                  <li className="nav-item"><a className="nav-link" href="speakers.html">Speakers</a>
-                  </li>
-                  <li className="nav-item submenu dropdown">
-                    <a href="#" className="nav-link dropdown-toggle" data-toggle="dropdown" role="button"
-                       aria-haspopup="true" aria-expanded="false">Pages</a>
+                  {/*<li className="nav-item active">*/}
+                    {/*<a className="nav-link" href="index.html">Home</a>*/}
+                  {/*</li>*/}
+                  {/*<li className="nav-item">*/}
+                    {/*<a className="nav-link" href="about-us.html">About</a>*/}
+                  {/*</li>*/}
+                  {/*<li className="nav-item">*/}
+                    {/*<a className="nav-link" href="speakers.html">Speakers</a>*/}
+                  {/*</li>*/}
+                  {/*<li className="nav-item submenu dropdown">*/}
+                    {/*<a href="#" className="nav-link dropdown-toggle" data-toggle="dropdown" role="button"*/}
+                    {/*   aria-haspopup="true" aria-expanded="false">Pages</a>*/}
                     {/*<ul className="dropdown-menu">*/}
                     {/*  <li className="nav-item">*/}
                     {/*    <a className="nav-link" href="schedule.html">Schedule</a>*/}
@@ -74,40 +74,26 @@ class HeaderAreaView extends Component {
                     {/*    </li>*/}
                     {/*  </li>*/}
                     {/*</ul>*/}
-                  </li>
-                  <li className="nav-item submenu dropdown">
-                    <a href="#" className="nav-link dropdown-toggle" data-toggle="dropdown" role="button"
-                       aria-haspopup="true" aria-expanded="false">Blog</a>
+                  {/*</li>*/}
+                  {/*<li className="nav-item submenu dropdown">*/}
+                    {/*<a href="#" className="nav-link dropdown-toggle" data-toggle="dropdown" role="button"*/}
+                    {/*   aria-haspopup="true" aria-expanded="false">Blog</a>*/}
                     {/*<ul className="dropdown-menu">*/}
                     {/*  <li className="nav-item"><a className="nav-link" href="blog.html">Blog</a></li>*/}
                     {/*  <li className="nav-item"><a className="nav-link" href="single-blog.html">Blog Details</a></li>*/}
                     {/*</ul>*/}
-                  </li>
-                  <li className="nav-item"><a className="nav-link" href="contact.html">Contact</a>
-                  </li>
+                  {/*</li>*/}
+                  {/*<li className="nav-item">*/}
+                    {/*<a className="nav-link" href="contact.html">Contact</a>*/}
+                  {/*</li>*/}
                 </ul>
-                <ul className="nav navbar-nav navbar-right">
+                <ul className="nav navbar-nav navbar-right mt-3 mb-3">
                   {/*<li className="nav-item"><a href="#" className="tickets_btn">Get Tickets</a></li>*/}
                   {/*<li className="nav-item">*/}
                   {/*  <a href="#" className="search">*/}
                   {/*    <i className="lnr lnr-magnifier" />*/}
                   {/*  </a>*/}
                   {/*</li>*/}
-                  <Route
-                    exact
-                    path={'/signin'}
-                    render={() => <SignIn />}
-                  />
-                  <Route
-                    exact
-                    path={'/signup'}
-                    render={() => <SignUp />}
-                  />
-                  <Route
-                    exact
-                    path={'/forgotpassword'}
-                    render={() => <ForgotPassword />}
-                  />
                   {
                     currentUser &&
                     <li className="nav-item">
@@ -117,8 +103,8 @@ class HeaderAreaView extends Component {
                   {
                     !currentUser &&
                     <li className="nav-item">
-                      <Link to="/signin" style={{ marginRight: 30 }} className='signin-btn text-white'>
-                        Sign in
+                      <Link to="/signin" className='signin-btn text-white'>
+                        <button type="button" className="btn btn-dark">Sign in</button>
                       </Link>
                     </li>
                   }
@@ -129,7 +115,6 @@ class HeaderAreaView extends Component {
                         <button type="button" className="btn btn-light">Sign up</button>
                       </Link>
                     </li>
-
                   }
                 </ul>
               </div>

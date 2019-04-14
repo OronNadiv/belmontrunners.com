@@ -1,17 +1,20 @@
 import React, { Component } from 'react'
-import Modal from 'react-bootstrap/Modal'
-import Button from 'react-bootstrap/Button'
-
 import firebase from 'firebase'
 import 'firebase/auth'
 import './Signin.scss'
-import { Link, Redirect } from 'react-router-dom'
-import PropTypes from 'prop-types'
-import { sendPasswordResetEmail as sendPasswordResetEmailAction } from './identityActions'
-import { connect } from 'react-redux'
-import TextField from '@material-ui/core/TextField'
+import { Redirect } from 'react-router-dom'
 import isEmail from 'isemail'
 import { INVALID_EMAIL, NO_USER_WITH_GIVEN_EMAIL, RESET_PASSWORD_EMAIL_SENT } from './messages'
+import Dialog from '@material-ui/core/Dialog'
+import DialogContent from '@material-ui/core/DialogContent'
+import DialogContentText from '@material-ui/core/DialogContentText'
+import DialogTitle from '@material-ui/core/DialogTitle'
+import TextField from '@material-ui/core/TextField'
+import DialogActions from '@material-ui/core/DialogActions'
+import Button from '@material-ui/core/Button'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { sendPasswordResetEmail as sendPasswordResetEmailAction } from './identityActions'
 
 class ForgotPasswordView extends Component {
   constructor (props) {
@@ -57,6 +60,7 @@ class ForgotPasswordView extends Component {
 
   render () {
     if (firebase.auth().currentUser || this.state.close) {
+      console.log('redirecting to root', this.state.close)
       return <Redirect
         to={{
           pathname: "/",
@@ -66,61 +70,62 @@ class ForgotPasswordView extends Component {
     }
 
     return (
-      <Modal show className="modal fade" role="dialog" onHide={() => this.setState({ close: true })}>
-        <Modal.Dialog className="modal-dialog form-elegant" role="document">
-          <Modal.Header className="modal-header text-center">
-            <h3 className="modal-title w-100 dark-grey-text font-weight-bold my-3" id="myModalLabel">
-              <strong>
-                Forgot Password
-              </strong>
-            </h3>
-            <Link to="/">
-              <Button type="button" className="close" data-dismiss="modal" aria-label="Close">
-                &times;
-              </Button>
-            </Link>
-          </Modal.Header>
+      <Dialog
+        open
+        fullWidth
+        maxWidth='xs'
+        onClose={() => this.setState({ close: true })}
+        aria-labelledby="form-dialog-title"
+      >
+        <DialogTitle>
+          Forgot Password
+        </DialogTitle>
 
+        <DialogContent>
           {
             this.state.showSuccessMessage ?
-              <Modal.Body className="modal-body mx-4">
+
+              <DialogContentText>
                 <div className='text-success text-center'>
                   {RESET_PASSWORD_EMAIL_SENT}
                 </div>
-              </Modal.Body>
-              :
-              <Modal.Body className="modal-body mx-4">
-                <div className="md-form mb-5">
-                  <TextField
-                    label="Your email"
-                    fullWidth
-                    margin="normal"
-                    variant="outlined"
-                    InputLabelProps={{
-                      shrink: true
-                    }}
-                    onChange={(event) => {
-                      this.setState({
-                        invalidEmailMessage: '',
-                        email: event.target.value
-                      })
-                    }}
-                    error={!!this.state.invalidEmailMessage}
-                    helperText={this.state.invalidEmailMessage}
-                  />
-                </div>
+              </DialogContentText> :
 
-                <div className="text-center mb-3">
-                  <Button type="button" className="btn blue-gradient btn-block btn-rounded z-depth-1a"
-                          onClick={() => this.sendPasswordReset()}
-                          disabled={this.props.isSendingPasswordResetEmail}>
-                    Send password reset email
-                  </Button>
-                </div>
-              </Modal.Body>
+              <TextField
+                label="Your email"
+                margin="normal"
+                fullWidth
+                onChange={(event) => {
+                  this.setState({
+                    invalidEmailMessage: '',
+                    email: event.target.value
+                  })
+                }}
+                error={!!this.state.invalidEmailMessage}
+                helperText={this.state.invalidEmailMessage}
+              />
           }
-        </Modal.Dialog>
-      </Modal>
+        </DialogContent>
+        {
+          this.state.showSuccessMessage ?
+            <DialogActions>
+              <Button onClick={() => this.setState({ close: true })} color="primary">
+                Close
+              </Button>
+            </DialogActions>
+            :
+            <DialogActions>
+              <Button onClick={() => this.setState({ close: true })}>
+                Cancel
+              </Button>
+              <Button type="button" color="primary"
+                      onClick={() => this.sendPasswordReset()}
+                      disabled={this.props.isSendingPasswordResetEmail}>
+                Send password reset email
+              </Button>
+            </DialogActions>
+        }
+      </Dialog>
     )
   }
 }

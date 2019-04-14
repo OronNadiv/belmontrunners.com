@@ -1,6 +1,4 @@
 import React, { Component } from 'react'
-import Modal from 'react-bootstrap/Modal'
-import Button from 'react-bootstrap/Button'
 import PropTypes from 'prop-types'
 import isEmail from 'isemail'
 import './Signin.scss'
@@ -8,7 +6,19 @@ import { Link, Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { signIn as signInAction } from './identityActions'
 import TextField from '@material-ui/core/TextField'
-import { INVALID_EMAIL, INVALID_EMAIL_OR_PASSWORD, INVALID_PASSWORD_LENGTH, MISSING_PASSWORD } from './messages'
+import {
+  INVALID_EMAIL,
+  INVALID_EMAIL_OR_PASSWORD,
+  INVALID_PASSWORD_LENGTH,
+  MISSING_PASSWORD,
+  POPUP_CLOSED_BEFORE_COMPLETION
+} from './messages'
+import Dialog from '@material-ui/core/Dialog'
+import DialogTitle from '@material-ui/core/DialogTitle'
+import DialogContent from '@material-ui/core/DialogContent'
+import DialogActions from '@material-ui/core/DialogActions'
+import Button from '@material-ui/core/Button'
+import 'firebase/auth'
 
 class SignInView extends Component {
 
@@ -21,7 +31,7 @@ class SignInView extends Component {
     }
   }
 
-  handleSignIn () {
+  handleSignInWithEmail () {
     this.setState({ generalErrorMessage: '' })
 
     const { email, password } = this.state
@@ -34,11 +44,15 @@ class SignInView extends Component {
       this.setState({ invalidPasswordMessage: MISSING_PASSWORD })
       return
     }
-    if (password.length < 4) {
-      this.setState({ invalidPasswordMessage: INVALID_PASSWORD_LENGTH })
+    if (password.length < 6) {
+      this.setState({ invalidPasswordMessage: INVALID_PASSWORD_LENGTH(6) })
       return
     }
-    this.props.signIn(email, password)
+    this.props.signIn('email', { email, password })
+  }
+
+  handleSignInWithProvider (providerName) {
+    this.props.signIn(providerName)
   }
 
   componentDidUpdate (prevProps) {
@@ -51,6 +65,9 @@ class SignInView extends Component {
         case 'auth/user-not-found':
         case 'auth/wrong-password':
           this.setState({ generalErrorMessage: INVALID_EMAIL_OR_PASSWORD })
+          break
+        case 'auth/popup-closed-by-user':
+          this.setState({ generalErrorMessage: POPUP_CLOSED_BEFORE_COMPLETION })
           break
         default:
           console.log('signInError', 'code:', code, 'message:', message)
@@ -72,89 +89,89 @@ class SignInView extends Component {
     }
 
     return (
-      <Modal show className="modal fade" role="dialog" onHide={() => this.setState({ close: true })}>
-        <Modal.Dialog className="modal-dialog form-elegant" role="document">
-          <Modal.Header className="modal-header text-center">
-            <h3 className="modal-title w-100 dark-grey-text font-weight-bold my-3" id="myModalLabel">
-              <strong>
-                Sign In
-              </strong>
-            </h3>
-            <Link to="/">
-              <Button type="button" className="close" data-dismiss="modal" aria-label="Close"
-                      onClick={() => this.setState({ close: true })}>
-                &times;
-              </Button>
-            </Link>
-          </Modal.Header>
+      <Dialog
+        open
+        fullWidth
+        maxWidth='xs'
+        onClose={() => this.setState({ close: true })}
+        aria-labelledby="form-dialog-title"
+      >
+        <DialogTitle>
+          Sign In
+        </DialogTitle>
 
-          <Modal.Body className="modal-body mx-4">
+        <DialogContent>
+          <div className="btn btn-block btn-social btn-twitter"
+               onClick={() => this.handleSignInWithProvider('facebook')}>
+            <span className="fab fa-facebook" /> Sign in with Facebook
+          </div>
+          <div className="btn btn-block btn-social btn-google"
+               onClick={() => this.handleSignInWithProvider('google')}>
+            <span className="fab fa-google" /> Sign in with Google
+          </div>
 
-            <div className="mb-3">
-              <TextField
-                label="Your email"
-                fullWidth
-                margin="normal"
-                variant="outlined"
-                InputLabelProps={{
-                  shrink: true
-                }}
-                onChange={(event) => {
-                  this.setState({
-                    invalidEmailMessage: '',
-                    email: event.target.value
-                  })
-                }}
-                error={!!this.state.invalidEmailMessage}
-                helperText={this.state.invalidEmailMessage}
-              />
-            </div>
+          <div className="mt-4 text-center text-dark">Or sign in with email</div>
 
-            <div className="mb-3">
-              <TextField
-                label="Your password"
-                fullWidth
-                margin="normal"
-                variant="outlined"
-                InputLabelProps={{
-                  shrink: true
-                }}
-                type="password"
-                onChange={(event) => {
-                  this.setState({
-                    invalidPasswordMessage: '',
-                    password: event.target.value
-                  })
-                }}
-                onKeyPress={(ev) => {
-                  console.log(`Pressed keyCode ${ev.key}`)
-                  if (ev.key === 'Enter') {
-                    // Do code here
-                    ev.preventDefault()
-                    this.handleSignIn()
-                  }
-                }}
-                error={!!this.state.invalidPasswordMessage}
-                helperText={this.state.invalidPasswordMessage}
-              />
-            </div>
+          {
+            this.state.generalErrorMessage &&
+            <div className="mt-2 text-danger text-center">{this.state.generalErrorMessage}</div>
+          }
 
-            <div className="text-center mb-3">
-              <Button type="button" className="btn blue-gradient btn-block btn-rounded z-depth-1a"
-                      onClick={() => this.handleSignIn()}>Sign in</Button>
-            </div>
-            <div className="text-danger text-center">{this.state.generalErrorMessage}</div>
-          </Modal.Body>
-          <Modal.Footer className="modal-footer mx-5 pt-3 mb-1">
-            <p className="font-small grey-text d-flex justify-content-end">Not a member?&nbsp;
-              <Link to="/signup">Sign Up</Link>
-            </p>
-            <p className="font-small blue-text d-flex justify-content-end">
-              Forgot&nbsp;<Link className="blue-text ml-1" to="/forgotpassword">Password?</Link>
-            </p>
-          </Modal.Footer>
-        </Modal.Dialog>
-      </Modal>
+          <TextField
+            label="Your email"
+            margin="normal"
+            type='search'
+            fullWidth
+            onChange={(event) => {
+              this.setState({
+                invalidEmailMessage: '',
+                email: event.target.value
+              })
+            }}
+            error={!!this.state.invalidEmailMessage}
+            helperText={this.state.invalidEmailMessage}
+          />
+          <TextField
+            label="Your password"
+            type="password"
+            margin="normal"
+            fullWidth
+            onChange={(event) => {
+              this.setState({
+                invalidPasswordMessage: '',
+                password: event.target.value
+              })
+            }}
+            error={!!this.state.invalidPasswordMessage}
+            helperText={this.state.invalidPasswordMessage}
+            onKeyPress={(ev) => {
+              console.log(`Pressed keyCode ${ev.key}`)
+              if (ev.key === 'Enter') {
+                // Do code here
+                ev.preventDefault()
+                this.handleSignInWithEmail()
+              }
+            }}
+          />
+
+          <p className="font-small blue-text d-flex justify-content-end">
+            Forgot&nbsp;<Link className="blue-text ml-1" to="/forgotpassword">Password?</Link>
+          </p>
+
+        </DialogContent>
+
+        <DialogActions>
+          <Button onClick={() => this.setState({ close: true })}>
+            Cancel
+          </Button>
+          <Button type="button" color="primary"
+                  onClick={() => this.handleSignInWithEmail()}
+                  disabled={this.props.isSendingPasswordResetEmail}>
+            Sign in
+          </Button>
+
+        </DialogActions>
+      </Dialog>
     )
   }
 }

@@ -1,34 +1,35 @@
 import React, { Component } from 'react'
-import Modal from 'react-bootstrap/Modal'
-import Button from 'react-bootstrap/Button'
 
 import './Signup.scss'
-import { Link, Redirect } from 'react-router-dom'
+import { Redirect } from 'react-router-dom'
 import TextField from '@material-ui/core/TextField'
 import PropTypes from 'prop-types'
-import { signUp as signUpAction } from './identityActions'
+import { signIn as signInAction, signUp as signUpAction } from './identityActions'
 import { connect } from 'react-redux'
 import isEmail from 'isemail'
 import {
   EMAIL_ADDRESS_ALREADY_TAKEN,
   INVALID_EMAIL,
-  INVALID_FIRST_NAME,
-  INVALID_LAST_NAME,
+  INVALID_FULL_NAME,
   INVALID_PASSWORD_LENGTH,
-  MISSING_PASSWORD
+  MISSING_PASSWORD,
+  POPUP_CLOSED_BEFORE_COMPLETION
 } from './messages'
+import Dialog from '@material-ui/core/Dialog'
+import DialogTitle from '@material-ui/core/DialogTitle'
+import DialogContent from '@material-ui/core/DialogContent'
+import DialogActions from '@material-ui/core/DialogActions'
+import Button from '@material-ui/core/Button'
 
 class SignUpView extends Component {
   constructor (props) {
     super(props)
     console.log('Signup contor called')
     this.state = {
-      firstName: '',
-      lastName: '',
+      fullName: '',
       email: '',
       password: '',
-      invalidFirstNameMessage: '',
-      invalidLastNameMessage: '',
+      invalidFullNameMessage: '',
       invalidEmailMessage: '',
       invalidPasswordMessage: '',
       generalErrorMessage: ''
@@ -37,14 +38,10 @@ class SignUpView extends Component {
 
   handleSignUp () {
     this.setState({ generalErrorMessage: '' })
-    const { firstName, lastName, email, password } = this.state
+    const { fullName, email, password } = this.state
 
-    if (!firstName) {
-      this.setState({ invalidFirstNameMessage: INVALID_FIRST_NAME })
-      return
-    }
-    if (!lastName) {
-      this.setState({ invalidLastNameMessage: INVALID_LAST_NAME })
+    if (!fullName) {
+      this.setState({ invalidFullNameMessage: INVALID_FULL_NAME })
       return
     }
     if (!email || !isEmail.validate(email)) {
@@ -55,11 +52,15 @@ class SignUpView extends Component {
       this.setState({ invalidPasswordMessage: MISSING_PASSWORD })
       return
     }
-    if (password.length < 4) {
-      this.setState({ invalidPasswordMessage: INVALID_PASSWORD_LENGTH })
+    if (password.length < 6) {
+      this.setState({ invalidPasswordMessage: INVALID_PASSWORD_LENGTH(6) })
       return
     }
-    this.props.signUp(firstName, lastName, email, password)
+    this.props.signUp(fullName, email, password)
+  }
+
+  handleSignIn (providerName) {
+    this.props.signIn(providerName)
   }
 
   componentDidUpdate (prevProps) {
@@ -71,6 +72,10 @@ class SignUpView extends Component {
           break
         case 'auth/email-already-in-use':
           this.setState({ invalidEmailMessage: EMAIL_ADDRESS_ALREADY_TAKEN })
+          break
+        case 'auth/popup-closed-by-user':
+          this.setState({ generalErrorMessage: POPUP_CLOSED_BEFORE_COMPLETION })
+          break
         default:
           console.log('signUpError', 'code:', code, 'message:', message)
           this.setState({ generalErrorMessage: message })
@@ -90,129 +95,113 @@ class SignUpView extends Component {
     }
 
     return (
-      <Modal show className="modal fade" role="dialog" onHide={() => this.setState({ close: true })}>
-        <Modal.Dialog className="modal-dialog form-elegant" role="document">
-          <Modal.Header className="modal-header text-center">
-            <h3 className="modal-title w-100 dark-grey-text font-weight-bold my-3" id="myModalLabel">
-              <strong>Sign Up</strong>
-            </h3>
-            <Link to="/">
-              <Button type="button" className="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </Button>
-            </Link>
-          </Modal.Header>
 
-          <Modal.Body className="modal-body mx-4">
+      <Dialog
+        open
+        fullWidth
+        maxWidth='xs'
+        onClose={() => this.setState({ close: true })}
+        aria-labelledby="form-dialog-title"
+      >
+        <DialogTitle>
+          Sign Up
+        </DialogTitle>
 
-            <div className="mb-2">
-              <TextField
-                label="Your first name"
-                fullWidth
-                margin="normal"
-                variant="outlined"
-                InputLabelProps={{
-                  shrink: true
-                }}
-                onChange={(event) => {
-                  this.setState({
-                    invalidFirstNameMessage: '',
-                    firstName: event.target.value
-                  })
-                }}
-                error={!!this.state.invalidFirstNameMessage}
-                helperText={this.state.invalidFirstNameMessage}
-              />
-            </div>
+        <DialogContent>
 
-            <div className="mb-2">
-              <TextField
-                label="Your last name"
-                fullWidth
-                margin="normal"
-                variant="outlined"
-                InputLabelProps={{
-                  shrink: true
-                }}
-                onChange={(event) => {
-                  this.setState({
-                    invalidLastNameMessage: '',
-                    lastName: event.target.value
-                  })
-                }}
-                error={!!this.state.invalidLastNameMessage}
-                helperText={this.state.invalidLastNameMessage}
-              />
-            </div>
+          <div className="btn btn-block btn-social btn-twitter"
+               onClick={() => this.handleSignIn('facebook')}>
+            <span className="fab fa-facebook" /> Connect with Facebook
+          </div>
+          <div className="btn btn-block btn-social btn-google"
+               onClick={() => this.handleSignIn('google')}>
+            <span className="fab fa-google" /> Connect with Google
+          </div>
 
-            <div className="mb-2">
-              <TextField
-                label="Your email"
-                fullWidth
-                margin="normal"
-                variant="outlined"
-                InputLabelProps={{
-                  shrink: true
-                }}
-                onChange={(event) => {
-                  this.setState({
-                    invalidEmailMessage: '',
-                    email: event.target.value
-                  })
-                }}
-                error={!!this.state.invalidEmailMessage}
-                helperText={this.state.invalidEmailMessage}
-              />
-            </div>
+          <div className="mt-4 text-center text-dark">Or sign up with email</div>
 
-            <div className="pb-3">
-              <TextField
-                label="Your password"
-                fullWidth
-                margin="normal"
-                variant="outlined"
-                InputLabelProps={{
-                  shrink: true
-                }}
-                type="password"
-                onChange={(event) => {
+          {
+            this.state.generalErrorMessage &&
+            <div className="mt-2 text-danger text-center">{this.state.generalErrorMessage}</div>
+          }
 
-                  this.setState({
-                    invalidPasswordMessage: '',
-                    password: event.target.value
-                  })
-                }}
-                error={!!this.state.invalidPasswordMessage}
-                helperText={this.state.invalidPasswordMessage}
-              />
-            </div>
+          <TextField
+            label="Your email"
+            type='email'
+            fullWidth
+            margin="normal"
+            onChange={(event) => {
+              this.setState({
+                invalidEmailMessage: '',
+                email: event.target.value
+              })
+            }}
+            error={!!this.state.invalidEmailMessage}
+            helperText={this.state.invalidEmailMessage}
+          />
 
-            <div className="text-center mb-3">
-              <Button type="button" className="btn blue-gradient btn-block btn-rounded z-depth-1a"
-                      onClick={() => this.handleSignUp()}>Sign up</Button>
-              <div className="text-danger text-center">{this.state.generalErrorMessage}</div>
-            </div>
+          <TextField
+            label="Your full name"
+            margin="normal"
+            fullWidth
+            onChange={(event) => {
+              this.setState({
+                invalidFullNameMessage: '',
+                fullName: event.target.value
+              })
+            }}
+            error={!!this.state.invalidFullNameMessage}
+            helperText={this.state.invalidFullNameMessage}
+          />
 
-          </Modal.Body>
-          <Modal.Footer className="modal-footer mx-5 pt-3 mb-1">
-            <p className="font-small grey-text d-flex justify-content-end">
-              Already a member?&nbsp;
-              <Link to="/signin">Sign in</Link>
-            </p>
-          </Modal.Footer>
-        </Modal.Dialog>
-      </Modal>
+          <TextField
+            label="Your password"
+            type="password"
+            margin="normal"
+            fullWidth
+            onChange={(event) => {
+              this.setState({
+                invalidPasswordMessage: '',
+                password: event.target.value
+              })
+            }}
+            error={!!this.state.invalidPasswordMessage}
+            helperText={this.state.invalidPasswordMessage}
+            onKeyPress={(ev) => {
+              console.log(`Pressed keyCode ${ev.key}`)
+              if (ev.key === 'Enter') {
+                // Do code here
+                ev.preventDefault()
+                this.handleSignUp()
+              }
+            }}
+          />
+
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => this.setState({ close: true })}>
+            Cancel
+          </Button>
+          <Button type="button" color="primary"
+                  onClick={() => this.handleSignUp()}
+                  disabled={this.props.isSendingPasswordResetEmail}>
+            Sign up
+          </Button>
+        </DialogActions>
+      </Dialog>
     )
   }
 }
 
 SignUpView.propTypes = {
   signUp: PropTypes.func.isRequired,
+  signInWithProvider: PropTypes.func.isRequired,
   signUpError: PropTypes.object
 }
 
 const mapDispatchToProps = {
-  signUp: signUpAction
+  signUp: signUpAction,
+  signIn: signInAction
 }
 
 const mapStateToProps = (state) => {
