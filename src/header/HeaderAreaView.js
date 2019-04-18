@@ -4,7 +4,7 @@ import 'firebase/auth'
 import $ from 'jquery'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { signOut as signOutAction } from '../identity/identityActions'
+import { signIn as signInAction, signOut as signOutAction } from '../identity/identityActions'
 import Profile from './Profile'
 import Button from '@material-ui/core/Button'
 
@@ -38,8 +38,8 @@ class HeaderAreaView extends Component {
         <div className="main_menu">
           <nav className="navbar navbar-expand-lg navbar-light">
             <div className="container box_1620">
-              {/*<a className="navbar-brand logo_h" href="index.html"><img src="img/logo.png" alt="" />*/}
-              {/*</a>*/}
+              <a className="navbar-brand logo_h" href="index.html"><img src="img/logo.png" alt="" />
+              </a>
               <button className="navbar-toggler" type="button" data-toggle="collapse"
                       data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                       aria-expanded="false" aria-label="Toggle navigation">
@@ -49,15 +49,28 @@ class HeaderAreaView extends Component {
               </button>
               <div className="collapse navbar-collapse offset" id="navbarSupportedContent">
                 <ul className="nav navbar-nav menu_nav ml-auto">
-                  {/*<li className="nav-item active">*/}
-                  {/*<a className="nav-link" href="index.html">Home</a>*/}
-                  {/*</li>*/}
-                  {/*<li className="nav-item">*/}
-                  {/*<a className="nav-link" href="about-us.html">About</a>*/}
-                  {/*</li>*/}
-                  {/*<li className="nav-item">*/}
-                  {/*<a className="nav-link" href="speakers.html">Speakers</a>*/}
-                  {/*</li>*/}
+                  <li className="nav-item active">
+                    <a className="nav-link" href="/">Home</a>
+                  </li>
+                  <li className="nav-item">
+                    <a className="nav-link" href="about-us.html">Members</a>
+                  </li>
+                  <li className="nav-item">
+                    {
+                      currentUser &&
+                      <a className='nav-link sign-out-link' href='#' rel="noopener noreferrer"
+                         onClick={() => this.props.signOut()}>
+                        Sign out
+                      </a>
+                    }
+                    {
+                      !currentUser &&
+                      <a className='nav-link sign-in-link' href='#' rel="noopener noreferrer"
+                         onClick={() => this.props.signIn()}>
+                        Sign in
+                      </a>
+                    }
+                  </li>
                   {/*<li className="nav-item submenu dropdown">*/}
                   {/*<a href="#" className="nav-link dropdown-toggle" data-toggle="dropdown" role="button"*/}
                   {/*   aria-haspopup="true" aria-expanded="false">Pages</a>*/}
@@ -132,10 +145,13 @@ class HeaderAreaView extends Component {
 }
 
 HeaderAreaView.propTypes = {
-  currentUser: PropTypes.object
+  currentUser: PropTypes.object,
+  signIn: PropTypes.func.isRequired,
+  signOut: PropTypes.func.isRequired
 }
 
 const mapDispatchToProps = {
+  signIn: signInAction,
   signOut: signOutAction
 }
 

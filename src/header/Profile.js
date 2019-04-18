@@ -29,7 +29,8 @@ class ProfileView extends Component {
 
 
 ProfileView.propTypes = {
-  currentUser: PropTypes.object
+  currentUser: PropTypes.object,
+  signOut: PropTypes.func.isRequired
 }
 
 const mapDispatchToProps = {
