@@ -8,6 +8,8 @@ import { ConnectedRouter } from 'connected-react-router'
 
 import * as serviceWorker from './serviceWorker'
 import firebase from 'firebase'
+import theme from './MuiTheme'
+import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider'
 
 const config = {
   apiKey: "AIzaSyC0Xnd3J3pE5pz_mpEPu68hJsZegQ89d_o",
@@ -24,7 +26,9 @@ let store = configureStore()
 ReactDOM.render(
   <Provider store={store}>
     <ConnectedRouter history={history}>
-      <App />
+      <MuiThemeProvider theme={theme}>
+        <App />
+      </MuiThemeProvider>
     </ConnectedRouter>
   </Provider>, document.getElementById('root'))
 

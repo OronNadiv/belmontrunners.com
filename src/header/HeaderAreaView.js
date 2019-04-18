@@ -6,6 +6,7 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { signOut as signOutAction } from '../identity/identityActions'
 import Profile from './Profile'
+import Button from '@material-ui/core/Button'
 
 class HeaderAreaView extends Component {
   componentDidMount () {
@@ -49,42 +50,42 @@ class HeaderAreaView extends Component {
               <div className="collapse navbar-collapse offset" id="navbarSupportedContent">
                 <ul className="nav navbar-nav menu_nav ml-auto">
                   {/*<li className="nav-item active">*/}
-                    {/*<a className="nav-link" href="index.html">Home</a>*/}
+                  {/*<a className="nav-link" href="index.html">Home</a>*/}
                   {/*</li>*/}
                   {/*<li className="nav-item">*/}
-                    {/*<a className="nav-link" href="about-us.html">About</a>*/}
+                  {/*<a className="nav-link" href="about-us.html">About</a>*/}
                   {/*</li>*/}
                   {/*<li className="nav-item">*/}
-                    {/*<a className="nav-link" href="speakers.html">Speakers</a>*/}
+                  {/*<a className="nav-link" href="speakers.html">Speakers</a>*/}
                   {/*</li>*/}
                   {/*<li className="nav-item submenu dropdown">*/}
-                    {/*<a href="#" className="nav-link dropdown-toggle" data-toggle="dropdown" role="button"*/}
-                    {/*   aria-haspopup="true" aria-expanded="false">Pages</a>*/}
-                    {/*<ul className="dropdown-menu">*/}
-                    {/*  <li className="nav-item">*/}
-                    {/*    <a className="nav-link" href="schedule.html">Schedule</a>*/}
-                    {/*    <li className="nav-item">*/}
-                    {/*      <a className="nav-link" href="venue.html">Venue</a>*/}
-                    {/*      <li className="nav-item">*/}
-                    {/*        <a className="nav-link" href="price.html">Pricing</a>*/}
-                    {/*        <li className="nav-item">*/}
-                    {/*          <a className="nav-link" href="elements.html">Elements</a>*/}
-                    {/*        </li>*/}
-                    {/*      </li>*/}
-                    {/*    </li>*/}
-                    {/*  </li>*/}
-                    {/*</ul>*/}
+                  {/*<a href="#" className="nav-link dropdown-toggle" data-toggle="dropdown" role="button"*/}
+                  {/*   aria-haspopup="true" aria-expanded="false">Pages</a>*/}
+                  {/*<ul className="dropdown-menu">*/}
+                  {/*  <li className="nav-item">*/}
+                  {/*    <a className="nav-link" href="schedule.html">Schedule</a>*/}
+                  {/*    <li className="nav-item">*/}
+                  {/*      <a className="nav-link" href="venue.html">Venue</a>*/}
+                  {/*      <li className="nav-item">*/}
+                  {/*        <a className="nav-link" href="price.html">Pricing</a>*/}
+                  {/*        <li className="nav-item">*/}
+                  {/*          <a className="nav-link" href="elements.html">Elements</a>*/}
+                  {/*        </li>*/}
+                  {/*      </li>*/}
+                  {/*    </li>*/}
+                  {/*  </li>*/}
+                  {/*</ul>*/}
                   {/*</li>*/}
                   {/*<li className="nav-item submenu dropdown">*/}
-                    {/*<a href="#" className="nav-link dropdown-toggle" data-toggle="dropdown" role="button"*/}
-                    {/*   aria-haspopup="true" aria-expanded="false">Blog</a>*/}
-                    {/*<ul className="dropdown-menu">*/}
-                    {/*  <li className="nav-item"><a className="nav-link" href="blog.html">Blog</a></li>*/}
-                    {/*  <li className="nav-item"><a className="nav-link" href="single-blog.html">Blog Details</a></li>*/}
-                    {/*</ul>*/}
+                  {/*<a href="#" className="nav-link dropdown-toggle" data-toggle="dropdown" role="button"*/}
+                  {/*   aria-haspopup="true" aria-expanded="false">Blog</a>*/}
+                  {/*<ul className="dropdown-menu">*/}
+                  {/*  <li className="nav-item"><a className="nav-link" href="blog.html">Blog</a></li>*/}
+                  {/*  <li className="nav-item"><a className="nav-link" href="single-blog.html">Blog Details</a></li>*/}
+                  {/*</ul>*/}
                   {/*</li>*/}
                   {/*<li className="nav-item">*/}
-                    {/*<a className="nav-link" href="contact.html">Contact</a>*/}
+                  {/*<a className="nav-link" href="contact.html">Contact</a>*/}
                   {/*</li>*/}
                 </ul>
                 <ul className="nav navbar-nav navbar-right mt-3 mb-3">
@@ -104,7 +105,9 @@ class HeaderAreaView extends Component {
                     !currentUser &&
                     <li className="nav-item">
                       <Link to="/signin" className='signin-btn text-white'>
-                        <button type="button" className="btn btn-dark">Sign in</button>
+                        <Button className='text-white'>
+                          Log in
+                        </Button>
                       </Link>
                     </li>
                   }
@@ -112,7 +115,9 @@ class HeaderAreaView extends Component {
                     !currentUser &&
                     <li className="nav-item">
                       <Link to="/signup">
-                        <button type="button" className="btn btn-light">Sign up</button>
+                        <Button variant="contained" color="primary">
+                          Sign up
+                        </Button>
                       </Link>
                     </li>
                   }

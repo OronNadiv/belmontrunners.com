@@ -49,18 +49,9 @@ export const signIn = (providerName, params) => {
 
 
     }
-    Promise.all([
-      publicIp.v4(),
-      promise
-    ])
-      .spread((ip, { user: { uid } }) => {
-        console.log('signed in', uid)
-        const docRef = firebase.firestore().doc(`users/${uid}/visits/${moment.utc().format()}`)
-        return docRef.set({
-          ip,
-          signInMethod: providerName
-        })
-      })
+
+    promise
+      .then(({ user }) => updateUserVisit(providerName)(user))
       .then(() => {
         dispatch({
           type: SIGN_IN_SUCCEEDED
@@ -75,21 +66,47 @@ export const signIn = (providerName, params) => {
       })
   }
 }
+
+const updateUserVisit = (signInMethod) => {
+  return (user) => {
+    console.log('updateUserVisit: user:', user)
+    const { uid, email, displayName, photoURL } = user
+    console.log('uid:', uid, 'email:', email, 'displayName:', displayName, 'photoURL:', photoURL)
+    return publicIp.v4()
+      .then(ip => {
+        const currentVisit = firebase.firestore().doc(`users/${uid}/visits/${moment.utc().format()}`)
+        const currentUser = firebase.firestore().doc(`users/${uid}`)
+        return Promise.all([
+          currentVisit.set({
+            ip,
+            signInMethod
+          }),
+          currentUser.set({
+            email,
+            displayName,
+            photoURL
+          })
+        ])
+      })
+  }
+}
+
 export const signUp = (fullName, email, password) => {
   return (dispatch) => {
     dispatch({
       type: SIGN_UP_START
     })
 
-    firebase.auth().createUserWithEmailAndPassword(email, password)
-      .then(() => {
-        console.log('calling updateProfile')
+    Promise.resolve(firebase.auth().createUserWithEmailAndPassword(email, password))
+      .tap((user) => {
+        console.log('calling updateProfile', user)
         const displayName = s.words(fullName).map((w) => s.capitalize(w)).join(" ")
         console.log('displayName:', displayName)
         return firebase.auth().currentUser.updateProfile({
           displayName
         })
       })
+      .then(({ user }) => updateUserVisit('email')(user))
       .then(() => {
         dispatch({
           type: SIGN_UP_SUCCEEDED
