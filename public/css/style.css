@@ -3694,6 +3694,10 @@ h6 {
   text-transform: uppercase;
 }
 
+.event_schedule_inner .tab-pane .media .media-body .special-event {
+  color: #fb4848;
+}
+
 .event_schedule_inner .tab-pane .media .media-body p {
   margin-bottom: 0px;
 }

@@ -50,7 +50,10 @@ class EventSchedule extends Component {
                             </div>
                             <div className="media-body">
                               <h5>{event.moment.format('MMMM D h:mm a')}</h5>
-                              <h4>{event.moment.format("dddd")} {event.subject}</h4>
+                              <h4
+                                className={event['is-special-event'] === 'TRUE' ? 'special-event' : undefined}>
+                                {event.moment.format("dddd")} {event.subject}
+                              </h4>
                               <p>What: {event.what}</p>
                               <p>Where: {event.where}</p>
                               {
