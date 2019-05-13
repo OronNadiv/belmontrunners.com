@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { shuffle } from './Random'
+import { shuffle } from '../unitities/random'
 
 class Team extends Component {
   getTeam () {
