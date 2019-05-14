@@ -55,9 +55,9 @@ class HeaderAreaView extends Component {
                   {
                     // TODO: uncomment
                     // currentUser && currentUser.permissions && currentUser.permissions.usersList &&
-                    <li className="nav-item">
-                      <a className="nav-link" href="/members">Members</a>
-                    </li>
+                    // <li className="nav-item">
+                    // <a className="nav-link" href="/members">Members</a>
+                    // </li>
                   }
                   <li className="nav-item">
                     {
