@@ -11,8 +11,8 @@ import StepLabel from '@material-ui/core/StepLabel'
 
 import SignUpStepAuth from './SignUpStepAuth'
 import SignUpStepTerms from './SignUpStepTerms'
+import SignUpStepPayment from '../payment/SignUpStepPayment'
 import StepContent from '@material-ui/core/StepContent'
-import Button from '@material-ui/core/Button'
 
 class SignUpStepper extends Component {
   constructor (props) {
@@ -48,13 +48,21 @@ class SignUpStepper extends Component {
 
     return (
       <Stepper activeStep={this.state.activeStep} orientation="vertical">
+        <Step key={2}>
+          <StepLabel>
+            <div>"Payment"</div>
+          </StepLabel>
+          <StepContent>
+            <SignUpStepPayment isFirst />
+          </StepContent>
+        </Step>
+
         <Step key={1}>
           <StepLabel>
             {SignUpStepAuth.getLabel()}
           </StepLabel>
           <StepContent>
             <SignUpStepAuth />
-            {this.getButtons()}
           </StepContent>
         </Step>
 
@@ -63,8 +71,7 @@ class SignUpStepper extends Component {
             {SignUpStepTerms.getLabel()}
           </StepLabel>
           <StepContent>
-            <SignUpStepTerms />
-            {this.getButtons()}
+            <SignUpStepTerms isLast />
           </StepContent>
         </Step>
 
@@ -73,41 +80,12 @@ class SignUpStepper extends Component {
     )
   }
 
-  getButtons () {
-    return <div>
-      <div>
-        <Button
-          disabled={this.state.activeStep === 0}
-          onClick={this.handleBack}
-        >
-          Back
-        </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={this.handleNext}
-        >
-          {this.state.activeStep === 2 ? 'Finish' : 'Next'}
-        </Button>
-      </div>
-    </div>
-  }
-
   getLabel () {
     switch (this.state.activeStep) {
       case 0:
         return SignUpStepTerms.getLabel()
       case 1:
         return SignUpStepAuth.getLabel()
-    }
-  }
-
-  getContent () {
-    switch (this.state.activeStep) {
-      case 0:
-        return <SignUpStepTerms />
-      case 1:
-        return <SignUpStepAuth />
     }
   }
 }

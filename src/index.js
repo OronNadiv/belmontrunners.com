@@ -5,6 +5,7 @@ import configureStore, { history } from './store'
 import './index.css'
 import App from './App'
 import { ConnectedRouter } from 'connected-react-router'
+import { Elements, StripeProvider } from 'react-stripe-elements'
 
 import * as serviceWorker from './serviceWorker'
 import firebase from 'firebase'
@@ -27,7 +28,11 @@ ReactDOM.render(
   <Provider store={store}>
     <ConnectedRouter history={history}>
       <MuiThemeProvider theme={theme}>
-        <App />
+        <StripeProvider apiKey="pk_test_R3hC7CQ84gcox9h8iinHtok200qDiPg0HT">
+          <Elements>
+            <App />
+          </Elements>
+        </StripeProvider>
       </MuiThemeProvider>
     </ConnectedRouter>
   </Provider>, document.getElementById('root'))
