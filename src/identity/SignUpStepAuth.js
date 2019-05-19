@@ -12,6 +12,7 @@ import {
   POPUP_CLOSED_BEFORE_COMPLETION
 } from './messages'
 import * as PropTypes from 'prop-types'
+import SignUpStepperButtons from './SignUpStepperButtons1'
 
 class SignUpStepAuth extends Component {
   constructor (props) {
@@ -23,13 +24,20 @@ class SignUpStepAuth extends Component {
       invalidFullNameMessage: '',
       invalidEmailMessage: '',
       invalidPasswordMessage: '',
-      generalErrorMessage: ''
+      generalErrorMessage: '',
+      success: false
     }
   }
 
   componentDidUpdate (prevProps) {
-    if (this.props.signUpError && prevProps.signUpError !== this.props.signUpError) {
-      const { code, message } = this.props.signUpError
+    const {
+      signUpError
+    } = this.props
+    if (signUpError && prevProps.signUpError !== signUpError) {
+      const {
+        code,
+        message
+      } = signUpError
       switch (code) {
         case 'auth/invalid-email':
           this.setState({ invalidEmailMessage: INVALID_EMAIL })
@@ -48,71 +56,79 @@ class SignUpStepAuth extends Component {
   }
 
   handleSignUp () {
+    const { signUp } = this.props
     this.setState({ generalErrorMessage: '' })
     const { fullName, email, password } = this.state
 
-    if (!fullName) {
-      this.setState({ invalidFullNameMessage: INVALID_FULL_NAME })
-      return
-    }
     if (!email || !isEmail.validate(email)) {
       this.setState({ invalidEmailMessage: INVALID_EMAIL })
-      return
+    }
+    if (!fullName) {
+      this.setState({ invalidFullNameMessage: INVALID_FULL_NAME })
     }
     if (!password) {
       this.setState({ invalidPasswordMessage: MISSING_PASSWORD })
-      return
-    }
-    if (password.length < 6) {
+    } else if (password.length < 6) {
       this.setState({ invalidPasswordMessage: INVALID_PASSWORD_LENGTH(6) })
-      return
     }
-    this.props.signUp(fullName, email, password)
+    signUp(fullName, email, password)
   }
 
-  static getLabel () {
-    return 'Sign up'
+  handleSignInWithProvider (providerName) {
+    return () => this.props.signIn(providerName)
   }
 
   render () {
-    console.log('render called')
+    const {
+      generalErrorMessage,
+      invalidEmailMessage,
+      invalidFullNameMessage,
+      invalidPasswordMessage,
+      success
+    } = this.state
+    const {
+      isLast,
+      onNextClicked
+    } = this.props
     return (
-      <div className="container-fluid" style={{ maxWidth: 400 }}>
-        <div className="row justify-content-center">
-          <div className="btn btn-block btn-social btn-twitter"
-               onClick={() => this.handleSignIn('facebook')}>
-            <span className="fab fa-facebook" /> Connect with Facebook
+      <div className='container-fluid'>
+        <div className='row justify-content-center'>
+          <div className='btn btn-block btn-social btn-twitter'
+               onClick={this.handleSignInWithProvider('facebook')}>
+            <span className='fab fa-facebook' /> Connect with Facebook
           </div>
-          <div className="btn btn-block btn-social btn-google"
-               onClick={() => this.handleSignIn('google')}>
-            <span className="fab fa-google" /> Connect with Google
+          <div className='btn btn-block btn-social btn-google'
+               onClick={this.handleSignInWithProvider('google')}>
+            <span className='fab fa-google' /> Connect with Google
           </div>
 
-          <div className="mt-4 text-center text-dark">Or sign up with email</div>
+          <div className='mt-4 text-center text-dark'>Or sign up with email</div>
 
           {
-            this.state.generalErrorMessage &&
-            <div className="mt-2 text-danger text-center">{this.state.generalErrorMessage}</div>
+            generalErrorMessage &&
+            <div className='mt-2 text-danger text-center'>{generalErrorMessage}</div>
           }
 
           <TextField
-            label="Your email"
+            style={{ minHeight: 68 }}
+            label='Your email'
             type='email'
             fullWidth
-            margin="normal"
+            margin='normal'
             onChange={(event) => {
               this.setState({
                 invalidEmailMessage: '',
                 email: event.target.value
               })
             }}
-            error={!!this.state.invalidEmailMessage}
-            helperText={this.state.invalidEmailMessage}
+            error={!!invalidEmailMessage}
+            helperText={invalidEmailMessage}
           />
 
           <TextField
-            label="Your full name"
-            margin="normal"
+            style={{ minHeight: 68 }}
+            label='Your full name'
+            margin='normal'
             fullWidth
             onChange={(event) => {
               this.setState({
@@ -120,14 +136,15 @@ class SignUpStepAuth extends Component {
                 fullName: event.target.value
               })
             }}
-            error={!!this.state.invalidFullNameMessage}
-            helperText={this.state.invalidFullNameMessage}
+            error={!!invalidFullNameMessage}
+            helperText={invalidFullNameMessage}
           />
 
           <TextField
-            label="Your password"
-            type="password"
-            margin="normal"
+            style={{ minHeight: 68 }}
+            label='Your password'
+            type='password'
+            margin='normal'
             fullWidth
             onChange={(event) => {
               this.setState({
@@ -135,8 +152,8 @@ class SignUpStepAuth extends Component {
                 password: event.target.value
               })
             }}
-            error={!!this.state.invalidPasswordMessage}
-            helperText={this.state.invalidPasswordMessage}
+            error={!!invalidPasswordMessage}
+            helperText={invalidPasswordMessage}
             onKeyPress={(ev) => {
               console.log(`Pressed keyCode ${ev.key}`)
               if (ev.key === 'Enter') {
@@ -145,6 +162,21 @@ class SignUpStepAuth extends Component {
               }
             }}
           />
+          <SignUpStepperButtons
+            className='mt-2'
+            isLast={isLast}
+            onNextClicked={() => success ? onNextClicked() : this.handleSignUp()}
+            disable={!success}
+          />
+
+          <div className='mt-2 text-center'>
+            By clicking “NEXT”, you agree to our <a href='https://www.belmontrunners.com/2019-04-01_tos.pdf'
+                                                    target='_blank' rel='noopener noreferrer'>terms of service</a>, <a
+            href='https://www.belmontrunners.com/2019-05-18_privacy_policy.pdf' target='_blank'
+            rel='noopener noreferrer'>privacy statement</a> and <a
+            href='https://www.belmontrunners.com/2019-05-18_waver.pdf' target='_blank'
+            rel='noopener noreferrer'>release of liability</a>. We’ll occasionally send you account related emails.
+          </div>
         </div>
       </div>
     )

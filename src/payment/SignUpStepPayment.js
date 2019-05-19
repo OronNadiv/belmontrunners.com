@@ -1,33 +1,62 @@
 import React, { Component } from 'react'
-import TextField from '@material-ui/core/TextField/index'
-import Expiration from './Expiration'
-import CreditCard from './CreditCard'
-import CVC from './CVC'
-import { injectStripe } from 'react-stripe-elements'
-import PropTypes from 'prop-types'
+import { CardElement, injectStripe } from 'react-stripe-elements'
 import { connect } from 'react-redux'
-import { submitPayment as submitPaymentAction } from './paymentActions'
+import rp from 'request-promise'
 import SignUpStepperButtons from '../identity/SignUpStepperButtons1'
+import './Stripe.scss'
 
 class View extends Component {
   constructor (props) {
     super(props)
-    this.initialValues = {
-      name: "",
-      cc: '    -    -    -    ',
-      cvc: '    ',
-      zip: "",
-      expiration: '  /  '
-    }
-    this.state = {
-      ...this.initialValues
-    }
+    this.state = {}
+  }
+
+  setMessage (errorMessage = '', successMessage = '') {
+    this.setState({ successMessage, errorMessage })
   }
 
   submitPayment () {
-    console.log('submitPayment')
-    const { stripe, name, cc, expiration, zip } = this.state
-    this.props.submitPayment({ stripe, name, cc, expiration, zip })
+
+    this.setState({ submitting: true })
+    // You can also use createToken to create tokens.
+    // See our tokens documentation for more:
+    // https://stripe.com/docs/stripe-js/reference#stripe-create-token
+    return this.props.stripe.createToken({
+      type: 'card'
+    })
+      .then(stripeResponse => {
+        console.log('stripeResponse:', stripeResponse)
+        if (stripeResponse.error) {
+          this.setMessage(stripeResponse.error.message)
+          throw stripeResponse.error
+        }
+        const options = {
+          method: 'POST',
+          uri: 'https://c0belq1th0.execute-api.us-west-1.amazonaws.com/default/stripe',
+          body: stripeResponse,
+          json: true
+        }
+        return rp(options)
+          .then(chargeResponse => {
+            console.log('chargeResponse:', chargeResponse)
+            return this.setMessage(null, 'success')
+          }).catch(err => {
+            // todo:handle case where charge failed by showing an error message
+            console.error("chargeError:", err)
+          })
+      })
+      .catch(err => {
+        // todo:handle case where charge failed by showing an error message
+        console.error("stripeError:", err)
+      })
+      .finally(() => {
+        this.setState({ submitting: false })
+        setTimeout(() => {
+          if (this.state.successMessage) {
+            this.props.onNextClicked()
+          }
+        }, 1000)
+      })
   }
 
   handleChange = name => event => {
@@ -38,62 +67,51 @@ class View extends Component {
   }
 
   render () {
-    const { name, cc, cvc, zip, expiration } = this.state
+    const { errorMessage, successMessage } = this.state
 
     return (
-      <div className="container-fluid" style={{ maxWidth: 400 }}>
-        <div className="row justify-content-center">
-          <div className="checkout">
-            <div className="row justify-content-start">
-              <TextField
-                label="Name on card"
-                type='name'
-                value={name}
-                fullWidth
-                margin="normal"
-                onChange={this.handleChange('name')}
-                error={!!this.state.invalidNameMessage}
-                helperText={this.state.invalidNameMessage}
-              />
-            </div>
-            <div className="row justify-content-start">
-              <CreditCard
-                onChange={this.handleChange('cc')}
-                value={cc}
-              />
-            </div>
-            <div className="row justify-content-between">
-              <Expiration
-                onChange={this.handleChange('expiration')}
-                value={expiration}
-              />
-              <CVC
-                onChange={this.handleChange('cvc')}
-                value={cvc}
-              />
-            </div>
-          </div>
+      <div className="container-fluid justify-content-center">
+        <h5 className='mt-1'>
+          Benefits to being part of Belmont Runners
+        </h5>
+        &bull; Training at group runs and walks<br />
+        &bull; Free or discounted workshops, clinics, and classes<br />
+        &bull; Discounted entry to the Belmont Water Dog Run<br />
+        &bull; Discounted entry to other local races<br />
+        &bull; Membership with the Road Runners Club of America<br />
+        &bull; Liability insurance coverage<br />
+        &bull; Discounts at local restaurants<br />
+        &bull; Social events with fun, active local runners and walkers<br />
+        &bull; 10% discount at <a target='_blank' rel='noopener noreferrer' href='https://arunnersmind.com'>A Runner’s
+        Mind</a><br />
+
+        <h5 className='mt-4 mb-1'>
+          Credit or debit card
+        </h5>
+        <div className='mb-3' style={{ minHeight: 64 }}>
+          <CardElement className='mt-3' onReady={(el) => el.focus()} />
+          {
+            errorMessage && <div className='text-danger text-center'>{errorMessage}</div>
+          }
         </div>
         <SignUpStepperButtons
-          isFirst={this.props.isFirst}
+          // isFirst={this.props.isFirst}
           isLast={this.props.isLast}
-          onBackClicked={() => this.setState(this.initialValues)}
-          onNextClicked={() => this.submitPayment()}
+          // onBackClicked={() => this.props.onBackClicked()}
+          onNextClicked={() => successMessage ? this.props.onNextClicked() : this.submitPayment()}
+          disableNext={this.props.submitting && !successMessage}
+          // disableBack={this.props.submitting}
         />
       </div>
     )
   }
 }
 
-View.propTypes = {
-  submitPayment: PropTypes.func.isRequired
-}
+View.propTypes = {}
 
-const mapDispatchToProps = {
-  submitPayment: submitPaymentAction
-}
+const mapDispatchToProps = {}
 
-const mapStateToProps = (state) => {
+const mapStateToProps = () => {
   return {}
 }
 

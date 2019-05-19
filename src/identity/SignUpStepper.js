@@ -20,6 +20,8 @@ class SignUpStepper extends Component {
     this.state = {
       activeStep: 0
     }
+    this.handleNext = this.handleNext.bind(this)
+    this.handleBack = this.handleBack.bind(this)
   }
 
   handleNext = () => {
@@ -47,34 +49,25 @@ class SignUpStepper extends Component {
     }
 
     return (
-      <Stepper activeStep={this.state.activeStep} orientation="vertical">
+      <Stepper className="container-fluid justify-content-center" activeStep={this.state.activeStep}
+               orientation="vertical" style={{ maxWidth: 500 }}>
         <Step key={2}>
           <StepLabel>
-            <div>"Payment"</div>
+            Membership
           </StepLabel>
           <StepContent>
-            <SignUpStepPayment isFirst />
+            <SignUpStepPayment isFirst onNextClicked={this.handleNext} />
           </StepContent>
         </Step>
 
         <Step key={1}>
           <StepLabel>
-            {SignUpStepAuth.getLabel()}
+            Create an account
           </StepLabel>
           <StepContent>
-            <SignUpStepAuth />
+            <SignUpStepAuth onNextClicked={this.handleNext} />
           </StepContent>
         </Step>
-
-        <Step key={0}>
-          <StepLabel>
-            {SignUpStepTerms.getLabel()}
-          </StepLabel>
-          <StepContent>
-            <SignUpStepTerms isLast />
-          </StepContent>
-        </Step>
-
 
       </Stepper>
     )

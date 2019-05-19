@@ -8,7 +8,7 @@ import './scss/style.scss'
 import PropTypes from 'prop-types'
 import { fetchCurrentUser as fetchCurrentUserAction } from './reducers/currentUser'
 import { connect } from 'react-redux'
-import { Route } from 'react-router-dom'
+import { Route, Switch } from 'react-router-dom'
 import SignIn from './identity/SignIn'
 import SignUp from './identity/SignUp'
 import ForgotPassword from './identity/ForgotPassword'
@@ -24,27 +24,29 @@ class App extends Component {
     return (
       <div>
         <HeaderArea />
-        <Route
-          exact
-          path={'/signin'}
-          render={() => <SignIn />}
-        />
-        <Route
-          exact
-          path={'/signup'}
-          render={() => <SignUp />}
-        />
-        <Route
-          exact
-          path={'/forgotpassword'}
-          render={() => <ForgotPassword />}
-        />
+        <Switch>
+          <Route
+            exact
+            path={'/signin'}
+            render={() => <SignIn />}
+          />
+          <Route
+            exact
+            path={'/join'}
+            render={() => <SignUp />}
+          />
+          <Route
+            exact
+            path={'/forgotpassword'}
+            render={() => <ForgotPassword />}
+          />
 
-        <Route
-          exact
-          path={'/'}
-          render={() => <HomePage />}
-        />
+          <Route
+            exact
+            path={'/'}
+            render={() => <HomePage />}
+          />
+        </Switch>
 
         <Footer />
       </div>

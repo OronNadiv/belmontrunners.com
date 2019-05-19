@@ -3,23 +3,17 @@ import React from 'react'
 
 class SignUpStepperButtons extends React.Component {
   render () {
-    const { isFirst, isLast, onBackClicked, onNextClicked } = this.props
+    const { isLast, onNextClicked, disabled } = this.props
     return (
-      <div>
-        <Button
-          disabled={isFirst}
-          onClick={onBackClicked}
-        >
-          Back
-        </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={onNextClicked}
-        >
-          {isLast ? 'Finish' : 'Next'}
-        </Button>
-      </div>
+      <Button
+        variant="contained"
+        color="primary"
+        fullWidth
+        onClick={onNextClicked}
+        disabled={disabled}
+      >
+        {isLast ? 'Finish' : 'Next'}
+      </Button>
     )
   }
 }

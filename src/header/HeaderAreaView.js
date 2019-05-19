@@ -131,9 +131,9 @@ class HeaderAreaView extends Component {
                   {
                     !currentUser &&
                     <li className="nav-item">
-                      <Link to="/signup">
+                      <Link to="/join">
                         <Button variant="contained" color="primary">
-                          Sign up
+                          Join Us
                         </Button>
                       </Link>
                     </li>
