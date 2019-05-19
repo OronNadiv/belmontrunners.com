@@ -91,93 +91,89 @@ class SignUpStepAuth extends Component {
       onNextClicked
     } = this.props
     return (
-      <div className='container-fluid'>
-        <div className='row justify-content-center'>
-          <div className='btn btn-block btn-social btn-twitter'
-               onClick={this.handleSignInWithProvider('facebook')}>
-            <span className='fab fa-facebook' /> Connect with Facebook
-          </div>
-          <div className='btn btn-block btn-social btn-google'
-               onClick={this.handleSignInWithProvider('google')}>
-            <span className='fab fa-google' /> Connect with Google
-          </div>
-
-          <div className='mt-4 text-center text-dark'>Or sign up with email</div>
-
-          {
-            generalErrorMessage &&
-            <div className='mt-2 text-danger text-center'>{generalErrorMessage}</div>
-          }
-
-          <TextField
-            style={{ minHeight: 68 }}
-            label='Your email'
-            type='email'
-            fullWidth
-            margin='normal'
-            onChange={(event) => {
-              this.setState({
-                invalidEmailMessage: '',
-                email: event.target.value
-              })
-            }}
-            error={!!invalidEmailMessage}
-            helperText={invalidEmailMessage}
-          />
-
-          <TextField
-            style={{ minHeight: 68 }}
-            label='Your full name'
-            margin='normal'
-            fullWidth
-            onChange={(event) => {
-              this.setState({
-                invalidFullNameMessage: '',
-                fullName: event.target.value
-              })
-            }}
-            error={!!invalidFullNameMessage}
-            helperText={invalidFullNameMessage}
-          />
-
-          <TextField
-            style={{ minHeight: 68 }}
-            label='Your password'
-            type='password'
-            margin='normal'
-            fullWidth
-            onChange={(event) => {
-              this.setState({
-                invalidPasswordMessage: '',
-                password: event.target.value
-              })
-            }}
-            error={!!invalidPasswordMessage}
-            helperText={invalidPasswordMessage}
-            onKeyPress={(ev) => {
-              console.log(`Pressed keyCode ${ev.key}`)
-              if (ev.key === 'Enter') {
-                ev.preventDefault()
-                this.handleSignUp()
-              }
-            }}
-          />
-          <SignUpStepperButtons
-            className='mt-2'
-            isLast={isLast}
-            onNextClicked={() => success ? onNextClicked() : this.handleSignUp()}
-            disable={!success}
-          />
-
-          <div className='mt-2 text-center'>
-            By clicking “NEXT”, you agree to our <a href='https://www.belmontrunners.com/2019-04-01_tos.pdf'
-                                                    target='_blank' rel='noopener noreferrer'>terms of service</a>, <a
-            href='https://www.belmontrunners.com/2019-05-18_privacy_policy.pdf' target='_blank'
-            rel='noopener noreferrer'>privacy statement</a> and <a
-            href='https://www.belmontrunners.com/2019-05-18_waver.pdf' target='_blank'
-            rel='noopener noreferrer'>release of liability</a>. We’ll occasionally send you account related emails.
-          </div>
+      <div className='justify-content-center'>
+        <div className='btn btn-block btn-social btn-twitter'
+             onClick={this.handleSignInWithProvider('facebook')}>
+          <span className='fab fa-facebook' /> Connect with Facebook
         </div>
+        <div className='btn btn-block btn-social btn-google'
+             onClick={this.handleSignInWithProvider('google')}>
+          <span className='fab fa-google' /> Connect with Google
+        </div>
+
+        <div className='mt-4 text-center text-dark'>Or sign up with email</div>
+
+        {
+          generalErrorMessage &&
+          <div className='mt-2 text-danger text-center'>{generalErrorMessage}</div>
+        }
+
+        <TextField
+          style={{ minHeight: 68 }}
+          label='Your email'
+          type='email'
+          fullWidth
+          margin='normal'
+          onChange={(event) => {
+            this.setState({
+              invalidEmailMessage: '',
+              email: event.target.value
+            })
+          }}
+          error={!!invalidEmailMessage}
+          helperText={invalidEmailMessage}
+        />
+
+        <TextField
+          style={{ minHeight: 68 }}
+          label='Your full name'
+          margin='normal'
+          fullWidth
+          onChange={(event) => {
+            this.setState({
+              invalidFullNameMessage: '',
+              fullName: event.target.value
+            })
+          }}
+          error={!!invalidFullNameMessage}
+          helperText={invalidFullNameMessage}
+        />
+
+        <TextField
+          style={{ minHeight: 68 }}
+          label='Your password'
+          type='password'
+          margin='normal'
+          fullWidth
+          onChange={(event) => {
+            this.setState({
+              invalidPasswordMessage: '',
+              password: event.target.value
+            })
+          }}
+          error={!!invalidPasswordMessage}
+          helperText={invalidPasswordMessage}
+          onKeyPress={(ev) => {
+            console.log(`Pressed keyCode ${ev.key}`)
+            if (ev.key === 'Enter') {
+              ev.preventDefault()
+              this.handleSignUp()
+            }
+          }}
+        />
+        <div className='mt-2 mb-2 text-center'>
+          By clicking “NEXT”, you agree to our <a href='https://www.belmontrunners.com/2019-04-01_tos.pdf'
+                                                  target='_blank' rel='noopener noreferrer'>terms of service</a>, <a
+          href='https://www.belmontrunners.com/2019-05-18_privacy_policy.pdf' target='_blank'
+          rel='noopener noreferrer'>privacy statement</a> and <a
+          href='https://www.belmontrunners.com/2019-05-18_waver.pdf' target='_blank'
+          rel='noopener noreferrer'>release of liability</a>. We’ll occasionally send you account related emails.
+        </div>
+        <SignUpStepperButtons
+          isLast={isLast}
+          onNextClicked={() => success ? onNextClicked() : this.handleSignUp()}
+          disable={!success}
+        />
       </div>
     )
   }

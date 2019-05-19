@@ -7,7 +7,11 @@ jobs:
       - checkout
       - run:
           name: Install Dependencies
-          command: npm install
+          command: |
+            npm install
+            cd lambda
+            npm install
+            zip -r ../public/lambda.zip .
       - run:
           name: Build Application
           command: npm run build

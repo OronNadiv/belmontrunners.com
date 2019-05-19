@@ -7,8 +7,10 @@ import { signIn as signInAction, signUp as signUpAction } from './identityAction
 import { connect } from 'react-redux'
 
 import SignUpStep1 from './SignUpStepAuth'
-import SignUpDialog from './SignUpDialog'
 import SignUpStepper from './SignUpStepper'
+import Dialog from '@material-ui/core/Dialog'
+import DialogTitle from '@material-ui/core/DialogTitle'
+import DialogContent from '@material-ui/core/DialogContent'
 
 class SignUpView extends Component {
   constructor (props) {
@@ -25,19 +27,6 @@ class SignUpView extends Component {
     this.steps = [SignUpStep1]
   }
 
-  handleNext = () => {
-    this.setState(state => ({
-      activeStep: state.activeStep + 1
-    }))
-  }
-
-  handleBack = () => {
-    this.setState(state => ({
-      activeStep: state.activeStep - 1
-    }))
-  }
-
-
   render () {
     console.log('Signup render called')
     if (this.props.currentUser || this.state.close) {
@@ -50,7 +39,21 @@ class SignUpView extends Component {
     }
 
     return (
-      <SignUpStepper />
+      <Dialog
+        open
+        // fullWidth
+        maxWidth='sm'
+        onClose={() => this.setState({ close: true })}
+        aria-labelledby="form-dialog-title"
+      >
+        <DialogTitle>
+          Join Us
+        </DialogTitle>
+
+        <DialogContent>
+          <SignUpStepper />
+        </DialogContent>
+      </Dialog>
     )
   }
 }

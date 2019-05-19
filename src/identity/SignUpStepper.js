@@ -12,7 +12,6 @@ import StepLabel from '@material-ui/core/StepLabel'
 import SignUpStepAuth from './SignUpStepAuth'
 import SignUpStepTerms from './SignUpStepTerms'
 import SignUpStepPayment from '../payment/SignUpStepPayment'
-import StepContent from '@material-ui/core/StepContent'
 
 class SignUpStepper extends Component {
   constructor (props) {
@@ -49,27 +48,26 @@ class SignUpStepper extends Component {
     }
 
     return (
-      <Stepper className="container-fluid justify-content-center" activeStep={this.state.activeStep}
-               orientation="vertical" style={{ maxWidth: 500 }}>
-        <Step key={2}>
-          <StepLabel>
-            Membership
-          </StepLabel>
-          <StepContent>
-            <SignUpStepPayment isFirst onNextClicked={this.handleNext} />
-          </StepContent>
-        </Step>
+      <div>
+        <Stepper alternativeLabel className="justify-content-center" activeStep={this.state.activeStep}>
+          <Step key={2}>
+            <StepLabel>
+              Membership
+            </StepLabel>
+          </Step>
 
-        <Step key={1}>
-          <StepLabel>
-            Create an account
-          </StepLabel>
-          <StepContent>
+          <Step key={1}>
+            <StepLabel>
+              Account
+            </StepLabel>
+          </Step>
+        </Stepper>
+        {
+          this.state.activeStep === 0 ?
+            <SignUpStepPayment isFirst onNextClicked={this.handleNext} /> :
             <SignUpStepAuth onNextClicked={this.handleNext} />
-          </StepContent>
-        </Step>
-
-      </Stepper>
+        }
+      </div>
     )
   }
 

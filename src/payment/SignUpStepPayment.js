@@ -70,7 +70,7 @@ class View extends Component {
     const { errorMessage, successMessage } = this.state
 
     return (
-      <div className="container-fluid justify-content-center">
+      <div className="justify-content-center">
         <h5 className='mt-1'>
           Benefits to being part of Belmont Runners
         </h5>
