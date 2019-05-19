@@ -10,7 +10,6 @@ import Step from '@material-ui/core/Step'
 import StepLabel from '@material-ui/core/StepLabel'
 
 import SignUpStepAuth from './SignUpStepAuth'
-import SignUpStepTerms from './SignUpStepTerms'
 import SignUpStepPayment from '../payment/SignUpStepPayment'
 
 class SignUpStepper extends Component {
@@ -69,15 +68,6 @@ class SignUpStepper extends Component {
         }
       </div>
     )
-  }
-
-  getLabel () {
-    switch (this.state.activeStep) {
-      case 0:
-        return SignUpStepTerms.getLabel()
-      case 1:
-        return SignUpStepAuth.getLabel()
-    }
   }
 }
 

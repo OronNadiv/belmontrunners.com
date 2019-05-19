@@ -62,14 +62,14 @@ class HeaderAreaView extends Component {
                   <li className="nav-item">
                     {
                       currentUser &&
-                      <a className='nav-link sign-out-link' href='#' rel="noopener noreferrer"
+                      <a className='nav-link sign-out-link' href='https://belmontrunners.com' rel="noopener noreferrer"
                          onClick={() => this.props.signOut()}>
                         Sign out
                       </a>
                     }
                     {
                       !currentUser &&
-                      <a className='nav-link sign-in-link' href='#' rel="noopener noreferrer"
+                      <a className='nav-link sign-in-link' href='https://belmontrunners.com' rel="noopener noreferrer"
                          onClick={() => this.props.signIn()}>
                         Sign in
                       </a>
