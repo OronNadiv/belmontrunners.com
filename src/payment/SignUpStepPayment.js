@@ -18,12 +18,9 @@ class View extends Component {
   submitPayment () {
 
     this.setState({ submitting: true })
-    // You can also use createToken to create tokens.
-    // See our tokens documentation for more:
-    // https://stripe.com/docs/stripe-js/reference#stripe-create-token
-    return this.props.stripe.createToken({
-      type: 'card'
-    })
+
+    return this.props.stripe
+      .createToken({ type: 'card' })
       .then(stripeResponse => {
         console.log('stripeResponse:', stripeResponse)
         if (stripeResponse.error) {
@@ -39,7 +36,7 @@ class View extends Component {
         return rp(options)
           .then(chargeResponse => {
             console.log('chargeResponse:', chargeResponse)
-            return this.setMessage(null, 'success')
+            return this.props.onNextClicked()
           }).catch(err => {
             // todo:handle case where charge failed by showing an error message
             console.error("chargeError:", err)
@@ -51,22 +48,14 @@ class View extends Component {
       })
       .finally(() => {
         this.setState({
-          submitting: false,
-          success: true
+          submitting: false
         })
       })
   }
 
-  handleChange = name => event => {
-    console.log('handleChange', name, event.target.value)
-    this.setState({
-      [name]: name = 'name' ? event.target.value : event.target.value.replace(/\s/g, '')
-    })
-  }
-
   render () {
     const { errorMessage, submitting, success } = this.state
-
+    const { isLast, onNextClicked } = this.props
     return (
       <div className="justify-content-center">
         <h5 className='mt-1'>
@@ -96,8 +85,8 @@ class View extends Component {
           }
         </div>
         <SignUpStepperButton
-          isLast={this.props.isLast}
-          onNextClicked={() => success ? this.props.onNextClicked() : this.submitPayment()}
+          isLast={isLast}
+          onNextClicked={() => success ? onNextClicked() : this.submitPayment()}
           disabled={submitting && !success}
         />
       </div>

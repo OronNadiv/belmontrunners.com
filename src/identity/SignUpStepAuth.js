@@ -77,14 +77,17 @@ class View extends Component {
       .then(({ user }) => updateUserVisit('email')(user))
       .then(() => {
         this.setState({
-          isSigningUp: false,
           signUpError: null
         })
       })
       .catch((error) => {
         this.state({
-          isSigningUp: false,
           signUpError: error
+        })
+      })
+      .finally(() => {
+        this.setState({
+          isSigningUp: false
         })
       })
   }
@@ -117,12 +120,15 @@ class View extends Component {
       invalidEmailMessage,
       invalidFullNameMessage,
       invalidPasswordMessage,
-      success
+      success,
+      isSigningUp
     } = this.state
+
     const {
       isLast,
       onNextClicked
     } = this.props
+
     return (
       <div className='justify-content-center'>
         <div className='btn btn-block btn-social btn-twitter'
@@ -195,17 +201,17 @@ class View extends Component {
           }}
         />
         <div className='mt-2 mb-2 text-center'>
-          By clicking “NEXT”, you agree to our <a href='https://www.belmontrunners.com/2019-04-01_tos.pdf'
+          By clicking “NEXT”, you agree to our <a href='https://www.belmontrunners.com/documents/2019-04-01_tos.pdf'
                                                   target='_blank' rel='noopener noreferrer'>terms of service</a>, <a
-          href='https://www.belmontrunners.com/2019-05-18_privacy_policy.pdf' target='_blank'
+          href='https://www.belmontrunners.com/documents/2019-05-18_privacy_policy.pdf' target='_blank'
           rel='noopener noreferrer'>privacy statement</a> and <a
-          href='https://www.belmontrunners.com/2019-05-18_waver.pdf' target='_blank'
+          href='https://www.belmontrunners.com/documents/2019-05-18_waver.pdf' target='_blank'
           rel='noopener noreferrer'>release of liability</a>. We’ll occasionally send you account related emails.
         </div>
         <SignUpStepperButton
           isLast={isLast}
           onNextClicked={() => success ? onNextClicked() : this.handleSignUp()}
-          disabled={!success}
+          disabled={isSigningUp}
         />
       </div>
     )
