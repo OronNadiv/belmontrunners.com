@@ -4,7 +4,6 @@ import isEmail from 'isemail'
 import './Signin.scss'
 import { Link, Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { signIn as signInAction } from './identityActions'
 import TextField from '@material-ui/core/TextField'
 import {
   INVALID_EMAIL,
@@ -19,6 +18,10 @@ import DialogContent from '@material-ui/core/DialogContent'
 import DialogActions from '@material-ui/core/DialogActions'
 import Button from '@material-ui/core/Button'
 import 'firebase/auth'
+import firebase from 'firebase'
+
+const providerGoogle = new firebase.auth.GoogleAuthProvider()
+const providerFacebook = new firebase.auth.FacebookAuthProvider()
 
 class SignInView extends Component {
 
@@ -29,6 +32,43 @@ class SignInView extends Component {
       invalidPasswordMessage: '',
       generalErrorMessage: ''
     }
+  }
+
+  signIn (providerName, params) {
+    let promise
+    switch (providerName.toLowerCase()) {
+      case 'facebook':
+        promise = firebase.auth().signInWithPopup(providerFacebook)
+        break
+      case 'google':
+        promise = firebase.auth().signInWithPopup(providerGoogle)
+        break
+      case 'email':
+      default:
+        promise = firebase.auth().signInWithEmailAndPassword(params.email, params.password)
+        break
+    }
+
+    this.setState({
+      isSigningIn: true,
+      signInError: null
+    })
+
+    promise
+      .then(({ user }) => this.updateUserVisit(providerName)(user))
+      .then(() => {
+        this.setState({
+          isSigningIn: false,
+          signInError: null
+        })
+      })
+      .catch((error) => {
+        console.log('error while signing in', error)
+        this.setState({
+          isSigningIn: false,
+          signInError: error
+        })
+      })
   }
 
   handleSignInWithEmail () {
@@ -48,16 +88,18 @@ class SignInView extends Component {
       this.setState({ invalidPasswordMessage: INVALID_PASSWORD_LENGTH(6) })
       return
     }
-    this.props.signIn('email', { email, password })
+
+    this.signIn('email', { email, password })
   }
 
   handleSignInWithProvider (providerName) {
-    this.props.signIn(providerName)
+    this.signIn(providerName)
   }
 
-  componentDidUpdate (prevProps) {
-    if (this.props.signInError && prevProps.signInError !== this.props.signInError) {
-      const { code, message } = this.props.signInError
+  componentDidUpdate (prevProps, prevState) {
+    const { signInError } = this.state
+    if (signInError && prevState.signInError !== signInError) {
+      const { code, message } = signInError
       switch (code) {
         case 'auth/invalid-email':
           this.setState({ invalidEmailMessage: INVALID_EMAIL })
@@ -78,6 +120,8 @@ class SignInView extends Component {
 
   render () {
     console.log('Signin render called')
+
+    const { isSigningIn } = this.state
 
     if (this.props.currentUser || this.state.close) {
       return <Redirect
@@ -161,12 +205,16 @@ class SignInView extends Component {
         </DialogContent>
 
         <DialogActions>
-          <Button onClick={() => this.setState({ close: true })}>
+          <Button
+            onClick={() => this.setState({ close: true })}
+            disabled={isSigningIn}
+          >
             Cancel
           </Button>
           <Button type="button" color="primary"
                   onClick={() => this.handleSignInWithEmail()}
-                  disabled={this.props.isSendingPasswordResetEmail}>
+                  disabled={isSigningIn}
+          >
             Sign in
           </Button>
 
@@ -177,19 +225,13 @@ class SignInView extends Component {
 }
 
 SignInView.propTypes = {
-  signIn: PropTypes.func.isRequired,
-  signInError: PropTypes.object
-}
-
-const mapDispatchToProps = {
-  signIn: signInAction
+  currentUser: PropTypes.object
 }
 
 const mapStateToProps = (state) => {
   return {
-    signInError: state.identity.get('signInError'),
     currentUser: state.currentUser.get('data')
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(SignInView)
+export default connect(mapStateToProps)(SignInView)

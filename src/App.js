@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import HeaderArea from './header/HeaderAreaView'
 import Footer from './Footer'
 import './App.css'
 import firebase from 'firebase'
@@ -23,7 +22,10 @@ class App extends Component {
     console.log('firebase.auth().currentUser:', firebase.auth().currentUser)
     return (
       <div>
+        {/*
+        //TODO: uncomment
         <HeaderArea />
+        */}
         <Switch>
           <Route
             exact

@@ -3,7 +3,6 @@ import React, { Component } from 'react'
 import './Signup.scss'
 import { Redirect } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import { signIn as signInAction, signUp as signUpAction } from './identityActions'
 import { connect } from 'react-redux'
 import Stepper from '@material-ui/core/Stepper'
 import Step from '@material-ui/core/Step'
@@ -37,18 +36,20 @@ class SignUpStepper extends Component {
 
   render () {
     console.log('Signup render called')
-    if (this.props.currentUser || this.state.close) {
+    const { activeStep, close } = this.state
+    const { currentUser } = this.props
+    if (currentUser || close) {
       return <Redirect
         to={{
           pathname: "/",
-          state: { from: '/signup' }
+          state: { from: '/join' }
         }}
       />
     }
 
     return (
       <div>
-        <Stepper alternativeLabel className="justify-content-center" activeStep={this.state.activeStep}>
+        <Stepper alternativeLabel className="justify-content-center" activeStep={activeStep}>
           <Step key={2}>
             <StepLabel>
               Membership
@@ -62,7 +63,7 @@ class SignUpStepper extends Component {
           </Step>
         </Stepper>
         {
-          this.state.activeStep === 0 ?
+          activeStep === 0 ?
             <SignUpStepPayment isFirst onNextClicked={this.handleNext} /> :
             <SignUpStepAuth onNextClicked={this.handleNext} />
         }
@@ -72,19 +73,14 @@ class SignUpStepper extends Component {
 }
 
 SignUpStepper.propTypes = {
-  signUp: PropTypes.func.isRequired,
-  signInWithProvider: PropTypes.func.isRequired,
-  signUpError: PropTypes.object
+  currentUser: PropTypes.object
 }
 
 const mapDispatchToProps = {
-  signUp: signUpAction,
-  signIn: signInAction
 }
 
 const mapStateToProps = (state) => {
   return {
-    signUpError: state.identity.get('signUpError'),
     currentUser: state.currentUser.get('data')
   }
 }

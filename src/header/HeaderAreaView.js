@@ -4,7 +4,7 @@ import 'firebase/auth'
 import $ from 'jquery'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { signIn as signInAction, signOut as signOutAction } from '../identity/identityActions'
+// import { signIn as signInAction, signOut as signOutAction } from '../identity/identityActions'
 import Profile from './Profile'
 import Button from '@material-ui/core/Button'
 
@@ -64,14 +64,14 @@ class HeaderAreaView extends Component {
                       currentUser &&
                       <a className='nav-link sign-out-link' href='https://belmontrunners.com' rel="noopener noreferrer"
                          onClick={() => this.props.signOut()}>
-                        Sign out
+                        Sign out1
                       </a>
                     }
                     {
                       !currentUser &&
                       <a className='nav-link sign-in-link' href='https://belmontrunners.com' rel="noopener noreferrer"
                          onClick={() => this.props.signIn()}>
-                        Sign in
+                        Sign in1
                       </a>
                     }
                   </li>
@@ -150,13 +150,13 @@ class HeaderAreaView extends Component {
 
 HeaderAreaView.propTypes = {
   currentUser: PropTypes.object,
-  signIn: PropTypes.func.isRequired,
-  signOut: PropTypes.func.isRequired
+  // signIn: PropTypes.func.isRequired,
+  // signOut: PropTypes.func.isRequired
 }
 
 const mapDispatchToProps = {
-  signIn: signInAction,
-  signOut: signOutAction
+  // signIn: signInAction,
+  // signOut: signOutAction
 }
 
 const mapStateToProps = (state) => {

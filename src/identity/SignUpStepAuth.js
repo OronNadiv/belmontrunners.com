@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import TextField from '@material-ui/core/TextField'
-import { signIn as signInAction, signUp as signUpAction } from './identityActions'
+import { updateUserVisit } from './identityActions'
 import { connect } from 'react-redux'
 import isEmail from 'isemail'
 import {
@@ -12,9 +12,13 @@ import {
   POPUP_CLOSED_BEFORE_COMPLETION
 } from './messages'
 import * as PropTypes from 'prop-types'
-import SignUpStepperButtons from './SignUpStepperButtons1'
+import SignUpStepperButton from './SignUpStepperButton'
+import Promise from 'bluebird'
+import s from 'underscore.string'
+import 'firebase/auth'
+import firebase from 'firebase'
 
-class SignUpStepAuth extends Component {
+class View extends Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -29,11 +33,11 @@ class SignUpStepAuth extends Component {
     }
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate (prevProps1, prevState) {
     const {
       signUpError
-    } = this.props
-    if (signUpError && prevProps.signUpError !== signUpError) {
+    } = this.state
+    if (signUpError && prevState.signUpError !== signUpError) {
       const {
         code,
         message
@@ -55,8 +59,37 @@ class SignUpStepAuth extends Component {
     }
   }
 
+  signUp (fullName, email, password) {
+    this.setState({
+      isSigningUp: true,
+      signUpError: null
+    })
+
+    Promise.resolve(firebase.auth().createUserWithEmailAndPassword(email, password))
+      .tap((user) => {
+        console.log('calling updateProfile', user)
+        const displayName = s.words(fullName).map((w) => s.capitalize(w)).join(" ")
+        console.log('displayName:', displayName)
+        return firebase.auth().currentUser.updateProfile({
+          displayName
+        })
+      })
+      .then(({ user }) => updateUserVisit('email')(user))
+      .then(() => {
+        this.setState({
+          isSigningUp: false,
+          signUpError: null
+        })
+      })
+      .catch((error) => {
+        this.state({
+          isSigningUp: false,
+          signUpError: error
+        })
+      })
+  }
+
   handleSignUp () {
-    const { signUp } = this.props
     this.setState({ generalErrorMessage: '' })
     const { fullName, email, password } = this.state
 
@@ -71,11 +104,11 @@ class SignUpStepAuth extends Component {
     } else if (password.length < 6) {
       this.setState({ invalidPasswordMessage: INVALID_PASSWORD_LENGTH(6) })
     }
-    signUp(fullName, email, password)
+    this.signUp(fullName, email, password)
   }
 
   handleSignInWithProvider (providerName) {
-    return () => this.props.signIn(providerName)
+    return () => this.signIn(providerName)
   }
 
   render () {
@@ -169,25 +202,20 @@ class SignUpStepAuth extends Component {
           href='https://www.belmontrunners.com/2019-05-18_waver.pdf' target='_blank'
           rel='noopener noreferrer'>release of liability</a>. We’ll occasionally send you account related emails.
         </div>
-        <SignUpStepperButtons
+        <SignUpStepperButton
           isLast={isLast}
           onNextClicked={() => success ? onNextClicked() : this.handleSignUp()}
-          disable={!success}
+          disabled={!success}
         />
       </div>
     )
   }
 }
 
-SignUpStepAuth.propTypes = {
-  signUp: PropTypes.func.isRequired,
-  signInWithProvider: PropTypes.func.isRequired,
-  signUpError: PropTypes.object
-}
-
-const mapDispatchToProps = {
-  signUp: signUpAction,
-  signIn: signInAction
+View.propTypes = {
+  isLast: PropTypes.bool,
+  onNextClicked: PropTypes.func.isRequired,
+  currentUser: PropTypes.object
 }
 
 const mapStateToProps = (state) => {
@@ -197,4 +225,4 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(SignUpStepAuth)
+export default connect(mapStateToProps)(View)

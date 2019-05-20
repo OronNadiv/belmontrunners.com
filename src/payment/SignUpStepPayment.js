@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import { CardElement, injectStripe } from 'react-stripe-elements'
-import { connect } from 'react-redux'
 import rp from 'request-promise'
-import SignUpStepperButtons from '../identity/SignUpStepperButtons1'
+import SignUpStepperButton from '../identity/SignUpStepperButton'
 import './Stripe.scss'
+import PropTypes from 'prop-types'
 
 class View extends Component {
   constructor (props) {
@@ -50,12 +50,10 @@ class View extends Component {
         console.error("stripeError:", err)
       })
       .finally(() => {
-        this.setState({ submitting: false })
-        setTimeout(() => {
-          if (this.state.successMessage) {
-            this.props.onNextClicked()
-          }
-        }, 1000)
+        this.setState({
+          submitting: false,
+          success: true
+        })
       })
   }
 
@@ -67,7 +65,7 @@ class View extends Component {
   }
 
   render () {
-    const { errorMessage, successMessage } = this.state
+    const { errorMessage, submitting, success } = this.state
 
     return (
       <div className="justify-content-center">
@@ -85,6 +83,9 @@ class View extends Component {
         &bull; 10% discount at <a target='_blank' rel='noopener noreferrer' href='https://arunnersmind.com'>A Runner’s
         Mind</a><br />
 
+        {
+          // todo: add amount that will be charged.
+        }
         <h5 className='mt-4 mb-1'>
           Credit or debit card
         </h5>
@@ -94,25 +95,22 @@ class View extends Component {
             errorMessage && <div className='text-danger text-center'>{errorMessage}</div>
           }
         </div>
-        <SignUpStepperButtons
-          // isFirst={this.props.isFirst}
+        <SignUpStepperButton
           isLast={this.props.isLast}
-          // onBackClicked={() => this.props.onBackClicked()}
-          onNextClicked={() => successMessage ? this.props.onNextClicked() : this.submitPayment()}
-          disableNext={this.props.submitting && !successMessage}
-          // disableBack={this.props.submitting}
+          onNextClicked={() => success ? this.props.onNextClicked() : this.submitPayment()}
+          disabled={submitting && !success}
         />
       </div>
     )
   }
 }
 
-View.propTypes = {}
-
-const mapDispatchToProps = {}
-
-const mapStateToProps = () => {
-  return {}
+View.propTypes = {
+  stripe: PropTypes.shape({
+    createToken: PropTypes.func.isRequired
+  }).isRequired,
+  isLast: PropTypes.bool,
+  onNextClicked: PropTypes.func.isRequired
 }
 
-export default injectStripe(connect(mapStateToProps, mapDispatchToProps)(View))
+export default injectStripe(View)

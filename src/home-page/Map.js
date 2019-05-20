@@ -1,8 +1,10 @@
 import React, { Component } from 'react'
 import { GoogleApiWrapper, Map as GoogleMap } from 'google-maps-react'
+import PropTypes from 'prop-types'
 
 class Map extends Component {
   render () {
+    const { google } = this.props
     return (
       <section className="home_map_area">
         <div id="mapBox2" className="mapBox2">
@@ -11,7 +13,7 @@ class Map extends Component {
           {/*data-zoom="14"*/}
           {/*data-mlat="37.5214784"*/}
           {/*data-mlon="-122.26">*/}
-          <GoogleMap google={this.props.google}
+          <GoogleMap google={google}
                      zoom={14}
                      initialCenter={{
                        lat: 37.5214784,
@@ -60,6 +62,9 @@ class Map extends Component {
   }
 }
 
+Map.propTypes = {
+  google: PropTypes.object.isRequired
+}
 export default GoogleApiWrapper({
   apiKey: 'AIzaSyBPgHuk6L4BnzuKsTuyqGEDn6_JkK7meM4'
 })(Map)

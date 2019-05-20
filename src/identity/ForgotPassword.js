@@ -14,9 +14,8 @@ import DialogActions from '@material-ui/core/DialogActions'
 import Button from '@material-ui/core/Button'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { sendPasswordResetEmail as sendPasswordResetEmailAction } from './identityActions'
 
-class ForgotPasswordView extends Component {
+class ForgotPassword extends Component {
   constructor (props) {
     super(props)
     console.log('ForgotPassword contor called')
@@ -35,12 +34,30 @@ class ForgotPasswordView extends Component {
       return
     }
 
-    this.props.sendPasswordResetEmail(email)
+    this.setState({
+      isSendingPasswordResetEmail: true,
+      sendPasswordResetEmailError: null
+    })
+    firebase.auth().sendPasswordResetEmail(email)
+      .then(() => {
+        this.setState({
+          isSendingPasswordResetEmail: false,
+          sendPasswordResetEmailError: null
+        })
+      })
+      .catch((error) => {
+        this.setState({
+          isSendingPasswordResetEmail: false,
+          sendPasswordResetEmailError: error
+        })
+      })
   }
 
-  componentDidUpdate (prevProps) {
-    if (this.props.sendPasswordResetEmailError && prevProps.sendPasswordResetEmailError !== this.props.sendPasswordResetEmailError) {
-      const { code, message } = this.props.sendPasswordResetEmailError
+  componentDidUpdate (prevProps, prevState) {
+    const { isSendingPasswordResetEmail, sendPasswordResetEmailError } = this.state
+
+    if (sendPasswordResetEmailError && prevState.sendPasswordResetEmailError !== sendPasswordResetEmailError) {
+      const { code, message } = sendPasswordResetEmailError
       switch (code) {
         case 'auth/user-not-found':
           this.setState({ invalidEmailMessage: NO_USER_WITH_GIVEN_EMAIL })
@@ -52,13 +69,15 @@ class ForgotPasswordView extends Component {
           console.log('sendPasswordResetEmailError', 'code:', code, 'message:', message)
           this.setState({ invalidEmailMessage: message })
       }
-    } else if (!this.props.isSendingPasswordResetEmail && prevProps.isSendingPasswordResetEmail) {
+    } else if (!isSendingPasswordResetEmail && prevState.isSendingPasswordResetEmail) {
       this.setState({ showSuccessMessage: true })
     }
   }
 
 
   render () {
+    const { isSendingPasswordResetEmail } = this.state
+
     if (firebase.auth().currentUser || this.state.close) {
       console.log('redirecting to root', this.state.close)
       return <Redirect
@@ -120,7 +139,7 @@ class ForgotPasswordView extends Component {
               </Button>
               <Button type="button" color="primary"
                       onClick={() => this.sendPasswordReset()}
-                      disabled={this.props.isSendingPasswordResetEmail}>
+                      disabled={isSendingPasswordResetEmail}>
                 Send password reset email
               </Button>
             </DialogActions>
@@ -130,22 +149,14 @@ class ForgotPasswordView extends Component {
   }
 }
 
-ForgotPasswordView.propTypes = {
-  sendPasswordResetEmail: PropTypes.func.isRequired,
-  sendPasswordResetEmailError: PropTypes.object,
+ForgotPassword.propTypes = {
   currentUser: PropTypes.object
-}
-
-const mapDispatchToProps = {
-  sendPasswordResetEmail: sendPasswordResetEmailAction
 }
 
 const mapStateToProps = (state) => {
   return {
-    isSendingPasswordResetEmail: state.identity.get('isSendingPasswordResetEmail'),
-    sendPasswordResetEmailError: state.identity.get('sendPasswordResetEmailError'),
     currentUser: state.currentUser.get('data')
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ForgotPasswordView)
+export default connect(mapStateToProps)(ForgotPassword)
