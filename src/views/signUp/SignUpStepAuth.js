@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
-import TextField from '@material-ui/core/TextField'
-import { updateUserVisit } from './identityActions'
+import TextField from '@material-ui/core/TextField/index'
+import { updateUserVisit } from '../identityActions'
 import { connect } from 'react-redux'
-import isEmail from 'isemail'
+import isEmail from 'isemail/lib/index'
 import {
   EMAIL_ADDRESS_ALREADY_TAKEN,
   INVALID_EMAIL,
@@ -10,7 +10,7 @@ import {
   INVALID_PASSWORD_LENGTH,
   MISSING_PASSWORD,
   POPUP_CLOSED_BEFORE_COMPLETION
-} from './messages'
+} from '../messages'
 import * as PropTypes from 'prop-types'
 import SignUpStepperButton from './SignUpStepperButton'
 import Promise from 'bluebird'
@@ -226,7 +226,6 @@ View.propTypes = {
 
 const mapStateToProps = (state) => {
   return {
-    signUpError: state.identity.get('signUpError'),
     currentUser: state.currentUser.get('data')
   }
 }

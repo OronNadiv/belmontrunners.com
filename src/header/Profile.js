@@ -1,8 +1,9 @@
 import Avatar from 'react-avatar'
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { signOut as signOutAction } from '../identity/identityActions'
 import { connect } from 'react-redux'
+import 'firebase/auth'
+import firebase from 'firebase'
 
 class ProfileView extends Component {
   render () {
@@ -18,7 +19,7 @@ class ProfileView extends Component {
           <div className="dropdown-item-text text-nowrap">Hello, {currentUser.displayName}</div>
           <div className="dropdown-divider" />
           <a className='dropdown-item' href='https://belmontrunners.com' rel="noopener noreferrer"
-             onClick={() => this.props.signOut()}>
+             onClick={() => firebase.auth().signOut()}>
             Sign out
           </a>
         </div>
@@ -29,12 +30,7 @@ class ProfileView extends Component {
 
 
 ProfileView.propTypes = {
-  currentUser: PropTypes.object,
-  signOut: PropTypes.func.isRequired
-}
-
-const mapDispatchToProps = {
-  signOut: signOutAction
+  currentUser: PropTypes.object
 }
 
 const mapStateToProps = (state) => {
@@ -43,4 +39,4 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ProfileView)
+export default connect(mapStateToProps)(ProfileView)

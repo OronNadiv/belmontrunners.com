@@ -9,7 +9,7 @@ import Step from '@material-ui/core/Step'
 import StepLabel from '@material-ui/core/StepLabel'
 
 import SignUpStepAuth from './SignUpStepAuth'
-import SignUpStepPayment from '../payment/SignUpStepPayment'
+import SignUpStepPayment from './SignUpStepPayment'
 
 class SignUpStepper extends Component {
   constructor (props) {

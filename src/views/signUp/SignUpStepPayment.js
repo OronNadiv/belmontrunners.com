@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { CardElement, injectStripe } from 'react-stripe-elements'
 import rp from 'request-promise'
-import SignUpStepperButton from '../identity/SignUpStepperButton'
+import SignUpStepperButton from './SignUpStepperButton'
 import './Stripe.scss'
 import PropTypes from 'prop-types'
 

@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
 import { Link } from "react-router-dom"
 import 'firebase/auth'
+import firebase from 'firebase'
 import $ from 'jquery'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-// import { signIn as signInAction, signOut as signOutAction } from '../identity/identityActions'
 import Profile from './Profile'
 import Button from '@material-ui/core/Button'
 
@@ -33,6 +33,7 @@ class HeaderAreaView extends Component {
   render () {
     const currentUser = this.props.currentUser
     console.log('currentUser', currentUser)
+    return <div/>
     return (
       <header className="header_area">
         <div className="main_menu">
@@ -49,10 +50,10 @@ class HeaderAreaView extends Component {
               </button>
               <div className="collapse navbar-collapse offset" id="navbarSupportedContent">
                 <ul className="nav navbar-nav menu_nav ml-auto">
-                  <li className="nav-item active">
-                    <a className="nav-link" href="/">Home</a>
-                  </li>
                   {
+                    // <li className="nav-item active">
+                    // <a className="nav-link" href="/">Home</a>
+                    // </li>
                     // TODO: uncomment
                     // currentUser && currentUser.permissions && currentUser.permissions.usersList &&
                     // <li className="nav-item">
@@ -63,16 +64,21 @@ class HeaderAreaView extends Component {
                     {
                       currentUser &&
                       <a className='nav-link sign-out-link' href='https://belmontrunners.com' rel="noopener noreferrer"
-                         onClick={() => this.props.signOut()}>
-                        Sign out1
+                         onClick={() => firebase.auth().signOut()}>
+                        Sign out
                       </a>
                     }
                     {
                       !currentUser &&
-                      <a className='nav-link sign-in-link' href='https://belmontrunners.com' rel="noopener noreferrer"
-                         onClick={() => this.props.signIn()}>
-                        Sign in1
-                      </a>
+                      <Link to="/signin" className='nav-link sign-in-link'>
+                        Sign in
+                      </Link>
+                    }
+                    {
+                      !currentUser &&
+                      <Link to="/join" className='nav-link sign-in-link'>
+                        Join Us
+                      </Link>
                     }
                   </li>
                   {/*<li className="nav-item submenu dropdown">*/}
@@ -149,14 +155,7 @@ class HeaderAreaView extends Component {
 }
 
 HeaderAreaView.propTypes = {
-  currentUser: PropTypes.object,
-  // signIn: PropTypes.func.isRequired,
-  // signOut: PropTypes.func.isRequired
-}
-
-const mapDispatchToProps = {
-  // signIn: signInAction,
-  // signOut: signOutAction
+  currentUser: PropTypes.object
 }
 
 const mapStateToProps = (state) => {
@@ -165,4 +164,4 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(HeaderAreaView)
+export default connect(mapStateToProps)(HeaderAreaView)

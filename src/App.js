@@ -8,10 +8,11 @@ import PropTypes from 'prop-types'
 import { fetchCurrentUser as fetchCurrentUserAction } from './reducers/currentUser'
 import { connect } from 'react-redux'
 import { Route, Switch } from 'react-router-dom'
-import SignIn from './identity/SignIn'
-import SignUp from './identity/SignUp'
-import ForgotPassword from './identity/ForgotPassword'
+import SignIn from './views/signIn/SignIn'
+import SignUp from './views/signUp/SignUp'
+import ForgotPassword from './views/forgotPassword/ForgotPassword'
 import HomePage from './home-page'
+import HeaderArea from './header/HeaderAreaView'
 
 class App extends Component {
   componentDidMount () {
@@ -21,37 +22,59 @@ class App extends Component {
   render () {
     console.log('firebase.auth().currentUser:', firebase.auth().currentUser)
     return (
-      <div>
-        {/*
-        //TODO: uncomment
-        <HeaderArea />
-        */}
-        <Switch>
-          <Route
-            exact
-            path={'/signin'}
-            render={() => <SignIn />}
-          />
-          <Route
-            exact
-            path={'/join'}
-            render={() => <SignUp />}
-          />
-          <Route
-            exact
-            path={'/forgotpassword'}
-            render={() => <ForgotPassword />}
-          />
+      <Switch>
+        <Route
+          exact
+          path={'/signin'}
+          render={() => (
+            <div>
+              <HeaderArea />
+              <HomePage />
+              <Footer />
 
-          <Route
-            exact
-            path={'/'}
-            render={() => <HomePage />}
-          />
-        </Switch>
+              <SignIn />
+            </div>
+          )}
+        />
+        <Route
+          exact
+          path={'/join'}
+          render={() => (
+            <div>
+              <HeaderArea />
+              <HomePage />
+              <Footer />
 
-        <Footer />
-      </div>
+              <SignUp />
+            </div>
+          )}
+        />
+        <Route
+          exact
+          path={'/forgotpassword'}
+          render={() => (
+            <div>
+              <HeaderArea />
+              <HomePage />
+              <Footer />
+
+              <ForgotPassword />
+            </div>
+          )}
+        />
+
+        <Route
+          exact
+          path={'/'}
+          render={() => (
+            <div>
+              <HeaderArea />
+              <HomePage />
+              <Footer />
+            </div>
+          )}
+        />
+      </Switch>
     )
   }
 }

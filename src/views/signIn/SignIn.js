@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import isEmail from 'isemail'
+import isEmail from 'isemail/lib/index'
 import './Signin.scss'
 import { Link, Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
@@ -11,7 +11,7 @@ import {
   INVALID_PASSWORD_LENGTH,
   MISSING_PASSWORD,
   POPUP_CLOSED_BEFORE_COMPLETION
-} from './messages'
+} from '../messages'
 import Dialog from '@material-ui/core/Dialog'
 import DialogTitle from '@material-ui/core/DialogTitle'
 import DialogContent from '@material-ui/core/DialogContent'
