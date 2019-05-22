@@ -12,8 +12,8 @@ import DialogTitle from '@material-ui/core/DialogTitle'
 import TextField from '@material-ui/core/TextField'
 import DialogActions from '@material-ui/core/DialogActions'
 import Button from '@material-ui/core/Button'
-import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
+import { FORGOT_PASSWORD, ROOT } from '../urls'
+import LoggedInState from '../HOC/LoggedInState'
 
 class ForgotPassword extends Component {
   constructor (props) {
@@ -76,14 +76,14 @@ class ForgotPassword extends Component {
 
 
   render () {
-    const { isSendingPasswordResetEmail } = this.state
+    const { isSendingPasswordResetEmail, close } = this.state
 
-    if (firebase.auth().currentUser || this.state.close) {
-      console.log('redirecting to root', this.state.close)
+    if (close) {
+      console.log('redirecting to root', close)
       return <Redirect
         to={{
-          pathname: "/",
-          state: { from: '/forgotpassword' }
+          pathname: ROOT,
+          state: { from: FORGOT_PASSWORD }
         }}
       />
     }
@@ -149,14 +149,4 @@ class ForgotPassword extends Component {
   }
 }
 
-ForgotPassword.propTypes = {
-  currentUser: PropTypes.object
-}
-
-const mapStateToProps = (state) => {
-  return {
-    currentUser: state.currentUser.get('data')
-  }
-}
-
-export default connect(mapStateToProps)(ForgotPassword)
+export default LoggedInState({ name: 'ForgotPassword', isRequiredToBeLoggedIn: false })(ForgotPassword)

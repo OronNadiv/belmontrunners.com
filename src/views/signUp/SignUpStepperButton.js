@@ -7,6 +7,7 @@ class SignUpStepperButton extends React.Component {
     const { isLast, onNextClicked, disabled } = this.props
     return (
       <Button
+        className='my-5'
         variant="contained"
         color="primary"
         fullWidth

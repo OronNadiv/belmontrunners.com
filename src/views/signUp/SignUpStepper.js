@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 
 import './Signup.scss'
-import { Redirect } from 'react-router-dom'
 import Stepper from '@material-ui/core/Stepper'
 import Step from '@material-ui/core/Step'
 import StepLabel from '@material-ui/core/StepLabel'
@@ -9,6 +8,8 @@ import StepLabel from '@material-ui/core/StepLabel'
 import SignUpStepAuth from './SignUpStepAuth'
 import SignUpStepPayment from './SignUpStepPayment'
 import SignUpStepUserDetails from './SignUpStepUserDetails'
+import { Redirect } from 'react-router-dom'
+import { JOIN, ROOT } from '../urls'
 
 class SignUpStepper extends Component {
   constructor (props) {
@@ -21,6 +22,7 @@ class SignUpStepper extends Component {
   }
 
   handleNext = () => {
+    console.log('handleNext called')
     this.setState(state => ({
       activeStep: state.activeStep + 1
     }))
@@ -34,16 +36,7 @@ class SignUpStepper extends Component {
 
 
   render () {
-    console.log('Signup render called')
-    const { activeStep, close } = this.state
-    if (close) {
-      return <Redirect
-        to={{
-          pathname: "/",
-          state: { from: '/join' }
-        }}
-      />
-    }
+    const { activeStep } = this.state
 
     return (
       <div>
@@ -67,15 +60,31 @@ class SignUpStepper extends Component {
           </Step>
         </Stepper>
         {
-
-          activeStep === 0 ?
-            <SignUpStepUserDetails isFirst onNextClicked={this.handleNext} /> :
-            activeStep === 1 ?
-              <SignUpStepPayment isFirst onNextClicked={this.handleNext} /> :
-              <SignUpStepAuth onNextClicked={this.handleNext} />
+          this.getStep()
         }
       </div>
     )
+  }
+
+  getStep () {
+    const { activeStep } = this.state
+    switch (activeStep) {
+      case 0:
+        return <SignUpStepAuth isLast onNextClicked={this.handleNext} />
+      case 1:
+        return <SignUpStepUserDetails onNextClicked={this.handleNext} />
+      case 2:
+        return <SignUpStepPayment onNextClicked={this.handleNext} />
+      case 3:
+        return <Redirect
+          to={{
+            pathname: ROOT,
+            state: { from: JOIN }
+          }}
+        />
+      default:
+        throw new Error("Unknown active step.  Active step: " + activeStep)
+    }
   }
 }
 

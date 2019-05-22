@@ -7,6 +7,7 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import Profile from './Profile'
 import Button from '@material-ui/core/Button'
+import { JOIN, SIGN_IN } from '../views/urls'
 
 class HeaderAreaView extends Component {
   componentDidMount () {
@@ -31,8 +32,9 @@ class HeaderAreaView extends Component {
   }
 
   render () {
-    const currentUser = this.props.currentUser
-    console.log('currentUser', currentUser)
+    const { isLoaded } = this.props
+    const { currentUser } = firebase.auth()
+
     return (
       <header className="header_area">
         <div className="main_menu">
@@ -61,22 +63,22 @@ class HeaderAreaView extends Component {
                   }
                   <li className="nav-item">
                     {
-                      currentUser &&
-                      <a className='nav-link sign-out-link' href='https://belmontrunners.com'
+                      isLoaded && currentUser &&
+                      <a className='nav-link sign-out-link' href='/'
                          rel="noopener noreferrer"
                          onClick={() => firebase.auth().signOut()}>
                         Sign out
                       </a>
                     }
                     {
-                      !currentUser &&
-                      <Link to="/signin" className='nav-link sign-in-link'>
+                      isLoaded && !currentUser &&
+                      <Link to={SIGN_IN} className='nav-link sign-in-link'>
                         Sign in
                       </Link>
                     }
                     {
-                      !currentUser &&
-                      <Link to="/join" className='nav-link sign-in-link'>
+                      isLoaded && !currentUser &&
+                      <Link to={JOIN} className='nav-link sign-in-link'>
                         Join Us
                       </Link>
                     }
@@ -119,15 +121,15 @@ class HeaderAreaView extends Component {
                   {/*  </a>*/}
                   {/*</li>*/}
                   {
-                    currentUser &&
+                    isLoaded && currentUser &&
                     <li className="nav-item">
                       <Profile />
                     </li>
                   }
                   {
-                    !currentUser &&
+                    isLoaded && !currentUser &&
                     <li className="nav-item">
-                      <Link to="/signin" className='signin-btn text-white'>
+                      <Link to={SIGN_IN} className='signin-btn text-white'>
                         <Button className='text-white'>
                           Log in
                         </Button>
@@ -135,9 +137,9 @@ class HeaderAreaView extends Component {
                     </li>
                   }
                   {
-                    !currentUser &&
+                    isLoaded && !currentUser &&
                     <li className="nav-item">
-                      <Link to="/join">
+                      <Link to={JOIN}>
                         <Button variant="contained" color="primary">
                           Join Us
                         </Button>
@@ -155,12 +157,12 @@ class HeaderAreaView extends Component {
 }
 
 HeaderAreaView.propTypes = {
-  currentUser: PropTypes.object
+  isLoaded: PropTypes.bool.isRequired
 }
 
 const mapStateToProps = (state) => {
   return {
-    currentUser: state.currentUser.get('data')
+    isLoaded: state.currentUser.isLoaded
   }
 }
 

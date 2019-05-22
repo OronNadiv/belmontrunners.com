@@ -1,37 +1,32 @@
+import 'firebase/auth'
+import 'firebase/firestore'
+import firebase from 'firebase'
 import React, { Component } from 'react'
 import { Select, TextField } from 'final-form-material-ui'
 import Promise from 'bluebird'
 import * as PropTypes from 'prop-types'
-import "firebase/firestore"
-import firebase from 'firebase'
-
+import moment from 'moment'
 import { Field, Form } from 'react-final-form'
 import MenuItem from '@material-ui/core/MenuItem'
 import SignUpStepperButton from './SignUpStepperButton'
+import LoggedInState from '../HOC/LoggedInState'
 
 const states = require('./states_titlecase.json')
 const required = value => (value ? undefined : 'Required')
 const mustBeNumber = value => (isNaN(value) ? 'Must be a number' : undefined)
-const minValue = min => value =>
-  isNaN(value) || value >= min ? undefined : `Should be greater than ${min}`
+const MAX_YEAR = moment().year() - 5
+const MIN_YEAR = moment().year() - 120
+const birthday = value => {
+  const val = moment(value, 'YYYY-MM-DD')
+  return val.year() < MIN_YEAR || val.year() > MAX_YEAR ? 'Invalid birthday' : undefined
+}
 const composeValidators = (...validators) => value =>
   validators.reduce((error, validator) => error || validator(value), undefined)
 
-class View extends Component {
+class SignUpStepUserDetails extends Component {
   constructor (props) {
     super(props)
-    this.state = {
-      phone: '',
-      address1: '',
-      address2: '',
-      city: '',
-      state: '',
-      zip: '',
-      gender: '',
-      dateOfBirth: '',
-      shirtSizeGender: '',
-      shirtSize: '' // XXS XS S M L XL XXL
-    }
+    this.state = {}
   }
 
   handleSubmit (values) {
@@ -48,29 +43,61 @@ class View extends Component {
         console.log('res', res)
         onNextClicked()
       })
-      .catch(() => {
+      .catch((err) => {
+        console.log('caught an exception', err)
         this.setState({ submitting: false })
       })
   }
+
+  load () {
+    if (this.state.loaded || this.state.loading || !this.props.isCurrentUserLoaded) {
+      return
+    }
+
+    this.setState({ loading: true })
+    const currentUser = firebase.firestore().doc(`users/${firebase.auth().currentUser.uid}`)
+    currentUser.get().then(values => {
+      console.log('values:', values.data())
+      this.setState({ data: values.data() })
+      this.setState({ loading: false, loaded: true })
+    })
+      .finally(() => {
+        this.setState({ loading: false })
+
+      })
+  }
+
+  componentDidUpdate () {
+    this.load()
+  }
+
+  componentDidMount () {
+    this.load()
+  }
+
 
   render () {
     const {
       isLast
     } = this.props
 
-    return (
+    //todo: load values if exist in DB.
+
+    return this.state.loading || !this.state.loaded ?
+      <div className="loading" /> :
       <Form
-        className="container"
+        className='container-fluid'
         onSubmit={(values) => this.handleSubmit(values)}
-        render={({ handleSubmit, form, submitting, pristine, values }) => (
+        initialValues={this.state.data}
+        render={({ handleSubmit, form }) => (
           <form onSubmit={handleSubmit}>
             <div className='row'>
               <Field
                 style={{ minHeight: 68 }}
-                label="Address 1"
+                label='Address 1'
                 fullWidth
-                margin="normal"
-                name="address1"
+                margin='normal'
+                name='address1'
                 component={TextField}
                 validate={required}
               />
@@ -79,34 +106,43 @@ class View extends Component {
             <div className='row'>
               <Field
                 style={{ minHeight: 68 }}
-                label="Address 2"
+                label='Address 2'
                 fullWidth
-                margin="normal"
-                name="address2"
+                margin='normal'
+                name='address2'
                 component={TextField}
               />
             </div>
 
-            <div className='row'>
+            <div className='row d-flex justify-content-between align-content-center'>
               <Field
                 style={{ minHeight: 68 }}
-                label="City"
-                margin="normal"
-                name="city"
+                label='City'
+                margin='normal'
+                name='city'
                 component={TextField}
                 validate={required}
+              />
+
+              <Field
+                style={{ width: 100 }}
+                name='zip'
+                component={TextField}
+                validate={composeValidators(required, mustBeNumber)}
+                label='Zip'
+                margin='normal'
               />
             </div>
 
             <div className='row'>
               <Field
                 // style={{ minWidth: 180 }}
-                name="state"
+                name='state'
                 component={Select}
                 validate={required}
-                label="State"
-                // margin="normal"
-                initialValue="CA"
+                label='State'
+                // margin='normal'
+                initialValue='CA'
                 width='auto'
               >
                 {
@@ -118,36 +154,40 @@ class View extends Component {
               </Field>
             </div>
 
-            <div className='row'>
+            <div className='row d-flex justify-content-between align-items-end'>
               <Field
-                // style={{ minWidth: 180 }}
-                name="zip"
-                component={TextField}
-                validate={composeValidators(required, mustBeNumber)}
-                label="Zip"
-                margin="normal"
-              />
-            </div>
-
-            <div className='row'>
-              <Field
-                // style={{ minWidth: 180 }}
-                name="phone"
+                style={{ width: 120 }}
+                name='phone'
                 component={TextField}
                 validate={required}
-                label="Phone"
-                margin="normal"
+                label='Phone'
+                margin='normal'
+                InputLabelProps={{
+                  shrink: true
+                }}
+              />
+              <Field
+                style={{ width: 140 }}
+                label='Birthday'
+                margin='normal'
+                name='dateOfBirth'
+                type='date'
+                component={TextField}
+                validate={composeValidators(required, birthday)}
+                InputLabelProps={{
+                  shrink: true
+                }}
               />
             </div>
 
-            <div className='row'>
+            <div className='row' style={{ minHeight: 92 }}>
               <Field
-                style={{ minWidth: 180 }}
-                name="gender"
+                style={{ width: 120 }}
+                name='gender'
                 component={Select}
-                validate={composeValidators(required)}
-                label="Gender"
-                // margin="normal"
+                validate={required}
+                label='Gender'
+                // margin='normal'
                 width='auto'
               >
                 <MenuItem value={'F'}>Female</MenuItem>
@@ -156,43 +196,27 @@ class View extends Component {
               </Field>
             </div>
 
-            <div className='row' style={{ minHeight: 68 }}>
-              <Field
-                label="Birthday"
-                margin="normal"
-                name="dateOfBirth"
-                type="date"
-                component={TextField}
-                validate={required}
-                InputLabelProps={{
-                  shrink: true
-                }}
-              />
-            </div>
-
-            <div className='row'>
+            <div className='row d-flex justify-content-between align-content-center' style={{ minHeight: 92 }}>
               <Field
                 style={{ minWidth: 180 }}
-                name="shirtSizeGender"
+                name='shirtSizeGender'
                 component={Select}
-                validate={composeValidators(required)}
-                label="Shirt size gender"
-                // margin="normal"
+                validate={required}
+                label='Shirt size gender'
+                // margin='normal'
                 width='auto'
               >
                 <MenuItem value={'F'}>Female</MenuItem>
                 <MenuItem value={'M'}>Male</MenuItem>
               </Field>
-            </div>
 
-            <div className='row'>
               <Field
-                style={{ minWidth: 100 }}
-                name="shirtSize"
+                style={{ width: 100 }}
+                name='shirtSize'
                 component={Select}
-                validate={composeValidators(required)}
-                label="Shirt size"
-                // margin="normal"
+                validate={required}
+                label='Shirt size'
+                // margin='normal'
                 width='auto'
               >
                 <MenuItem value={'XXS'}>XX-Small</MenuItem>
@@ -205,22 +229,21 @@ class View extends Component {
               </Field>
             </div>
 
-            <pre>{JSON.stringify(values, 0, 2)}</pre>
             <SignUpStepperButton
-              isLast={isLast}
+              isLast={!!isLast}
               onNextClicked={() => form.submit()}
-              disabled={this.state.submitting}
+              disabled={!!this.state.submitting}
             />
           </form>
         )}
       />
-    )
   }
 }
 
-View.propTypes = {
+SignUpStepUserDetails.propTypes = {
+  isCurrentUserLoaded: PropTypes.bool,
   isLast: PropTypes.bool,
   onNextClicked: PropTypes.func.isRequired
 }
 
-export default View
+export default LoggedInState({ name: 'SignUpStepUserDetails', isRequiredToBeLoggedIn: true })(SignUpStepUserDetails)

@@ -1,9 +1,7 @@
 import React, { Component } from 'react'
-import PropTypes from 'prop-types'
 import isEmail from 'isemail/lib/index'
 import './Signin.scss'
 import { Link, Redirect } from 'react-router-dom'
-import { connect } from 'react-redux'
 import TextField from '@material-ui/core/TextField'
 import {
   INVALID_EMAIL,
@@ -19,11 +17,13 @@ import DialogActions from '@material-ui/core/DialogActions'
 import Button from '@material-ui/core/Button'
 import 'firebase/auth'
 import firebase from 'firebase'
+import { ROOT, SIGN_IN } from '../urls'
+import LoggedInState from '../HOC/LoggedInState'
 
 const providerGoogle = new firebase.auth.GoogleAuthProvider()
 const providerFacebook = new firebase.auth.FacebookAuthProvider()
 
-class SignInView extends Component {
+class SignIn extends Component {
 
   constructor (props) {
     super(props)
@@ -55,19 +55,24 @@ class SignInView extends Component {
     })
 
     promise
-      .then(({ user }) => this.updateUserVisit(providerName)(user))
       .then(() => {
         this.setState({
-          isSigningIn: false,
+          isSignedIn: true,
           signInError: null
         })
       })
       .catch((error) => {
         console.log('error while signing in', error)
         this.setState({
-          isSigningIn: false,
+          isSignedIn: false,
           signInError: error
         })
+      })
+      .finally(() => {
+        this.setState({
+          isSigningIn: false
+        })
+
       })
   }
 
@@ -121,13 +126,13 @@ class SignInView extends Component {
   render () {
     console.log('Signin render called')
 
-    const { isSigningIn } = this.state
+    const { close, isSigningIn, isSignedIn } = this.state
 
-    if (this.props.currentUser || this.state.close) {
+    if (close || isSignedIn) {
       return <Redirect
         to={{
-          pathname: "/",
-          state: { from: '/signin' }
+          pathname: ROOT,
+          state: { from: SIGN_IN }
         }}
       />
     }
@@ -224,14 +229,4 @@ class SignInView extends Component {
   }
 }
 
-SignInView.propTypes = {
-  currentUser: PropTypes.object
-}
-
-const mapStateToProps = (state) => {
-  return {
-    currentUser: state.currentUser.get('data')
-  }
-}
-
-export default connect(mapStateToProps)(SignInView)
+export default LoggedInState({ name: 'SignIn', isRequiredToBeLoggedIn: false })(SignIn)

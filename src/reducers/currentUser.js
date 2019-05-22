@@ -1,4 +1,3 @@
-import { fromJS } from 'immutable'
 import firebase from 'firebase'
 import 'firebase/auth'
 
@@ -9,7 +8,7 @@ export const FETCHED_CURRENT_USER = `${PREFIX}_FETCHED_CURRENT_USER`
 let isRegistered
 export const fetchCurrentUser = () => {
   return (dispatch, getState) => {
-    if (getState().currentUser.get('isLoading') || getState().currentUser.get('isLoaded')) {
+    if (getState().currentUser.isLoading || getState().currentUser.isLoaded) {
       return
     }
     dispatch({
@@ -17,7 +16,7 @@ export const fetchCurrentUser = () => {
     })
     if (!isRegistered) {
       isRegistered = true
-      firebase.auth().onAuthStateChanged((user) => {
+      firebase.auth().onAuthStateChanged(() => {
         dispatch({
           type: FETCHED_CURRENT_USER
         })
@@ -26,26 +25,22 @@ export const fetchCurrentUser = () => {
   }
 }
 
-const initialState = fromJS({
-  data: null,
+const initialState = {
   isLoaded: false,
   isLoading: false
-})
+}
 
 const ACTION_HANDLERS = {
-  [FETCHED_CURRENT_USER]: (state = initialState) => {
-    console.log('123', firebase.auth().currentUser)
-    state = state.merge(
-      fromJS({
-        data: firebase.auth().currentUser,
-        isLoaded: true,
-        isLoading: false
-      })
-    )
+  [FETCHING_CURRENT_USER]: (state = initialState) => {
+    state = { ...state, isLoading: true }
     return state
   },
-  [FETCHING_CURRENT_USER]: (state = initialState) => {
-    state = state.set('isLoading', true)
+  [FETCHED_CURRENT_USER]: (state = initialState) => {
+    state = {
+      ...state,
+      isLoaded: true,
+      isLoading: false
+    }
     return state
   }
 }

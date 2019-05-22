@@ -4,8 +4,9 @@ import rp from 'request-promise'
 import SignUpStepperButton from './SignUpStepperButton'
 import './Stripe.scss'
 import PropTypes from 'prop-types'
+import LoggedInState from '../HOC/LoggedInState'
 
-class View extends Component {
+class SignUpStepPayment extends Component {
   constructor (props) {
     super(props)
     this.state = {}
@@ -15,8 +16,7 @@ class View extends Component {
     this.setState({ successMessage, errorMessage })
   }
 
-  submitPayment () {
-
+  handleSubmitPayment () {
     this.setState({ submitting: true })
 
     return this.props.stripe
@@ -54,8 +54,8 @@ class View extends Component {
   }
 
   render () {
-    const { errorMessage, submitting, success } = this.state
-    const { isLast, onNextClicked } = this.props
+    const { errorMessage, submitting } = this.state
+    const { isLast } = this.props
     return (
       <div className="justify-content-center">
         <h5 className='mt-1'>
@@ -72,30 +72,31 @@ class View extends Component {
         &bull; 10% discount at <a target='_blank' rel='noopener noreferrer' href='https://arunnersmind.com'>A Runner’s
         Mind</a><br />
 
-        <h6>Total amount: $25</h6>
+        <h6 className='my-4'>Total amount: $25</h6>
         {
           // todo: add amount that will be charged.
         }
-        <h5 className='mt-4 mb-1'>
+        <h5 className='mb-2'>
           Credit or debit card
         </h5>
-        <div className='mb-3' style={{ minHeight: 64 }}>
-          <CardElement className='mt-3' onReady={(el) => el.focus()} />
+        <div style={{ minHeight: 64 }}>
+          <CardElement onReady={(el) => el.focus()} />
           {
+            // todo: add complete successfully msg and confirmation number.  Then next should finish it.
             errorMessage && <div className='text-danger text-center'>{errorMessage}</div>
           }
         </div>
         <SignUpStepperButton
           isLast={isLast}
-          onNextClicked={() => success ? onNextClicked() : this.submitPayment()}
-          disabled={submitting && !success}
+          onNextClicked={() => this.handleSubmitPayment()}
+          disabled={submitting}
         />
       </div>
     )
   }
 }
 
-View.propTypes = {
+SignUpStepPayment.propTypes = {
   stripe: PropTypes.shape({
     createToken: PropTypes.func.isRequired
   }).isRequired,
@@ -103,4 +104,7 @@ View.propTypes = {
   onNextClicked: PropTypes.func.isRequired
 }
 
-export default injectStripe(View)
+export default injectStripe(LoggedInState({
+  name: 'SignUpStepPayment',
+  isRequiredToBeLoggedIn: true
+})(SignUpStepPayment))

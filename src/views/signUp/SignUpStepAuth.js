@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import TextField from '@material-ui/core/TextField/index'
-import { connect } from 'react-redux'
 import isEmail from 'isemail/lib/index'
 import {
   EMAIL_ADDRESS_ALREADY_TAKEN,
@@ -16,6 +15,9 @@ import Promise from 'bluebird'
 import s from 'underscore.string'
 import 'firebase/auth'
 import firebase from 'firebase'
+import LoggedInState from '../HOC/LoggedInState'
+import { PRIVACY_POLICY, PRIVACY_POLICY_FILE_NAME, TOS, TOS_FILE_NAME, WAVER, WAVER_FILE_NAME } from '../urls'
+import moment from 'moment'
 
 class View extends Component {
   constructor (props) {
@@ -58,37 +60,77 @@ class View extends Component {
     }
   }
 
-  signUp (fullName, email, password) {
+  signUp (providerName, fullName, email, password) {
+    console.log('signUp  called')
+    const { onNextClicked } = this.props
     this.setState({
       isSigningUp: true,
       signUpError: null
     })
+    const providerGoogle = new firebase.auth.GoogleAuthProvider()
+    const providerFacebook = new firebase.auth.FacebookAuthProvider()
 
-    Promise.resolve(firebase.auth().createUserWithEmailAndPassword(email, password))
-      .tap((user) => {
-        console.log('calling updateProfile', user)
-        const displayName = s.words(fullName).map((w) => s.capitalize(w)).join(" ")
-        console.log('displayName:', displayName)
-        return firebase.auth().currentUser.updateProfile({
-          displayName
-        })
+    let promise
+    switch (providerName.toLowerCase()) {
+      case 'email':
+        promise = Promise.resolve(firebase.auth().createUserWithEmailAndPassword(email, password))
+          .tap((user) => {
+            console.log('calling updateProfile', user)
+            const displayName = s.words(fullName).map((w) => s.capitalize(w)).join(" ")
+            console.log('displayName:', displayName)
+            return firebase.auth().currentUser.updateProfile({
+              displayName
+            })
+          })
+        break
+      case 'facebook':
+        promise = firebase.auth().signInWithPopup(providerFacebook)
+        break
+      case 'google':
+        promise = firebase.auth().signInWithPopup(providerGoogle)
+        break
+      default:
+        console.error('missing default provider. returning facebook.')
+        promise = firebase.auth().signInWithPopup(providerFacebook)
+        break
+    }
+
+    promise
+      .then(() => {
+        const currentUserRef = firebase.firestore().doc(`users/${firebase.auth().currentUser.uid}`)
+        return currentUserRef.get()
       })
-      .then(({ user }) => {
-        const currentUser = firebase.firestore().doc(`users/${firebase.auth().currentUser.uid}`)
-        const { email, displayName, photoURL } = user
-        return currentUser.set({
+      .then((doc) => {
+        let values = {}
+        if (!doc.exists) {
+          values = {
+            ...values,
+            tosUrl: TOS_FILE_NAME,
+            tosAcceptedAt: moment().format(),
+            waverUrl: WAVER_FILE_NAME,
+            waverAcceptedAt: moment().format(),
+            privacyPolicyUrl: PRIVACY_POLICY_FILE_NAME,
+            privacyPolicyAcceptedAt: moment().format()
+          }
+        }
+        const { email, displayName, photoURL } = firebase.auth().currentUser
+        values = {
+          ...values,
           email,
           displayName,
           photoURL
-        })
+        }
+        const currentUserRef = firebase.firestore().doc(`users/${firebase.auth().currentUser.uid}`)
+        return currentUserRef.set(values)
       })
       .then(() => {
         this.setState({
           signUpError: null
         })
+        onNextClicked()
       })
       .catch((error) => {
-        this.state({
+        this.setState({
           signUpError: error
         })
       })
@@ -99,7 +141,7 @@ class View extends Component {
       })
   }
 
-  handleSignUp () {
+  handleSignUpWithEmail () {
     this.setState({ generalErrorMessage: '' })
     const { fullName, email, password } = this.state
 
@@ -114,11 +156,12 @@ class View extends Component {
     } else if (password.length < 6) {
       this.setState({ invalidPasswordMessage: INVALID_PASSWORD_LENGTH(6) })
     }
-    this.signUp(fullName, email, password)
+    this.signUp('email', fullName, email, password)
   }
 
+
   handleSignInWithProvider (providerName) {
-    return () => this.signIn(providerName)
+    this.signUp(providerName)
   }
 
   render () {
@@ -127,23 +170,21 @@ class View extends Component {
       invalidEmailMessage,
       invalidFullNameMessage,
       invalidPasswordMessage,
-      success,
       isSigningUp
     } = this.state
 
     const {
-      isLast,
-      onNextClicked
+      isLast
     } = this.props
 
     return (
-      <div className='justify-content-center'>
+      <div style={{ maxWidth: 400 }}>
         <div className='btn btn-block btn-social btn-twitter'
-             onClick={this.handleSignInWithProvider('facebook')}>
+             onClick={() => this.handleSignInWithProvider('facebook')}>
           <span className='fab fa-facebook' /> Connect with Facebook
         </div>
         <div className='btn btn-block btn-social btn-google'
-             onClick={this.handleSignInWithProvider('google')}>
+             onClick={() => this.handleSignInWithProvider('google')}>
           <span className='fab fa-google' /> Connect with Google
         </div>
 
@@ -208,17 +249,17 @@ class View extends Component {
           }}
         />
         <div className='mt-2 mb-2 text-center'>
-          By clicking “NEXT”, you agree to our <a href='https://www.belmontrunners.com/documents/2019-04-01_tos.pdf'
+          By clicking “NEXT”, you agree to our <a href={TOS}
                                                   target='_blank' rel='noopener noreferrer'>terms of service</a>, <a
-          href='https://www.belmontrunners.com/documents/2019-05-18_privacy_policy.pdf' target='_blank'
+          href={PRIVACY_POLICY} target='_blank'
           rel='noopener noreferrer'>privacy statement</a> and <a
-          href='https://www.belmontrunners.com/documents/2019-05-18_waver.pdf' target='_blank'
+          href={WAVER} target='_blank'
           rel='noopener noreferrer'>release of liability</a>. We’ll occasionally send you account related emails.
         </div>
         <SignUpStepperButton
           isLast={isLast}
-          onNextClicked={() => success ? onNextClicked() : this.handleSignUp()}
-          disabled={isSigningUp}
+          onNextClicked={() => this.handleSignUpWithEmail()}
+          disabled={!!isSigningUp}
         />
       </div>
     )
@@ -227,14 +268,7 @@ class View extends Component {
 
 View.propTypes = {
   isLast: PropTypes.bool,
-  onNextClicked: PropTypes.func.isRequired,
-  currentUser: PropTypes.object
+  onNextClicked: PropTypes.func.isRequired
 }
 
-const mapStateToProps = (state) => {
-  return {
-    currentUser: state.currentUser.get('data')
-  }
-}
-
-export default connect(mapStateToProps)(View)
+export default LoggedInState({ name: 'SignUpStepAuth', isRequiredToBeLoggedIn: false, isAllowStateChange: true })(View)

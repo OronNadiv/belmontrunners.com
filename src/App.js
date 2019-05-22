@@ -9,10 +9,11 @@ import { fetchCurrentUser as fetchCurrentUserAction } from './reducers/currentUs
 import { connect } from 'react-redux'
 import { Route, Switch } from 'react-router-dom'
 import SignIn from './views/signIn/SignIn'
-import SignUp from './views/signUp/SignUp'
 import ForgotPassword from './views/forgotPassword/ForgotPassword'
 import HomePage from './home-page'
 import HeaderArea from './header/HeaderAreaView'
+import SignUpPage from './views/signUp/SignUpPage'
+import { FORGOT_PASSWORD, JOIN, ROOT, SIGN_IN } from './views/urls'
 
 class App extends Component {
   componentDidMount () {
@@ -25,7 +26,7 @@ class App extends Component {
       <Switch>
         <Route
           exact
-          path={'/signin'}
+          path={SIGN_IN}
           render={() => (
             <div>
               <HeaderArea />
@@ -38,20 +39,18 @@ class App extends Component {
         />
         <Route
           exact
-          path={'/join'}
+          path={JOIN}
           render={() => (
             <div>
               <HeaderArea />
-              <HomePage />
+              <SignUpPage />
               <Footer />
-
-              <SignUp />
             </div>
           )}
         />
         <Route
           exact
-          path={'/forgotpassword'}
+          path={FORGOT_PASSWORD}
           render={() => (
             <div>
               <HeaderArea />
@@ -65,7 +64,7 @@ class App extends Component {
 
         <Route
           exact
-          path={'/'}
+          path={ROOT}
           render={() => (
             <div>
               <HeaderArea />
