@@ -33,7 +33,6 @@ class HeaderAreaView extends Component {
   render () {
     const currentUser = this.props.currentUser
     console.log('currentUser', currentUser)
-    return <div/>
     return (
       <header className="header_area">
         <div className="main_menu">
@@ -63,7 +62,8 @@ class HeaderAreaView extends Component {
                   <li className="nav-item">
                     {
                       currentUser &&
-                      <a className='nav-link sign-out-link' href='https://belmontrunners.com' rel="noopener noreferrer"
+                      <a className='nav-link sign-out-link' href='https://belmontrunners.com'
+                         rel="noopener noreferrer"
                          onClick={() => firebase.auth().signOut()}>
                         Sign out
                       </a>

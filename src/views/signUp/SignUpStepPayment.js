@@ -72,6 +72,7 @@ class View extends Component {
         &bull; 10% discount at <a target='_blank' rel='noopener noreferrer' href='https://arunnersmind.com'>A Runner’s
         Mind</a><br />
 
+        <h6>Total amount: $25</h6>
         {
           // todo: add amount that will be charged.
         }

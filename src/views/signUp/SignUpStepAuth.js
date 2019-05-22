@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import TextField from '@material-ui/core/TextField/index'
-import { updateUserVisit } from '../identityActions'
 import { connect } from 'react-redux'
 import isEmail from 'isemail/lib/index'
 import {
@@ -74,7 +73,15 @@ class View extends Component {
           displayName
         })
       })
-      .then(({ user }) => updateUserVisit('email')(user))
+      .then(({ user }) => {
+        const currentUser = firebase.firestore().doc(`users/${firebase.auth().currentUser.uid}`)
+        const { email, displayName, photoURL } = user
+        return currentUser.set({
+          email,
+          displayName,
+          photoURL
+        })
+      })
       .then(() => {
         this.setState({
           signUpError: null

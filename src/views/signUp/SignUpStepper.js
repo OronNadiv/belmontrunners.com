@@ -2,14 +2,13 @@ import React, { Component } from 'react'
 
 import './Signup.scss'
 import { Redirect } from 'react-router-dom'
-import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
 import Stepper from '@material-ui/core/Stepper'
 import Step from '@material-ui/core/Step'
 import StepLabel from '@material-ui/core/StepLabel'
 
 import SignUpStepAuth from './SignUpStepAuth'
 import SignUpStepPayment from './SignUpStepPayment'
+import SignUpStepUserDetails from './SignUpStepUserDetails'
 
 class SignUpStepper extends Component {
   constructor (props) {
@@ -37,8 +36,7 @@ class SignUpStepper extends Component {
   render () {
     console.log('Signup render called')
     const { activeStep, close } = this.state
-    const { currentUser } = this.props
-    if (currentUser || close) {
+    if (close) {
       return <Redirect
         to={{
           pathname: "/",
@@ -50,6 +48,12 @@ class SignUpStepper extends Component {
     return (
       <div>
         <Stepper alternativeLabel className="justify-content-center" activeStep={activeStep}>
+          <Step key={0}>
+            <StepLabel>
+              User Details
+            </StepLabel>
+          </Step>
+
           <Step key={2}>
             <StepLabel>
               Membership
@@ -63,26 +67,16 @@ class SignUpStepper extends Component {
           </Step>
         </Stepper>
         {
+
           activeStep === 0 ?
-            <SignUpStepPayment isFirst onNextClicked={this.handleNext} /> :
-            <SignUpStepAuth onNextClicked={this.handleNext} />
+            <SignUpStepUserDetails isFirst onNextClicked={this.handleNext} /> :
+            activeStep === 1 ?
+              <SignUpStepPayment isFirst onNextClicked={this.handleNext} /> :
+              <SignUpStepAuth onNextClicked={this.handleNext} />
         }
       </div>
     )
   }
 }
 
-SignUpStepper.propTypes = {
-  currentUser: PropTypes.object
-}
-
-const mapDispatchToProps = {
-}
-
-const mapStateToProps = (state) => {
-  return {
-    currentUser: state.currentUser.get('data')
-  }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(SignUpStepper)
+export default SignUpStepper

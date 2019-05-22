@@ -2,8 +2,6 @@ import React, { Component } from 'react'
 
 import './Signup.scss'
 import { Redirect } from 'react-router-dom'
-import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
 import SignUpStepper from './SignUpStepper'
 import Dialog from '@material-ui/core/Dialog'
 import DialogTitle from '@material-ui/core/DialogTitle'
@@ -26,9 +24,8 @@ class SignUp extends Component {
   render () {
     console.log('Signup render called')
     const { close } = this.state
-    const { currentUser } = this.props
 
-    if (currentUser || close) {
+    if (close) {
       return <Redirect
         to={{
           pathname: "/",
@@ -57,14 +54,4 @@ class SignUp extends Component {
   }
 }
 
-SignUp.propTypes = {
-  currentUser: PropTypes.object
-}
-
-const mapStateToProps = (state) => {
-  return {
-    currentUser: state.currentUser.get('data')
-  }
-}
-
-export default connect(mapStateToProps)(SignUp)
+export default SignUp
