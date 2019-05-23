@@ -29,10 +29,6 @@ class SignUpStepUserDetails extends Component {
     this.state = {}
   }
 
-  componentDidMount () {
-    window.scrollTo(0, 0)
-  }
-
   handleSubmit (values) {
     const { onNextClicked } = this.props
     console.log('submitting values:', values)
@@ -55,6 +51,8 @@ class SignUpStepUserDetails extends Component {
 
 
   componentDidMount () {
+    window.scrollTo(0, 0)
+
     this.setState({ loading: true })
     const currentUser = firebase.firestore().doc(`users/${firebase.auth().currentUser.uid}`)
     currentUser.get().then(values => {
