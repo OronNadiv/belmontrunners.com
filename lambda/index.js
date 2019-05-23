@@ -33,7 +33,9 @@ exports.handler = async (event, context, callback) => {
 
     let charge
     try {
-      const stripe = event.headers.origin === 'https://www.belmontrunners.com' ? stripeLive : stripeTest
+      const isProduction = event.headers.origin === 'https://www.belmontrunners.com'
+      console.log('isProduction:', isProduction, 'origin:', event.headers.origin)
+      const stripe = isProduction ? stripeLive : stripeTest
       charge = await stripe.charges.create({
         amount: parseInt(amount),
         currency: 'usd',

@@ -24,6 +24,8 @@ firebase.initializeApp(config)
 
 let store = configureStore()
 
+console.log('process.env.REACT_APP_STRIPE_PUBLIC_KEY:', process.env.REACT_APP_STRIPE_PUBLIC_KEY)
+
 ReactDOM.render(
   <Provider store={store}>
     <ConnectedRouter history={history}>
