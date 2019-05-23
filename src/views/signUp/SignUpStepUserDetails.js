@@ -29,6 +29,10 @@ class SignUpStepUserDetails extends Component {
     this.state = {}
   }
 
+  componentDidMount () {
+    window.scrollTo(0, 0)
+  }
+
   handleSubmit (values) {
     const { onNextClicked } = this.props
     console.log('submitting values:', values)

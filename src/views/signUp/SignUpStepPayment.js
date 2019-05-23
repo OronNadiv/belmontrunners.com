@@ -18,6 +18,10 @@ class SignUpStepPayment extends Component {
     this.state = {}
   }
 
+  componentDidMount () {
+    window.scrollTo(0, 0)
+  }
+
   setMessage (errorMessage = '', successMessage = '') {
     this.setState({ successMessage, errorMessage })
     if (!errorMessage) {

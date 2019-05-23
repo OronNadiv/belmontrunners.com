@@ -34,7 +34,11 @@ class View extends Component {
     }
   }
 
-  componentDidUpdate (prevProps1, prevState) {
+  componentDidMount () {
+    window.scrollTo(0, 0)
+  }
+
+  componentDidUpdate (prevProps, prevState) {
     const {
       signUpError
     } = this.state
