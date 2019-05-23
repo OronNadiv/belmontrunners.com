@@ -36,8 +36,8 @@ class SignUpStepUserDetails extends Component {
       .try(() => {
         console.log(JSON.stringify(values, 0, 2))
         this.setState({ submitting: true })
-        const currentUser = firebase.firestore().doc(`users/${firebase.auth().currentUser.uid}`)
-        return currentUser.set(values)
+        const currentUserRef = firebase.firestore().doc(`users/${firebase.auth().currentUser.uid}`)
+        return currentUserRef.set(values, { merge: true })
       })
       .then((res) => {
         console.log('res', res)
@@ -49,11 +49,8 @@ class SignUpStepUserDetails extends Component {
       })
   }
 
-  load () {
-    if (this.state.loaded || this.state.loading || !this.props.isCurrentUserLoaded) {
-      return
-    }
 
+  componentDidMount () {
     this.setState({ loading: true })
     const currentUser = firebase.firestore().doc(`users/${firebase.auth().currentUser.uid}`)
     currentUser.get().then(values => {
@@ -63,16 +60,7 @@ class SignUpStepUserDetails extends Component {
     })
       .finally(() => {
         this.setState({ loading: false })
-
       })
-  }
-
-  componentDidUpdate () {
-    this.load()
-  }
-
-  componentDidMount () {
-    this.load()
   }
 
 
@@ -238,7 +226,6 @@ class SignUpStepUserDetails extends Component {
 }
 
 SignUpStepUserDetails.propTypes = {
-  isCurrentUserLoaded: PropTypes.bool,
   isLast: PropTypes.bool,
   onNextClicked: PropTypes.func.isRequired
 }

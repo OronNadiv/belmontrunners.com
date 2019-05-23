@@ -126,7 +126,7 @@ class SignUpStepPayment extends Component {
         </div>
         <SignUpStepperButton
           nextText={success ? '' : "Pay Now"}
-          isLast={isLast}
+          isLast={!!isLast}
           onNextClicked={() => success ? this.props.onNextClicked() : this.handleSubmitPayment()}
           disabled={!!submitting}
         />

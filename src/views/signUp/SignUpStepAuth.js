@@ -121,7 +121,7 @@ class View extends Component {
           photoURL
         }
         const currentUserRef = firebase.firestore().doc(`users/${firebase.auth().currentUser.uid}`)
-        return currentUserRef.set(values)
+        return currentUserRef.set(values, { merge: true })
       })
       .then(() => {
         this.setState({
@@ -257,7 +257,7 @@ class View extends Component {
           rel='noopener noreferrer'>release of liability</a>. We’ll occasionally send you account related emails.
         </div>
         <SignUpStepperButton
-          isLast={isLast}
+          isLast={!!isLast}
           onNextClicked={() => this.handleSignUpWithEmail()}
           disabled={!!isSigningUp}
         />
