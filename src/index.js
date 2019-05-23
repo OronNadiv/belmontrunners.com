@@ -28,7 +28,7 @@ ReactDOM.render(
   <Provider store={store}>
     <ConnectedRouter history={history}>
       <MuiThemeProvider theme={theme}>
-        <StripeProvider apiKey="pk_test_R3hC7CQ84gcox9h8iinHtok200qDiPg0HT">
+        <StripeProvider apiKey={process.env.REACT_APP_STRIPE_PUBLIC_KEY}>
           <Elements>
             <App />
           </Elements>

@@ -1,7 +1,7 @@
-const secretKey = process.env.STRIPE_SECRET_KEY
 const amount = process.env.CHARGE_AMOUNT_IN_CENTS
 
-const stripe = require('stripe')(secretKey)
+const stripeLive = require('stripe')(process.env.STRIPE_SECRET_KEY_LIVE)
+const stripeTest = require('stripe')(process.env.STRIPE_SECRET_KEY_TEST)
 
 const generateResponse = (body, statusCode) => {
   return {
@@ -33,10 +33,11 @@ exports.handler = async (event, context, callback) => {
 
     let charge
     try {
+      const stripe = event.headers.origin === 'https://www.belmontrunners.com' ? stripeLive : stripeTest
       charge = await stripe.charges.create({
         amount: parseInt(amount),
         currency: 'usd',
-        description: 'Example charge',
+        description: 'Annual membership for Belmont Runners',
         source: id
       })
     } catch (err) {
