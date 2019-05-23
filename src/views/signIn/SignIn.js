@@ -72,8 +72,12 @@ class SignIn extends Component {
         this.setState({
           isSigningIn: false
         })
-
       })
+    // todo: when sign-in is done via provider, redirect to user details and then maybe to payments
+    // todo: if payment wasn't done, show bottom message.
+    // todo: if user details wasn't done, show bottom message.
+
+
   }
 
   handleSignInWithEmail () {
@@ -150,6 +154,8 @@ class SignIn extends Component {
         </DialogTitle>
 
         <DialogContent>
+{/*
+          // TODO: enable providers
           <div className="btn btn-block btn-social btn-twitter"
                onClick={() => this.handleSignInWithProvider('facebook')}>
             <span className="fab fa-facebook" /> Sign in with Facebook
@@ -160,6 +166,7 @@ class SignIn extends Component {
           </div>
 
           <div className="mt-4 text-center text-dark">Or sign in with email</div>
+*/}
 
           {
             this.state.generalErrorMessage &&

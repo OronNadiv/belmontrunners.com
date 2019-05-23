@@ -86,7 +86,7 @@ const mapDispatchToProps = {
   fetchCurrentUser: fetchCurrentUserAction
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = () => {
   return {}
 }
 

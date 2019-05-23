@@ -183,6 +183,8 @@ class View extends Component {
 
     return (
       <div style={{ maxWidth: 400 }}>
+{/*
+        // TODO: enable providers.  Need to redirect to details and payment if seeing for the first time
         <div className='btn btn-block btn-social btn-twitter'
              onClick={() => this.handleSignInWithProvider('facebook')}>
           <span className='fab fa-facebook' /> Connect with Facebook
@@ -193,6 +195,7 @@ class View extends Component {
         </div>
 
         <div className='mt-4 text-center text-dark'>Or sign up with email</div>
+*/}
 
         {
           generalErrorMessage &&
@@ -248,10 +251,13 @@ class View extends Component {
             console.log(`Pressed keyCode ${ev.key}`)
             if (ev.key === 'Enter') {
               ev.preventDefault()
-              this.handleSignUp()
+              this.handleSignUpWithEmail()
             }
           }}
         />
+        {
+          // todo: add 'confirm password' field
+        }
         <div className='mt-2 mb-2 text-center'>
           By clicking “NEXT”, you agree to our <a href={TOS}
                                                   target='_blank' rel='noopener noreferrer'>terms of service</a>, <a
@@ -261,9 +267,10 @@ class View extends Component {
           rel='noopener noreferrer'>release of liability</a>. We’ll occasionally send you account related emails.
         </div>
         <SignUpStepperButton
-          isLast={!!isLast}
-          onNextClicked={() => this.handleSignUpWithEmail()}
-          disabled={!!isSigningUp}
+          handlePrimaryClicked={() => this.handleSignUpWithEmail()}
+          primaryText={isLast ? 'Finish' : 'Next'}
+          showPrimary
+          primaryDisabled={!!isSigningUp}
         />
       </div>
     )

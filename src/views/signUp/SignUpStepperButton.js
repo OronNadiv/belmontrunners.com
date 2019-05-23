@@ -4,31 +4,54 @@ import PropTypes from 'prop-types'
 
 class SignUpStepperButton extends React.Component {
   render () {
-    const { isLast, onNextClicked, disabled, nextText } = this.props
-    let text = nextText
-    if (!text) {
-      text = isLast ? 'Finish' : 'Next'
-    }
+    const {
+      primaryText, secondaryText,
+      primaryDisabled, secondaryDisabled,
+      handlePrimaryClicked, handleSecondaryClicked,
+      showPrimary, showSecondary
+    } = this.props
     return (
-      <Button
-        className='my-5'
-        variant="contained"
-        color="primary"
-        fullWidth
-        onClick={onNextClicked}
-        disabled={disabled}
-      >
-        {text}
-      </Button>
+      <div className='d-flex justify-content-between my-5'>
+        {
+          showSecondary &&
+          <Button
+            className='mr-4'
+            variant="contained"
+            color="default"
+            fullWidth
+            onClick={handleSecondaryClicked}
+            disabled={secondaryDisabled}
+          >
+            {secondaryText}
+          </Button>
+        }
+        {
+          showPrimary &&
+          <Button
+            variant="contained"
+            color="primary"
+            fullWidth
+            onClick={handlePrimaryClicked}
+            disabled={primaryDisabled}
+          >
+            {primaryText}
+          </Button>
+        }
+      </div>
     )
   }
 }
 
 SignUpStepperButton.propTypes = {
-  nextText: PropTypes.string,
-  disabled: PropTypes.bool.isRequired,
-  isLast: PropTypes.bool,
-  onNextClicked: PropTypes.func.isRequired
+  primaryText: PropTypes.string.isRequired,
+  primaryDisabled: PropTypes.bool,
+  showPrimary: PropTypes.bool.isRequired,
+  handlePrimaryClicked: PropTypes.func.isRequired,
+
+  secondaryText: PropTypes.string,
+  secondaryDisabled: PropTypes.bool,
+  showSecondary: PropTypes.bool,
+  handleSecondaryClicked: PropTypes.func
 }
 
 export default SignUpStepperButton

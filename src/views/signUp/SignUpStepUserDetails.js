@@ -67,11 +67,8 @@ class SignUpStepUserDetails extends Component {
 
 
   render () {
-    const {
-      isLast
-    } = this.props
-
-    //todo: load values if exist in DB.
+    const { submitting } = this.state
+    const { isLast } = this.props
 
     return this.state.loading || !this.state.loaded ?
       <div className="loading" /> :
@@ -217,9 +214,10 @@ class SignUpStepUserDetails extends Component {
             </div>
 
             <SignUpStepperButton
-              isLast={!!isLast}
-              onNextClicked={() => form.submit()}
-              disabled={!!this.state.submitting}
+              handlePrimaryClicked={() => form.submit()}
+              primaryText={isLast ? 'Finish' : 'Next'}
+              primaryDisabled={!!submitting}
+              showPrimary
             />
           </form>
         )}

@@ -1,3 +1,4 @@
+import 'firebase/auth'
 import 'firebase/firestore'
 import firebase from 'firebase'
 import React, { Component } from 'react'
@@ -9,8 +10,13 @@ import PropTypes from 'prop-types'
 import LoggedInState from '../HOC/LoggedInState'
 import moment from 'moment'
 import Promise from 'bluebird'
+import { Redirect } from 'react-router-dom'
+import { ROOT } from '../urls'
+import { connect } from 'react-redux'
 
 const MEMBERSHIP_FEE = 25
+const NEED_TO_PAY = 'needToPay'
+const MEMBERSHIP_EXPIRES_AT = 'membershopExpiresAt'
 
 class SignUpStepPayment extends Component {
   constructor (props) {
@@ -18,8 +24,36 @@ class SignUpStepPayment extends Component {
     this.state = {}
   }
 
+  fetchLastTransactionInformation () {
+    const transactionsLastRef = firebase.firestore().doc(
+      `users/${firebase.auth().currentUser.uid}/transactions/latest`)
+
+    transactionsLastRef.get()
+      .then((values) => {
+        const membershipExpiresAt = values.data()[MEMBERSHIP_EXPIRES_AT]
+        let needToPay = true
+        if (membershipExpiresAt && moment(membershipExpiresAt).isAfter(moment().add(1, 'month'))) {
+          needToPay = false
+        }
+        this.setState({
+          [NEED_TO_PAY]: needToPay,
+          [MEMBERSHIP_EXPIRES_AT]: membershipExpiresAt
+        })
+      })
+  }
+
   componentDidMount () {
     window.scrollTo(0, 0)
+
+    if (this.props.isLoaded) {
+      this.fetchLastTransactionInformation()
+    }
+  }
+
+  componentDidUpdate (prevProps, prevState) {
+    if (prevProps.isLoaded !== this.props.isLoaded) {
+      this.fetchLastTransactionInformation()
+    }
   }
 
   setMessage (errorMessage = '', successMessage = '') {
@@ -53,13 +87,19 @@ class SignUpStepPayment extends Component {
               `users/${firebase.auth().currentUser.uid}/transactions/${moment().utc().format()}`)
             const transactionsLastRef = firebase.firestore().doc(
               `users/${firebase.auth().currentUser.uid}/transactions/latest`)
+            const membershipExpiresAt = moment().add(1, 'year').utc().format()
             let values = {
               // stripeResponse: JSON.stringify(stripeResponse),
               stripeResponse: stripeResponse,
               paidAt: moment().utc().format(),
               paidAmount: MEMBERSHIP_FEE,
-              confirmationNumber: chargeResponse.id
+              confirmationNumber: chargeResponse.id,
+              [MEMBERSHIP_EXPIRES_AT]: membershipExpiresAt
             }
+            this.setState({
+              [NEED_TO_PAY]: false,
+              [MEMBERSHIP_EXPIRES_AT]: membershipExpiresAt
+            })
             return Promise.all([
               transactionsRef.set(values),
               transactionsLastRef.set(values)
@@ -92,8 +132,17 @@ class SignUpStepPayment extends Component {
   }
 
   render () {
-    const { successMessage, errorMessage, submitting, success } = this.state
+    const { successMessage, errorMessage, submitting, success, close } = this.state
     const { isLast } = this.props
+
+    if (close) {
+      return <Redirect
+        to={{
+          pathname: ROOT
+        }}
+      />
+    }
+
     return (
       <div className="justify-content-center">
         <h5 className='mt-1'>
@@ -112,34 +161,52 @@ class SignUpStepPayment extends Component {
 
         <div>
           {
-            !success && (
+            this.state[NEED_TO_PAY] === false && !success ?
               <div>
-                <h6 className='my-4'>Total amount: ${MEMBERSHIP_FEE}</h6>
-                {
-                  // todo: add a few words on the shirt they'll get - what, how long to get it, etc.
-                }
-                <h5 className='mb-2'>
-                  Credit or debit card
-                </h5>
-                <CardElement onReady={(el) => el.focus()} />
-                {errorMessage && <div className='text-danger text-center'>{errorMessage}</div>}
-              </div>
-            )
+                <div className='text-success text-center mt-4'>Your membership expires
+                  on {moment(this.state[MEMBERSHIP_EXPIRES_AT]).format("MMMM Do YYYY")}</div>
+                <div className='text-success text-center'>You can renew it
+                  after {moment(this.state[MEMBERSHIP_EXPIRES_AT]).subtract(1, 'month').format("MMMM Do YYYY")}
+                </div>
+              </div> :
+              // need to pay.
+              this.state[NEED_TO_PAY] && !success && (
+                <div>
+                  <h6 className='my-4'>Total amount: ${MEMBERSHIP_FEE}</h6>
+                  {
+                    // todo: add a few words on the shirt they'll get - what, how long to get it, etc.
+                  }
+                  <h5 className='mb-2'>
+                    Credit or debit card
+                  </h5>
+                  <CardElement onReady={(el) => el.focus()} />
+                  {errorMessage && <div className='text-danger text-center'>{errorMessage}</div>}
+                </div>
+              )
           }
           {successMessage && <div className='text-success text-center mt-4'>{successMessage}</div>}
         </div>
         <SignUpStepperButton
-          nextText={success ? '' : "Pay Now"}
-          isLast={!!isLast}
-          onNextClicked={() => success ? this.props.onNextClicked() : this.handleSubmitPayment()}
-          disabled={!!submitting}
+          handlePrimaryClicked={() => success || this.state[NEED_TO_PAY] === false ? this.props.onNextClicked() : this.handleSubmitPayment()}
+          primaryText={success || this.state[NEED_TO_PAY] === false ?
+            (isLast ? 'Finish' : 'Next')
+            : "Pay Now"}
+          primaryDisabled={!!submitting}
+          showPrimary
+
+          handleSecondaryClicked={() => this.setState({ close: true })}
+          secondaryText={'Finish later'}
+          secondaryDisabled={!!submitting}
+          showSecondary={this.state[NEED_TO_PAY] && !success}
         />
       </div>
     )
   }
+
 }
 
 SignUpStepPayment.propTypes = {
+  isLoaded: PropTypes.bool.isRequired,
   stripe: PropTypes.shape({
     createToken: PropTypes.func.isRequired
   }).isRequired,
@@ -147,7 +214,14 @@ SignUpStepPayment.propTypes = {
   onNextClicked: PropTypes.func.isRequired
 }
 
+const mapStateToProps = (state) => {
+  return {
+    isLoaded: state.currentUser.isLoaded,
+    lastChanged: state.currentUser.lastChanged
+  }
+}
+
 export default injectStripe(LoggedInState({
   name: 'SignUpStepPayment',
   isRequiredToBeLoggedIn: true
-})(SignUpStepPayment))
+})(connect(mapStateToProps)(SignUpStepPayment)))
