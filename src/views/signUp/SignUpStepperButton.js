@@ -4,7 +4,11 @@ import PropTypes from 'prop-types'
 
 class SignUpStepperButton extends React.Component {
   render () {
-    const { isLast, onNextClicked, disabled } = this.props
+    const { isLast, onNextClicked, disabled, nextText } = this.props
+    let text = nextText
+    if (!text) {
+      text = isLast ? 'Finish' : 'Next'
+    }
     return (
       <Button
         className='my-5'
@@ -14,15 +18,16 @@ class SignUpStepperButton extends React.Component {
         onClick={onNextClicked}
         disabled={disabled}
       >
-        {isLast ? 'Finish' : 'Next'}
+        {text}
       </Button>
     )
   }
 }
 
 SignUpStepperButton.propTypes = {
+  nextText: PropTypes.string,
   disabled: PropTypes.bool.isRequired,
-  isLast: PropTypes.bool.isRequired,
+  isLast: PropTypes.bool,
   onNextClicked: PropTypes.func.isRequired
 }
 

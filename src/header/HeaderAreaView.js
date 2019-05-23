@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Link } from "react-router-dom"
+import { Link, withRouter } from "react-router-dom"
 import 'firebase/auth'
 import firebase from 'firebase'
 import $ from 'jquery'
@@ -10,13 +10,36 @@ import Button from '@material-ui/core/Button'
 import { JOIN, SIGN_IN } from '../views/urls'
 
 class HeaderAreaView extends Component {
+  checkIsFixed () {
+    if (this.props.location.pathname.trim() === JOIN) {
+      console.log('adding. this.props.location.pathname.trim():', this.props.location.pathname.trim())
+      $(".header_area").addClass("navbar_fixed")
+      $(".header_area").addClass("navbar_fixed_not_root")
+      return true
+    } else {
+      console.log('removing. this.props.location.pathname.trim():', this.props.location.pathname.trim())
+
+      $(".header_area").removeClass("navbar_fixed_not_root")
+      return false
+    }
+  }
+
   componentDidMount () {
     const nav_offset_top = $('.header_area').height() + 50
     console.log('nav_offset_top:', nav_offset_top)
+    console.log('this.props.location:', this.props.location)
 
-    function navbarFixed () {
+
+    const navbarFixed = () => {
       if ($('.header_area').length) {
-        $(window).scroll(function () {
+        if (this.checkIsFixed()) {
+          return
+        }
+
+        $(window).scroll(() => {
+          if (this.checkIsFixed()) {
+            return
+          }
           const scroll = $(window).scrollTop()
           if (scroll >= nav_offset_top) {
             $(".header_area").addClass("navbar_fixed")
@@ -31,6 +54,10 @@ class HeaderAreaView extends Component {
     navbarFixed()
   }
 
+  componentDidUpdate (prevProps) {
+    this.checkIsFixed()
+  }
+
   render () {
     const { isLoaded } = this.props
     const { currentUser } = firebase.auth()
@@ -40,7 +67,7 @@ class HeaderAreaView extends Component {
         <div className="main_menu">
           <nav className="navbar navbar-expand-lg navbar-light">
             <div className="container box_1620">
-              <a className="navbar-brand logo_h" href="index.html"><img src="img/logo.png" alt="" />
+              <a className="navbar-brand logo_h" href="/"><img src="img/logo.png" alt="" />
               </a>
               <button className="navbar-toggler" type="button" data-toggle="collapse"
                       data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
@@ -77,7 +104,7 @@ class HeaderAreaView extends Component {
                       </Link>
                     }
                     {
-                      isLoaded && !currentUser &&
+                      isLoaded && !currentUser && this.props.location.pathname.trim() !== JOIN &&
                       <Link to={JOIN} className='nav-link sign-in-link'>
                         Join Us
                       </Link>
@@ -137,7 +164,7 @@ class HeaderAreaView extends Component {
                     </li>
                   }
                   {
-                    isLoaded && !currentUser &&
+                    isLoaded && !currentUser && this.props.location.pathname.trim() !== JOIN &&
                     <li className="nav-item">
                       <Link to={JOIN}>
                         <Button variant="contained" color="primary">
@@ -157,13 +184,18 @@ class HeaderAreaView extends Component {
 }
 
 HeaderAreaView.propTypes = {
-  isLoaded: PropTypes.bool.isRequired
+  isLoaded: PropTypes.bool.isRequired,
+  lastChanged: PropTypes.number.isRequired,
+  location: PropTypes.shape({
+    pathname: PropTypes.string.isRequired
+  }).isRequired
 }
 
 const mapStateToProps = (state) => {
   return {
-    isLoaded: state.currentUser.isLoaded
+    isLoaded: state.currentUser.isLoaded,
+    lastChanged: state.currentUser.lastChanged
   }
 }
 
-export default connect(mapStateToProps)(HeaderAreaView)
+export default connect(mapStateToProps)(withRouter(HeaderAreaView))

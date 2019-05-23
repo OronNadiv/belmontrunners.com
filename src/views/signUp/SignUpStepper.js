@@ -43,6 +43,12 @@ class SignUpStepper extends Component {
         <Stepper alternativeLabel className="justify-content-center" activeStep={activeStep}>
           <Step key={0}>
             <StepLabel>
+              Account
+            </StepLabel>
+          </Step>
+
+          <Step key={1}>
+            <StepLabel>
               User Details
             </StepLabel>
           </Step>
@@ -53,11 +59,6 @@ class SignUpStepper extends Component {
             </StepLabel>
           </Step>
 
-          <Step key={1}>
-            <StepLabel>
-              Account
-            </StepLabel>
-          </Step>
         </Stepper>
         {
           this.getStep()
@@ -70,11 +71,11 @@ class SignUpStepper extends Component {
     const { activeStep } = this.state
     switch (activeStep) {
       case 0:
-        return <SignUpStepAuth isLast onNextClicked={this.handleNext} />
+        return <SignUpStepAuth onNextClicked={this.handleNext} />
       case 1:
         return <SignUpStepUserDetails onNextClicked={this.handleNext} />
       case 2:
-        return <SignUpStepPayment onNextClicked={this.handleNext} />
+        return <SignUpStepPayment isLast onNextClicked={this.handleNext} />
       case 3:
         return <Redirect
           to={{

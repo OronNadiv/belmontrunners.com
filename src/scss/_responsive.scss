@@ -1,6 +1,9 @@
 @media (max-width: 1619px) {
   /* Main Menu Area css
   ============================================================================================ */
+  .navbar_fixed_not_root + div {
+    margin-top: 71px;
+  }
   .header_area .navbar .search {
     margin-left: 40px;
   }
@@ -121,7 +124,7 @@
   .header_area .navbar .nav .nav-item {
     margin-right: 0px;
   }
-  .header_area + section, .header_area + row, .header_area + div {
+  .header_area + section, .header_area + row, .header_area + div, .navbar_fixed_not_root + div {
     margin-top: 71px;
   }
   .home_banner_area .banner_inner .banner_content .banner_map_img {
@@ -254,7 +257,7 @@
   .top_menu {
     display: none;
   }
-  .header_area + section, .header_area + row, .header_area + div {
+  .header_area + section, .header_area + row, .header_area + div, .navbar_fixed_not_root + div {
     margin-top: 71px;
   }
   /* Home Banner Area css

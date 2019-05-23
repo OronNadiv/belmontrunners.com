@@ -27,7 +27,8 @@ export const fetchCurrentUser = () => {
 
 const initialState = {
   isLoaded: false,
-  isLoading: false
+  isLoading: false,
+  lastChanged: 0
 }
 
 const ACTION_HANDLERS = {
@@ -39,7 +40,8 @@ const ACTION_HANDLERS = {
     state = {
       ...state,
       isLoaded: true,
-      isLoading: false
+      isLoading: false,
+      lastChanged: new Date().valueOf()
     }
     return state
   }

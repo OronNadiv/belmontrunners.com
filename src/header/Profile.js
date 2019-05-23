@@ -3,6 +3,8 @@ import firebase from 'firebase'
 import Avatar from 'react-avatar'
 import React, { Component } from 'react'
 import LoggedInState from '../views/HOC/LoggedInState'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 
 class ProfileView extends Component {
   render () {
@@ -28,5 +30,14 @@ class ProfileView extends Component {
   }
 }
 
+ProfileView.propTypes = {
+  lastChanged: PropTypes.number.isRequired
+}
 
-export default LoggedInState({name: 'profile', isRequiredToBeLoggedIn: true})(ProfileView)
+const mapStateToProps = (state) => {
+  return {
+    lastChanged: state.currentUser.lastChanged
+  }
+}
+
+export default LoggedInState({ name: 'profile', isRequiredToBeLoggedIn: true })(connect(mapStateToProps)(ProfileView))

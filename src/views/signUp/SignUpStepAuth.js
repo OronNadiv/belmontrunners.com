@@ -108,9 +108,9 @@ class View extends Component {
             tosUrl: TOS_FILE_NAME,
             tosAcceptedAt: moment().format(),
             waverUrl: WAVER_FILE_NAME,
-            waverAcceptedAt: moment().format(),
+            waverAcceptedAt: moment().utc().format(),
             privacyPolicyUrl: PRIVACY_POLICY_FILE_NAME,
-            privacyPolicyAcceptedAt: moment().format()
+            privacyPolicyAcceptedAt: moment().utc().format()
           }
         }
         const { email, displayName, photoURL } = firebase.auth().currentUser

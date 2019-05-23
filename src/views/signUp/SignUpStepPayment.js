@@ -1,3 +1,5 @@
+import 'firebase/firestore'
+import firebase from 'firebase'
 import React, { Component } from 'react'
 import { CardElement, injectStripe } from 'react-stripe-elements'
 import rp from 'request-promise'
@@ -5,6 +7,10 @@ import SignUpStepperButton from './SignUpStepperButton'
 import './Stripe.scss'
 import PropTypes from 'prop-types'
 import LoggedInState from '../HOC/LoggedInState'
+import moment from 'moment'
+import Promise from 'bluebird'
+
+const MEMBERSHIP_FEE = 25
 
 class SignUpStepPayment extends Component {
   constructor (props) {
@@ -14,6 +20,9 @@ class SignUpStepPayment extends Component {
 
   setMessage (errorMessage = '', successMessage = '') {
     this.setState({ successMessage, errorMessage })
+    if (!errorMessage) {
+      this.setState({ success: true })
+    }
   }
 
   handleSubmitPayment () {
@@ -22,7 +31,7 @@ class SignUpStepPayment extends Component {
     return this.props.stripe
       .createToken({ type: 'card' })
       .then(stripeResponse => {
-        console.log('stripeResponse:', stripeResponse)
+        console.log('stripeResponse:', JSON.stringify(stripeResponse, 0, 2))
         if (stripeResponse.error) {
           this.setMessage(stripeResponse.error.message)
           throw stripeResponse.error
@@ -33,13 +42,38 @@ class SignUpStepPayment extends Component {
           body: stripeResponse,
           json: true
         }
-        return rp(options)
-          .then(chargeResponse => {
-            console.log('chargeResponse:', chargeResponse)
-            return this.props.onNextClicked()
-          }).catch(err => {
-            // todo:handle case where charge failed by showing an error message
-            console.error("chargeError:", err)
+        return Promise
+          .resolve(rp(options))
+          .tap(chargeResponse => {
+            const transactionsRef = firebase.firestore().doc(
+              `users/${firebase.auth().currentUser.uid}/transactions/${moment().utc().format()}`)
+            const transactionsLastRef = firebase.firestore().doc(
+              `users/${firebase.auth().currentUser.uid}/transactions/latest`)
+            let values = {
+              // stripeResponse: JSON.stringify(stripeResponse),
+              stripeResponse: stripeResponse,
+              paidAt: moment().utc().format(),
+              paidAmount: MEMBERSHIP_FEE,
+              confirmationNumber: chargeResponse.id
+            }
+            return Promise.all([
+              transactionsRef.set(values),
+              transactionsLastRef.set(values)
+            ])
+          })
+          .then((chargeResponse) => {
+            this.setMessage('',
+              <div>
+                <div>Complete successfully</div>
+                <div>Confirmation: {chargeResponse.id.substring(3)}</div>
+              </div>)
+          })
+          .catch(stripeResponse => {
+            if (stripeResponse.error) {
+              this.setMessage(stripeResponse.error.message)
+              throw stripeResponse.error
+            }
+            throw stripeResponse
           })
       })
       .catch(err => {
@@ -54,7 +88,7 @@ class SignUpStepPayment extends Component {
   }
 
   render () {
-    const { errorMessage, submitting } = this.state
+    const { successMessage, errorMessage, submitting, success } = this.state
     const { isLast } = this.props
     return (
       <div className="justify-content-center">
@@ -72,24 +106,29 @@ class SignUpStepPayment extends Component {
         &bull; 10% discount at <a target='_blank' rel='noopener noreferrer' href='https://arunnersmind.com'>A Runner’s
         Mind</a><br />
 
-        <h6 className='my-4'>Total amount: $25</h6>
-        {
-          // todo: add amount that will be charged.
-        }
-        <h5 className='mb-2'>
-          Credit or debit card
-        </h5>
-        <div style={{ minHeight: 64 }}>
-          <CardElement onReady={(el) => el.focus()} />
+        <div>
           {
-            // todo: add complete successfully msg and confirmation number.  Then next should finish it.
-            errorMessage && <div className='text-danger text-center'>{errorMessage}</div>
+            !success && (
+              <div>
+                <h6 className='my-4'>Total amount: ${MEMBERSHIP_FEE}</h6>
+                {
+                  // todo: add a few words on the shirt they'll get - what, how long to get it, etc.
+                }
+                <h5 className='mb-2'>
+                  Credit or debit card
+                </h5>
+                <CardElement onReady={(el) => el.focus()} />
+                {errorMessage && <div className='text-danger text-center'>{errorMessage}</div>}
+              </div>
+            )
           }
+          {successMessage && <div className='text-success text-center mt-4'>{successMessage}</div>}
         </div>
         <SignUpStepperButton
+          nextText={success ? '' : "Pay Now"}
           isLast={isLast}
-          onNextClicked={() => this.handleSubmitPayment()}
-          disabled={submitting}
+          onNextClicked={() => success ? this.props.onNextClicked() : this.handleSubmitPayment()}
+          disabled={!!submitting}
         />
       </div>
     )

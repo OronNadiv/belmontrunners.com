@@ -11,7 +11,7 @@ class SignUp extends Component {
 
   render () {
     return (
-      <div className='container-fluid mx-3'>
+      <div className='container-fluid'>
         <div className='d-flex justify-content-center'>
           <SignUpStepper />
         </div>

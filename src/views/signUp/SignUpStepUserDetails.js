@@ -89,7 +89,7 @@ class SignUpStepUserDetails extends Component {
         className='container-fluid'
         onSubmit={(values) => this.handleSubmit(values)}
         initialValues={this.state.data}
-        render={({ handleSubmit, form }) => (
+        render={({ handleSubmit, form, values }) => (
           <form onSubmit={handleSubmit}>
             <div className='row'>
               <Field
@@ -182,7 +182,7 @@ class SignUpStepUserDetails extends Component {
 
             <div className='row' style={{ minHeight: 92 }}>
               <Field
-                style={{ width: 120 }}
+                style={{ minWidth: 120 }}
                 name='gender'
                 component={Select}
                 validate={required}
@@ -211,7 +211,7 @@ class SignUpStepUserDetails extends Component {
               </Field>
 
               <Field
-                style={{ width: 100 }}
+                style={{ minWidth: 100 }}
                 name='shirtSize'
                 component={Select}
                 validate={required}
@@ -219,13 +219,10 @@ class SignUpStepUserDetails extends Component {
                 // margin='normal'
                 width='auto'
               >
-                <MenuItem value={'XXS'}>XX-Small</MenuItem>
-                <MenuItem value={'XS'}>X-Small</MenuItem>
-                <MenuItem value={'S'}>Small</MenuItem>
+                {values.shirtSizeGender === 'F' && <MenuItem value={'S'}>Small</MenuItem>}
                 <MenuItem value={'M'}>Medium</MenuItem>
                 <MenuItem value={'L'}>Large</MenuItem>
                 <MenuItem value={'XL'}>X-Large</MenuItem>
-                <MenuItem value={'XXL'}>XX-Large</MenuItem>
               </Field>
             </div>
 
