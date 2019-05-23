@@ -30,8 +30,13 @@ class SignUpStepPayment extends Component {
 
     transactionsLastRef.get()
       .then((values) => {
-        const membershipExpiresAt = values.data()[MEMBERSHIP_EXPIRES_AT]
+        let membershipExpiresAt = null
         let needToPay = true
+        const documentData = values.data()
+
+        if (documentData) {
+          membershipExpiresAt = documentData[MEMBERSHIP_EXPIRES_AT]
+        }
         if (membershipExpiresAt && moment(membershipExpiresAt).isAfter(moment().add(1, 'month'))) {
           needToPay = false
         }
@@ -39,6 +44,10 @@ class SignUpStepPayment extends Component {
           [NEED_TO_PAY]: needToPay,
           [MEMBERSHIP_EXPIRES_AT]: membershipExpiresAt
         })
+      })
+      .catch((err) => {
+        console.error('could not fetch user data.  err:', err)
+        throw err
       })
   }
 
@@ -58,9 +67,6 @@ class SignUpStepPayment extends Component {
 
   setMessage (errorMessage = '', successMessage = '') {
     this.setState({ successMessage, errorMessage })
-    if (!errorMessage) {
-      this.setState({ success: true })
-    }
   }
 
   handleSubmitPayment () {
@@ -97,6 +103,7 @@ class SignUpStepPayment extends Component {
               [MEMBERSHIP_EXPIRES_AT]: membershipExpiresAt
             }
             this.setState({
+              success: true,
               [NEED_TO_PAY]: false,
               [MEMBERSHIP_EXPIRES_AT]: membershipExpiresAt
             })
@@ -132,6 +139,7 @@ class SignUpStepPayment extends Component {
   }
 
   render () {
+    console.log('SignUpStepPayment.render() called.')
     const { successMessage, errorMessage, submitting, success, close } = this.state
     const { isLast } = this.props
 
@@ -170,7 +178,7 @@ class SignUpStepPayment extends Component {
                 </div>
               </div> :
               // need to pay.
-              this.state[NEED_TO_PAY] && !success && (
+              this.state[NEED_TO_PAY] === true && !success && (
                 <div>
                   <h6 className='my-4'>Total amount: ${MEMBERSHIP_FEE}</h6>
                   {
@@ -186,19 +194,22 @@ class SignUpStepPayment extends Component {
           }
           {successMessage && <div className='text-success text-center mt-4'>{successMessage}</div>}
         </div>
-        <SignUpStepperButton
-          handlePrimaryClicked={() => success || this.state[NEED_TO_PAY] === false ? this.props.onNextClicked() : this.handleSubmitPayment()}
-          primaryText={success || this.state[NEED_TO_PAY] === false ?
-            (isLast ? 'Finish' : 'Next')
-            : "Pay Now"}
-          primaryDisabled={!!submitting}
-          showPrimary
+        {
+          (this.state[NEED_TO_PAY] === false || this.state[NEED_TO_PAY] === true) &&
+          <SignUpStepperButton
+            handlePrimaryClicked={() => success || this.state[NEED_TO_PAY] === false ? this.props.onNextClicked() : this.handleSubmitPayment()}
+            primaryText={success || this.state[NEED_TO_PAY] === false ?
+              (isLast ? 'Finish' : 'Next')
+              : "Pay Now"}
+            primaryDisabled={!!submitting}
+            showPrimary
 
-          handleSecondaryClicked={() => this.setState({ close: true })}
-          secondaryText={'Finish later'}
-          secondaryDisabled={!!submitting}
-          showSecondary={this.state[NEED_TO_PAY] && !success}
-        />
+            handleSecondaryClicked={() => this.setState({ close: true })}
+            secondaryText={'Finish later'}
+            secondaryDisabled={!!submitting}
+            showSecondary={this.state[NEED_TO_PAY] === true && !success}
+          />
+        }
       </div>
     )
   }

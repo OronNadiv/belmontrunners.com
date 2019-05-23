@@ -158,7 +158,7 @@ class HeaderAreaView extends Component {
                     <li className="nav-item">
                       <Link to={SIGN_IN} className='signin-btn text-white'>
                         <Button className='text-white'>
-                          Log in
+                          Sign in
                         </Button>
                       </Link>
                     </li>
