@@ -17,7 +17,7 @@ import DialogActions from '@material-ui/core/DialogActions'
 import Button from '@material-ui/core/Button'
 import 'firebase/auth'
 import firebase from 'firebase'
-import { ROOT, SIGN_IN } from '../urls'
+import { FORGOT_PASSWORD, ROOT } from '../urls'
 import LoggedInState from '../HOC/LoggedInState'
 
 const providerGoogle = new firebase.auth.GoogleAuthProvider()
@@ -133,12 +133,7 @@ class SignIn extends Component {
     const { close, isSigningIn, isSignedIn } = this.state
 
     if (close || isSignedIn) {
-      return <Redirect
-        to={{
-          pathname: ROOT,
-          state: { from: SIGN_IN }
-        }}
-      />
+      return <Redirect to={ROOT} />
     }
 
     return (
@@ -154,7 +149,7 @@ class SignIn extends Component {
         </DialogTitle>
 
         <DialogContent>
-{/*
+          {/*
           // TODO: enable providers
           <div className="btn btn-block btn-social btn-twitter"
                onClick={() => this.handleSignInWithProvider('facebook')}>
@@ -211,7 +206,7 @@ class SignIn extends Component {
           />
 
           <p className="font-small blue-text d-flex justify-content-end">
-            Forgot&nbsp;<Link className="blue-text ml-1" to="/forgotpassword">Password?</Link>
+            Forgot&nbsp;<Link to={FORGOT_PASSWORD} className="blue-text ml-1">Password?</Link>
           </p>
 
         </DialogContent>

@@ -16,7 +16,7 @@ import { connect } from 'react-redux'
 
 const MEMBERSHIP_FEE = 25
 const NEED_TO_PAY = 'needToPay'
-const MEMBERSHIP_EXPIRES_AT = 'membershopExpiresAt'
+export const MEMBERSHIP_EXPIRES_AT = 'membershopExpiresAt'
 
 class SignUpStepPayment extends Component {
   constructor (props) {
@@ -36,9 +36,9 @@ class SignUpStepPayment extends Component {
 
         if (documentData) {
           membershipExpiresAt = documentData[MEMBERSHIP_EXPIRES_AT]
-        }
-        if (membershipExpiresAt && moment(membershipExpiresAt).isAfter(moment().add(1, 'month'))) {
-          needToPay = false
+          if (membershipExpiresAt && moment(membershipExpiresAt).isAfter(moment().add(1, 'month'))) {
+            needToPay = false
+          }
         }
         this.setState({
           [NEED_TO_PAY]: needToPay,
@@ -53,15 +53,16 @@ class SignUpStepPayment extends Component {
 
   componentDidMount () {
     window.scrollTo(0, 0)
-
-    if (this.props.isLoaded) {
+    if (firebase.auth().currentUser) {
       this.fetchLastTransactionInformation()
     }
   }
 
-  componentDidUpdate (prevProps, prevState) {
-    if (prevProps.isLoaded !== this.props.isLoaded) {
-      this.fetchLastTransactionInformation()
+  componentDidUpdate (prevProps) {
+    if (prevProps.lastChanged !== this.props.lastChanged) {
+      if (firebase.auth().currentUser) {
+        this.fetchLastTransactionInformation()
+      }
     }
   }
 
@@ -93,19 +94,31 @@ class SignUpStepPayment extends Component {
               `users/${firebase.auth().currentUser.uid}/transactions/${moment().utc().format()}`)
             const transactionsLastRef = firebase.firestore().doc(
               `users/${firebase.auth().currentUser.uid}/transactions/latest`)
-            const membershipExpiresAt = moment().add(1, 'year').utc().format()
+
+            let newMembershipExpiresAt
+            const yearFromNow = moment().add(1, 'year')
+            if (this.state[MEMBERSHIP_EXPIRES_AT]) {
+              const membershipExpiresAtPlusOneYear = moment(this.state[MEMBERSHIP_EXPIRES_AT]).add(1, 'year')
+              if (membershipExpiresAtPlusOneYear.isBefore(yearFromNow)) {
+                newMembershipExpiresAt = yearFromNow
+              } else {
+                newMembershipExpiresAt = membershipExpiresAtPlusOneYear
+              }
+            } else {
+              newMembershipExpiresAt = yearFromNow
+            }
             let values = {
               // stripeResponse: JSON.stringify(stripeResponse),
               stripeResponse: stripeResponse,
               paidAt: moment().utc().format(),
               paidAmount: MEMBERSHIP_FEE,
               confirmationNumber: chargeResponse.id,
-              [MEMBERSHIP_EXPIRES_AT]: membershipExpiresAt
+              [MEMBERSHIP_EXPIRES_AT]: newMembershipExpiresAt.utc().format()
             }
             this.setState({
               success: true,
               [NEED_TO_PAY]: false,
-              [MEMBERSHIP_EXPIRES_AT]: membershipExpiresAt
+              [MEMBERSHIP_EXPIRES_AT]: newMembershipExpiresAt
             })
             return Promise.all([
               transactionsRef.set(values),
@@ -144,11 +157,7 @@ class SignUpStepPayment extends Component {
     const { isLast } = this.props
 
     if (close) {
-      return <Redirect
-        to={{
-          pathname: ROOT
-        }}
-      />
+      return <Redirect to={ROOT} />
     }
 
     return (
@@ -184,6 +193,15 @@ class SignUpStepPayment extends Component {
                   {
                     // todo: add a few words on the shirt they'll get - what, how long to get it, etc.
                   }
+                  {this.state[MEMBERSHIP_EXPIRES_AT] &&
+                  <div className='text-warning'>
+                    {
+                      moment(this.state[MEMBERSHIP_EXPIRES_AT]).isAfter(moment()) ?
+                        `Membership expired on ${moment(this.state[MEMBERSHIP_EXPIRES_AT]).format("MMMM Do YYYY")}` :
+                        `Membership will expire on ${moment(this.state[MEMBERSHIP_EXPIRES_AT]).format("MMMM Do YYYY")}`
+                    }
+                  </div>
+                  }
                   <h5 className='mb-2'>
                     Credit or debit card
                   </h5>
@@ -217,7 +235,7 @@ class SignUpStepPayment extends Component {
 }
 
 SignUpStepPayment.propTypes = {
-  isLoaded: PropTypes.bool.isRequired,
+  lastChanged: PropTypes.number.isRequired,
   stripe: PropTypes.shape({
     createToken: PropTypes.func.isRequired
   }).isRequired,
@@ -227,7 +245,6 @@ SignUpStepPayment.propTypes = {
 
 const mapStateToProps = (state) => {
   return {
-    isLoaded: state.currentUser.isLoaded,
     lastChanged: state.currentUser.lastChanged
   }
 }

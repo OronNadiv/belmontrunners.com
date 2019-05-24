@@ -8,7 +8,7 @@ export const FETCHED_CURRENT_USER = `${PREFIX}_FETCHED_CURRENT_USER`
 let isRegistered
 export const fetchCurrentUser = () => {
   return (dispatch, getState) => {
-    if (getState().currentUser.isLoading || getState().currentUser.isLoaded) {
+    if (getState().currentUser.isLoading || getState().currentUser.lastChanged) {
       return
     }
     dispatch({
@@ -26,20 +26,21 @@ export const fetchCurrentUser = () => {
 }
 
 const initialState = {
-  isLoaded: false,
   isLoading: false,
   lastChanged: 0
 }
 
 const ACTION_HANDLERS = {
   [FETCHING_CURRENT_USER]: (state = initialState) => {
-    state = { ...state, isLoading: true }
+    state = {
+      ...state,
+      isLoading: true
+    }
     return state
   },
   [FETCHED_CURRENT_USER]: (state = initialState) => {
     state = {
       ...state,
-      isLoaded: true,
       isLoading: false,
       lastChanged: new Date().valueOf()
     }

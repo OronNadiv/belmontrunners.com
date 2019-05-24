@@ -10,6 +10,7 @@ import { Field, Form } from 'react-final-form'
 import MenuItem from '@material-ui/core/MenuItem'
 import SignUpStepperButton from './SignUpStepperButton'
 import LoggedInState from '../HOC/LoggedInState'
+import { connect } from 'react-redux'
 
 const states = require('./states_titlecase.json')
 const required = value => (value ? undefined : 'Required')
@@ -49,10 +50,7 @@ class SignUpStepUserDetails extends Component {
       })
   }
 
-
-  componentDidMount () {
-    window.scrollTo(0, 0)
-
+  loadData () {
     this.setState({ loading: true })
     const currentUser = firebase.firestore().doc(`users/${firebase.auth().currentUser.uid}`)
     currentUser.get().then(values => {
@@ -63,8 +61,24 @@ class SignUpStepUserDetails extends Component {
       .finally(() => {
         this.setState({ loading: false })
       })
+
   }
 
+  componentDidMount () {
+    window.scrollTo(0, 0)
+
+    if (firebase.auth().currentUser) {
+      this.loadData()
+    }
+  }
+
+  componentDidUpdate (prevProps) {
+    if (prevProps.lastChanged !== this.props.lastChanged) {
+      if (firebase.auth().currentUser) {
+        this.loadData()
+      }
+    }
+  }
 
   render () {
     const { submitting } = this.state
@@ -185,6 +199,7 @@ class SignUpStepUserDetails extends Component {
 
             <div className='row d-flex justify-content-between align-content-center' style={{ minHeight: 92 }}>
               <Field
+                className='mr-4'
                 style={{ minWidth: 180 }}
                 name='shirtSizeGender'
                 component={Select}
@@ -215,7 +230,7 @@ class SignUpStepUserDetails extends Component {
 
             <SignUpStepperButton
               handlePrimaryClicked={() => form.submit()}
-              primaryText={isLast ? 'Finish' : 'Next'}
+              primaryText={isLast ? 'Save' : 'Next'}
               primaryDisabled={!!submitting}
               showPrimary
             />
@@ -227,7 +242,17 @@ class SignUpStepUserDetails extends Component {
 
 SignUpStepUserDetails.propTypes = {
   isLast: PropTypes.bool,
-  onNextClicked: PropTypes.func.isRequired
+  onNextClicked: PropTypes.func.isRequired,
+  lastChanged: PropTypes.number.isRequired
 }
 
-export default LoggedInState({ name: 'SignUpStepUserDetails', isRequiredToBeLoggedIn: true })(SignUpStepUserDetails)
+const mapStateToProps = (state) => {
+  return {
+    lastChanged: state.currentUser.lastChanged
+  }
+}
+
+export default LoggedInState({
+  name: 'SignUpStepUserDetails',
+  isRequiredToBeLoggedIn: true
+})(connect(mapStateToProps)(SignUpStepUserDetails))

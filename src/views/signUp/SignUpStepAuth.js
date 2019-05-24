@@ -183,7 +183,7 @@ class View extends Component {
 
     return (
       <div style={{ maxWidth: 400 }}>
-{/*
+        {/*
         // TODO: enable providers.  Need to redirect to details and payment if seeing for the first time
         <div className='btn btn-block btn-social btn-twitter'
              onClick={() => this.handleSignInWithProvider('facebook')}>
@@ -268,7 +268,7 @@ class View extends Component {
         </div>
         <SignUpStepperButton
           handlePrimaryClicked={() => this.handleSignUpWithEmail()}
-          primaryText={isLast ? 'Finish' : 'Next'}
+          primaryText={isLast ? 'Create Account' : 'Next'}
           showPrimary
           primaryDisabled={!!isSigningUp}
         />

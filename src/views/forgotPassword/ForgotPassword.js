@@ -12,7 +12,7 @@ import DialogTitle from '@material-ui/core/DialogTitle'
 import TextField from '@material-ui/core/TextField'
 import DialogActions from '@material-ui/core/DialogActions'
 import Button from '@material-ui/core/Button'
-import { FORGOT_PASSWORD, ROOT } from '../urls'
+import { ROOT } from '../urls'
 import LoggedInState from '../HOC/LoggedInState'
 
 class ForgotPassword extends Component {
@@ -80,12 +80,7 @@ class ForgotPassword extends Component {
 
     if (close) {
       console.log('redirecting to root', close)
-      return <Redirect
-        to={{
-          pathname: ROOT,
-          state: { from: FORGOT_PASSWORD }
-        }}
-      />
+      return <Redirect to={ROOT} />
     }
 
     return (

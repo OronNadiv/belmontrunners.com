@@ -59,7 +59,7 @@ class HeaderAreaView extends Component {
   }
 
   render () {
-    const { isLoaded } = this.props
+    const { lastChanged } = this.props
     const { currentUser } = firebase.auth()
 
     return (
@@ -90,7 +90,7 @@ class HeaderAreaView extends Component {
                   }
                   <li className="nav-item">
                     {
-                      isLoaded && currentUser &&
+                      !!lastChanged && currentUser &&
                       <a className='nav-link sign-out-link' href='/'
                          rel="noopener noreferrer"
                          onClick={() => firebase.auth().signOut()}>
@@ -98,14 +98,17 @@ class HeaderAreaView extends Component {
                       </a>
                     }
                     {
-                      isLoaded && !currentUser &&
+                      !!lastChanged && !currentUser &&
                       <Link to={SIGN_IN} className='nav-link sign-in-link'>
                         Sign in
                       </Link>
                     }
                     {
-                      isLoaded && !currentUser && this.props.location.pathname.trim() !== JOIN &&
-                      <Link to={JOIN} className='nav-link sign-in-link'>
+                      !!lastChanged && !currentUser && this.props.location.pathname.trim() !== JOIN &&
+                      <Link to={{
+                        pathname: JOIN,
+                        state: { steps: undefined }
+                      }} className='nav-link sign-in-link'>
                         Join Us
                       </Link>
                     }
@@ -148,13 +151,13 @@ class HeaderAreaView extends Component {
                   {/*  </a>*/}
                   {/*</li>*/}
                   {
-                    isLoaded && currentUser &&
+                    !!lastChanged && currentUser &&
                     <li className="nav-item">
                       <Profile />
                     </li>
                   }
                   {
-                    isLoaded && !currentUser &&
+                    !!lastChanged && !currentUser &&
                     <li className="nav-item">
                       <Link to={SIGN_IN} className='signin-btn text-white'>
                         <Button className='text-white'>
@@ -164,9 +167,12 @@ class HeaderAreaView extends Component {
                     </li>
                   }
                   {
-                    isLoaded && !currentUser && this.props.location.pathname.trim() !== JOIN &&
+                    !!lastChanged && !currentUser && this.props.location.pathname.trim() !== JOIN &&
                     <li className="nav-item">
-                      <Link to={JOIN}>
+                      <Link to={{
+                        pathname: JOIN,
+                        state: { steps: undefined }
+                      }}>
                         <Button variant="contained" color="primary">
                           Join Us
                         </Button>
@@ -184,7 +190,6 @@ class HeaderAreaView extends Component {
 }
 
 HeaderAreaView.propTypes = {
-  isLoaded: PropTypes.bool.isRequired,
   lastChanged: PropTypes.number.isRequired,
   location: PropTypes.shape({
     pathname: PropTypes.string.isRequired
@@ -193,7 +198,6 @@ HeaderAreaView.propTypes = {
 
 const mapStateToProps = (state) => {
   return {
-    isLoaded: state.currentUser.isLoaded,
     lastChanged: state.currentUser.lastChanged
   }
 }

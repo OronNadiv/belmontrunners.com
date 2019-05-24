@@ -5,6 +5,7 @@ import EventSchedule from '../EventSchedule'
 import Subscribe from './Subscribe'
 import Team from './Team'
 import Map from './Map'
+import Notifications from './Notifications'
 
 class Home extends Component {
   render () {
@@ -17,6 +18,7 @@ class Home extends Component {
         <Team />
         {/*<Partners />*/}
         <Map />
+        <Notifications />
       </div>
     )
   }

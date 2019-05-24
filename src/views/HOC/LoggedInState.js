@@ -16,35 +16,30 @@ export default ({ name, isRequiredToBeLoggedIn, isAllowStateChange }) => {
       }
 
       render () {
-        const { isLoaded } = this.props
+        const { lastChanged } = this.props
         const isLoggedIn = !!firebase.auth().currentUser
         isRequiredToBeLoggedIn = !!isRequiredToBeLoggedIn
         isAllowStateChange = !!isAllowStateChange
         console.log('name:', name,
-          'isLoaded:', isLoaded,
+          'lastChanged:', lastChanged,
           'isLoggedIn:', !!isLoggedIn,
           'isRequiredToBeLoggedIn:', isRequiredToBeLoggedIn,
           'isAllowStateChange:', isAllowStateChange)
-        if (isLoaded && isLoggedIn !== isRequiredToBeLoggedIn) {
+        if (lastChanged && isLoggedIn !== isRequiredToBeLoggedIn) {
           console.log('Inside 1.',
-            'isAllowStateChange:', isAllowStateChange,
-            'isStateChanged:', this.state.isStateChanged)
-          if (!isAllowStateChange || !this.state.isStateChanged) {
+            'isAllowStateChange:', isAllowStateChange)
+          if (!isAllowStateChange) {
             console.log('Inside 2.', 'redirecting to root')
-            return <Redirect
-              to={{
-                pathname: ROOT
-              }}
-            />
+            return <Redirect to={ROOT} />
           }
         }
 
-        return <WrappedComponent isCurrentUserLoaded={isLoaded} {...this.props} />
+        return <WrappedComponent {...this.props} />
       }
     }
 
     HOC.propTypes = {
-      isLoaded: PropTypes.bool
+      lastChanged: PropTypes.number.isRequired
 
     }
     const mapDispatchToProps = {
@@ -52,7 +47,7 @@ export default ({ name, isRequiredToBeLoggedIn, isAllowStateChange }) => {
     }
 
     const mapStateToProps = (state) => {
-      return { isLoaded: state.currentUser.isLoaded }
+      return { lastChanged: state.currentUser.lastChanged }
     }
 
     return connect(mapStateToProps, mapDispatchToProps)(HOC)
