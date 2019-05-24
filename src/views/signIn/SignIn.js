@@ -74,10 +74,6 @@ class SignIn extends Component {
         })
       })
     // todo: when sign-in is done via provider, redirect to user details and then maybe to payments
-    // todo: if payment wasn't done, show bottom message.
-    // todo: if user details wasn't done, show bottom message.
-
-
   }
 
   handleSignInWithEmail () {

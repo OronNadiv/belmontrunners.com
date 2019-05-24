@@ -107,6 +107,7 @@ class ForgotPassword extends Component {
 
               <TextField
                 label="Your email"
+                type='email'
                 margin="normal"
                 fullWidth
                 onChange={(event) => {
