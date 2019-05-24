@@ -171,7 +171,7 @@ class SignIn extends Component {
           <TextField
             label="Your email"
             margin="normal"
-            type='search'
+            type='email'
             fullWidth
             onChange={(event) => {
               this.setState({

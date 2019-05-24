@@ -161,6 +161,7 @@ class SignUpStepUserDetails extends Component {
                 name='phone'
                 component={TextField}
                 validate={required}
+                type='tel'
                 label='Phone'
                 margin='normal'
                 InputLabelProps={{
