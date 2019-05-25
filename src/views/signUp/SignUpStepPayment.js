@@ -13,10 +13,10 @@ import Promise from 'bluebird'
 import { Redirect } from 'react-router-dom'
 import { ROOT } from '../urls'
 import { connect } from 'react-redux'
+import { MEMBERSHIP_EXPIRES_AT } from '../../fields'
 
 const MEMBERSHIP_FEE = 25
 const NEED_TO_PAY = 'needToPay'
-export const MEMBERSHIP_EXPIRES_AT = 'membershipExpiresAt'
 
 class SignUpStepPayment extends Component {
   constructor (props) {

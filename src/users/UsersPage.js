@@ -11,6 +11,21 @@ import { AutoSizer, Column, Table } from 'react-virtualized'
 import s from 'underscore.string'
 import moment from 'moment'
 import googleLibPhoneNumber from 'google-libphonenumber'
+import {
+  ADDRESS1,
+  ADDRESS2,
+  CITY,
+  DATE_OF_BIRTH,
+  DISPLAY_NAME,
+  EMAIL,
+  GENDER,
+  MEMBERSHIP_EXPIRES_AT,
+  PHONE,
+  SHIRT_GENDER,
+  SHIRT_SIZE,
+  STATE,
+  ZIP
+} from '../fields'
 
 const PNF = googleLibPhoneNumber.PhoneNumberFormat
 const phoneUtil = googleLibPhoneNumber.PhoneNumberUtil.getInstance()
@@ -141,16 +156,17 @@ class UsersPage extends Component {
           let members = []
           doc.forEach((doc) => {
             const data = doc.data()
-            data.address = data.address1
-            if (data.address2) {
-              data.address += '\n' + data.address2
+            data.address = data[ADDRESS1]
+            if (data[ADDRESS2]) {
+              data.address += ' ' + data[ADDRESS2]
             }
-            data.address += '\r\n' + data.city
-            data.address += '\n' + data.state + ' ' + data.zip
-            const number = phoneUtil.parseAndKeepRawInput(data.phone, 'US')
+            data.address += ' ' + data[CITY]
+            data.address += ' ' + data[STATE] + ' ' + data[ZIP]
+            const number = phoneUtil.parseAndKeepRawInput(data[PHONE], 'US')
 
-            data.phone = phoneUtil.format(number, PNF.NATIONAL)
-            data.dateOfBirth = moment(data.dateOfBirth).format('MMMM D')
+            data[PHONE] = phoneUtil.format(number, PNF.NATIONAL)
+            data[DATE_OF_BIRTH] = moment(data[DATE_OF_BIRTH]).format('MMMM D')
+            data[MEMBERSHIP_EXPIRES_AT] = data[MEMBERSHIP_EXPIRES_AT] ? moment(data[MEMBERSHIP_EXPIRES_AT]).format('LLLL') : ''
             members.push(data)
           })
           members = members.sort((a, b) => {
@@ -170,55 +186,72 @@ class UsersPage extends Component {
 
   render () {
     return (
-      <Paper style={{ height: 400, width: '100%' }}>
-        <VirtualizedTable
-          rowCount={this.state.members.length}
-          rowGetter={({ index }) => this.state.members[index]}
-          columns={[
-            {
-              width: 200,
-              label: 'Name',
-              dataKey: 'displayName'
-            },
-            {
-              width: 200,
-              label: 'Email',
-              dataKey: 'email'
-              // numeric: true
-            },
-            {
-              width: 160,
-              label: 'Phone',
-              dataKey: 'phone'
-              // numeric: true
-            },
-            {
-              width: 200,
-              label: 'Address',
-              dataKey: 'address'
-              // numeric: true
-            },
-            {
-              width: 120,
-              label: 'Birthday',
-              dataKey: 'dateOfBirth'
-              //numeric: true
-            },
-            {
-              width: 80,
-              label: 'Shirt Gender',
-              dataKey: 'shirtGender'
-              //numeric: true
-            },
-            {
-              width: 80,
-              label: 'Shirt Size',
-              dataKey: 'shirtSize'
-              //numeric: true
-            }
-          ]}
-        />
-      </Paper>
+      <div className='container my-5'>
+        <div className='row footer-bottom d-flex justify-content-between align-items-center'>
+
+          <Paper style={{ height: 500, width: '100%' }}>
+            <VirtualizedTable
+              rowCount={this.state.members.length}
+              rowGetter={({ index }) => this.state.members[index]}
+              columns={[
+                {
+                  width: 200,
+                  label: 'Name',
+                  dataKey: DISPLAY_NAME
+                },
+                {
+                  width: 200,
+                  label: 'Email',
+                  dataKey: EMAIL
+                  // numeric: true
+                },
+                {
+                  width: 160,
+                  label: 'Phone',
+                  dataKey: PHONE
+                  // numeric: true
+                },
+                {
+                  width: 200,
+                  label: 'Address',
+                  dataKey: 'address'
+                  // numeric: true
+                },
+                {
+                  width: 120,
+                  label: 'Birthday',
+                  dataKey: DATE_OF_BIRTH
+                  //numeric: true
+                },
+                {
+                  width: 80,
+                  label: 'Gender',
+                  dataKey: GENDER
+                  //numeric: true
+                },
+                {
+                  width: 80,
+                  label: 'Shirt Gender',
+                  dataKey: SHIRT_GENDER
+                  //numeric: true
+                },
+                {
+                  width: 80,
+                  label: 'Shirt Size',
+                  dataKey: SHIRT_SIZE
+                  //numeric: true
+                },
+                {
+                  width: 180,
+                  label: 'Membership expires',
+                  dataKey: MEMBERSHIP_EXPIRES_AT
+                  //numeric: true
+                }
+              ]}
+            />
+          </Paper>
+        </div>
+      </div>
     )
   }
 }

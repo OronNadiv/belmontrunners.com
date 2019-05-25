@@ -7,11 +7,14 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import Profile from './Profile'
 import Button from '@material-ui/core/Button'
-import { JOIN, SIGN_IN } from '../views/urls'
+import { JOIN, USERS, SIGN_IN } from '../views/urls'
 
 class HeaderAreaView extends Component {
   checkIsFixed () {
-    if (this.props.location.pathname.trim() === JOIN) {
+    if (
+      this.props.location.pathname.trim() === JOIN ||
+      this.props.location.pathname.trim() === USERS
+    ) {
       console.log('adding. this.props.location.pathname.trim():', this.props.location.pathname.trim())
       $(".header_area").addClass("navbar_fixed")
       $(".header_area").addClass("navbar_fixed_not_root")

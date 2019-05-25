@@ -11,6 +11,18 @@ import MenuItem from '@material-ui/core/MenuItem'
 import SignUpStepperButton from './SignUpStepperButton'
 import LoggedInState from '../HOC/LoggedInState'
 import { connect } from 'react-redux'
+import {
+  ADDRESS1,
+  ADDRESS2,
+  CITY,
+  DATE_OF_BIRTH,
+  GENDER,
+  PHONE,
+  SHIRT_GENDER,
+  SHIRT_SIZE,
+  STATE,
+  ZIP
+} from '../../fields'
 
 const states = require('./states_titlecase.json')
 const required = value => (value ? undefined : 'Required')
@@ -98,7 +110,7 @@ class SignUpStepUserDetails extends Component {
                 label='Address 1'
                 fullWidth
                 margin='normal'
-                name='address1'
+                name={ADDRESS1}
                 component={TextField}
                 validate={required}
               />
@@ -110,7 +122,7 @@ class SignUpStepUserDetails extends Component {
                 label='Address 2'
                 fullWidth
                 margin='normal'
-                name='address2'
+                name={ADDRESS2}
                 component={TextField}
               />
             </div>
@@ -120,14 +132,14 @@ class SignUpStepUserDetails extends Component {
                 style={{ minHeight: 68 }}
                 label='City'
                 margin='normal'
-                name='city'
+                name={CITY}
                 component={TextField}
                 validate={required}
               />
 
               <Field
                 style={{ width: 100 }}
-                name='zip'
+                name={ZIP}
                 component={TextField}
                 validate={composeValidators(required, mustBeNumber)}
                 label='Zip'
@@ -138,7 +150,7 @@ class SignUpStepUserDetails extends Component {
             <div className='row'>
               <Field
                 // style={{ minWidth: 180 }}
-                name='state'
+                name={STATE}
                 component={Select}
                 validate={required}
                 label='State'
@@ -158,7 +170,7 @@ class SignUpStepUserDetails extends Component {
             <div className='row d-flex justify-content-between align-items-end'>
               <Field
                 style={{ width: 120 }}
-                name='phone'
+                name={PHONE}
                 component={TextField}
                 validate={required}
                 type='tel'
@@ -172,7 +184,7 @@ class SignUpStepUserDetails extends Component {
                 style={{ width: 140 }}
                 label='Birthday'
                 margin='normal'
-                name='dateOfBirth'
+                name={DATE_OF_BIRTH}
                 type='date'
                 component={TextField}
                 validate={composeValidators(required, birthday)}
@@ -185,7 +197,7 @@ class SignUpStepUserDetails extends Component {
             <div className='row' style={{ minHeight: 92 }}>
               <Field
                 style={{ minWidth: 120 }}
-                name='gender'
+                name={GENDER}
                 component={Select}
                 validate={required}
                 label='Gender'
@@ -202,7 +214,7 @@ class SignUpStepUserDetails extends Component {
               <Field
                 className='mr-4'
                 style={{ minWidth: 180 }}
-                name='shirtGender'
+                name={SHIRT_GENDER}
                 component={Select}
                 validate={required}
                 label='Shirt gender'
@@ -215,7 +227,7 @@ class SignUpStepUserDetails extends Component {
 
               <Field
                 style={{ minWidth: 100 }}
-                name='shirtSize'
+                name={SHIRT_SIZE}
                 component={Select}
                 validate={required}
                 label='Shirt size'
