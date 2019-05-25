@@ -83,10 +83,15 @@ class SignUpStepPayment extends Component {
           this.setMessage(stripeResponse.error.message)
           throw stripeResponse.error
         }
+        const { displayName, uid, email } = firebase.auth().currentUser
+        const body = {
+          ...stripeResponse,
+          description: `Annual membership for Belmont Runners. name: ${displayName} email: ${email}  uid: ${uid}`
+        }
         const options = {
           method: 'POST',
           uri: 'https://c0belq1th0.execute-api.us-west-1.amazonaws.com/default/stripe',
-          body: stripeResponse,
+          body,
           json: true
         }
         return Promise
