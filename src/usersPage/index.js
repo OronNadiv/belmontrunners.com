@@ -135,16 +135,12 @@ class UsersPage extends Component {
   }
 
   loadMembers () {
-    const usersRef = firebase.firestore().collection('users/*/transactions')
-console.log('quering')
+    const usersRef = firebase.firestore().collection('users')
     usersRef.get()
       .then((doc) => {
           let members = []
           doc.forEach((doc) => {
             const data = doc.data()
-            console.log('data', data)
-            return
-
             data.address = data.address1
             if (data.address2) {
               data.address += '\n' + data.address2
