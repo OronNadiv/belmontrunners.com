@@ -2,20 +2,29 @@ import 'firebase/firestore'
 import firebase from 'firebase'
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
-import clsx from 'clsx'
-import { withStyles } from '@material-ui/core/styles'
+import Table from '@material-ui/core/Table'
+import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
+import TableHead from '@material-ui/core/TableHead'
+import TablePagination from '@material-ui/core/TablePagination'
+import TableRow from '@material-ui/core/TableRow'
+import TableSortLabel from '@material-ui/core/TableSortLabel'
+import Toolbar from '@material-ui/core/Toolbar'
+import Typography from '@material-ui/core/Typography'
 import Paper from '@material-ui/core/Paper'
-import { AutoSizer, Column, Table } from 'react-virtualized'
+import FormControlLabel from '@material-ui/core/FormControlLabel'
+import Switch from '@material-ui/core/Switch'
 import s from 'underscore.string'
+import { connect } from 'react-redux'
 import moment from 'moment'
+import Promise from 'bluebird'
 import googleLibPhoneNumber from 'google-libphonenumber'
 import {
   ADDRESS1,
   ADDRESS2,
   CITY,
   DATE_OF_BIRTH,
+  DID_RECEIVED_SHIRT,
   DISPLAY_NAME,
   EMAIL,
   GENDER,
@@ -24,129 +33,124 @@ import {
   SHIRT_GENDER,
   SHIRT_SIZE,
   STATE,
+  UID,
   ZIP
 } from '../fields'
+import { Checkbox } from '@material-ui/core'
 
+const ADDRESS = 'address'
 const PNF = googleLibPhoneNumber.PhoneNumberFormat
 const phoneUtil = googleLibPhoneNumber.PhoneNumberUtil.getInstance()
 
-const styles = theme => ({
-  flexContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    boxSizing: 'border-box'
-  },
-  tableRow: {
-    cursor: 'pointer'
-  },
-  tableRowHover: {
-    '&:hover': {
-      backgroundColor: theme.palette.grey[200]
-    }
-  },
-  tableCell: {
-    flex: 1
-  },
-  noClick: {
-    cursor: 'initial'
+function desc (a, b, orderBy) {
+  if (b[orderBy] < a[orderBy]) {
+    return -1
   }
-})
-
-class MuiVirtualizedTable extends React.PureComponent {
-  static defaultProps = {
-    headerHeight: 48,
-    rowHeight: 48
+  if (b[orderBy] > a[orderBy]) {
+    return 1
   }
+  return 0
+}
 
-  getRowClassName = ({ index }) => {
-    const { classes, onRowClick } = this.props
+function stableSort (array, cmp) {
+  const stabilizedThis = array.map((el, index) => [el, index])
+  stabilizedThis.sort((a, b) => {
+    const order = cmp(a[0], b[0])
+    if (order !== 0) return order
+    return a[1] - b[1]
+  })
+  return stabilizedThis.map(el => el[0])
+}
 
-    return clsx(classes.tableRow, classes.flexContainer, {
-      [classes.tableRowHover]: index !== -1 && onRowClick != null
-    })
+function getSorting (order, orderBy) {
+  return order === 'desc' ? (a, b) => desc(a, b, orderBy) : (a, b) => -desc(a, b, orderBy)
+}
+
+function EnhancedTableHead (props) {
+  const { order, orderBy, onRequestSort } = props
+  const createSortHandler = property => event => {
+    onRequestSort(event, property)
   }
 
-  cellRenderer = ({ cellData, columnIndex }) => {
-    const { columns, classes, rowHeight, onRowClick } = this.props
-    return (
-      <TableCell
-        component="div"
-        className={clsx(classes.tableCell, classes.flexContainer, {
-          [classes.noClick]: onRowClick == null
-        })}
-        variant="body"
-        style={{ height: rowHeight }}
-        align={(columnIndex != null && columns[columnIndex].numeric) || false ? 'right' : 'left'}
-      >
-        {cellData}
-      </TableCell>
-    )
-  }
+  return (
+    <TableHead>
+      <TableRow>
+        {headRows.map(row => (
+          <TableCell
+            key={row.id}
+            align={row.numeric ? 'right' : 'left'}
+            padding={row.disablePadding ? 'none' : 'default'}
+            sortDirection={orderBy === row.id ? order : false}
+          >
+            <TableSortLabel
+              active={orderBy === row.id}
+              direction={order}
+              onClick={createSortHandler(row.id)}
+            >
+              {row.label}
+            </TableSortLabel>
+          </TableCell>
+        ))}
+      </TableRow>
+    </TableHead>
+  )
+}
 
-  headerRenderer = ({ label, columnIndex }) => {
-    const { headerHeight, columns, classes } = this.props
+EnhancedTableHead.propTypes = {
+  onRequestSort: PropTypes.func.isRequired,
+  order: PropTypes.string.isRequired,
+  orderBy: PropTypes.string.isRequired,
+  rowCount: PropTypes.number.isRequired
+}
 
-    return (
-      <TableCell
-        component="div"
-        className={clsx(classes.tableCell, classes.flexContainer, classes.noClick)}
-        variant="head"
-        style={{ height: headerHeight }}
-        align={columns[columnIndex].numeric || false ? 'right' : 'left'}
-      >
-        <span>{label}</span>
-      </TableCell>
-    )
-  }
-
+class EnhancedTableToolbar extends Component {
   render () {
-    const { classes, columns, ...tableProps } = this.props
+    const classes = {}
+
     return (
-      <AutoSizer>
-        {({ height, width }) => (
-          <Table height={height} width={width} {...tableProps} rowClassName={this.getRowClassName}>
-            {columns.map(({ dataKey, ...other }, index) => {
-              return (
-                <Column
-                  key={dataKey}
-                  headerRenderer={headerProps =>
-                    this.headerRenderer({
-                      ...headerProps,
-                      columnIndex: index
-                    })
-                  }
-                  className={classes.flexContainer}
-                  cellRenderer={this.cellRenderer}
-                  dataKey={dataKey}
-                  {...other}
-                />
-              )
-            })}
-          </Table>
-        )}
-      </AutoSizer>
+      <Toolbar>
+        <div className={classes.title}>
+          <Typography variant="h6" id="tableTitle">
+            Users
+          </Typography>
+        </div>
+        <div className={classes.spacer} />
+      </Toolbar>
     )
   }
 }
 
-MuiVirtualizedTable.propTypes = {
-  classes: PropTypes.object.isRequired,
-  columns: PropTypes.arrayOf(PropTypes.object).isRequired,
-  headerHeight: PropTypes.number,
-  onRowClick: PropTypes.func,
-  rowHeight: PropTypes.number
-}
+EnhancedTableToolbar.propTypes = {}
 
-const VirtualizedTable = withStyles(styles)(MuiVirtualizedTable)
+const headRows = [
+  { id: DISPLAY_NAME, numeric: false, disablePadding: false, label: 'Name' },
+  { id: EMAIL, numeric: false, disablePadding: false, label: 'Email' },
+  { id: PHONE, numeric: false, disablePadding: false, label: 'Phone' },
+  { id: ADDRESS, numeric: false, disablePadding: false, label: 'Address' },
+  { id: DATE_OF_BIRTH, numeric: false, disablePadding: false, label: 'Birthday' },
+  { id: GENDER, numeric: false, disablePadding: false, label: 'Gender' },
+  { id: SHIRT_GENDER, numeric: false, disablePadding: false, label: 'Shirt Gender' },
+  { id: SHIRT_SIZE, numeric: false, disablePadding: false, label: 'Shirt Size' },
+  { id: MEMBERSHIP_EXPIRES_AT, numeric: false, disablePadding: false, label: 'Membership Expires' },
+  { id: DID_RECEIVED_SHIRT, numeric: false, disablePadding: false, label: 'Received Shirt' }
+]
 
-class UsersPage extends Component {
+class EnhancedTable extends Component {
+
   constructor (props) {
     super(props)
-    this.state = { members: [] }
-  }
-
-  componentDidMount () {
-    this.loadMembers()
+    this.state = {
+      rows: [],
+      order: 'asc',
+      orderBy: DISPLAY_NAME,
+      page: 0,
+      dense: true,
+      rowsPerPage: 5
+    }
+    this.handleChangeDense = this.handleChangeDense.bind(this)
+    this.handleChangePage = this.handleChangePage.bind(this)
+    this.handleChangeRowsPerPage = this.handleChangeRowsPerPage.bind(this)
+    this.handleRequestSort = this.handleRequestSort.bind(this)
   }
 
   loadMembers () {
@@ -155,27 +159,49 @@ class UsersPage extends Component {
       .then((doc) => {
           let members = []
           doc.forEach((doc) => {
+            console.log(doc)
             const data = doc.data()
-            data.address = data[ADDRESS1]
+            data[UID] = doc.id
+            data[ADDRESS] = data[ADDRESS1]
             if (data[ADDRESS2]) {
-              data.address += ' ' + data[ADDRESS2]
+              data[ADDRESS] += ' ' + data[ADDRESS2]
             }
-            data.address += ' ' + data[CITY]
-            data.address += ' ' + data[STATE] + ' ' + data[ZIP]
+            data[ADDRESS] += ' ' + data[CITY]
+            data[ADDRESS] += ' ' + data[STATE] + ' ' + data[ZIP]
             const number = phoneUtil.parseAndKeepRawInput(data[PHONE], 'US')
 
             data[PHONE] = phoneUtil.format(number, PNF.NATIONAL)
             data[DATE_OF_BIRTH] = moment(data[DATE_OF_BIRTH]).format('MMMM D')
             data[MEMBERSHIP_EXPIRES_AT] = data[MEMBERSHIP_EXPIRES_AT] ? moment(data[MEMBERSHIP_EXPIRES_AT]).format('LLLL') : ''
+            data[DID_RECEIVED_SHIRT] = data[DID_RECEIVED_SHIRT] || false
             members.push(data)
           })
           members = members.sort((a, b) => {
             return s.naturalCmp(a.displayName, b.displayName)
           })
-          this.setState({ members })
+          this.setState({ rows: members })
         }
       )
       .catch((err) => console.log(err))
+  }
+
+  loadPermissions () {
+    const usersWriteRef = firebase.firestore().doc('permissions/usersWrite')
+    const usersReadRef = firebase.firestore().doc('permissions/usersRead')
+    Promise.all([usersWriteRef.get(), usersReadRef.get()])
+      .spread((docWrite, docRead) => {
+        const dataWrite = docWrite.data()
+        const dataRead = docRead.data()
+        this.setState({
+          allowRead: !!dataRead[firebase.auth().currentUser.uid],
+          allowWrite: !!dataWrite[firebase.auth().currentUser.uid]
+        })
+      })
+  }
+
+  componentDidMount () {
+    this.loadMembers()
+    this.loadPermissions()
   }
 
   componentDidUpdate (prevProps) {
@@ -184,79 +210,126 @@ class UsersPage extends Component {
     }
   }
 
-  render () {
-    return (
-      <div className='container my-5'>
-        <div className='row footer-bottom d-flex justify-content-between align-items-center'>
 
-          <Paper style={{ height: 500, width: '100%' }}>
-            <VirtualizedTable
-              rowCount={this.state.members.length}
-              rowGetter={({ index }) => this.state.members[index]}
-              columns={[
-                {
-                  width: 200,
-                  label: 'Name',
-                  dataKey: DISPLAY_NAME
-                },
-                {
-                  width: 200,
-                  label: 'Email',
-                  dataKey: EMAIL
-                  // numeric: true
-                },
-                {
-                  width: 160,
-                  label: 'Phone',
-                  dataKey: PHONE
-                  // numeric: true
-                },
-                {
-                  width: 210,
-                  label: 'Address',
-                  dataKey: 'address'
-                  // numeric: true
-                },
-                {
-                  width: 120,
-                  label: 'Birthday',
-                  dataKey: DATE_OF_BIRTH
-                  //numeric: true
-                },
-                {
-                  width: 80,
-                  label: 'Gender',
-                  dataKey: GENDER
-                  //numeric: true
-                },
-                {
-                  width: 80,
-                  label: 'Shirt Gender',
-                  dataKey: SHIRT_GENDER
-                  //numeric: true
-                },
-                {
-                  width: 80,
-                  label: 'Shirt Size',
-                  dataKey: SHIRT_SIZE
-                  //numeric: true
-                },
-                {
-                  width: 180,
-                  label: 'Membership expires',
-                  dataKey: MEMBERSHIP_EXPIRES_AT
-                  //numeric: true
-                }
-              ]}
-            />
-          </Paper>
-        </div>
+  handleRequestSort (event, property) {
+    const { orderBy, order } = this.state
+    const isDesc = orderBy === property && order === 'desc'
+    this.setState({
+      order: isDesc ? 'asc' : 'desc',
+      orderBy: property
+    })
+
+  }
+
+  handleChangePage (event, newPage) {
+    this.setState({ page: newPage })
+  }
+
+  handleChangeRowsPerPage (event) {
+    this.setState({ rowsPerPage: event.target.value })
+  }
+
+  handleChangeDense (event) {
+    this.setState({ dense: event.target.checked })
+  }
+
+  render () {
+    console.log('render called')
+    const { rowsPerPage, page, order, orderBy, dense, rows } = this.state
+
+    const classes = {}
+
+    const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage)
+
+    return (
+      <div style={{ marginTop: 100 }} className='mx-5 px-3'>
+        <Paper style={{ width: 'fit-content' }}>
+          <EnhancedTableToolbar />
+          <div className={{ overflowX: 'auto' }}>
+            <Table
+              className={classes.table}
+              aria-labelledby="tableTitle"
+              size={dense ? 'small' : 'medium'}
+            >
+              <EnhancedTableHead
+                order={order}
+                orderBy={orderBy}
+                onRequestSort={this.handleRequestSort}
+                rowCount={rows.length}
+              />
+              <TableBody>
+                {stableSort(rows, getSorting(order, orderBy))
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((row, index) => {
+                    return (
+                      <TableRow
+                        key={index}
+                        hover
+                      >
+                        <TableCell>{row[DISPLAY_NAME]}</TableCell>
+                        <TableCell>{row[EMAIL]}</TableCell>
+                        <TableCell>{row[PHONE]}</TableCell>
+                        <TableCell>{row[ADDRESS]}</TableCell>
+                        <TableCell>{row[DATE_OF_BIRTH]}</TableCell>
+                        <TableCell>{row[GENDER]}</TableCell>
+                        <TableCell>{row[SHIRT_GENDER]}</TableCell>
+                        <TableCell>{row[SHIRT_SIZE]}</TableCell>
+                        <TableCell>{row[MEMBERSHIP_EXPIRES_AT]}</TableCell>
+                        <TableCell>
+                          <Checkbox
+                            checked={row[DID_RECEIVED_SHIRT]}
+                            disabled={!this.state.allowWrite}
+                            onChange={(event, checked) => {
+                              const index = rows.indexOf(row)
+                              rows[index][DID_RECEIVED_SHIRT] = checked
+                              console.log('val', checked, index, row)
+
+                              const userRef = firebase.firestore().doc(`users/${row[UID]}`)
+                              userRef.set({ [DID_RECEIVED_SHIRT]: checked }, { merge: true })
+                                .then(() => {
+                                  this.setState({ rows })
+                                  console.log('val', checked, index, row)
+                                })
+                            }}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+                {emptyRows > 0 && (
+                  <TableRow style={{ height: 49 * emptyRows }}>
+                    <TableCell colSpan={10} />
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={rows.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            backIconButtonProps={{
+              'aria-label': 'Previous Page'
+            }}
+            nextIconButtonProps={{
+              'aria-label': 'Next Page'
+            }}
+            onChangePage={this.handleChangePage}
+            onChangeRowsPerPage={this.handleChangeRowsPerPage}
+          />
+        </Paper>
+        <FormControlLabel
+          control={<Switch checked={dense} onChange={this.handleChangeDense} />}
+          label="Dense padding"
+        />
       </div>
     )
   }
 }
 
-UsersPage.propTypes = {
+EnhancedTable.propTypes = {
   lastChanged: PropTypes.number.isRequired
 }
 
@@ -267,4 +340,4 @@ const mapStateToProps = (state) => {
 }
 
 
-export default connect(mapStateToProps)(UsersPage)
+export default connect(mapStateToProps)(EnhancedTable)
