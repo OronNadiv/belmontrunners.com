@@ -16,7 +16,7 @@ import { connect } from 'react-redux'
 
 const MEMBERSHIP_FEE = 25
 const NEED_TO_PAY = 'needToPay'
-export const MEMBERSHIP_EXPIRES_AT = 'membershopExpiresAt'
+export const MEMBERSHIP_EXPIRES_AT = 'membershipExpiresAt'
 
 class SignUpStepPayment extends Component {
   constructor (props) {
@@ -94,6 +94,8 @@ class SignUpStepPayment extends Component {
               `users/${firebase.auth().currentUser.uid}/transactions/${moment().utc().format()}`)
             const transactionsLastRef = firebase.firestore().doc(
               `users/${firebase.auth().currentUser.uid}/transactions/latest`)
+            const userRef = firebase.firestore().doc(
+              `users/${firebase.auth().currentUser.uid}`)
 
             let newMembershipExpiresAt
             const yearFromNow = moment().add(1, 'year')
@@ -122,7 +124,8 @@ class SignUpStepPayment extends Component {
             })
             return Promise.all([
               transactionsRef.set(values),
-              transactionsLastRef.set(values)
+              transactionsLastRef.set(values),
+              userRef.set({ [MEMBERSHIP_EXPIRES_AT]: newMembershipExpiresAt.utc().format() }, { merge: true })
             ])
           })
           .then((chargeResponse) => {

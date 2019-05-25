@@ -202,10 +202,10 @@ class SignUpStepUserDetails extends Component {
               <Field
                 className='mr-4'
                 style={{ minWidth: 180 }}
-                name='shirtSizeGender'
+                name='shirtGender'
                 component={Select}
                 validate={required}
-                label='Shirt size gender'
+                label='Shirt gender'
                 // margin='normal'
                 width='auto'
               >
@@ -222,7 +222,7 @@ class SignUpStepUserDetails extends Component {
                 // margin='normal'
                 width='auto'
               >
-                {values.shirtSizeGender === 'F' && <MenuItem value={'S'}>Small</MenuItem>}
+                {values.shirtGender === 'F' && <MenuItem value={'S'}>Small</MenuItem>}
                 <MenuItem value={'M'}>Medium</MenuItem>
                 <MenuItem value={'L'}>Large</MenuItem>
                 <MenuItem value={'XL'}>X-Large</MenuItem>

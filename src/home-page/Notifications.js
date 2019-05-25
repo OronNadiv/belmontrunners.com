@@ -90,9 +90,12 @@ class Notifications extends Component {
               }}>here</Link> to {!isExistingMember ? 'become a member' : 'renew your membership'}
               </div>
             }
-            action={<Button color="inherit" size="small" onClick={() => this.snoozeNotification()}>
-              Remind me later
-            </Button>}
+            action={
+              <Button style={{ color: 'rgb(169, 168, 168)' }} size="small"
+                      onClick={() => this.snoozeNotification()}>
+                Remind me later
+              </Button>
+            }
           />
 
         this.setState({

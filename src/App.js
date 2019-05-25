@@ -13,7 +13,8 @@ import ForgotPassword from './views/forgotPassword/ForgotPassword'
 import HomePage from './home-page'
 import HeaderArea from './header/HeaderAreaView'
 import SignUpPage from './views/signUp/SignUpPage'
-import { FORGOT_PASSWORD, JOIN, ROOT, SIGN_IN } from './views/urls'
+import { FORGOT_PASSWORD, JOIN, MEMBERS, ROOT, SIGN_IN } from './views/urls'
+import MembersPage from './usersPage'
 
 class App extends Component {
   componentDidMount () {
@@ -44,6 +45,17 @@ class App extends Component {
             <div>
               <HeaderArea />
               <SignUpPage />
+              <Footer />
+            </div>
+          )}
+        />
+        <Route
+          exact
+          path={MEMBERS}
+          render={() => (
+            <div>
+              <HeaderArea />
+              <MembersPage />
               <Footer />
             </div>
           )}
