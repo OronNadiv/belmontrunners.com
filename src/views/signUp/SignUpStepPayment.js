@@ -17,7 +17,9 @@ import { MEMBERSHIP_EXPIRES_AT } from '../../fields'
 
 const MEMBERSHIP_FEE = 25
 const NEED_TO_PAY = 'needToPay'
-
+// TODO: more information to the payment comment in stripe.
+// TODO: allow the user to change their personal information.
+// TODO: allow admin to add shirt status (sent to user, etc).
 class SignUpStepPayment extends Component {
   constructor (props) {
     super(props)

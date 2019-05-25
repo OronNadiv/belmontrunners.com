@@ -212,7 +212,7 @@ class UsersPage extends Component {
                   // numeric: true
                 },
                 {
-                  width: 200,
+                  width: 210,
                   label: 'Address',
                   dataKey: 'address'
                   // numeric: true
