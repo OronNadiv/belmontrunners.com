@@ -150,10 +150,6 @@ class HeaderAreaView extends Component {
                   {/*<a className="nav-link" href="contact.html">Contact</a>*/}
                   {/*</li>*/}
                 </ul>
-                {
-                  // TODO: fix mobile menu height when signed in vs out.
-                  // TODO: feature: add admin menu to see all users and relevant information.
-                }
                 <ul className="nav navbar-nav navbar-right mt-3 mb-3">
                   {/*<li className="nav-item"><a href="#" className="tickets_btn">Get Tickets</a></li>*/}
                   {/*<li className="nav-item">*/}

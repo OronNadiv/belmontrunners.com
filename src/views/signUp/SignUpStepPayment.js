@@ -17,9 +17,8 @@ import { MEMBERSHIP_EXPIRES_AT } from '../../fields'
 
 const MEMBERSHIP_FEE = 25
 const NEED_TO_PAY = 'needToPay'
-// TODO: more information to the payment comment in stripe.
+
 // TODO: allow the user to change their personal information.
-// TODO: allow admin to add shirt status (sent to user, etc).
 class SignUpStepPayment extends Component {
   constructor (props) {
     super(props)
@@ -202,7 +201,7 @@ class SignUpStepPayment extends Component {
                 <div>
                   <h6 className='my-4'>Total amount: ${MEMBERSHIP_FEE}</h6>
                   {
-                    // todo: add a few words on the shirt they'll get - what, how long to get it, etc.
+                    // TODO: add a few words on the shirt they'll get - what, how long to get it, etc.
                   }
                   {this.state[MEMBERSHIP_EXPIRES_AT] &&
                   <div className='text-warning mb-2'>

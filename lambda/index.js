@@ -54,7 +54,6 @@ exports.handler = async (event, context, callback) => {
   } catch (err) {
     console.log('err:', err)
     const response = generateResponse(JSON.stringify(err), 500)
-    // todo: do not return the actual response.
     callback(null, response)
   }
 }

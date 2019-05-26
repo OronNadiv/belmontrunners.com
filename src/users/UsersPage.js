@@ -227,7 +227,10 @@ class EnhancedTable extends Component {
   }
 
   handleChangeRowsPerPage (event) {
-    this.setState({ rowsPerPage: event.target.value })
+    this.setState({
+      page: 0,
+      rowsPerPage: event.target.value
+    })
   }
 
   handleChangeDense (event) {
