@@ -37,6 +37,7 @@ import {
   ZIP
 } from '../fields'
 import { Checkbox } from '@material-ui/core'
+import LoggedInState from '../views/HOC/LoggedInState'
 
 const ADDRESS = 'address'
 const PNF = googleLibPhoneNumber.PhoneNumberFormat
@@ -340,4 +341,7 @@ const mapStateToProps = (state) => {
 }
 
 
-export default connect(mapStateToProps)(EnhancedTable)
+export default LoggedInState({
+  name: 'usersPage',
+  isRequiredToBeLoggedIn: true
+})(connect(mapStateToProps)(EnhancedTable))

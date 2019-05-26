@@ -27,10 +27,10 @@ class SignUpStepPayment extends Component {
   }
 
   fetchLastTransactionInformation () {
-    const transactionsLastRef = firebase.firestore().doc(
-      `users/${firebase.auth().currentUser.uid}/transactions/latest`)
+    const usersRef = firebase.firestore().doc(
+      `users/${firebase.auth().currentUser.uid}`)
 
-    transactionsLastRef.get()
+    usersRef.get()
       .then((values) => {
         let membershipExpiresAt = null
         let needToPay = true
@@ -121,8 +121,7 @@ class SignUpStepPayment extends Component {
               stripeResponse: stripeResponse,
               paidAt: moment().utc().format(),
               paidAmount: MEMBERSHIP_FEE,
-              confirmationNumber: chargeResponse.id,
-              [MEMBERSHIP_EXPIRES_AT]: newMembershipExpiresAt.utc().format()
+              confirmationNumber: chargeResponse.id
             }
             this.setState({
               success: true,
@@ -132,7 +131,9 @@ class SignUpStepPayment extends Component {
             return Promise.all([
               transactionsRef.set(values),
               transactionsLastRef.set(values),
-              userRef.set({ [MEMBERSHIP_EXPIRES_AT]: newMembershipExpiresAt.utc().format() }, { merge: true })
+              userRef.set({
+                [MEMBERSHIP_EXPIRES_AT]: newMembershipExpiresAt.utc().format()
+              }, { merge: true })
             ])
           })
           .then((chargeResponse) => {
