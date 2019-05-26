@@ -11,9 +11,12 @@ import { MEMBERSHIP_EXPIRES_AT } from '../fields'
 import moment from 'moment'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
+import SnackbarContent from '@material-ui/core/SnackbarContent'
 
 const POPUP_PAY_MEMBERSHIP_SNOOZED_AT = 'popupPayMembershipSnoozedAt'
 const POPUP_RECEIVED_SHIRT_AT = 'popupReceivedShirtSnoozedAt'
+const ACTION_COLOR = '#b39ddb'
+const LINK_COLOR = 'crimson'
 
 class Notifications extends Component {
 
@@ -61,9 +64,14 @@ class Notifications extends Component {
         }}
         open
         key={0}
-        message={message}
-        action={action}
-      />
+      >
+        <SnackbarContent
+          aria-describedby="client-snackbar"
+          style={{ backgroundColor: '#673ab7' }}
+          message={message}
+          action={action}
+        />
+      </Snackbar>
 
     this.setState({
       notification
@@ -91,14 +99,18 @@ class Notifications extends Component {
     this.showNotification({
       message:
         <div>
-          Click <Link to={{
-          pathname: JOIN,
-          state: { steps: [STEP_USER_DETAILS, STEP_MEMBERSHIP] }
-        }}>here</Link> to {!isExistingMember ? 'become a member' : 'renew your membership'}
+          Click <Link
+          style={{ color: LINK_COLOR }}
+          to={{
+            pathname: JOIN,
+            state: { steps: [STEP_USER_DETAILS, STEP_MEMBERSHIP] }
+          }}>HERE</Link> to {!isExistingMember ? 'become a member' : 'renew your membership'}
         </div>,
       action:
-        <Button style={{ color: 'rgb(169, 168, 168)' }} size="small"
-                onClick={() => this.dismissNotification({ notificationKey: POPUP_PAY_MEMBERSHIP_SNOOZED_AT })}>
+        <Button
+          style={{ color: ACTION_COLOR }}
+          size="small"
+          onClick={() => this.dismissNotification({ notificationKey: POPUP_PAY_MEMBERSHIP_SNOOZED_AT })}>
           Remind me later
         </Button>
     })
@@ -120,7 +132,7 @@ class Notifications extends Component {
           'No problem. Please reach out to Doug or Shelly on the next Saturday run.',
         action:
           <Button
-            color="secondary"
+            style={{ color: ACTION_COLOR }}
             size="small"
             onClick={() => {
               console.log('dismissing POPUP_RECEIVED_SHIRT_AT, after Doug & Shelly message.')
@@ -136,12 +148,12 @@ class Notifications extends Component {
       action:
         <div>
           <Button
-            color="secondary"
+            color='secondary'
             size="small"
             onClick={() => this.dismissNotification({ notificationKey: POPUP_RECEIVED_SHIRT_AT })}>
             YES
           </Button> / <Button
-          color="secondary"
+          color='secondary'
           size="small"
           onClick={() => showDougShelly()}>
           NO
