@@ -109,14 +109,20 @@
     margin-left: 0px;
   }
   .header_area .navbar-collapse {
-    // two items
-    // max-height: 100px;
-
-    // three items
-    max-height: 141px;
-
     //overflow-y: scroll; // ORON: DISABLED SO IT DOES NOT SHOW THE PROFILE
     overflow-y: hidden;
+
+    &.signed_in {
+      // one item
+      max-height: 54px;
+    }
+
+    &.signed_out {
+      // two items
+      max-height: 90px;
+    }
+
+
   }
   .header_area .navbar .nav .nav-item.submenu ul .nav-item .nav-link {
     padding: 0px 15px;

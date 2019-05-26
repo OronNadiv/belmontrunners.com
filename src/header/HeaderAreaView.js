@@ -7,7 +7,8 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import Profile from './Profile'
 import Button from '@material-ui/core/Button'
-import { JOIN, USERS, SIGN_IN } from '../views/urls'
+import { JOIN, SIGN_IN, USERS } from '../views/urls'
+import classNames from 'classnames'
 
 class HeaderAreaView extends Component {
   checkIsFixed () {
@@ -79,7 +80,10 @@ class HeaderAreaView extends Component {
                 <span className="icon-bar" />
                 <span className="icon-bar" />
               </button>
-              <div className="collapse navbar-collapse offset" id="navbarSupportedContent">
+              <div className={classNames("collapse navbar-collapse offset", {
+                signed_in: !!currentUser,
+                signed_out: !currentUser
+              })} id="navbarSupportedContent">
                 <ul className="nav navbar-nav menu_nav ml-auto">
                   {
                     // <li className="nav-item active">
