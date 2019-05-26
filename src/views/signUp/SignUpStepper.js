@@ -7,7 +7,7 @@ import StepLabel from '@material-ui/core/StepLabel'
 
 import SignUpStepAuth from './SignUpStepAuth'
 import SignUpStepPayment from './SignUpStepPayment'
-import SignUpStepUserDetails from './SignUpStepUserDetails'
+import SignUpStepUserProfile from './SignUpStepUserProfile'
 import { Redirect } from 'react-router-dom'
 import { ROOT } from '../urls'
 import PropTypes from 'prop-types'
@@ -60,7 +60,7 @@ class SignUpStepper extends Component {
         case STEP_USER_DETAILS:
           return <Step key={1}>
             <StepLabel>
-              User Details
+              Profile
             </StepLabel>
           </Step>
 
@@ -97,7 +97,7 @@ class SignUpStepper extends Component {
       case STEP_AUTHENTICATION:
         return <SignUpStepAuth isLast={activeStep === steps.length - 1} onNextClicked={this.handleNext} />
       case STEP_USER_DETAILS:
-        return <SignUpStepUserDetails isLast={activeStep === steps.length - 1} onNextClicked={this.handleNext} />
+        return <SignUpStepUserProfile isLast={activeStep === steps.length - 1} onNextClicked={this.handleNext} />
       case STEP_MEMBERSHIP:
         return <SignUpStepPayment isLast={activeStep === steps.length - 1} onNextClicked={this.handleNext} />
       default:

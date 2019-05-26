@@ -8,9 +8,7 @@
     margin-left: 40px;
   }
   .header_area .navbar .nav .nav-item .nav-link {
-    &.sign-in-link, &.sign-out-link {
-      display: none;
-    }
+    display: none;
   }
 
   /* End Main Menu Area css
@@ -100,10 +98,6 @@
     display: block;
     border-bottom: 1px solid #ededed33;
     border-radius: 0px;
-
-    &.sign-in-link, &.sign-out-link {
-      display: block;
-    }
   }
   .header_area .navbar .search {
     margin-left: 0px;
@@ -111,21 +105,6 @@
   .header_area .navbar-collapse {
     //overflow-y: scroll; // ORON: DISABLED SO IT DOES NOT SHOW THE PROFILE
     overflow-y: hidden;
-
-    &.signed_in {
-      // one item
-      max-height: 54px;
-    }
-
-    &.has_users_permission {
-      // two items
-      max-height: 90px;
-    }
-
-    &.signed_out {
-      // two items
-      max-height: 90px;
-    }
   }
   .header_area .navbar .nav .nav-item.submenu ul .nav-item .nav-link {
     padding: 0px 15px;

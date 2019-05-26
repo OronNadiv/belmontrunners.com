@@ -36,7 +36,7 @@ const birthday = value => {
 const composeValidators = (...validators) => value =>
   validators.reduce((error, validator) => error || validator(value), undefined)
 
-class SignUpStepUserDetails extends Component {
+class SignUpStepUserProfile extends Component {
   constructor (props) {
     super(props)
     this.state = {}
@@ -177,7 +177,7 @@ class SignUpStepUserDetails extends Component {
                 }}
               />
               <Field
-                style={{ width: 140 }}
+                style={{ width: 150 }}
                 label='Birthday'
                 margin='normal'
                 name={DATE_OF_BIRTH}
@@ -249,7 +249,7 @@ class SignUpStepUserDetails extends Component {
   }
 }
 
-SignUpStepUserDetails.propTypes = {
+SignUpStepUserProfile.propTypes = {
   isLast: PropTypes.bool,
   onNextClicked: PropTypes.func.isRequired,
   lastChanged: PropTypes.number.isRequired
@@ -262,6 +262,6 @@ const mapStateToProps = (state) => {
 }
 
 export default LoggedInState({
-  name: 'SignUpStepUserDetails',
+  name: 'SignUpStepUserProfile',
   isRequiredToBeLoggedIn: true
-})(connect(mapStateToProps)(SignUpStepUserDetails))
+})(connect(mapStateToProps)(SignUpStepUserProfile))

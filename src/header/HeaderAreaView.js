@@ -2,14 +2,13 @@ import 'firebase/firestore'
 import 'firebase/auth'
 import firebase from 'firebase'
 import React, { Component } from 'react'
-import { Link, withRouter } from "react-router-dom"
+import { Link, withRouter } from 'react-router-dom'
 import $ from 'jquery'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import Profile from './Profile'
 import Button from '@material-ui/core/Button'
 import { JOIN, SIGN_IN, USERS } from '../views/urls'
-import classNames from 'classnames'
 import Promise from 'bluebird'
 
 class HeaderAreaView extends Component {
@@ -41,13 +40,13 @@ class HeaderAreaView extends Component {
       this.props.location.pathname.trim() === USERS
     ) {
       console.log('adding. this.props.location.pathname.trim():', this.props.location.pathname.trim())
-      $(".header_area").addClass("navbar_fixed")
-      $(".header_area").addClass("navbar_fixed_not_root")
+      $('.header_area').addClass('navbar_fixed')
+      $('.header_area').addClass('navbar_fixed_not_root')
       return true
     } else {
       console.log('removing. this.props.location.pathname.trim():', this.props.location.pathname.trim())
 
-      $(".header_area").removeClass("navbar_fixed_not_root")
+      $('.header_area').removeClass('navbar_fixed_not_root')
       return false
     }
   }
@@ -71,9 +70,9 @@ class HeaderAreaView extends Component {
           }
           const scroll = $(window).scrollTop()
           if (scroll >= nav_offset_top) {
-            $(".header_area").addClass("navbar_fixed")
+            $('.header_area').addClass('navbar_fixed')
           } else {
-            $(".header_area").removeClass("navbar_fixed")
+            $('.header_area').removeClass('navbar_fixed')
           }
         })
       }
@@ -91,104 +90,107 @@ class HeaderAreaView extends Component {
   render () {
     const { lastChanged } = this.props
     const { currentUser } = firebase.auth()
+    let totalNavItems = 0
+    this.state.allowUsersPage && (totalNavItems += 1)
+    const isSignedOut = !!lastChanged && !currentUser && (totalNavItems += 2)
+    const isSignedIn = !!lastChanged && currentUser && (totalNavItems += 1)
 
     return (
-      <header className="header_area">
-        <div className="main_menu">
-          <nav className="navbar navbar-expand-lg navbar-light">
-            <div className="container box_1620">
-              <a className="navbar-brand logo_h" href="/"><img src="img/logo.png" alt="" />
+      <header className='header_area'>
+        <div className='main_menu'>
+          <nav className='navbar navbar-expand-lg navbar-light'>
+            <div className='container box_1620'>
+              <a className='navbar-brand logo_h' href='/'><img src='img/logo.png' alt='' />
               </a>
-              <button className="navbar-toggler" type="button" data-toggle="collapse"
-                      data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                      aria-expanded="false" aria-label="Toggle navigation">
-                <span className="icon-bar" />
-                <span className="icon-bar" />
-                <span className="icon-bar" />
+              <button className='navbar-toggler' type='button' data-toggle='collapse'
+                      data-target='#navbarSupportedContent' aria-controls='navbarSupportedContent'
+                      aria-expanded='false' aria-label='Toggle navigation'>
+                <span className='icon-bar' />
+                <span className='icon-bar' />
+                <span className='icon-bar' />
               </button>
-              <div className={classNames("collapse navbar-collapse offset", {
-                signed_in: !!currentUser,
-                signed_out: !currentUser,
-                has_users_permission: this.state.allowUsersPage
-              })} id="navbarSupportedContent">
-                <ul className="nav navbar-nav menu_nav ml-auto">
+              <div className='collapse navbar-collapse offset' id='navbarSupportedContent'
+                   style={{ maxHeight: 10 + 41 * totalNavItems }}>
+                <ul className='nav navbar-nav menu_nav ml-auto'>
                   {
                     (this.state.allowUsersPage) &&
-                    <li className="nav-item">
-                      <a className="nav-link" href={USERS}>Users</a>
+                    <li className='nav-item'>
+                      <a className='nav-link' href={USERS}>
+                        Users
+                      </a>
                     </li>
                   }
-                  <li className="nav-item">
+                  <li className='nav-item'>
                     {
-                      !!lastChanged && currentUser &&
-                      <a className='nav-link sign-out-link' href='/'
-                         rel="noopener noreferrer"
+                      isSignedIn &&
+                      <a className='nav-link' href='/'
+                         rel='noopener noreferrer'
                          onClick={() => firebase.auth().signOut()}>
                         Sign out
                       </a>
                     }
                     {
-                      !!lastChanged && !currentUser &&
-                      <Link to={SIGN_IN} className='nav-link sign-in-link'>
+                      isSignedOut &&
+                      <Link to={SIGN_IN} className='nav-link'>
                         Sign in
                       </Link>
                     }
                     {
-                      !!lastChanged && !currentUser && this.props.location.pathname.trim() !== JOIN &&
+                      isSignedOut &&
                       <Link to={{
                         pathname: JOIN,
                         state: { steps: undefined }
-                      }} className='nav-link sign-in-link'>
+                      }} className='nav-link'>
                         Join Us
                       </Link>
                     }
                   </li>
-                  {/*<li className="nav-item submenu dropdown">*/}
-                  {/*<a href="#" className="nav-link dropdown-toggle" data-toggle="dropdown" role="button"*/}
-                  {/*   aria-haspopup="true" aria-expanded="false">Pages</a>*/}
-                  {/*<ul className="dropdown-menu">*/}
-                  {/*  <li className="nav-item">*/}
-                  {/*    <a className="nav-link" href="schedule.html">Schedule</a>*/}
-                  {/*    <li className="nav-item">*/}
-                  {/*      <a className="nav-link" href="venue.html">Venue</a>*/}
-                  {/*      <li className="nav-item">*/}
-                  {/*        <a className="nav-link" href="price.html">Pricing</a>*/}
-                  {/*        <li className="nav-item">*/}
-                  {/*          <a className="nav-link" href="elements.html">Elements</a>*/}
+                  {/*<li className='nav-item submenu dropdown'>*/}
+                  {/*<a href='#' className='nav-link dropdown-toggle' data-toggle='dropdown' role='button'*/}
+                  {/*   aria-haspopup='true' aria-expanded='false'>Pages</a>*/}
+                  {/*<ul className='dropdown-menu'>*/}
+                  {/*  <li className='nav-item'>*/}
+                  {/*    <a className='nav-link' href='schedule.html'>Schedule</a>*/}
+                  {/*    <li className='nav-item'>*/}
+                  {/*      <a className='nav-link' href='venue.html'>Venue</a>*/}
+                  {/*      <li className='nav-item'>*/}
+                  {/*        <a className='nav-link' href='price.html'>Pricing</a>*/}
+                  {/*        <li className='nav-item'>*/}
+                  {/*          <a className='nav-link' href='elements.html'>Elements</a>*/}
                   {/*        </li>*/}
                   {/*      </li>*/}
                   {/*    </li>*/}
                   {/*  </li>*/}
                   {/*</ul>*/}
                   {/*</li>*/}
-                  {/*<li className="nav-item submenu dropdown">*/}
-                  {/*<a href="#" className="nav-link dropdown-toggle" data-toggle="dropdown" role="button"*/}
-                  {/*   aria-haspopup="true" aria-expanded="false">Blog</a>*/}
-                  {/*<ul className="dropdown-menu">*/}
-                  {/*  <li className="nav-item"><a className="nav-link" href="blog.html">Blog</a></li>*/}
-                  {/*  <li className="nav-item"><a className="nav-link" href="single-blog.html">Blog Details</a></li>*/}
+                  {/*<li className='nav-item submenu dropdown'>*/}
+                  {/*<a href='#' className='nav-link dropdown-toggle' data-toggle='dropdown' role='button'*/}
+                  {/*   aria-haspopup='true' aria-expanded='false'>Blog</a>*/}
+                  {/*<ul className='dropdown-menu'>*/}
+                  {/*  <li className='nav-item'><a className='nav-link' href='blog.html'>Blog</a></li>*/}
+                  {/*  <li className='nav-item'><a className='nav-link' href='single-blog.html'>Blog Details</a></li>*/}
                   {/*</ul>*/}
                   {/*</li>*/}
-                  {/*<li className="nav-item">*/}
-                  {/*<a className="nav-link" href="contact.html">Contact</a>*/}
+                  {/*<li className='nav-item'>*/}
+                  {/*<a className='nav-link' href='contact.html'>Contact</a>*/}
                   {/*</li>*/}
                 </ul>
-                <ul className="nav navbar-nav navbar-right mt-3 mb-3">
-                  {/*<li className="nav-item"><a href="#" className="tickets_btn">Get Tickets</a></li>*/}
-                  {/*<li className="nav-item">*/}
-                  {/*  <a href="#" className="search">*/}
-                  {/*    <i className="lnr lnr-magnifier" />*/}
+                <ul className='nav navbar-nav navbar-right mt-3 mb-3'>
+                  {/*<li className='nav-item'><a href='#' className='tickets_btn'>Get Tickets</a></li>*/}
+                  {/*<li className='nav-item'>*/}
+                  {/*  <a href='#' className='search'>*/}
+                  {/*    <i className='lnr lnr-magnifier' />*/}
                   {/*  </a>*/}
                   {/*</li>*/}
                   {
                     !!lastChanged && currentUser &&
-                    <li className="nav-item">
+                    <li className='nav-item'>
                       <Profile />
                     </li>
                   }
                   {
                     !!lastChanged && !currentUser &&
-                    <li className="nav-item">
+                    <li className='nav-item'>
                       <Link to={SIGN_IN} className='signin-btn text-white'>
                         <Button className='text-white'>
                           Sign in
@@ -198,12 +200,12 @@ class HeaderAreaView extends Component {
                   }
                   {
                     !!lastChanged && !currentUser && this.props.location.pathname.trim() !== JOIN &&
-                    <li className="nav-item">
+                    <li className='nav-item'>
                       <Link to={{
                         pathname: JOIN,
                         state: { steps: undefined }
                       }}>
-                        <Button variant="contained" color="primary">
+                        <Button variant='contained' color='primary'>
                           Join Us
                         </Button>
                       </Link>
