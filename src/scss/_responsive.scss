@@ -9,6 +9,10 @@
   }
   .header_area .navbar .nav .nav-item .nav-link {
     display: none;
+
+    &.nav-link-menu {
+      display: block;
+    }
   }
 
   /* End Main Menu Area css

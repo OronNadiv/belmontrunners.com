@@ -160,22 +160,30 @@ class EnhancedTable extends Component {
       .then((doc) => {
           let members = []
           doc.forEach((doc) => {
-            console.log(doc)
-            const data = doc.data()
-            data[UID] = doc.id
-            data[ADDRESS] = data[ADDRESS1]
-            if (data[ADDRESS2]) {
-              data[ADDRESS] += ' ' + data[ADDRESS2]
+            let data
+            try {
+              console.log(doc)
+              data = doc.data()
+              data[UID] = doc.id
+              data[ADDRESS] = data[ADDRESS1]
+              if (data[ADDRESS2]) {
+                data[ADDRESS] += ' ' + data[ADDRESS2]
+              }
+              data[ADDRESS] += ' ' + data[CITY]
+              data[ADDRESS] += ' ' + data[STATE] + ' ' + data[ZIP]
+              if (data[PHONE]) {
+                const number = phoneUtil.parseAndKeepRawInput(data[PHONE] || '', 'US')
+                data[PHONE] = phoneUtil.format(number, PNF.NATIONAL)
+              }
+              data[DATE_OF_BIRTH] = moment(data[DATE_OF_BIRTH]).format('MMMM D')
+              data[MEMBERSHIP_EXPIRES_AT] = data[MEMBERSHIP_EXPIRES_AT] ? moment(data[MEMBERSHIP_EXPIRES_AT]).format('LLLL') : ''
+              data[DID_RECEIVED_SHIRT] = data[DID_RECEIVED_SHIRT] || false
+              members.push(data)
+            } catch (err) {
+              console.error('ERROR PROCESSING USER.',
+                'data:', data,
+                'err:', err)
             }
-            data[ADDRESS] += ' ' + data[CITY]
-            data[ADDRESS] += ' ' + data[STATE] + ' ' + data[ZIP]
-            const number = phoneUtil.parseAndKeepRawInput(data[PHONE], 'US')
-
-            data[PHONE] = phoneUtil.format(number, PNF.NATIONAL)
-            data[DATE_OF_BIRTH] = moment(data[DATE_OF_BIRTH]).format('MMMM D')
-            data[MEMBERSHIP_EXPIRES_AT] = data[MEMBERSHIP_EXPIRES_AT] ? moment(data[MEMBERSHIP_EXPIRES_AT]).format('LLLL') : ''
-            data[DID_RECEIVED_SHIRT] = data[DID_RECEIVED_SHIRT] || false
-            members.push(data)
           })
           members = members.sort((a, b) => {
             return s.naturalCmp(a.displayName, b.displayName)

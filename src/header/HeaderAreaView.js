@@ -115,7 +115,7 @@ class HeaderAreaView extends Component {
                   {
                     (this.state.allowUsersPage) &&
                     <li className='nav-item'>
-                      <a className='nav-link' href={USERS}>
+                      <a className='nav-link nav-link-menu' href={USERS}>
                         Users
                       </a>
                     </li>
