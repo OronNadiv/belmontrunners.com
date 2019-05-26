@@ -60,11 +60,9 @@ class SignUpStepPayment extends Component {
   }
 
   componentDidUpdate (prevProps) {
-    if (prevProps.lastChanged !== this.props.lastChanged) {
-      if (firebase.auth().currentUser) {
-        this.fetchLastTransactionInformation()
-      }
-    }
+    prevProps.lastChanged !== this.props.lastChanged
+    && firebase.auth().currentUser
+    && this.fetchLastTransactionInformation()
   }
 
   setMessage (errorMessage = '', successMessage = '') {

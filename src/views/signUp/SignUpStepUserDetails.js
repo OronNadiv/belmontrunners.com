@@ -85,11 +85,7 @@ class SignUpStepUserDetails extends Component {
   }
 
   componentDidUpdate (prevProps) {
-    if (prevProps.lastChanged !== this.props.lastChanged) {
-      if (firebase.auth().currentUser) {
-        this.loadData()
-      }
-    }
+    prevProps.lastChanged !== this.props.lastChanged && firebase.auth().currentUser && this.loadData()
   }
 
   render () {

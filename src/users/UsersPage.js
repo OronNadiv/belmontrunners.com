@@ -206,9 +206,7 @@ class EnhancedTable extends Component {
   }
 
   componentDidUpdate (prevProps) {
-    if (prevProps.lastChanged !== this.props.lastChanged) {
-      this.loadMembers()
-    }
+    prevProps.lastChanged !== this.props.lastChanged && this.loadMembers()
   }
 
 

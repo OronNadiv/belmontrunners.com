@@ -117,12 +117,15 @@
       max-height: 54px;
     }
 
-    &.signed_out {
+    &.has_users_permission {
       // two items
       max-height: 90px;
     }
 
-
+    &.signed_out {
+      // two items
+      max-height: 90px;
+    }
   }
   .header_area .navbar .nav .nav-item.submenu ul .nav-item .nav-link {
     padding: 0px 15px;

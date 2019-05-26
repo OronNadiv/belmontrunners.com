@@ -1,7 +1,8 @@
-import React, { Component } from 'react'
-import { Link, withRouter } from "react-router-dom"
+import 'firebase/firestore'
 import 'firebase/auth'
 import firebase from 'firebase'
+import React, { Component } from 'react'
+import { Link, withRouter } from "react-router-dom"
 import $ from 'jquery'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
@@ -9,8 +10,31 @@ import Profile from './Profile'
 import Button from '@material-ui/core/Button'
 import { JOIN, SIGN_IN, USERS } from '../views/urls'
 import classNames from 'classnames'
+import Promise from 'bluebird'
 
 class HeaderAreaView extends Component {
+
+  constructor (props) {
+    super(props)
+    this.state = {}
+  }
+
+  loadPermissions () {
+    if (!firebase.auth().currentUser) {
+      return
+    }
+    const usersWriteRef = firebase.firestore().doc('permissions/usersWrite')
+    const usersReadRef = firebase.firestore().doc('permissions/usersRead')
+    Promise.all([usersWriteRef.get(), usersReadRef.get()])
+      .spread((docWrite, docRead) => {
+        const dataWrite = docWrite.data()
+        const dataRead = docRead.data()
+        this.setState({
+          allowUsersPage: !!dataRead[firebase.auth().currentUser.uid] || !!dataWrite[firebase.auth().currentUser.uid]
+        })
+      })
+  }
+
   checkIsFixed () {
     if (
       this.props.location.pathname.trim() === JOIN ||
@@ -29,6 +53,7 @@ class HeaderAreaView extends Component {
   }
 
   componentDidMount () {
+    this.loadPermissions()
     const nav_offset_top = $('.header_area').height() + 50
     console.log('nav_offset_top:', nav_offset_top)
     console.log('this.props.location:', this.props.location)
@@ -59,6 +84,7 @@ class HeaderAreaView extends Component {
   }
 
   componentDidUpdate (prevProps) {
+    prevProps.lastChanged !== this.props.lastChanged && this.loadPermissions()
     this.checkIsFixed()
   }
 
@@ -82,18 +108,15 @@ class HeaderAreaView extends Component {
               </button>
               <div className={classNames("collapse navbar-collapse offset", {
                 signed_in: !!currentUser,
-                signed_out: !currentUser
+                signed_out: !currentUser,
+                has_users_permission: this.state.allowUsersPage
               })} id="navbarSupportedContent">
                 <ul className="nav navbar-nav menu_nav ml-auto">
                   {
-                    // <li className="nav-item active">
-                    // <a className="nav-link" href="/">Home</a>
-                    // </li>
-                    // TODO: uncomment
-                    // currentUser && currentUser.permissions && currentUser.permissions.usersList &&
-                    // <li className="nav-item">
-                    // <a className="nav-link" href="/members">Members</a>
-                    // </li>
+                    (this.state.allowUsersPage) &&
+                    <li className="nav-item">
+                      <a className="nav-link" href={USERS}>Users</a>
+                    </li>
                   }
                   <li className="nav-item">
                     {
