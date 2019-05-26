@@ -205,11 +205,11 @@ class SignUpStepPayment extends Component {
                     // todo: add a few words on the shirt they'll get - what, how long to get it, etc.
                   }
                   {this.state[MEMBERSHIP_EXPIRES_AT] &&
-                  <div className='text-warning'>
+                  <div className='text-warning mb-2'>
                     {
                       moment(this.state[MEMBERSHIP_EXPIRES_AT]).isAfter(moment()) ?
-                        `Membership expired on ${moment(this.state[MEMBERSHIP_EXPIRES_AT]).format("MMMM Do YYYY")}` :
-                        `Membership will expire on ${moment(this.state[MEMBERSHIP_EXPIRES_AT]).format("MMMM Do YYYY")}`
+                        `Membership will expire on ${moment(this.state[MEMBERSHIP_EXPIRES_AT]).format("MMMM Do YYYY")}` :
+                        `Membership expired on ${moment(this.state[MEMBERSHIP_EXPIRES_AT]).format("MMMM Do YYYY")}`
                     }
                   </div>
                   }

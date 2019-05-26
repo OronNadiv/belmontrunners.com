@@ -340,7 +340,6 @@ const mapStateToProps = (state) => {
   }
 }
 
-
 export default LoggedInState({
   name: 'usersPage',
   isRequiredToBeLoggedIn: true

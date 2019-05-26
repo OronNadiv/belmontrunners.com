@@ -8,12 +8,12 @@ import { Link } from 'react-router-dom'
 import { JOIN } from '../views/urls'
 import { STEP_MEMBERSHIP, STEP_USER_DETAILS } from '../views/signUp/SignUpStepper'
 import { MEMBERSHIP_EXPIRES_AT } from '../fields'
-import { connect } from 'react-redux'
-import PropTypes from 'prop-types'
 import moment from 'moment'
-import Promise from 'bluebird'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 
-const POPUP_PAY_MEMBERSHIP_SNOOZED_AT = 'popupSnoozedAt'
+const POPUP_PAY_MEMBERSHIP_SNOOZED_AT = 'popupPayMembershipSnoozedAt'
+const POPUP_RECEIVED_SHIRT_AT = 'popupReceivedShirtSnoozedAt'
 
 class Notifications extends Component {
 
@@ -22,114 +22,158 @@ class Notifications extends Component {
     this.state = {}
   }
 
-  getMembershipStatus () {
+  wasPopupDismissed ({ userData, notificationKey, days = 7 }) {
+    const snoozedAt = userData.notifications && userData.notifications[notificationKey]
+
+    if (!!snoozedAt && moment(snoozedAt).add(days, 'days').isAfter(moment())) {
+      console.log(notificationKey + ' dismissed.  snoozedAt:', snoozedAt)
+      return true
+    }
+
+    console.log('not dismissed.',
+      'userData:', userData,
+      'snoozedAt:', snoozedAt,
+      "moment(snoozedAt).add(2, 'days'):", moment(snoozedAt).add(2, 'days').format(),
+      'moment():', moment().format(),
+      "moment(snoozedAt).add(2, 'days').isAfter(moment()):", moment(snoozedAt).add(2, 'days').isAfter(moment()),
+      'total:', (!!snoozedAt && moment(snoozedAt).add(2, 'days').isAfter(moment())))
+
+    return false
+  }
+
+  dismissNotification ({ notificationKey }) {
+    this.setState({ notification: null })
+    const userRef = firebase.firestore().doc(`users/${firebase.auth().currentUser.uid}`)
+
+    userRef.set({ notifications: { [notificationKey]: moment().utc().format() } }, { merge: true })
+      .then(() => {
+        console.log('snoozed')
+      })
+  }
+
+
+  showNotification ({ message, action }) {
+    const notification =
+      <Snackbar
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center'
+        }}
+        open
+        key={0}
+        message={message}
+        action={action}
+      />
+
+    this.setState({
+      notification
+    })
+  }
+
+  didPayMembership ({ userData }) {
+    const membershipExpiresAt = userData[MEMBERSHIP_EXPIRES_AT]
+    return membershipExpiresAt && moment(membershipExpiresAt).isAfter(moment().add(1, 'month'))
+  }
+
+  processPayMembershipNotification ({ userData }) {
+    if (this.wasPopupDismissed({ userData, notificationKey: POPUP_PAY_MEMBERSHIP_SNOOZED_AT })) {
+      return
+    }
+
+    // ok, we can show the popup.
+
+    if (this.didPayMembership({ userData })) {
+      return
+    }
+
+    const isExistingMember = !!userData[MEMBERSHIP_EXPIRES_AT]
+
+    this.showNotification({
+      message:
+        <div>
+          Click <Link to={{
+          pathname: JOIN,
+          state: { steps: [STEP_USER_DETAILS, STEP_MEMBERSHIP] }
+        }}>here</Link> to {!isExistingMember ? 'become a member' : 'renew your membership'}
+        </div>,
+      action:
+        <Button style={{ color: 'rgb(169, 168, 168)' }} size="small"
+                onClick={() => this.dismissNotification({ notificationKey: POPUP_PAY_MEMBERSHIP_SNOOZED_AT })}>
+          Remind me later
+        </Button>
+    })
+  }
+
+  processReceivedShirt ({ userData }) {
+    if (this.wasPopupDismissed({
+      userData,
+      notificationKey: POPUP_RECEIVED_SHIRT_AT
+    }) || !this.didPayMembership({ userData })) {
+      return
+    }
+
+    // ok, we can show the popup.
+
+    const showDougShelly = () => {
+      this.showNotification({
+        message:
+          'No problem. Please reach out to Doug or Shelly on the next Saturday run.',
+        action:
+          <Button
+            color="secondary"
+            size="small"
+            onClick={() => {
+              console.log('dismissing POPUP_RECEIVED_SHIRT_AT, after Doug & Shelly message.')
+              this.dismissNotification({ notificationKey: POPUP_RECEIVED_SHIRT_AT })
+            }}>
+            Remind me later
+          </Button>
+      })
+    }
+    this.showNotification({
+      message:
+        'Did you receive a running shirt',
+      action:
+        <div>
+          <Button
+            color="secondary"
+            size="small"
+            onClick={() => this.dismissNotification({ notificationKey: POPUP_RECEIVED_SHIRT_AT })}>
+            YES
+          </Button> / <Button
+          color="secondary"
+          size="small"
+          onClick={() => showDougShelly()}>
+          NO
+        </Button>
+        </div>
+    })
+  }
+
+  processNotifications () {
     if (!firebase.auth().currentUser) {
       this.setState({ notification: null })
       return
     }
-    const transactionsLastRef = firebase.firestore().doc(
-      `users/${firebase.auth().currentUser.uid}/transactions/latest`)
+    const userRef = firebase.firestore().doc(`users/${firebase.auth().currentUser.uid}`)
 
-    const notificationsRef = firebase.firestore().doc(
-      `users/${firebase.auth().currentUser.uid}/notifications/payMembership`)
-
-    Promise.all([
-      transactionsLastRef.get(),
-      notificationsRef.get()
-    ])
-      .spread((transactionValues, notificationsValues) => {
-        let membershipExpiresAt = null
-        let needToPay = true
-        const transactionsDocumentData = transactionValues.data()
-        const notificationsDocumentData = notificationsValues.data()
-
-        if (notificationsDocumentData) {
-          const snoozedAt = notificationsDocumentData[POPUP_PAY_MEMBERSHIP_SNOOZED_AT]
-          if (!!snoozedAt && moment(snoozedAt).add(2, 'days').isAfter(moment())) {
-            console.log('dismissing.  snoozedAt:', snoozedAt)
-            this.setState({ notification: null })
-            return
-          }
-          console.log('not dismissed.  ' +
-            'snoozedAt:', snoozedAt,
-            "moment(snoozedAt).add(2, 'days'):", moment(snoozedAt).add(2, 'days').format(),
-            'moment():', moment().format(),
-            "moment(snoozedAt).add(2, 'days').isAfter(moment()):", moment(snoozedAt).add(2, 'days').isAfter(moment()),
-            'total:', (!!snoozedAt && moment(snoozedAt).add(2, 'days').isAfter(moment())))
-        }
-        // ok, we can show the popup.
-
-        if (transactionsDocumentData) {
-          membershipExpiresAt = transactionsDocumentData[MEMBERSHIP_EXPIRES_AT]
-          if (membershipExpiresAt && moment(membershipExpiresAt).isAfter(moment().add(1, 'month'))) {
-            needToPay = false
-          }
-        }
-
-        const isExistingMember = !!membershipExpiresAt
-
-        if (!needToPay) {
-          console.log('does not need to pay.  membershipExpiresAt:', membershipExpiresAt)
-
-          this.setState({ notification: null })
-          return
-        }
-        const notification =
-          <Snackbar
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'center'
-            }}
-            open
-            key={0}
-            message={
-              <div>
-                Click <Link to={{
-                pathname: JOIN,
-                state: { steps: [STEP_USER_DETAILS, STEP_MEMBERSHIP] }
-              }}>here</Link> to {!isExistingMember ? 'become a member' : 'renew your membership'}
-              </div>
-            }
-            action={
-              <Button style={{ color: 'rgb(169, 168, 168)' }} size="small"
-                      onClick={() => this.snoozeNotification()}>
-                Remind me later
-              </Button>
-            }
-          />
-
-        this.setState({
-          notification
-        })
+    userRef.get()
+      .then((userDoc) => {
+        const userData = userDoc.data()
+        this.processPayMembershipNotification({ userData }) || this.processReceivedShirt({ userData })
       })
       .catch((err) => {
-        console.error('could not fetch user data.  err:', err)
+        console.error('could not fetch user data. err:', err)
         throw err
       })
   }
 
   componentDidMount () {
-    if (firebase.auth().currentUser) {
-      this.getMembershipStatus()
-    }
+    this.processNotifications()
   }
 
   componentDidUpdate (prevProps) {
-    if (prevProps.lastChanged !== this.props.lastChanged) {
-      this.getMembershipStatus()
-    }
-  }
-
-  snoozeNotification () {
-    this.setState({ notification: null })
-
-    const notificationsRef = firebase.firestore().doc(
-      `users/${firebase.auth().currentUser.uid}/notifications/payMembership`)
-
-    notificationsRef.set({ [POPUP_PAY_MEMBERSHIP_SNOOZED_AT]: moment().utc().format() }, { merge: true })
-      .then(() => {
-        console.log('snoozed')
-      })
+    prevProps.lastChanged !== this.props.lastChanged && this.processNotifications()
   }
 
   render () {
