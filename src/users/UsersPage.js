@@ -14,7 +14,6 @@ import Typography from '@material-ui/core/Typography'
 import Paper from '@material-ui/core/Paper'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Switch from '@material-ui/core/Switch'
-import s from 'underscore.string'
 import { connect } from 'react-redux'
 import moment from 'moment'
 import Promise from 'bluebird'
@@ -158,37 +157,29 @@ class EnhancedTable extends Component {
     const usersRef = firebase.firestore().collection('users')
     usersRef.get()
       .then((doc) => {
-          let members = []
+          let rows = []
           doc.forEach((doc) => {
             let data
             try {
               console.log(doc)
               data = doc.data()
               data[UID] = doc.id
-              data[ADDRESS] = data[ADDRESS1]
-              if (data[ADDRESS2]) {
-                data[ADDRESS] += ' ' + data[ADDRESS2]
-              }
-              data[ADDRESS] += ' ' + data[CITY]
-              data[ADDRESS] += ' ' + data[STATE] + ' ' + data[ZIP]
+              data[ADDRESS] = [data[ADDRESS1], data[ADDRESS2], data[CITY], data[STATE], data[ZIP]].join(' ').trim()
               if (data[PHONE]) {
-                const number = phoneUtil.parseAndKeepRawInput(data[PHONE] || '', 'US')
+                const number = phoneUtil.parseAndKeepRawInput(data[PHONE], 'US')
                 data[PHONE] = phoneUtil.format(number, PNF.NATIONAL)
               }
-              data[DATE_OF_BIRTH] = moment(data[DATE_OF_BIRTH]).format('MMMM D')
+              data[DATE_OF_BIRTH] = data[DATE_OF_BIRTH] ? moment(data[DATE_OF_BIRTH]).format('MMMM D') : ''
               data[MEMBERSHIP_EXPIRES_AT] = data[MEMBERSHIP_EXPIRES_AT] ? moment(data[MEMBERSHIP_EXPIRES_AT]).format('LLLL') : ''
-              data[DID_RECEIVED_SHIRT] = data[DID_RECEIVED_SHIRT] || false
-              members.push(data)
+              data[DID_RECEIVED_SHIRT] = !!data[DID_RECEIVED_SHIRT]
+              rows.push(data)
             } catch (err) {
               console.error('ERROR PROCESSING USER.',
                 'data:', data,
                 'err:', err)
             }
           })
-          members = members.sort((a, b) => {
-            return s.naturalCmp(a.displayName, b.displayName)
-          })
-          this.setState({ rows: members })
+          this.setState({ rows })
         }
       )
       .catch((err) => console.log(err))
