@@ -47,7 +47,7 @@ class SignUpStepPayment extends Component {
         })
       })
       .catch((err) => {
-        console.error('could not fetch user data.  err:', err)
+        console.error('SignUpStepPayment: could not fetch user data.  err:', err)
         throw err
       })
   }

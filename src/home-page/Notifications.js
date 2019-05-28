@@ -171,11 +171,11 @@ class Notifications extends Component {
 
     userRef.get()
       .then((userDoc) => {
-        const userData = userDoc.data()
+        const userData = userDoc.data() || {}
         this.processPayMembershipNotification({ userData }) || this.processReceivedShirt({ userData })
       })
       .catch((err) => {
-        console.error('could not fetch user data. err:', err)
+        console.error('Notification: could not fetch user data. err:', err)
         throw err
       })
   }

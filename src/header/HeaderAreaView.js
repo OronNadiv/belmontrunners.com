@@ -8,7 +8,7 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import Profile from './Profile'
 import Button from '@material-ui/core/Button'
-import { JOIN, SIGN_IN, USERS } from '../views/urls'
+import { FORGOT_PASSWORD, JOIN, ROOT, SIGN_IN, USERS } from '../views/urls'
 import Promise from 'bluebird'
 
 class HeaderAreaView extends Component {
@@ -20,6 +20,9 @@ class HeaderAreaView extends Component {
 
   loadPermissions () {
     if (!firebase.auth().currentUser) {
+      this.setState({
+        allowUsersPage: false
+      })
       return
     }
     const usersWriteRef = firebase.firestore().doc('permissions/usersWrite')
@@ -34,10 +37,23 @@ class HeaderAreaView extends Component {
       })
   }
 
+  evalNavbarFixed () {
+    const nav_offset_top = $('.header_area').height() + 50
+
+    const scroll = $(window).scrollTop()
+    if (scroll >= nav_offset_top) {
+      $('.header_area').addClass('navbar_fixed')
+    } else {
+      $('.header_area').removeClass('navbar_fixed')
+    }
+  }
+
+
   checkIsFixed () {
     if (
-      this.props.location.pathname.trim() === JOIN ||
-      this.props.location.pathname.trim() === USERS
+      this.props.location.pathname.trim() !== ROOT &&
+      this.props.location.pathname.trim() !== SIGN_IN &&
+      this.props.location.pathname.trim() !== FORGOT_PASSWORD
     ) {
       console.log('adding. this.props.location.pathname.trim():', this.props.location.pathname.trim())
       $('.header_area').addClass('navbar_fixed')
@@ -47,14 +63,13 @@ class HeaderAreaView extends Component {
       console.log('removing. this.props.location.pathname.trim():', this.props.location.pathname.trim())
 
       $('.header_area').removeClass('navbar_fixed_not_root')
+      this.evalNavbarFixed()
       return false
     }
   }
 
   componentDidMount () {
     this.loadPermissions()
-    const nav_offset_top = $('.header_area').height() + 50
-    console.log('nav_offset_top:', nav_offset_top)
     console.log('this.props.location:', this.props.location)
 
 
@@ -68,12 +83,7 @@ class HeaderAreaView extends Component {
           if (this.checkIsFixed()) {
             return
           }
-          const scroll = $(window).scrollTop()
-          if (scroll >= nav_offset_top) {
-            $('.header_area').addClass('navbar_fixed')
-          } else {
-            $('.header_area').removeClass('navbar_fixed')
-          }
+          this.evalNavbarFixed()
         })
       }
 
@@ -100,8 +110,7 @@ class HeaderAreaView extends Component {
         <div className='main_menu'>
           <nav className='navbar navbar-expand-lg navbar-light'>
             <div className='container box_1620'>
-              <a className='navbar-brand logo_h' href='/'><img src='img/logo.png' alt='' />
-              </a>
+              <Link className='navbar-brand logo_h' to={ROOT}><img src='img/logo.png' alt='' /></Link>
               <button className='navbar-toggler' type='button' data-toggle='collapse'
                       data-target='#navbarSupportedContent' aria-controls='navbarSupportedContent'
                       aria-expanded='false' aria-label='Toggle navigation'>
@@ -112,22 +121,18 @@ class HeaderAreaView extends Component {
               <div className='collapse navbar-collapse offset' id='navbarSupportedContent'
                    style={{ maxHeight: 10 + 41 * totalNavItems }}>
                 <ul className='nav navbar-nav menu_nav ml-auto'>
-                  {
-                    (this.state.allowUsersPage) &&
-                    <li className='nav-item'>
-                      <a className='nav-link nav-link-menu' href={USERS}>
-                        Users
-                      </a>
-                    </li>
-                  }
                   <li className='nav-item'>
                     {
+                      this.state.allowUsersPage &&
+                      <Link to={USERS} className='nav-link'>
+                        Users
+                      </Link>
+                    }
+                    {
                       isSignedIn &&
-                      <a className='nav-link' href='/'
-                         rel='noopener noreferrer'
-                         onClick={() => firebase.auth().signOut()}>
+                      <Link to={ROOT} className='nav-link' onClick={() => firebase.auth().signOut()}>
                         Sign out
-                      </a>
+                      </Link>
                     }
                     {
                       isSignedOut &&

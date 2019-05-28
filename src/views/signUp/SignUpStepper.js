@@ -45,9 +45,6 @@ class SignUpStepper extends Component {
 
   getStepsHeaders () {
     const { steps } = this.state
-    if (steps.length < 2) {
-      return null
-    }
     return steps.map((step) => {
       switch (step) {
         case STEP_AUTHENTICATION:
@@ -77,13 +74,16 @@ class SignUpStepper extends Component {
   }
 
   render () {
-    const { activeStep } = this.state
+    const { activeStep, steps } = this.state
 
     return (
       <div>
-        <Stepper alternativeLabel className="justify-content-center" activeStep={activeStep}>
-          {this.getStepsHeaders()}
-        </Stepper>
+        {
+          steps.length > 1 &&
+          <Stepper alternativeLabel className="justify-content-center" activeStep={activeStep}>
+            {this.getStepsHeaders()}
+          </Stepper>
+        }
         {
           this.getStep()
         }

@@ -37,6 +37,8 @@ import {
 } from '../fields'
 import { Checkbox } from '@material-ui/core'
 import LoggedInState from '../views/HOC/LoggedInState'
+import { ROOT } from '../views/urls'
+import { Redirect } from 'react-router-dom'
 
 const ADDRESS = 'address'
 const PNF = googleLibPhoneNumber.PhoneNumberFormat
@@ -145,7 +147,7 @@ class EnhancedTable extends Component {
       orderBy: DISPLAY_NAME,
       page: 0,
       dense: true,
-      rowsPerPage: 5
+      rowsPerPage: 25
     }
     this.handleChangeDense = this.handleChangeDense.bind(this)
     this.handleChangePage = this.handleChangePage.bind(this)
@@ -154,8 +156,13 @@ class EnhancedTable extends Component {
   }
 
   loadMembers () {
+    console.log('in loadmembers.  this.state.allowRead:', this.state.allowRead)
+    if (!this.state.allowRead) {
+      return
+    }
+
     const usersRef = firebase.firestore().collection('users')
-    usersRef.get()
+    return usersRef.get()
       .then((doc) => {
           let rows = []
           doc.forEach((doc) => {
@@ -188,10 +195,12 @@ class EnhancedTable extends Component {
   loadPermissions () {
     const usersWriteRef = firebase.firestore().doc('permissions/usersWrite')
     const usersReadRef = firebase.firestore().doc('permissions/usersRead')
-    Promise.all([usersWriteRef.get(), usersReadRef.get()])
+    return Promise.all([usersWriteRef.get(), usersReadRef.get()])
       .spread((docWrite, docRead) => {
         const dataWrite = docWrite.data()
         const dataRead = docRead.data()
+        console.log('dataRead:', dataRead)
+        console.log('dataWrite:', dataWrite)
         this.setState({
           allowRead: !!dataRead[firebase.auth().currentUser.uid],
           allowWrite: !!dataWrite[firebase.auth().currentUser.uid]
@@ -200,12 +209,22 @@ class EnhancedTable extends Component {
   }
 
   componentDidMount () {
-    this.loadMembers()
+    if (!firebase.auth().currentUser) {
+      return
+    }
+
     this.loadPermissions()
+      .then(() => {
+        this.loadMembers()
+      })
   }
 
   componentDidUpdate (prevProps) {
-    prevProps.lastChanged !== this.props.lastChanged && this.loadMembers()
+    prevProps.lastChanged !== this.props.lastChanged &&
+    this.loadPermissions()
+      .then(() => {
+        this.loadMembers()
+      })
   }
 
 
@@ -235,7 +254,15 @@ class EnhancedTable extends Component {
   }
 
   render () {
-    console.log('render called')
+    console.log('render called.  this.state.allowRead:', this.state.allowRead)
+    if (this.state.allowRead === false) {
+      return <Redirect to={ROOT} />
+    } else if (!this.state.allowRead) {
+      return <div />
+    }
+
+    // at that point, read is allowed
+
     const { rowsPerPage, page, order, orderBy, dense, rows } = this.state
 
     const classes = {}
@@ -267,7 +294,9 @@ class EnhancedTable extends Component {
                         key={index}
                         hover
                       >
-                        <TableCell>{row[DISPLAY_NAME]}</TableCell>
+                        <TableCell onClick={() => {
+                          console.log('uid:', row[UID])
+                        }}>{row[DISPLAY_NAME]}</TableCell>
                         <TableCell>{row[EMAIL]}</TableCell>
                         <TableCell>{row[PHONE]}</TableCell>
                         <TableCell>{row[ADDRESS]}</TableCell>

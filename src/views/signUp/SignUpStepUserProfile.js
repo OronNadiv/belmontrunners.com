@@ -102,7 +102,6 @@ class SignUpStepUserProfile extends Component {
           <form onSubmit={handleSubmit}>
             <div className='row'>
               <Field
-                style={{ minHeight: 68 }}
                 label='Address 1'
                 fullWidth
                 margin='normal'
@@ -114,7 +113,6 @@ class SignUpStepUserProfile extends Component {
 
             <div className='row'>
               <Field
-                style={{ minHeight: 68 }}
                 label='Address 2'
                 fullWidth
                 margin='normal'
@@ -125,14 +123,12 @@ class SignUpStepUserProfile extends Component {
 
             <div className='row d-flex justify-content-between align-content-center'>
               <Field
-                style={{ minHeight: 68 }}
                 label='City'
                 margin='normal'
                 name={CITY}
                 component={TextField}
                 validate={required}
               />
-
               <Field
                 style={{ width: 100 }}
                 name={ZIP}
@@ -144,23 +140,24 @@ class SignUpStepUserProfile extends Component {
             </div>
 
             <div className='row'>
-              <Field
-                // style={{ minWidth: 180 }}
-                name={STATE}
-                component={Select}
-                validate={required}
-                label='State'
-                // margin='normal'
-                initialValue='CA'
-                width='auto'
-              >
-                {
-                  states.map(
-                    ({ abbreviation, name }, key) =>
-                      <MenuItem key={key} value={abbreviation}>{name}</MenuItem>
-                  )
-                }
-              </Field>
+              <div style={{ margin: '16px 0 8px' }}>
+                <Field
+                  name={STATE}
+                  component={Select}
+                  validate={required}
+                  label='State'
+                  // margin='normal'
+                  initialValue='CA'
+                  width='auto'
+                >
+                  {
+                    states.map(
+                      ({ abbreviation, name }, key) =>
+                        <MenuItem key={key} value={abbreviation}>{name}</MenuItem>
+                    )
+                  }
+                </Field>
+              </div>
             </div>
 
             <div className='row d-flex justify-content-between align-items-end'>
@@ -190,51 +187,57 @@ class SignUpStepUserProfile extends Component {
               />
             </div>
 
-            <div className='row' style={{ minHeight: 92 }}>
-              <Field
-                style={{ minWidth: 120 }}
-                name={GENDER}
-                component={Select}
-                validate={required}
-                label='Gender'
-                // margin='normal'
-                width='auto'
-              >
-                <MenuItem value={'F'}>Female</MenuItem>
-                <MenuItem value={'M'}>Male</MenuItem>
-                <MenuItem value={'O'}>Other</MenuItem>
-              </Field>
+            <div className='row'>
+              <div style={{ margin: '16px 0 8px' }}>
+                <Field
+                  style={{ minWidth: 120 }}
+                  name={GENDER}
+                  component={Select}
+                  validate={required}
+                  label='Gender'
+                  // margin='normal'
+                  width='auto'
+                >
+                  <MenuItem value={'F'}>Female</MenuItem>
+                  <MenuItem value={'M'}>Male</MenuItem>
+                  <MenuItem value={'O'}>Other</MenuItem>
+                </Field>
+              </div>
             </div>
 
-            <div className='row d-flex justify-content-between align-content-center' style={{ minHeight: 92 }}>
-              <Field
-                className='mr-4'
-                style={{ minWidth: 180 }}
-                name={SHIRT_GENDER}
-                component={Select}
-                validate={required}
-                label='Shirt gender'
-                // margin='normal'
-                width='auto'
-              >
-                <MenuItem value={'F'}>Female</MenuItem>
-                <MenuItem value={'M'}>Male</MenuItem>
-              </Field>
+            <div className='row'>
+              <div style={{ margin: '16px 0 8px' }}>
 
-              <Field
-                style={{ minWidth: 100 }}
-                name={SHIRT_SIZE}
-                component={Select}
-                validate={required}
-                label='Shirt size'
-                // margin='normal'
-                width='auto'
-              >
-                {values.shirtGender === 'F' && <MenuItem value={'S'}>Small</MenuItem>}
-                <MenuItem value={'M'}>Medium</MenuItem>
-                <MenuItem value={'L'}>Large</MenuItem>
-                <MenuItem value={'XL'}>X-Large</MenuItem>
-              </Field>
+                <Field
+                  className='mr-4'
+                  style={{ minWidth: 180 }}
+                  name={SHIRT_GENDER}
+                  component={Select}
+                  validate={required}
+                  label='Shirt gender'
+                  // margin='normal'
+                  width='auto'
+                >
+                  <MenuItem value={'F'}>Female</MenuItem>
+                  <MenuItem value={'M'}>Male</MenuItem>
+                </Field>
+
+                <Field
+                  style={{ minWidth: 100 }}
+                  name={SHIRT_SIZE}
+                  component={Select}
+                  validate={required}
+                  label='Shirt size'
+                  // margin='normal'
+                  width='auto'
+                >
+                  {values.shirtGender === 'F' && <MenuItem value={'XS'}>X-Small</MenuItem>}
+                  <MenuItem value={'S'}>Small</MenuItem>
+                  <MenuItem value={'M'}>Medium</MenuItem>
+                  <MenuItem value={'L'}>Large</MenuItem>
+                  <MenuItem value={'XL'}>X-Large</MenuItem>
+                </Field>
+              </div>
             </div>
 
             <SignUpStepperButton

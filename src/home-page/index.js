@@ -8,6 +8,10 @@ import Map from './Map'
 import Notifications from './Notifications'
 
 class Home extends Component {
+  componentDidMount () {
+    window.scrollTo(0, 0)
+  }
+
   render () {
     return (
       <div>

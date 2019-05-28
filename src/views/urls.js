@@ -1,8 +1,11 @@
+// urls
 export const JOIN = '/join'
 export const SIGN_IN = '/signin'
 export const FORGOT_PASSWORD = '/forgotpassword'
 export const ROOT = '/'
 export const USERS = '/users'
+
+// documents
 export const TOS_FILE_NAME = '2019-04-01_tos.pdf'
 export const TOS = `https://www.belmontrunners.com/documents/${TOS_FILE_NAME}`
 export const PRIVACY_POLICY_FILE_NAME = '2019-05-18_privacy_policy.pdf'

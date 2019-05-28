@@ -282,4 +282,4 @@ View.propTypes = {
   onNextClicked: PropTypes.func.isRequired
 }
 
-export default LoggedInState({ name: 'SignUpStepAuth', isRequiredToBeLoggedIn: false, isAllowStateChange: true })(View)
+export default LoggedInState({ name: 'SignUpStepAuth', isRequiredToBeLoggedIn: false, canSwitchToLogin: true })(View)
