@@ -1,9 +1,5 @@
-import 'firebase/auth'
-import 'firebase/firestore'
-import firebase from 'firebase'
 import React, { Component } from 'react'
 import { Select, TextField } from 'final-form-material-ui'
-import Promise from 'bluebird'
 import * as PropTypes from 'prop-types'
 import moment from 'moment'
 import { Field, Form } from 'react-final-form'
@@ -23,6 +19,7 @@ import {
   STATE,
   ZIP
 } from '../../fields'
+import { updateUserData as updateUserDataAction } from '../../reducers/currentUser'
 
 const states = require('./states_titlecase.json')
 const required = value => (value ? undefined : 'Required')
@@ -37,67 +34,36 @@ const composeValidators = (...validators) => value =>
   validators.reduce((error, validator) => error || validator(value), undefined)
 
 class SignUpStepUserProfile extends Component {
-  constructor (props) {
-    super(props)
-    this.state = {}
-  }
-
   handleSubmit (values) {
-    const { onNextClicked } = this.props
-    console.log('submitting values:', values)
-    return Promise
-      .try(() => {
-        console.log(JSON.stringify(values, 0, 2))
-        this.setState({ submitting: true })
-        const currentUserRef = firebase.firestore().doc(`users/${firebase.auth().currentUser.uid}`)
-        return currentUserRef.set(values, { merge: true })
-      })
-      .then((res) => {
-        console.log('res', res)
-        onNextClicked()
-      })
-      .catch((err) => {
-        console.log('caught an exception', err)
-        this.setState({ submitting: false })
-      })
-  }
-
-  loadData () {
-    this.setState({ loading: true })
-    const currentUser = firebase.firestore().doc(`users/${firebase.auth().currentUser.uid}`)
-    currentUser.get().then(values => {
-      console.log('values:', values.data())
-      this.setState({ data: values.data() })
-      this.setState({ loading: false, loaded: true })
-    })
-      .finally(() => {
-        this.setState({ loading: false })
-      })
-
+    const { updateUserData } = this.props
+    console.log('submitting values:', JSON.stringify(values, 0, 2))
+    return updateUserData(values, { merge: true })
   }
 
   componentDidMount () {
     window.scrollTo(0, 0)
+  }
 
-    if (firebase.auth().currentUser) {
-      this.loadData()
+  componentDidUpdate (prevProps, prevState, snapshot) {
+    if (prevProps.userDataUpdating && !this.props.userDataUpdating) {
+      if (!this.props.userDataUpdateError) {
+        const { onNextClicked } = this.props
+        onNextClicked()
+      } else {
+        // todo: show error since update failed.
+      }
     }
   }
 
-  componentDidUpdate (prevProps) {
-    prevProps.lastChanged !== this.props.lastChanged && firebase.auth().currentUser && this.loadData()
-  }
-
   render () {
-    const { submitting } = this.state
-    const { isLast } = this.props
+    const { isLast, userData, isCurrentUserLoaded, userDataUpdating } = this.props
 
-    return this.state.loading || !this.state.loaded ?
+    return !isCurrentUserLoaded ?
       <div className="loading" /> :
       <Form
         className='container-fluid'
         onSubmit={(values) => this.handleSubmit(values)}
-        initialValues={this.state.data}
+        initialValues={userData}
         render={({ handleSubmit, form, values }) => (
           <form onSubmit={handleSubmit}>
             <div className='row'>
@@ -243,7 +209,7 @@ class SignUpStepUserProfile extends Component {
             <SignUpStepperButton
               handlePrimaryClicked={() => form.submit()}
               primaryText={isLast ? 'Save' : 'Next'}
-              primaryDisabled={!!submitting}
+              primaryDisabled={!!userDataUpdating}
               showPrimary
             />
           </form>
@@ -253,18 +219,30 @@ class SignUpStepUserProfile extends Component {
 }
 
 SignUpStepUserProfile.propTypes = {
+  updateUserData: PropTypes.func.isRequired,
+  userData: PropTypes.object.isRequired,
+  userDataUpdating: PropTypes.bool.isRequired,
+  userDataUpdateError: PropTypes.object,
+  isCurrentUserLoaded: PropTypes.bool.isRequired,
+
   isLast: PropTypes.bool,
-  onNextClicked: PropTypes.func.isRequired,
-  lastChanged: PropTypes.number.isRequired
+  onNextClicked: PropTypes.func.isRequired
 }
 
-const mapStateToProps = (state) => {
+const mapDispatchToProps = {
+  updateUserData: updateUserDataAction
+}
+
+const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, userData, userDataUpdating, userDataUpdateError } }) => {
   return {
-    lastChanged: state.currentUser.lastChanged
+    isCurrentUserLoaded,
+    userData,
+    userDataUpdating,
+    userDataUpdateError
   }
 }
 
 export default LoggedInState({
   name: 'SignUpStepUserProfile',
   isRequiredToBeLoggedIn: true
-})(connect(mapStateToProps)(SignUpStepUserProfile))
+})(connect(mapStateToProps, mapDispatchToProps)(SignUpStepUserProfile))

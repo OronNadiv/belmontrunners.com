@@ -5,7 +5,6 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { JOIN, ROOT, USERS } from '../views/urls'
 import { STEP_USER_DETAILS } from '../views/signUp/SignUpStepper'
-import Promise from 'bluebird'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import LoggedInState from '../views/HOC/LoggedInState'
@@ -16,37 +15,8 @@ class ProfileView extends Component {
     this.state = {}
   }
 
-  loadPermissions () {
-    if (!firebase.auth().currentUser) {
-      this.setState({
-        allowUsersPage: false
-      })
-      return
-    }
-    const usersWriteRef = firebase.firestore().doc('permissions/usersWrite')
-    const usersReadRef = firebase.firestore().doc('permissions/usersRead')
-    Promise.all([usersWriteRef.get(), usersReadRef.get()])
-      .spread((docWrite, docRead) => {
-        const dataWrite = docWrite.data()
-        const dataRead = docRead.data()
-        this.setState({
-          allowUsersPage: !!dataRead[firebase.auth().currentUser.uid] || !!dataWrite[firebase.auth().currentUser.uid]
-        })
-      })
-  }
-
-  componentDidMount () {
-    this.loadPermissions()
-  }
-
-  componentDidUpdate (prevProps) {
-    prevProps.lastChanged !== this.props.lastChanged && this.loadPermissions()
-  }
-
-
   render () {
-    const { currentUser } = firebase.auth()
-
+    const { currentUser, allowUsersPage } = this.props
     return (
       <span className="dropdown signout-btn text-white-50">
         <a className="dropdown-toggle" id="dropdownMenuLink" href='/'
@@ -57,7 +27,7 @@ class ProfileView extends Component {
 
         <div className="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
           {
-            this.state.allowUsersPage &&
+            allowUsersPage &&
             <Link to={USERS} className='dropdown-item'>
               Users
             </Link>
@@ -83,12 +53,16 @@ class ProfileView extends Component {
 }
 
 ProfileView.propTypes = {
-  lastChanged: PropTypes.number.isRequired
+  allowUsersPage: PropTypes.bool.isRequired,
+  currentUser: PropTypes.object.isRequired
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = ({ currentUser: { permissions, currentUser } }) => {
   return {
-    lastChanged: state.currentUser.lastChanged
+    allowUsersPage: !!currentUser && (
+      !!permissions.usersRead[currentUser.uid] ||
+      !!permissions.usersWrite[currentUser.uid]),
+    currentUser: currentUser || {}
   }
 }
 

@@ -1,4 +1,3 @@
-import 'firebase/firestore'
 import 'firebase/auth'
 import firebase from 'firebase'
 import React, { Component } from 'react'
@@ -9,33 +8,8 @@ import PropTypes from 'prop-types'
 import Profile from './Profile'
 import Button from '@material-ui/core/Button'
 import { FORGOT_PASSWORD, JOIN, ROOT, SIGN_IN, USERS } from '../views/urls'
-import Promise from 'bluebird'
 
 class HeaderAreaView extends Component {
-
-  constructor (props) {
-    super(props)
-    this.state = {}
-  }
-
-  loadPermissions () {
-    if (!firebase.auth().currentUser) {
-      this.setState({
-        allowUsersPage: false
-      })
-      return
-    }
-    const usersWriteRef = firebase.firestore().doc('permissions/usersWrite')
-    const usersReadRef = firebase.firestore().doc('permissions/usersRead')
-    Promise.all([usersWriteRef.get(), usersReadRef.get()])
-      .spread((docWrite, docRead) => {
-        const dataWrite = docWrite.data()
-        const dataRead = docRead.data()
-        this.setState({
-          allowUsersPage: !!dataRead[firebase.auth().currentUser.uid] || !!dataWrite[firebase.auth().currentUser.uid]
-        })
-      })
-  }
 
   evalNavbarFixed () {
     const nav_offset_top = $('.header_area').height() + 50
@@ -50,17 +24,18 @@ class HeaderAreaView extends Component {
 
 
   checkIsFixed () {
+    const pathname = this.props.location.pathname.trim()
     if (
-      this.props.location.pathname.trim() !== ROOT &&
-      this.props.location.pathname.trim() !== SIGN_IN &&
-      this.props.location.pathname.trim() !== FORGOT_PASSWORD
+      pathname !== ROOT &&
+      pathname !== SIGN_IN &&
+      pathname !== FORGOT_PASSWORD
     ) {
-      console.log('adding. this.props.location.pathname.trim():', this.props.location.pathname.trim())
+      console.log('adding. this.props.location.pathname.trim():', pathname)
       $('.header_area').addClass('navbar_fixed')
       $('.header_area').addClass('navbar_fixed_not_root')
       return true
     } else {
-      console.log('removing. this.props.location.pathname.trim():', this.props.location.pathname.trim())
+      console.log('removing. this.props.location.pathname.trim():', pathname)
 
       $('.header_area').removeClass('navbar_fixed_not_root')
       this.evalNavbarFixed()
@@ -69,10 +44,6 @@ class HeaderAreaView extends Component {
   }
 
   componentDidMount () {
-    this.loadPermissions()
-    console.log('this.props.location:', this.props.location)
-
-
     const navbarFixed = () => {
       if ($('.header_area').length) {
         if (this.checkIsFixed()) {
@@ -93,17 +64,15 @@ class HeaderAreaView extends Component {
   }
 
   componentDidUpdate (prevProps) {
-    prevProps.lastChanged !== this.props.lastChanged && this.loadPermissions()
     this.checkIsFixed()
   }
 
   render () {
-    const { lastChanged } = this.props
-    const { currentUser } = firebase.auth()
+    const { isCurrentUserLoaded, currentUser, allowUsersPage } = this.props
     let totalNavItems = 0
-    this.state.allowUsersPage && (totalNavItems += 1)
-    const isSignedOut = !!lastChanged && !currentUser && (totalNavItems += 2)
-    const isSignedIn = !!lastChanged && currentUser && (totalNavItems += 1)
+    allowUsersPage && (totalNavItems += 1)
+    const isSignedOut = isCurrentUserLoaded && !currentUser && (totalNavItems += 2)
+    const isSignedIn = isCurrentUserLoaded && currentUser && (totalNavItems += 1)
 
     return (
       <header className='header_area'>
@@ -123,7 +92,7 @@ class HeaderAreaView extends Component {
                 <ul className='nav navbar-nav menu_nav ml-auto'>
                   <li className='nav-item'>
                     {
-                      this.state.allowUsersPage &&
+                      allowUsersPage &&
                       <Link to={USERS} className='nav-link'>
                         Users
                       </Link>
@@ -188,13 +157,13 @@ class HeaderAreaView extends Component {
                   {/*  </a>*/}
                   {/*</li>*/}
                   {
-                    !!lastChanged && currentUser &&
+                    isCurrentUserLoaded && currentUser &&
                     <li className='nav-item'>
                       <Profile />
                     </li>
                   }
                   {
-                    !!lastChanged && !currentUser &&
+                    isCurrentUserLoaded && !currentUser &&
                     <li className='nav-item'>
                       <Link to={SIGN_IN} className='signin-btn text-white'>
                         <Button className='text-white'>
@@ -204,7 +173,7 @@ class HeaderAreaView extends Component {
                     </li>
                   }
                   {
-                    !!lastChanged && !currentUser && this.props.location.pathname.trim() !== JOIN &&
+                    isCurrentUserLoaded && !currentUser && this.props.location.pathname.trim() !== JOIN &&
                     <li className='nav-item'>
                       <Link to={{
                         pathname: JOIN,
@@ -227,15 +196,21 @@ class HeaderAreaView extends Component {
 }
 
 HeaderAreaView.propTypes = {
-  lastChanged: PropTypes.number.isRequired,
+  allowUsersPage: PropTypes.bool.isRequired,
+  isCurrentUserLoaded: PropTypes.bool.isRequired,
+  currentUser: PropTypes.object,
   location: PropTypes.shape({
     pathname: PropTypes.string.isRequired
   }).isRequired
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, currentUser, permissions } }) => {
   return {
-    lastChanged: state.currentUser.lastChanged
+    allowUsersPage: !!currentUser && (
+      !!permissions.usersRead[currentUser.uid] ||
+      !!permissions.usersWrite[currentUser.uid]),
+    isCurrentUserLoaded,
+    currentUser
   }
 }
 

@@ -1,5 +1,3 @@
-import 'firebase/auth'
-import firebase from 'firebase'
 import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
 import { ROOT } from '../urls'
@@ -11,25 +9,33 @@ export default ({ name, isRequiredToBeLoggedIn, canSwitchToLogin }) => {
     class HOC extends Component {
       constructor (props) {
         super(props)
-        this.state = {}
+        this.state = {
+          initialIsLoggedIn: null
+        }
       }
 
       checkLoginState () {
-        const { lastChanged } = this.props
-        console.log('user hasn\'t been fetched yet.')
-        if (!lastChanged) {
+        console.log('checkLoginState called.  name:', name)
+        const { isCurrentUserLoaded, currentUser } = this.props
+        if (!isCurrentUserLoaded) {
+          console.log(`user hasn't been fetched yet.`)
           return
         }
 
         console.log('user has been fetched.')
-        const isLoggedIn = !!firebase.auth().currentUser
+        const isLoggedIn = !!currentUser
 
         // save state login for later
-        this.setState({ initialIsLoggedIn: isLoggedIn })
+        if (this.state.initialIsLoggedIn === null) {
+          this.setState({ initialIsLoggedIn: isLoggedIn })
+        }
 
         isRequiredToBeLoggedIn = !!isRequiredToBeLoggedIn
         if (isLoggedIn === isRequiredToBeLoggedIn) {
-          console.log('state is as expected.')
+          console.log('state is as expected',
+            'initialIsLoggedIn', this.state.initialIsLoggedIn,
+            'isLoggedIn:', isLoggedIn,
+            'isRequiredToBeLoggedIn:', isRequiredToBeLoggedIn)
           return
         }
 
@@ -56,13 +62,14 @@ export default ({ name, isRequiredToBeLoggedIn, canSwitchToLogin }) => {
       }
 
       componentDidUpdate (prevProps, prevState, snapshot) {
-        if (prevProps.lastChanged !== this.props.lastChanged) {
+        if (prevProps.isCurrentUserLoaded !== this.props.isCurrentUserLoaded) {
           this.checkLoginState()
         }
       }
 
       render () {
-        if (!this.props.lastChanged) {
+        const { isCurrentUserLoaded } = this.props
+        if (!isCurrentUserLoaded) {
           return null // todo: better to show loading spinner
         }
         return this.state.redirectToRoot ?
@@ -72,12 +79,15 @@ export default ({ name, isRequiredToBeLoggedIn, canSwitchToLogin }) => {
     }
 
     HOC.propTypes = {
-      lastChanged: PropTypes.number.isRequired
-
+      isCurrentUserLoaded: PropTypes.bool.isRequired,
+      currentUser: PropTypes.object
     }
 
-    const mapStateToProps = (state) => {
-      return { lastChanged: state.currentUser.lastChanged }
+    const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, currentUser } }) => {
+      return {
+        isCurrentUserLoaded,
+        currentUser
+      }
     }
 
     return connect(mapStateToProps)(HOC)

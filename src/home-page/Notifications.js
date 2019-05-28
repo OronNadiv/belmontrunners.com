@@ -1,6 +1,3 @@
-import 'firebase/auth'
-import 'firebase/firestore'
-import firebase from 'firebase'
 import React, { Component } from 'react'
 import Button from '@material-ui/core/Button'
 import Snackbar from '@material-ui/core/Snackbar'
@@ -12,6 +9,7 @@ import moment from 'moment'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import SnackbarContent from '@material-ui/core/SnackbarContent'
+import { updateUserData as updateUserDataAction } from '../reducers/currentUser'
 
 const POPUP_PAY_MEMBERSHIP_SNOOZED_AT = 'popupPayMembershipSnoozedAt'
 const POPUP_RECEIVED_SHIRT_AT = 'popupReceivedShirtSnoozedAt'
@@ -45,13 +43,9 @@ class Notifications extends Component {
   }
 
   dismissNotification ({ notificationKey }) {
+    const { updateUserData } = this.props
     this.setState({ notification: null })
-    const userRef = firebase.firestore().doc(`users/${firebase.auth().currentUser.uid}`)
-
-    userRef.set({ notifications: { [notificationKey]: moment().utc().format() } }, { merge: true })
-      .then(() => {
-        console.log('snoozed')
-      })
+    updateUserData({ notifications: { [notificationKey]: moment().utc().format() } }, { merge: true })
   }
 
 
@@ -163,21 +157,12 @@ class Notifications extends Component {
   }
 
   processNotifications () {
-    if (!firebase.auth().currentUser) {
+    const { currentUser, userData } = this.props
+    if (!currentUser) {
       this.setState({ notification: null })
       return
     }
-    const userRef = firebase.firestore().doc(`users/${firebase.auth().currentUser.uid}`)
-
-    userRef.get()
-      .then((userDoc) => {
-        const userData = userDoc.data() || {}
-        this.processPayMembershipNotification({ userData }) || this.processReceivedShirt({ userData })
-      })
-      .catch((err) => {
-        console.error('Notification: could not fetch user data. err:', err)
-        throw err
-      })
+    this.processPayMembershipNotification({ userData }) || this.processReceivedShirt({ userData })
   }
 
   componentDidMount () {
@@ -185,7 +170,7 @@ class Notifications extends Component {
   }
 
   componentDidUpdate (prevProps) {
-    prevProps.lastChanged !== this.props.lastChanged && this.processNotifications()
+    prevProps.currentUser !== this.props.currentUser && this.processNotifications()
   }
 
   render () {
@@ -195,17 +180,23 @@ class Notifications extends Component {
       </div>
     )
   }
-
 }
 
 Notifications.propTypes = {
-  lastChanged: PropTypes.number.isRequired
+  currentUser: PropTypes.object,
+  updateUserData: PropTypes.func.isRequired,
+  userData: PropTypes.object.isRequired
 }
 
-const mapStateToProps = (state) => {
+const mapDispatchToProps = {
+  updateUserData: updateUserDataAction
+}
+
+const mapStateToProps = ({ currentUser: { currentUser, userData } }) => {
   return {
-    lastChanged: state.currentUser.lastChanged
+    currentUser,
+    userData
   }
 }
 
-export default connect(mapStateToProps)(Notifications)
+export default connect(mapStateToProps, mapDispatchToProps)(Notifications)

@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
 import Footer from './Footer'
 import './App.css'
-import firebase from 'firebase'
-import 'firebase/auth'
 import './scss/style.scss'
 import PropTypes from 'prop-types'
 import { fetchCurrentUser as fetchCurrentUserAction } from './reducers/currentUser'
@@ -22,7 +20,6 @@ class App extends Component {
   }
 
   render () {
-    console.log('firebase.auth().currentUser:', firebase.auth().currentUser)
     return (
       <Switch>
         <Route

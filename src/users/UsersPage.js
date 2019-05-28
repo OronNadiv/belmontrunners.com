@@ -16,7 +16,6 @@ import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Switch from '@material-ui/core/Switch'
 import { connect } from 'react-redux'
 import moment from 'moment'
-import Promise from 'bluebird'
 import googleLibPhoneNumber from 'google-libphonenumber'
 import {
   ADDRESS1,
@@ -156,10 +155,7 @@ class EnhancedTable extends Component {
   }
 
   loadMembers () {
-    console.log('in loadmembers.  this.state.allowRead:', this.state.allowRead)
-    if (!this.state.allowRead) {
-      return
-    }
+    console.log('in loadmembers.')
 
     const usersRef = firebase.firestore().collection('users')
     return usersRef.get()
@@ -192,39 +188,12 @@ class EnhancedTable extends Component {
       .catch((err) => console.log(err))
   }
 
-  loadPermissions () {
-    const usersWriteRef = firebase.firestore().doc('permissions/usersWrite')
-    const usersReadRef = firebase.firestore().doc('permissions/usersRead')
-    return Promise.all([usersWriteRef.get(), usersReadRef.get()])
-      .spread((docWrite, docRead) => {
-        const dataWrite = docWrite.data()
-        const dataRead = docRead.data()
-        console.log('dataRead:', dataRead)
-        console.log('dataWrite:', dataWrite)
-        this.setState({
-          allowRead: !!dataRead[firebase.auth().currentUser.uid],
-          allowWrite: !!dataWrite[firebase.auth().currentUser.uid]
-        })
-      })
-  }
-
   componentDidMount () {
-    if (!firebase.auth().currentUser) {
-      return
-    }
-
-    this.loadPermissions()
-      .then(() => {
-        this.loadMembers()
-      })
+    this.props.allowRead && this.loadMembers()
   }
 
   componentDidUpdate (prevProps) {
-    prevProps.lastChanged !== this.props.lastChanged &&
-    this.loadPermissions()
-      .then(() => {
-        this.loadMembers()
-      })
+    prevProps.allowRead !== this.props.allowRead && this.props.allowRead && this.loadMembers()
   }
 
 
@@ -254,11 +223,14 @@ class EnhancedTable extends Component {
   }
 
   render () {
-    console.log('render called.  this.state.allowRead:', this.state.allowRead)
-    if (this.state.allowRead === false) {
+    console.log('render called.  allowRead:', this.props.allowRead)
+
+    const { currentUser, allowRead, allowWrite } = this.props
+
+    if (currentUser && !allowRead) {
       return <Redirect to={ROOT} />
-    } else if (!this.state.allowRead) {
-      return <div />
+    } else if (!allowRead) {
+      return <div /> // todo: show loading spinner
     }
 
     // at that point, read is allowed
@@ -308,7 +280,7 @@ class EnhancedTable extends Component {
                         <TableCell>
                           <Checkbox
                             checked={row[DID_RECEIVED_SHIRT]}
-                            disabled={!this.state.allowWrite}
+                            disabled={!allowWrite}
                             onChange={(event, checked) => {
                               const index = rows.indexOf(row)
                               rows[index][DID_RECEIVED_SHIRT] = checked
@@ -360,12 +332,16 @@ class EnhancedTable extends Component {
 }
 
 EnhancedTable.propTypes = {
-  lastChanged: PropTypes.number.isRequired
+  allowRead: PropTypes.bool.isRequired,
+  allowWrite: PropTypes.bool.isRequired,
+  currentUser: PropTypes.object.isRequired
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = ({ currentUser: { permissions, currentUser } }) => {
   return {
-    lastChanged: state.currentUser.lastChanged
+    allowRead: !!currentUser && !!permissions.usersRead[currentUser.uid],
+    allowWrite: !!currentUser && !!permissions.usersWrite[currentUser.uid],
+    currentUser: currentUser || {}
   }
 }
 
