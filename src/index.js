@@ -8,10 +8,12 @@ import { ConnectedRouter } from 'connected-react-router'
 import { Elements, StripeProvider } from 'react-stripe-elements'
 
 import * as serviceWorker from './serviceWorker'
+import * as Sentry from '@sentry/browser';
 import firebase from 'firebase'
 import theme from './MuiTheme'
 import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider'
 
+// firebase init
 const config = {
   apiKey: "AIzaSyC0Xnd3J3pE5pz_mpEPu68hJsZegQ89d_o",
   authDomain: "belmont-runners-1548537264040.firebaseapp.com",
@@ -21,6 +23,9 @@ const config = {
   messagingSenderId: "623861554235"
 }
 firebase.initializeApp(config)
+
+// Sentry init
+Sentry.init({ dsn: 'https://38a18be9353a4b6ba6d58b6be978d285@sentry.io/1469731' });
 
 let store = configureStore()
 
