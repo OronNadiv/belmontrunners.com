@@ -159,7 +159,7 @@ class SignUpStepPayment extends Component {
               // TODO: add a few words on the shirt they'll get - what, how long to get it, etc.
             }
             {this.props[MEMBERSHIP_EXPIRES_AT] &&
-            <div className='text-warning mb-2'>
+            <div className='text-warning mb-2 text-center'>
               {
                 moment(this.props[MEMBERSHIP_EXPIRES_AT]).isAfter(moment()) ?
                   `Membership will expire on ${moment(this.props[MEMBERSHIP_EXPIRES_AT]).format("MMMM Do YYYY")}` :
@@ -194,9 +194,9 @@ class SignUpStepPayment extends Component {
         <h5 className='mt-5'>
           Benefits to being part of Belmont Runners
         </h5>
-        &bull; Free Belmont Runners official <a
+        &bull; Each member receives the Belmont Runners official&nbsp;<a
         target='_blank' rel='noopener noreferrer'
-        href={`https://www.belmontrunners.com/documents/running-shirt.png`}>running shirt</a>
+        href={`https://www.belmontrunners.com/documents/running-shirt.png`}>Running Shirt</a>
         <br />
         &bull; Training at group runs and walks<br />
         &bull; Free or discounted workshops, clinics, and classes<br />

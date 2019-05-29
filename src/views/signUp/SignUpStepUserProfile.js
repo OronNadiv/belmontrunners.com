@@ -61,11 +61,10 @@ class SignUpStepUserProfile extends Component {
     return !isCurrentUserLoaded ?
       <div className="loading" /> :
       <Form
-        className='container-fluid'
         onSubmit={(values) => this.handleSubmit(values)}
         initialValues={userData}
         render={({ handleSubmit, form, values }) => (
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className='container-fluid'>
             <div className='row'>
               <Field
                 label='Address 1'
@@ -171,12 +170,19 @@ class SignUpStepUserProfile extends Component {
               </div>
             </div>
 
-            <div className='row'>
-              <div style={{ margin: '16px 0 8px' }}>
+            <div className='row mx-auto mt-2'>
+              <div className='text-center'>
+                Each member receives the Belmont Runners official<a
+                target='_blank' rel='noopener noreferrer'
+                href={`https://www.belmontrunners.com/documents/running-shirt.png`}> Running Shirt</a>
+              </div>
+            </div>
 
+            <div className='row d-flex justify-content-between'>
+              <div style={{ margin: '16px 0 8px' }}>
                 <Field
                   className='mr-4'
-                  style={{ minWidth: 180 }}
+                  style={{ minWidth: 100 }}
                   name={SHIRT_GENDER}
                   component={Select}
                   validate={required}
@@ -187,7 +193,9 @@ class SignUpStepUserProfile extends Component {
                   <MenuItem value={'F'}>Female</MenuItem>
                   <MenuItem value={'M'}>Male</MenuItem>
                 </Field>
+              </div>
 
+              <div style={{ margin: '16px 0 8px' }}>
                 <Field
                   style={{ minWidth: 100 }}
                   name={SHIRT_SIZE}
