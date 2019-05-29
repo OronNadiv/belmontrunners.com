@@ -30,13 +30,10 @@ class HeaderAreaView extends Component {
       pathname !== SIGN_IN &&
       pathname !== FORGOT_PASSWORD
     ) {
-      console.log('adding. this.props.location.pathname.trim():', pathname)
       $('.header_area').addClass('navbar_fixed')
       $('.header_area').addClass('navbar_fixed_not_root')
       return true
     } else {
-      console.log('removing. this.props.location.pathname.trim():', pathname)
-
       $('.header_area').removeClass('navbar_fixed_not_root')
       this.evalNavbarFixed()
       return false
