@@ -29,7 +29,7 @@ exports.handler = async (event, context, callback) => {
         return callback(null, response)
       }
     }
-    const { token: { id } } = JSON.parse(body)
+    const { token: { id }, description } = JSON.parse(body)
 
     let charge
     try {
@@ -39,7 +39,7 @@ exports.handler = async (event, context, callback) => {
       charge = await stripe.charges.create({
         amount: parseInt(amount),
         currency: 'usd',
-        description: 'Annual membership for Belmont Runners',
+        description: description || 'Annual membership for Belmont Runners',
         source: id
       })
     } catch (err) {

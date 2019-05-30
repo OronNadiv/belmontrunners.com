@@ -10,11 +10,23 @@ class EventSchedule extends Component {
   }
 
   componentDidMount () {
-    const self = this
     csv()
       .fromStream(request.get("https://docs.google.com/spreadsheets/d/1FZOB291KWLoutpr0s6VeK5EtvuiQ8uhe497nOmWoqPA/export?format=csv&usp=sharing"))
       .then((events) => {
-        self.setState({ events })
+        events = events.map(event => {
+          event.month--
+          event.moment = moment(event)
+          return event
+        })
+          .filter(event => {
+            return event.moment.isAfter(moment().subtract(1, 'day')) &&
+              event.moment.isBefore(moment().add(15, 'day'))
+          })
+          .sort((a, b) => {
+            return a.moment.valueOf() - b.moment.valueOf()
+          })
+
+        this.setState({ events })
       })
   }
 
@@ -30,18 +42,6 @@ class EventSchedule extends Component {
               <div className="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
                 {
                   this.state.events
-                    .map(event => {
-                      event.month--
-                      event.moment = moment(event)
-                      return event
-                    })
-                    .filter(event => {
-                      return event.moment.isAfter(moment().subtract(1, 'day')) &&
-                        event.moment.isBefore(moment().add(15, 'day'))
-                    })
-                    .sort((a, b) => {
-                      return a.moment.valueOf() - b.moment.valueOf()
-                    })
                     .map((event, index) => {
                         return (
                           <div key={index} className="media">
