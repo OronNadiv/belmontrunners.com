@@ -38,33 +38,49 @@ import { Checkbox } from '@material-ui/core'
 import LoggedInState from '../views/HOC/LoggedInState'
 import { ROOT } from '../views/urls'
 import { Redirect } from 'react-router-dom'
+import s from 'underscore.string'
 
 const ADDRESS = 'address'
 const PNF = googleLibPhoneNumber.PhoneNumberFormat
 const phoneUtil = googleLibPhoneNumber.PhoneNumberUtil.getInstance()
+const DATE_OF_BIRTH_FORMAT = 'MMMM D'
+const MEMBERSHIP_EXPIRES_AT_FORMAT = 'LLLL'
 
-function desc (a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1
+const SHIRT_SIZES_ORDER = ['XXXS', 'XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL']
+
+function desc (rowA, rowB, columnName) {
+  switch (columnName) {
+    case MEMBERSHIP_EXPIRES_AT:
+      return moment(rowB[columnName] || moment(0), MEMBERSHIP_EXPIRES_AT_FORMAT).diff(moment(rowA[columnName] || moment(0), MEMBERSHIP_EXPIRES_AT_FORMAT))
+    case DATE_OF_BIRTH:
+      return moment(rowB[columnName] || moment(0), DATE_OF_BIRTH_FORMAT).diff(moment(rowA[columnName] || moment(0), DATE_OF_BIRTH_FORMAT))
+    case SHIRT_SIZE:
+      let a = SHIRT_SIZES_ORDER.indexOf(rowA[columnName])
+      let b = SHIRT_SIZES_ORDER.indexOf(rowB[columnName])
+      if (b < a) {
+        return -1
+      } else if (b > a) {
+        return 1
+      } else {
+        return 0
+      }
+    default:
+      return s.naturalCmp(rowB[columnName], rowA[columnName])
   }
-  if (b[orderBy] > a[orderBy]) {
-    return 1
-  }
-  return 0
 }
 
-function stableSort (array, cmp) {
-  const stabilizedThis = array.map((el, index) => [el, index])
-  stabilizedThis.sort((a, b) => {
+function stableSort (rows, cmp) {
+  const rowIndexPairs = rows.map((row, index) => [row, index])
+  rowIndexPairs.sort((a, b) => {
     const order = cmp(a[0], b[0])
     if (order !== 0) return order
     return a[1] - b[1]
   })
-  return stabilizedThis.map(el => el[0])
+  return rowIndexPairs.map(el => el[0])
 }
 
-function getSorting (order, orderBy) {
-  return order === 'desc' ? (a, b) => desc(a, b, orderBy) : (a, b) => -desc(a, b, orderBy)
+function getSorting (order, columnName) {
+  return order === 'desc' ? (a, b) => desc(a, b, columnName) : (a, b) => -desc(a, b, columnName)
 }
 
 function EnhancedTableHead (props) {
@@ -136,6 +152,13 @@ const headRows = [
   { id: DID_RECEIVED_SHIRT, numeric: false, disablePadding: false, label: 'Received Shirt' }
 ]
 
+function getColor (membershipExpires) {
+  if (moment(membershipExpires, MEMBERSHIP_EXPIRES_AT_FORMAT).isBefore(moment())) {
+    return 'red'
+  }
+  return 'initial'
+}
+
 class EnhancedTable extends Component {
 
   constructor (props) {
@@ -172,8 +195,8 @@ class EnhancedTable extends Component {
                 const number = phoneUtil.parseAndKeepRawInput(data[PHONE], 'US')
                 data[PHONE] = phoneUtil.format(number, PNF.NATIONAL)
               }
-              data[DATE_OF_BIRTH] = data[DATE_OF_BIRTH] ? moment(data[DATE_OF_BIRTH]).format('MMMM D') : ''
-              data[MEMBERSHIP_EXPIRES_AT] = data[MEMBERSHIP_EXPIRES_AT] ? moment(data[MEMBERSHIP_EXPIRES_AT]).format('LLLL') : ''
+              data[DATE_OF_BIRTH] = data[DATE_OF_BIRTH] ? moment(data[DATE_OF_BIRTH]).format(DATE_OF_BIRTH_FORMAT) : ''
+              data[MEMBERSHIP_EXPIRES_AT] = data[MEMBERSHIP_EXPIRES_AT] ? moment(data[MEMBERSHIP_EXPIRES_AT]).format(MEMBERSHIP_EXPIRES_AT_FORMAT) : ''
               data[DID_RECEIVED_SHIRT] = !!data[DID_RECEIVED_SHIRT]
               rows.push(data)
             } catch (err) {
@@ -202,7 +225,8 @@ class EnhancedTable extends Component {
     const isDesc = orderBy === property && order === 'desc'
     this.setState({
       order: isDesc ? 'asc' : 'desc',
-      orderBy: property
+      orderBy: property,
+      page: 0
     })
 
   }
@@ -276,7 +300,8 @@ class EnhancedTable extends Component {
                         <TableCell>{row[GENDER]}</TableCell>
                         <TableCell>{row[SHIRT_GENDER]}</TableCell>
                         <TableCell>{row[SHIRT_SIZE]}</TableCell>
-                        <TableCell>{row[MEMBERSHIP_EXPIRES_AT]}</TableCell>
+                        <TableCell style={{ color: getColor(row[MEMBERSHIP_EXPIRES_AT]) }}
+                        >{row[MEMBERSHIP_EXPIRES_AT]}</TableCell>
                         <TableCell>
                           <Checkbox
                             checked={row[DID_RECEIVED_SHIRT]}
