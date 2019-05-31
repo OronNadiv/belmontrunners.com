@@ -33,10 +33,10 @@ import {
   STATE,
   UID,
   ZIP
-} from '../fields'
+} from '../../fields'
 import { Checkbox } from '@material-ui/core'
-import LoggedInState from '../views/HOC/LoggedInState'
-import { ROOT } from '../views/urls'
+import LoggedInState from '../../components/LoggedInState'
+import { ROOT } from '../../urls'
 import { Redirect } from 'react-router-dom'
 import s from 'underscore.string'
 

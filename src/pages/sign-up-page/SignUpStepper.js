@@ -9,7 +9,7 @@ import SignUpStepAuth from './SignUpStepAuth'
 import SignUpStepPayment from './SignUpStepPayment'
 import SignUpStepUserProfile from './SignUpStepUserProfile'
 import { Redirect } from 'react-router-dom'
-import { ROOT } from '../urls'
+import { ROOT } from '../../urls'
 import PropTypes from 'prop-types'
 
 export const STEP_AUTHENTICATION = 'STEP_AUTHENTICATION'

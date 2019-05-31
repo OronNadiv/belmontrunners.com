@@ -1,3 +1,5 @@
+import 'firebase/auth'
+import firebase from 'firebase'
 import React, { Component } from 'react'
 import isEmail from 'isemail/lib/index'
 import './Signin.scss'
@@ -9,21 +11,19 @@ import {
   INVALID_PASSWORD_LENGTH,
   MISSING_PASSWORD,
   POPUP_CLOSED_BEFORE_COMPLETION
-} from '../messages'
+} from '../../messages'
 import Dialog from '@material-ui/core/Dialog'
 import DialogTitle from '@material-ui/core/DialogTitle'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogActions from '@material-ui/core/DialogActions'
 import Button from '@material-ui/core/Button'
-import 'firebase/auth'
-import firebase from 'firebase'
-import { FORGOT_PASSWORD, ROOT } from '../urls'
-import LoggedInState from '../HOC/LoggedInState'
+import { FORGOT_PASSWORD, ROOT } from '../../urls'
+import LoggedInState from '../../components/LoggedInState'
 
 const providerGoogle = new firebase.auth.GoogleAuthProvider()
 const providerFacebook = new firebase.auth.FacebookAuthProvider()
 
-class SignIn extends Component {
+class SignInPage extends Component {
 
   constructor (props) {
     super(props)
@@ -227,4 +227,4 @@ class SignIn extends Component {
   }
 }
 
-export default LoggedInState({ name: 'SignIn', isRequiredToBeLoggedIn: false })(SignIn)
+export default LoggedInState({ name: 'SignIn', isRequiredToBeLoggedIn: false })(SignInPage)

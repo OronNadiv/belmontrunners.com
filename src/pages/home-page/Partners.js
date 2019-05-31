@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { shuffle } from './Random'
+import { shuffle } from '../../utilities/Random'
 
 class Partners extends Component {
   render () {

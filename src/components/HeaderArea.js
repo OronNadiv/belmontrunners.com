@@ -7,9 +7,9 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import Profile from './Profile'
 import Button from '@material-ui/core/Button'
-import { FORGOT_PASSWORD, JOIN, ROOT, SIGN_IN, USERS } from '../views/urls'
+import { FORGOT_PASSWORD, JOIN, ROOT, SIGN_IN, USERS } from '../urls'
 
-class HeaderAreaView extends Component {
+class HeaderArea extends Component {
 
   evalNavbarFixed () {
     const nav_offset_top = $('.header_area').height() + 50
@@ -192,7 +192,7 @@ class HeaderAreaView extends Component {
   }
 }
 
-HeaderAreaView.propTypes = {
+HeaderArea.propTypes = {
   allowUsersPage: PropTypes.bool.isRequired,
   isCurrentUserLoaded: PropTypes.bool.isRequired,
   currentUser: PropTypes.object,
@@ -211,4 +211,4 @@ const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, currentUser, perm
   }
 }
 
-export default connect(mapStateToProps)(withRouter(HeaderAreaView))
+export default connect(mapStateToProps)(withRouter(HeaderArea))

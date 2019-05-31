@@ -5,7 +5,7 @@ import moment from 'moment'
 import { Field, Form } from 'react-final-form'
 import MenuItem from '@material-ui/core/MenuItem'
 import SignUpStepperButton from './SignUpStepperButton'
-import LoggedInState from '../HOC/LoggedInState'
+import LoggedInState from '../../components/LoggedInState'
 import { connect } from 'react-redux'
 import {
   ADDRESS1,

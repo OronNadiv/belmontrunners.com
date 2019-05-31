@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import rp from 'request-promise'
-import isEmail from 'isemail'
+import isEmail from 'isemail/lib/index'
 
 class Footer extends Component {
   constructor () {

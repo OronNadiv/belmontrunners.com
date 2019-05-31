@@ -3,13 +3,13 @@ import firebase from 'firebase'
 import Avatar from 'react-avatar'
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import { JOIN, ROOT, USERS } from '../views/urls'
-import { STEP_USER_DETAILS } from '../views/signUp/SignUpStepper'
+import { JOIN, ROOT, USERS } from '../urls'
+import { STEP_USER_DETAILS } from '../pages/sign-up-page/SignUpStepper'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import LoggedInState from '../views/HOC/LoggedInState'
+import LoggedInState from './LoggedInState'
 
-class ProfileView extends Component {
+class Profile extends Component {
   constructor (props) {
     super(props)
     this.state = {}
@@ -52,7 +52,7 @@ class ProfileView extends Component {
   }
 }
 
-ProfileView.propTypes = {
+Profile.propTypes = {
   allowUsersPage: PropTypes.bool.isRequired,
   currentUser: PropTypes.object.isRequired
 }
@@ -66,4 +66,4 @@ const mapStateToProps = ({ currentUser: { permissions, currentUser } }) => {
   }
 }
 
-export default connect(mapStateToProps)(LoggedInState({ name: 'profile', isRequiredToBeLoggedIn: true })(ProfileView))
+export default connect(mapStateToProps)(LoggedInState({ name: 'profile', isRequiredToBeLoggedIn: true })(Profile))

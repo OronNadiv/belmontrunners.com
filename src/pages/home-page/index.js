@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import HomeBanner from './HomeBanner'
 import Welcome from './Welcome'
-import EventSchedule from '../EventSchedule'
+import EventSchedule from './EventSchedule'
 import Subscribe from './Subscribe'
 import Team from './Team'
 import Map from './Map'

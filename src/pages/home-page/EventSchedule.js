@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import request from 'request'
 import csv from 'csvtojson'
-import moment from 'moment'
+import moment from 'moment/moment'
 
 class EventSchedule extends Component {
   constructor () {
@@ -46,7 +46,7 @@ class EventSchedule extends Component {
                         return (
                           <div key={index} className="media">
                             <div className="d-flex">
-                              <img src="img/schedule-3.png" alt="" />
+                              <img src="../../img/schedule-3.png" alt="" />
                             </div>
                             <div className="media-body">
                               <h5>{event.moment.format('MMMM D h:mm a')}</h5>

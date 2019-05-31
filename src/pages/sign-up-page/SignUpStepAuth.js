@@ -1,3 +1,5 @@
+import 'firebase/auth'
+import firebase from 'firebase'
 import React, { Component } from 'react'
 import TextField from '@material-ui/core/TextField/index'
 import isEmail from 'isemail/lib/index'
@@ -8,15 +10,13 @@ import {
   INVALID_PASSWORD_LENGTH,
   MISSING_PASSWORD,
   POPUP_CLOSED_BEFORE_COMPLETION
-} from '../messages'
+} from '../../messages'
 import * as PropTypes from 'prop-types'
 import SignUpStepperButton from './SignUpStepperButton'
 import Promise from 'bluebird'
 import s from 'underscore.string'
-import 'firebase/auth'
-import firebase from 'firebase'
-import LoggedInState from '../HOC/LoggedInState'
-import { PRIVACY_POLICY, PRIVACY_POLICY_FILE_NAME, TOS, TOS_FILE_NAME, WAVER, WAVER_FILE_NAME } from '../urls'
+import LoggedInState from '../../components/LoggedInState'
+import { PRIVACY_POLICY, PRIVACY_POLICY_FILE_NAME, TOS, TOS_FILE_NAME, WAVER, WAVER_FILE_NAME } from '../../urls'
 import moment from 'moment'
 
 class View extends Component {

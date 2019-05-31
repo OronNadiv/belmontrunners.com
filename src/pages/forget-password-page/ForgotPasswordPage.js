@@ -1,10 +1,10 @@
-import React, { Component } from 'react'
 import 'firebase/auth'
 import firebase from 'firebase'
-import '../signIn/Signin.scss'
+import React, { Component } from 'react'
+import '../sign-in-page/Signin.scss'
 import { Redirect } from 'react-router-dom'
 import isEmail from 'isemail'
-import { INVALID_EMAIL, NO_USER_WITH_GIVEN_EMAIL, RESET_PASSWORD_EMAIL_SENT } from '../messages'
+import { INVALID_EMAIL, NO_USER_WITH_GIVEN_EMAIL, RESET_PASSWORD_EMAIL_SENT } from '../../messages'
 import Dialog from '@material-ui/core/Dialog'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogContentText from '@material-ui/core/DialogContentText'
@@ -12,10 +12,10 @@ import DialogTitle from '@material-ui/core/DialogTitle'
 import TextField from '@material-ui/core/TextField'
 import DialogActions from '@material-ui/core/DialogActions'
 import Button from '@material-ui/core/Button'
-import { ROOT } from '../urls'
-import LoggedInState from '../HOC/LoggedInState'
+import { ROOT } from '../../urls'
+import LoggedInState from '../../components/LoggedInState'
 
-class ForgotPassword extends Component {
+class ForgotPasswordPage extends Component {
   constructor (props) {
     super(props)
     console.log('ForgotPassword contor called')
@@ -145,4 +145,4 @@ class ForgotPassword extends Component {
   }
 }
 
-export default LoggedInState({ name: 'ForgotPassword', isRequiredToBeLoggedIn: false })(ForgotPassword)
+export default LoggedInState({ name: 'ForgotPassword', isRequiredToBeLoggedIn: false })(ForgotPasswordPage)
