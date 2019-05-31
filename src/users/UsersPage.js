@@ -208,7 +208,6 @@ class EnhancedTable extends Component {
           this.setState({ rows })
         }
       )
-      .catch((err) => console.log(err))
   }
 
   componentDidMount () {

@@ -21,8 +21,8 @@ class App extends Component {
     this.props.fetchCurrentUser()
   }
 
-  componentWillReceiveProps (nextProps, nextContext) {
-    if (nextProps.currentUser !== this.props.currentUser) {
+  componentDidUpdate (prevProps) {
+    if (prevProps.currentUser !== this.props.currentUser) {
       if (this.props.currentUser) {
         Sentry.configureScope((scope) => {
           scope.setUser({
