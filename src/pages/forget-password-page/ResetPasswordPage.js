@@ -19,11 +19,12 @@ const INVALID_URL = 'Invalid URL.'
 const WEAK_PASSWORD = 'Password is too weak.'
 
 const EXPIRED_ACTION_CODE = 'Link has been expired.'
+const CODE_KEY_NAME = 'oobCode'
 
 class ResetPasswordPage extends Component {
   constructor (props) {
     super(props)
-    console.log('ResetPassword contor called')
+    console.log('ResetPassword constructor called')
     this.state = {
       close: false,
       newPassword: ''
@@ -43,7 +44,7 @@ class ResetPasswordPage extends Component {
     const { search } = this.props.location
 
     const parsed = queryString.parse(search) || {}
-    const code = parsed.code
+    const code = parsed[CODE_KEY_NAME]
 
     this.setState({ isRequesting: true })
     try {
@@ -74,7 +75,7 @@ class ResetPasswordPage extends Component {
     const { search } = this.props.location
 
     const parsed = queryString.parse(search) || {}
-    const code = parsed.code
+    const code = parsed[CODE_KEY_NAME]
 
     if (!code || code.length < 10) {
       this.setState({
