@@ -11,11 +11,12 @@ import ForgotPasswordPage from './pages/forget-password-page/ForgotPasswordPage'
 import HomePage from './pages/home-page'
 import HeaderArea from './components/HeaderArea'
 import SignUpPage from './pages/sign-up-page/SignUpPage'
-import { FORGOT_PASSWORD, JOIN, RESET_PASSWORD, ROOT, SIGN_IN, USERS } from './urls'
+import { COMPLETE, FORGOT_PASSWORD, JOIN, RESET_PASSWORD, ROOT, SIGN_IN, USERS } from './urls'
 import UsersPage from './pages/users-page/UsersPage'
 import Drift from './components/Drift'
 import * as Sentry from '@sentry/browser'
 import ResetPasswordPage from './pages/forget-password-page/ResetPasswordPage'
+import Complete from './Complete'
 
 class App extends Component {
   componentDidMount () {
@@ -92,6 +93,19 @@ class App extends Component {
                 <Footer />
 
                 <ForgotPasswordPage />
+              </div>
+            )}
+          />
+          <Route
+            exact
+            path={COMPLETE}
+            render={() => (
+              <div>
+                <HeaderArea />
+                <HomePage />
+                <Footer />
+
+                <Complete />
               </div>
             )}
           />

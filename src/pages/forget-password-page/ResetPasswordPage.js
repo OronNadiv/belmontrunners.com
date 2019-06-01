@@ -83,7 +83,6 @@ class ResetPasswordPage extends Component {
         isDone: true
       })
     }
-
   }
 
   componentDidUpdate (prevProps, prevState) {

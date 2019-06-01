@@ -2,7 +2,8 @@
 export const JOIN = '/join'
 export const SIGN_IN = '/signin'
 export const FORGOT_PASSWORD = '/forgotpassword'
-export const RESET_PASSWORD = '/resetpassword'
+export const COMPLETE = '/complete'
+export const RESET_PASSWORD = '/resetPassword'
 export const ROOT = '/'
 export const USERS = '/users'
 
