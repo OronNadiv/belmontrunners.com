@@ -8,3 +8,5 @@ export const RESET_PASSWORD_EMAIL_SENT = 'We have sent you an e-mail. Please con
 export const NO_USER_WITH_GIVEN_EMAIL = 'There is no user corresponding to this email.'
 export const POPUP_CLOSED_BEFORE_COMPLETION = 'Popup closed before completion..'
 export const RESET_PASSWORD_SUCCESS = 'Password has been reset successfully'
+export const EXPIRED_ACTION_CODE = 'Link has been expired.'
+export const INVALID_URL = 'Invalid URL.'

@@ -1,6 +1,9 @@
 @media (max-width: 1619px) {
   /* Main Menu Area css
   ============================================================================================ */
+  .header_area .navbar{
+    min-height: 72px;
+  }
   .navbar_fixed_not_root + div {
     margin-top: 71px;
   }

@@ -15,8 +15,8 @@ import { COMPLETE, FORGOT_PASSWORD, JOIN, RESET_PASSWORD, ROOT, SIGN_IN, USERS }
 import UsersPage from './pages/users-page/UsersPage'
 import Drift from './components/Drift'
 import * as Sentry from '@sentry/browser'
-import ResetPasswordPage from './pages/forget-password-page/ResetPasswordPage'
-import Complete from './Complete'
+import ResetPasswordPage from './pages/actions-page/ResetPasswordPage'
+import Complete from './pages/actions-page/Complete'
 
 class App extends Component {
   componentDidMount () {

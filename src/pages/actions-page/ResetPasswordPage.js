@@ -13,12 +13,10 @@ import Button from '@material-ui/core/Button'
 import { ROOT } from '../../urls'
 import PropTypes from 'prop-types'
 import queryString from 'query-string'
-import { INVALID_PASSWORD_LENGTH, MISSING_PASSWORD, RESET_PASSWORD_SUCCESS } from '../../messages'
+import { INVALID_PASSWORD_LENGTH, INVALID_URL, MISSING_PASSWORD, RESET_PASSWORD_SUCCESS } from '../../messages'
 
-const INVALID_URL = 'Invalid URL.'
 const WEAK_PASSWORD = 'Password is too weak.'
 
-const EXPIRED_ACTION_CODE = 'Link has been expired.'
 const CODE_KEY_NAME = 'oobCode'
 
 class ResetPasswordPage extends Component {
@@ -92,25 +90,11 @@ class ResetPasswordPage extends Component {
     }
 
     const { code, message } = error
-    switch (code) {
-      case 'auth/expired-action-code':
-        this.setState({ errorMessage: EXPIRED_ACTION_CODE, isDone: true })
-        break
-      case 'auth/invalid-action-code':
-        this.setState({ errorMessage: INVALID_URL, isDone: true })
-        break
-      case 'auth/user-disabled':
-        this.setState({ errorMessage: message, isDone: true })
-        break
-      case 'auth/user-not-found':
-        this.setState({ errorMessage: message, isDone: true })
-        break
-      case 'auth/weak-password':
-        this.setState({ errorMessage: WEAK_PASSWORD })
-        break
-      default:
-        console.error('confirmPasswordReset', 'code:', code, 'message:', message)
-        this.setState({ errorMessage: message })
+    if (code === 'auth/weak-password') {
+      this.setState({ errorMessage: WEAK_PASSWORD })
+    } else {
+      console.error('confirmPasswordReset', 'code:', code, 'message:', message)
+      this.setState({ errorMessage: message })
     }
   }
 

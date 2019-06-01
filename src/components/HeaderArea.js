@@ -7,7 +7,7 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import Profile from './Profile'
 import Button from '@material-ui/core/Button'
-import { FORGOT_PASSWORD, JOIN, ROOT, SIGN_IN, USERS } from '../urls'
+import { FORGOT_PASSWORD, JOIN, RESET_PASSWORD, ROOT, SIGN_IN, USERS } from '../urls'
 
 class HeaderArea extends Component {
 
@@ -23,12 +23,13 @@ class HeaderArea extends Component {
   }
 
 
-  checkIsFixed () {
-    const pathname = this.props.location.pathname.trim()
+  checkIsFixed (pathname) {
+    console.log('checkIsFixed:', pathname)
     if (
       pathname !== ROOT &&
       pathname !== SIGN_IN &&
-      pathname !== FORGOT_PASSWORD
+      pathname !== FORGOT_PASSWORD &&
+      pathname !== RESET_PASSWORD
     ) {
       $('.header_area').addClass('navbar_fixed')
       $('.header_area').addClass('navbar_fixed_not_root')
@@ -61,7 +62,10 @@ class HeaderArea extends Component {
   }
 
   componentDidUpdate (prevProps) {
-    this.checkIsFixed()
+    if (prevProps.location.pathname.trim() !== this.props.location.pathname.trim()) {
+      this.checkIsFixed()
+    }
+
   }
 
   render () {
