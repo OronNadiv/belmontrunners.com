@@ -14,11 +14,11 @@ class Complete extends Component {
     const { search } = this.props.location
 
     const parsed = queryString.parse(search) || {}
-    const { action, oobCode } = parsed
+    const { mode, oobCode } = parsed
 
     let redirect
-    if (action) {
-      const to = `/${action}?oobCode=${oobCode}`
+    if (mode) {
+      const to = `/${mode}?oobCode=${oobCode}`
       redirect = <Redirect to={to} />
     } else {
       redirect = <Redirect to={ROOT} />
