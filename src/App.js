@@ -27,8 +27,8 @@ import Drift from './components/Drift'
 import * as Sentry from '@sentry/browser'
 import ResetPasswordPage from './pages/actions-page/ResetPasswordPage'
 import Complete from './pages/actions-page/Complete'
-import ChangeEmailPage from './pages/account-settings-page/ChangeEmailPage'
-import ChangePasswordPage from './pages/account-settings-page/ChangePasswordPage'
+import ChangeEmailPage from './pages/ChangeEmailPage'
+import ChangePasswordPage from './pages/ChangePasswordPage'
 
 class App extends Component {
   componentDidMount () {

@@ -1,97 +1,102 @@
 import 'firebase/auth'
 import firebase from 'firebase'
 import React, { Component } from 'react'
-import { ROOT } from '../../urls'
+import { ROOT } from '../urls'
 import Dialog from '@material-ui/core/Dialog'
 import DialogContent from '@material-ui/core/DialogContent'
 import TextField from '@material-ui/core/TextField'
 import DialogActions from '@material-ui/core/DialogActions'
 import { Redirect } from 'react-router-dom'
-import LoggedInState from '../../components/LoggedInState'
+import LoggedInState from '../components/LoggedInState'
 import Button from '@material-ui/core/Button'
 import DialogTitle from '@material-ui/core/DialogTitle'
-import { INVALID_PASSWORD_LENGTH, MISSING_PASSWORD, PASSWORDS_MISMATCH, WRONG_PASSWORD } from '../../messages'
+import isEmail from 'isemail'
+import {
+  EMAIL_ALREADY_IN_USE,
+  EMAILS_DONT_MATCH,
+  INVALID_EMAIL,
+  MISSING_PASSWORD,
+  WRONG_PASSWORD
+} from '../../messages'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-class ChangePasswordPage extends Component {
+class ChangeEmailPage extends Component {
   constructor (props) {
     super(props)
     this.state = {
       successMessage: '',
       generalErrorMessage: '',
-      errorPasswordMessage0: '',
-      errorPasswordMessage1: '',
-      errorPasswordMessage2: '',
-      password0: '',
-      password1: '',
-      password2: ''
+      errorEmailMessage1: '',
+      errorEmailMessage2: '',
+      errorPasswordMessage: ''
     }
   }
 
   resetErrors () {
     this.setState({
       generalErrorMessage: '',
-      errorPasswordMessage0: '',
-      errorPasswordMessage1: '',
-      errorPasswordMessage2: ''
+      errorEmailMessage1: '',
+      errorEmailMessage2: '',
+      errorPasswordMessage: ''
     })
 
   }
 
   handleSubmit () {
-    const { password0, password1, password2 } = this.state
+    const { email1, email2, password } = this.state
     const { currentUser } = this.props
 
-    if (!password0) {
-      this.setState({ errorPasswordMessage0: MISSING_PASSWORD })
+    if (!email1 || !isEmail.validate(email1)) {
+      this.setState({ errorEmailMessage1: INVALID_EMAIL })
       return
     }
-    if (!password1) {
-      this.setState({ errorPasswordMessage1: MISSING_PASSWORD })
+    if (email1 !== email2) {
+      this.setState({ errorEmailMessage2: EMAILS_DONT_MATCH })
       return
     }
-    if (!password2) {
-      this.setState({ errorPasswordMessage2: MISSING_PASSWORD })
+    if (!password) {
+      this.setState({ errorPasswordMessage: MISSING_PASSWORD })
       return
     }
-
-    if (password1 !== password2) {
-      this.setState({ errorPasswordMessage2: PASSWORDS_MISMATCH })
-      return
-    }
-
-    console.log('password1.length:', password1.length)
-    if (password1.length < 6) {
-      this.setState({ errorPasswordMessage1: INVALID_PASSWORD_LENGTH(6) })
-      return
-    }
-
 
     this.setState({ isSubmitting: true })
     this.resetErrors()
-    const credentials = firebase.auth.EmailAuthProvider.credential(currentUser.email, password0)
+    const credentials = firebase.auth.EmailAuthProvider.credential(currentUser.email, password)
     currentUser.reauthenticateWithCredential(credentials)
       .then(() => {
-        return currentUser.updatePassword(password1)
+        return currentUser.updateEmail(email1)
           .then(() => {
-            this.setState({ successMessage: 'Password changed successfully.' })
+            this.setState({ successMessage: 'Email changed successfully.' })
           })
           .catch((error) => {
             const { code, message } = error
-            console.error('unexpected code.',
-              'code:', code,
-              'message:', message)
-            this.setState({
-              generalErrorMessage: message
-            })
+            switch (code) {
+              case 'auth/invalid-email':
+                this.setState({
+                  errorEmailMessage1: INVALID_EMAIL
+                })
+                return
+              case 'auth/email-already-in-use':
+                this.setState({
+                  errorEmailMessage1: EMAIL_ALREADY_IN_USE
+                })
+                return
+              default:
+                console.error('unexpected code.',
+                  'code:', code,
+                  'message:', message)
+                this.setState({
+                  generalErrorMessage: message
+                })
+            }
           })
       })
       .catch((error) => {
         const { code, message } = error
         if (code === 'auth/wrong-password') {
           this.setState({
-            errorPasswordMessage0: WRONG_PASSWORD
+            errorPasswordMessage: WRONG_PASSWORD
           })
         } else {
           this.setState({
@@ -105,19 +110,23 @@ class ChangePasswordPage extends Component {
   }
 
   render () {
-    console.log('ChangePasswordPage render called.  close:', close)
+    console.log('ChangeEmailPage render called')
 
     const {
       close, isSubmitting,
       successMessage,
-      errorPasswordMessage0,
-      errorPasswordMessage1,
-      errorPasswordMessage2,
-      generalErrorMessage
+      errorEmailMessage1,
+      errorEmailMessage2,
+      generalErrorMessage,
+      errorPasswordMessage
     } = this.state
 
     if (close) {
       return <Redirect to={ROOT} />
+    }
+
+    if (successMessage) {
+      return <div className='text-success text-center mt-4'>{successMessage}</div>
     }
 
     return (
@@ -129,7 +138,7 @@ class ChangePasswordPage extends Component {
         aria-labelledby="form-dialog-title"
       >
         <DialogTitle>
-          Change Password
+          Change Email
         </DialogTitle>
 
         <DialogContent>
@@ -137,42 +146,43 @@ class ChangePasswordPage extends Component {
             generalErrorMessage &&
             <div className="mt-2 text-danger text-center">{generalErrorMessage}</div>
           }
+
           {
             successMessage ?
               <div className='text-success text-center mt-4'>{successMessage}</div> :
               <div>
                 <TextField
+                  label="New email"
+                  margin="normal"
+                  type='email'
+                  fullWidth
+                  onChange={(event) => {
+                    this.resetErrors()
+                    this.setState({
+                      email1: event.target.value
+                    })
+                  }}
+                  error={!!errorEmailMessage1}
+                  helperText={errorEmailMessage1}
+                />
+
+                <TextField
+                  label="Confirm email"
+                  margin="normal"
+                  type='email'
+                  fullWidth
+                  onChange={(event) => {
+                    this.resetErrors()
+                    this.setState({
+                      email2: event.target.value
+                    })
+                  }}
+                  error={!!errorEmailMessage2}
+                  helperText={errorEmailMessage2}
+                />
+
+                <TextField
                   label="Current password"
-                  margin="normal"
-                  type='password'
-                  fullWidth
-                  onChange={(event) => {
-                    this.resetErrors()
-                    this.setState({
-                      password0: event.target.value
-                    })
-                  }}
-                  error={!!errorPasswordMessage0}
-                  helperText={errorPasswordMessage0}
-                />
-
-                <TextField
-                  label="New password"
-                  margin="normal"
-                  type='password'
-                  fullWidth
-                  onChange={(event) => {
-                    this.resetErrors()
-                    this.setState({
-                      password1: event.target.value
-                    })
-                  }}
-                  error={!!errorPasswordMessage1}
-                  helperText={errorPasswordMessage1}
-                />
-
-                <TextField
-                  label="Confirm new password"
                   margin="normal"
                   type='password'
                   fullWidth
@@ -187,11 +197,11 @@ class ChangePasswordPage extends Component {
                   onChange={(event) => {
                     this.resetErrors()
                     this.setState({
-                      password2: event.target.value
+                      password: event.target.value
                     })
                   }}
-                  error={!!errorPasswordMessage2}
-                  helperText={errorPasswordMessage2}
+                  error={!!errorPasswordMessage}
+                  helperText={errorPasswordMessage}
                 />
               </div>
           }
@@ -232,7 +242,7 @@ class ChangePasswordPage extends Component {
 }
 
 
-ChangePasswordPage.propTypes = {
+ChangeEmailPage.propTypes = {
   currentUser: PropTypes.object.isRequired
 }
 
@@ -243,6 +253,6 @@ const mapStateToProps = ({ currentUser: { currentUser } }) => {
 }
 
 export default connect(mapStateToProps)(LoggedInState({
-  name: 'ChangePasswordPage',
+  name: 'ChangeEmailPage',
   isRequiredToBeLoggedIn: true
-})(ChangePasswordPage))
+})(ChangeEmailPage))
