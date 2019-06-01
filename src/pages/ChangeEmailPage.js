@@ -17,7 +17,7 @@ import {
   INVALID_EMAIL,
   MISSING_PASSWORD,
   WRONG_PASSWORD
-} from '../../messages'
+} from '../messages'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
