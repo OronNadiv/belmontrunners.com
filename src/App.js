@@ -7,14 +7,15 @@ import { fetchCurrentUser as fetchCurrentUserAction } from './reducers/currentUs
 import { connect } from 'react-redux'
 import { Route, Switch } from 'react-router-dom'
 import SignIn from './pages/sign-in-page/SignInPage'
-import ForgotPassword from './pages/forget-password-page/ForgotPasswordPage'
+import ForgotPasswordPage from './pages/forget-password-page/ForgotPasswordPage'
 import HomePage from './pages/home-page'
 import HeaderArea from './components/HeaderArea'
 import SignUpPage from './pages/sign-up-page/SignUpPage'
-import { FORGOT_PASSWORD, JOIN, ROOT, SIGN_IN, USERS } from './urls'
+import { FORGOT_PASSWORD, JOIN, RESET_PASSWORD, ROOT, SIGN_IN, USERS } from './urls'
 import UsersPage from './pages/users-page/UsersPage'
 import Drift from './components/Drift'
 import * as Sentry from '@sentry/browser'
+import ResetPasswordPage from './pages/forget-password-page/ResetPasswordPage'
 
 class App extends Component {
   componentDidMount () {
@@ -90,7 +91,20 @@ class App extends Component {
                 <HomePage />
                 <Footer />
 
-                <ForgotPassword />
+                <ForgotPasswordPage />
+              </div>
+            )}
+          />
+          <Route
+            exact
+            path={RESET_PASSWORD}
+            render={() => (
+              <div>
+                <HeaderArea />
+                <HomePage />
+                <Footer />
+
+                <ResetPasswordPage />
               </div>
             )}
           />
