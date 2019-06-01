@@ -1,11 +1,13 @@
 // urls
 export const JOIN = '/join'
 export const SIGN_IN = '/signin'
-export const FORGOT_PASSWORD = '/forgotpassword'
+export const FORGOT_PASSWORD = '/forgotPassword'
 export const COMPLETE = '/complete'
 export const RESET_PASSWORD = '/resetPassword'
 export const ROOT = '/'
 export const USERS = '/users'
+export const CHANGE_EMAIL= '/changeEmail'
+export const CHANGE_PASSWORD = '/changePassword'
 
 // documents
 export const TOS_FILE_NAME = '2019-04-01_tos.pdf'

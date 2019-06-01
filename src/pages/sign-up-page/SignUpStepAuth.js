@@ -4,7 +4,7 @@ import React, { Component } from 'react'
 import TextField from '@material-ui/core/TextField/index'
 import isEmail from 'isemail/lib/index'
 import {
-  EMAIL_ADDRESS_ALREADY_TAKEN,
+  EMAIL_ALREADY_IN_USE,
   INVALID_EMAIL,
   INVALID_FULL_NAME,
   INVALID_PASSWORD_LENGTH,
@@ -52,7 +52,7 @@ class View extends Component {
           this.setState({ invalidEmailMessage: INVALID_EMAIL })
           break
         case 'auth/email-already-in-use':
-          this.setState({ invalidEmailMessage: EMAIL_ADDRESS_ALREADY_TAKEN })
+          this.setState({ invalidEmailMessage: EMAIL_ALREADY_IN_USE })
           break
         case 'auth/popup-closed-by-user':
           this.setState({ generalErrorMessage: POPUP_CLOSED_BEFORE_COMPLETION })
