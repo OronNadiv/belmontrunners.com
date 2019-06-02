@@ -1,7 +1,7 @@
-import 'firebase/auth'
+// import 'firebase/auth'
 import firebase from 'firebase'
 import React, { Component } from 'react'
-import '../sign-in-page/Signin.scss'
+import '../../sign-in-page/Signin.scss'
 import { Redirect, withRouter } from 'react-router-dom'
 import Dialog from '@material-ui/core/Dialog'
 import DialogContent from '@material-ui/core/DialogContent'
@@ -10,14 +10,11 @@ import DialogTitle from '@material-ui/core/DialogTitle'
 import TextField from '@material-ui/core/TextField'
 import DialogActions from '@material-ui/core/DialogActions'
 import Button from '@material-ui/core/Button'
-import { ROOT } from '../../urls'
+import { ROOT } from '../../../urls'
 import PropTypes from 'prop-types'
-import queryString from 'query-string'
-import { INVALID_PASSWORD_LENGTH, INVALID_URL, MISSING_PASSWORD, RESET_PASSWORD_SUCCESS } from '../../messages'
+import { INVALID_PASSWORD_LENGTH, MISSING_PASSWORD, RESET_PASSWORD_SUCCESS } from '../../../messages'
 
 const WEAK_PASSWORD = 'Password is too weak.'
-
-const CODE_KEY_NAME = 'oobCode'
 
 class ResetPasswordPage extends Component {
   constructor (props) {
@@ -26,6 +23,18 @@ class ResetPasswordPage extends Component {
     this.state = {
       close: false,
       newPassword: ''
+    }
+  }
+
+  processError (error) {
+    const { code, message } = error
+    if (code === 'auth/weak-password') {
+      this.setState({ errorMessage: WEAK_PASSWORD })
+    } else {
+      console.error('confirmPasswordReset',
+        'code:', code,
+        'message:', message)
+      this.setState({ errorMessage: message })
     }
   }
 
@@ -39,14 +48,11 @@ class ResetPasswordPage extends Component {
       return
     }
 
-    const { search } = this.props.location
-
-    const parsed = queryString.parse(search) || {}
-    const code = parsed[CODE_KEY_NAME]
+    const oobCode = this.props.location.state.query.oobCode
 
     this.setState({ isRequesting: true })
     try {
-      firebase.auth().confirmPasswordReset(code, newPassword)
+      firebase.auth().confirmPasswordReset(oobCode, newPassword)
         .then(() => {
           this.setState({
             isSuccess: true,
@@ -56,45 +62,13 @@ class ResetPasswordPage extends Component {
         })
         .catch((error) => {
           console.log('in catch', error)
-          this.setState({
-            isSuccess: false,
-            error
-          })
+          this.processError(error)
         })
         .finally(() => {
           this.setState({ isRequesting: false })
         })
     } catch (error) {
-      this.setState({ error })
-    }
-  }
-
-  componentDidMount () {
-    const { search } = this.props.location
-
-    const parsed = queryString.parse(search) || {}
-    const code = parsed[CODE_KEY_NAME]
-
-    if (!code || code.length < 10) {
-      this.setState({
-        errorMessage: INVALID_URL,
-        isDone: true
-      })
-    }
-  }
-
-  componentDidUpdate (prevProps, prevState) {
-    const { error } = this.state
-    if (!error || prevState.error === error) {
-      return
-    }
-
-    const { code, message } = error
-    if (code === 'auth/weak-password') {
-      this.setState({ errorMessage: WEAK_PASSWORD })
-    } else {
-      console.error('confirmPasswordReset', 'code:', code, 'message:', message)
-      this.setState({ errorMessage: message })
+      this.processError(error)
     }
   }
 
@@ -188,8 +162,16 @@ class ResetPasswordPage extends Component {
 
 ResetPasswordPage.propTypes = {
   location: PropTypes.shape({
-    pathname: PropTypes.string.isRequired,
-    search: PropTypes.string.isRequired
+    state: PropTypes.shape({
+      info: PropTypes.shape({
+        data: PropTypes.shape({
+          email: PropTypes.string.isRequired
+        }).isRequired
+      }).isRequired,
+      query: PropTypes.shape({
+        oobCode: PropTypes.string.isRequired
+      }).isRequired
+    }).isRequired
   }).isRequired
 }
 

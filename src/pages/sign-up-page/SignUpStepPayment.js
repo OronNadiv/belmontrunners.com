@@ -12,12 +12,14 @@ import Promise from 'bluebird'
 import { Redirect } from 'react-router-dom'
 import { ROOT } from '../../urls'
 import { connect } from 'react-redux'
-import { MEMBERSHIP_EXPIRES_AT } from '../../fields'
+import { DATE_OF_BIRTH, MEMBERSHIP_EXPIRES_AT } from '../../fields'
 import { updateUserData as updateUserDataAction } from '../../reducers/currentUser'
 
-const MEMBERSHIP_FEE = 25
+const MEMBERSHIP_FEE_ADULT = 25
+const MEMBERSHIP_FEE_KID = 15
 const NEED_TO_PAY = 'needToPay'
 const CONFIRMATION_NUMBER = 'CONFIRMATION_NUMBER'
+const TOTAL_AMOUNT_IN_DOLLARS = 'TOTAL_AMOUNT_IN_DOLLARS'
 
 // TODO: allow the user to change their personal information.
 class SignUpStepPayment extends Component {
@@ -70,7 +72,8 @@ class SignUpStepPayment extends Component {
         }
         const body = {
           ...stripeResponse,
-          description: `Annual membership for Belmont Runners. name: ${displayName} email: ${email}  uid: ${uid}`
+          description: `Annual membership for Belmont Runners. name: ${displayName} email: ${email}  uid: ${uid}`,
+          amountInCents: this.props[TOTAL_AMOUNT_IN_DOLLARS] * 100
         }
         const options = {
           method: 'POST',
@@ -105,7 +108,7 @@ class SignUpStepPayment extends Component {
               // stripeResponse: JSON.stringify(stripeResponse),
               stripeResponse: stripeResponse,
               paidAt: moment().utc().format(),
-              paidAmount: MEMBERSHIP_FEE,
+              paidAmount: this.props[TOTAL_AMOUNT_IN_DOLLARS],
               confirmationNumber: chargeResponse.id
             }
             return Promise.all([
@@ -154,10 +157,11 @@ class SignUpStepPayment extends Component {
       } else if (this.props[NEED_TO_PAY] === true) {
         // need to pay.
         return (<div>
-            <h6 className='my-4'>Total amount: ${MEMBERSHIP_FEE}</h6>
-            {
-              // TODO: add a few words on the shirt they'll get - what, how long to get it, etc.
-            }
+            <h6 className='mt-3'>Membership fees</h6>
+            &bull; Adult (18 and over): $25<br />
+            &bull; Kids: $15.<br />
+
+            <h4 className='my-4'>Total amount: ${this.props[TOTAL_AMOUNT_IN_DOLLARS] || ''}</h4>
             {this.props[MEMBERSHIP_EXPIRES_AT] &&
             <div className='text-warning mb-2 text-center'>
               {
@@ -244,6 +248,7 @@ SignUpStepPayment.propTypes = {
   updateUserData: PropTypes.func.isRequired,
   [NEED_TO_PAY]: PropTypes.bool,
   [MEMBERSHIP_EXPIRES_AT]: PropTypes.string,
+  totalAmount: PropTypes.number.isRequired,
 
   // from HOC
   stripe: PropTypes.shape({
@@ -263,8 +268,17 @@ const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, currentUser, user
 
   let membershipExpiresAt = null
   let needToPay
+  let totalAmount = 0
 
   if (isCurrentUserLoaded && currentUser) {
+    const dateOfBirth = moment(userData[DATE_OF_BIRTH])
+    const isAdult = moment().diff(dateOfBirth, 'years') >= 18
+    if (isAdult) {
+      totalAmount = MEMBERSHIP_FEE_ADULT
+    } else {
+      totalAmount = MEMBERSHIP_FEE_KID
+    }
+
     membershipExpiresAt = userData[MEMBERSHIP_EXPIRES_AT]
     if (membershipExpiresAt && moment(membershipExpiresAt).isAfter(moment().add(1, 'month'))) {
       needToPay = false
@@ -273,13 +287,15 @@ const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, currentUser, user
     }
   }
 
+
   return {
     currentUser,
     userDataUpdating,
     userDataUpdateError,
 
     [NEED_TO_PAY]: needToPay,
-    [MEMBERSHIP_EXPIRES_AT]: membershipExpiresAt
+    [MEMBERSHIP_EXPIRES_AT]: membershipExpiresAt,
+    [TOTAL_AMOUNT_IN_DOLLARS]: totalAmount
   }
 }
 

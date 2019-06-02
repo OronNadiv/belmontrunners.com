@@ -7,10 +7,11 @@ import { Link, Redirect } from 'react-router-dom'
 import TextField from '@material-ui/core/TextField'
 import {
   INVALID_EMAIL,
-  INVALID_EMAIL_OR_PASSWORD,
   INVALID_PASSWORD_LENGTH,
   MISSING_PASSWORD,
-  POPUP_CLOSED_BEFORE_COMPLETION
+  POPUP_CLOSED_BEFORE_COMPLETION,
+  USER_NOT_FOUND_INVALID_EMAIL_OR_PASSWORD,
+  WRONG_PASSWORD_INVALID_EMAIL_OR_PASSWORD
 } from '../../messages'
 import Dialog from '@material-ui/core/Dialog'
 import DialogTitle from '@material-ui/core/DialogTitle'
@@ -110,14 +111,18 @@ class SignInPage extends Component {
           this.setState({ invalidEmailMessage: INVALID_EMAIL })
           break
         case 'auth/user-not-found':
+          this.setState({ generalErrorMessage: USER_NOT_FOUND_INVALID_EMAIL_OR_PASSWORD })
+          break
         case 'auth/wrong-password':
-          this.setState({ generalErrorMessage: INVALID_EMAIL_OR_PASSWORD })
+          this.setState({ generalErrorMessage: WRONG_PASSWORD_INVALID_EMAIL_OR_PASSWORD })
           break
         case 'auth/popup-closed-by-user':
           this.setState({ generalErrorMessage: POPUP_CLOSED_BEFORE_COMPLETION })
           break
         default:
-          console.log('signInError', 'code:', code, 'message:', message)
+          console.error('SignInPage',
+            'code:', code,
+            'message:', message)
           this.setState({ generalErrorMessage: message })
       }
     }

@@ -4,7 +4,7 @@ import React, { Component } from 'react'
 import '../sign-in-page/Signin.scss'
 import { Redirect } from 'react-router-dom'
 import isEmail from 'isemail'
-import { INVALID_EMAIL, NO_USER_WITH_GIVEN_EMAIL, RESET_PASSWORD_EMAIL_SENT } from '../../messages'
+import { INVALID_EMAIL, USER_NOT_FOUND_EXPLICIT } from '../../messages'
 import Dialog from '@material-ui/core/Dialog'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogContentText from '@material-ui/core/DialogContentText'
@@ -18,7 +18,7 @@ import LoggedInState from '../../components/LoggedInState'
 class ForgotPasswordPage extends Component {
   constructor (props) {
     super(props)
-    console.log('ForgotPassword contor called')
+    console.log('ForgotPasswordPage ctor called')
     this.state = {
       close: false,
       email: '',
@@ -60,13 +60,13 @@ class ForgotPasswordPage extends Component {
       const { code, message } = sendPasswordResetEmailError
       switch (code) {
         case 'auth/user-not-found':
-          this.setState({ invalidEmailMessage: NO_USER_WITH_GIVEN_EMAIL })
+          this.setState({ invalidEmailMessage: USER_NOT_FOUND_EXPLICIT })
           break
         case 'auth/invalid-email':
           this.setState({ invalidEmailMessage: INVALID_EMAIL })
           break
         default:
-          console.log('sendPasswordResetEmailError', 'code:', code, 'message:', message)
+          console.error('sendPasswordResetEmailError', 'code:', code, 'message:', message)
           this.setState({ invalidEmailMessage: message })
       }
     } else if (!isSendingPasswordResetEmail && prevState.isSendingPasswordResetEmail) {
@@ -101,7 +101,7 @@ class ForgotPasswordPage extends Component {
 
               <DialogContentText>
                 <div className='text-success text-center'>
-                  {RESET_PASSWORD_EMAIL_SENT}
+                  We have sent you an e-mail. Please contact us if you do not receive it within a few minutes.
                 </div>
               </DialogContentText> :
 

@@ -1,4 +1,4 @@
-const amount = process.env.CHARGE_AMOUNT_IN_CENTS
+const DEFAULT_AMOUNT = process.env.CHARGE_AMOUNT_IN_CENTS
 
 const stripeLive = require('stripe')(process.env.STRIPE_SECRET_KEY_LIVE)
 const stripeTest = require('stripe')(process.env.STRIPE_SECRET_KEY_TEST)
@@ -29,7 +29,7 @@ exports.handler = async (event, context, callback) => {
         return callback(null, response)
       }
     }
-    const { token: { id }, description } = JSON.parse(body)
+    const { token: { id }, description, amountInCents } = JSON.parse(body)
 
     let charge
     try {
@@ -37,7 +37,7 @@ exports.handler = async (event, context, callback) => {
       console.log('isProduction:', isProduction, 'origin:', event.headers.origin)
       const stripe = isProduction ? stripeLive : stripeTest
       charge = await stripe.charges.create({
-        amount: parseInt(amount),
+        amount: amountInCents || DEFAULT_AMOUNT,
         currency: 'usd',
         description: description || 'Annual membership for Belmont Runners',
         source: id

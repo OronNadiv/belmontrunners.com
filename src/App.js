@@ -7,7 +7,7 @@ import { fetchCurrentUser as fetchCurrentUserAction } from './reducers/currentUs
 import { connect } from 'react-redux'
 import { Route, Switch } from 'react-router-dom'
 import SignIn from './pages/sign-in-page/SignInPage'
-import ForgotPasswordPage from './pages/forget-password-page/ForgotPasswordPage'
+import ForgotPasswordPage from './pages/authentication/ForgotPasswordPage'
 import HomePage from './pages/home-page'
 import HeaderArea from './components/HeaderArea'
 import SignUpPage from './pages/sign-up-page/SignUpPage'
@@ -17,6 +17,7 @@ import {
   COMPLETE,
   FORGOT_PASSWORD,
   JOIN,
+  RECOVER_EMAIL,
   RESET_PASSWORD,
   ROOT,
   SIGN_IN,
@@ -25,10 +26,11 @@ import {
 import UsersPage from './pages/users-page/UsersPage'
 import Drift from './components/Drift'
 import * as Sentry from '@sentry/browser'
-import ResetPasswordPage from './pages/actions-page/ResetPasswordPage'
-import Complete from './pages/actions-page/Complete'
-import ChangeEmailPage from './pages/ChangeEmailPage'
-import ChangePasswordPage from './pages/ChangePasswordPage'
+import ResetPasswordPage from './pages/authentication/actions/ResetPasswordPage'
+import Complete from './pages/authentication/actions/Complete'
+import ChangeEmailPage from './pages/authentication/ChangeEmailPage'
+import ChangePasswordPage from './pages/authentication/ChangePasswordPage'
+import RecoverEmailPage from './pages/authentication/actions/RecoverEmailPage'
 
 class App extends Component {
   componentDidMount () {
@@ -157,6 +159,19 @@ class App extends Component {
                 <Footer />
 
                 <ResetPasswordPage />
+              </div>
+            )}
+          />
+          <Route
+            exact
+            path={RECOVER_EMAIL}
+            render={() => (
+              <div>
+                <HeaderArea />
+                <HomePage />
+                <Footer />
+
+                <RecoverEmailPage />
               </div>
             )}
           />
