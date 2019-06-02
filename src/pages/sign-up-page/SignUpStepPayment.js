@@ -1,4 +1,3 @@
-import 'firebase/firestore'
 import firebase from 'firebase'
 import React, { Component } from 'react'
 import { CardElement, injectStripe } from 'react-stripe-elements'

@@ -1,4 +1,3 @@
-import 'firebase/firestore'
 import firebase from 'firebase'
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
@@ -39,6 +38,9 @@ import LoggedInState from '../../components/LoggedInState'
 import { ROOT } from '../../urls'
 import { Redirect } from 'react-router-dom'
 import s from 'underscore.string'
+import DeleteIcon from '@material-ui/icons/Delete'
+import ConfirmDeletion from './ConfirmDeletion'
+import IconButton from '@material-ui/core/IconButton'
 
 const ADDRESS = 'address'
 const PNF = googleLibPhoneNumber.PhoneNumberFormat
@@ -178,7 +180,7 @@ class EnhancedTable extends Component {
   }
 
   loadMembers () {
-    console.log('in loadmembers.')
+    console.log('in loadMembers.')
 
     const usersRef = firebase.firestore().collection('users')
     return usersRef.get()
@@ -246,9 +248,12 @@ class EnhancedTable extends Component {
   }
 
   render () {
-    console.log('render called.  allowRead:', this.props.allowRead)
-
-    const { currentUser, allowRead, allowWrite } = this.props
+    const { currentUser, allowRead, allowWrite, allowDelete } = this.props
+    console.log('render called.',
+      'allowRead:', allowRead,
+      'allowWrite:', allowWrite,
+      'allowDelete:', allowDelete
+    )
 
     if (currentUser && !allowRead) {
       return <Redirect to={ROOT} />
@@ -258,7 +263,7 @@ class EnhancedTable extends Component {
 
     // at that point, read is allowed
 
-    const { rowsPerPage, page, order, orderBy, dense, rows } = this.state
+    const { rowsPerPage, page, order, orderBy, dense, rows, rowToDelete } = this.state
 
     const classes = {}
 
@@ -266,6 +271,16 @@ class EnhancedTable extends Component {
 
     return (
       <div style={{ marginTop: 100 }} className='mx-5 px-3'>
+        {
+          rowToDelete &&
+          <ConfirmDeletion
+            row={rowToDelete}
+            onClose={() => {
+              this.setState({ rowToDelete: null })
+              this.loadMembers()
+            }}
+          />
+        }
         <Paper style={{ width: 'fit-content' }}>
           <EnhancedTableToolbar />
           <div className={{ overflowX: 'auto' }}>
@@ -319,6 +334,16 @@ class EnhancedTable extends Component {
                             }}
                           />
                         </TableCell>
+                        {
+                          allowDelete &&
+                          <TableCell>
+                            <IconButton className={classes.button} aria-label="Delete" onClick={() => {
+                              this.setState({ rowToDelete: row })
+                            }}>
+                              <DeleteIcon />
+                            </IconButton>
+                          </TableCell>
+                        }
                       </TableRow>
                     )
                   })}
@@ -358,6 +383,7 @@ class EnhancedTable extends Component {
 EnhancedTable.propTypes = {
   allowRead: PropTypes.bool.isRequired,
   allowWrite: PropTypes.bool.isRequired,
+  allowDelete: PropTypes.bool.isRequired,
   currentUser: PropTypes.object.isRequired
 }
 
@@ -365,6 +391,7 @@ const mapStateToProps = ({ currentUser: { permissions, currentUser } }) => {
   return {
     allowRead: !!currentUser && !!permissions.usersRead[currentUser.uid],
     allowWrite: !!currentUser && !!permissions.usersWrite[currentUser.uid],
+    allowDelete: !!currentUser && !!permissions.usersDelete[currentUser.uid],
     currentUser: currentUser || {}
   }
 }

@@ -1,5 +1,3 @@
-import 'firebase/auth'
-import 'firebase/firestore'
 import firebase from 'firebase'
 import Promise from 'bluebird'
 
@@ -25,15 +23,20 @@ const fetchUserData = () => {
 }
 
 const fetchPermissions = () => {
-  const usersWriteRef = firebase.firestore().doc('permissions/usersWrite')
-  const usersReadRef = firebase.firestore().doc('permissions/usersRead')
-  return Promise.all([usersWriteRef.get(), usersReadRef.get()])
-    .spread((docWrite, docRead) => {
-      const dataWrite = docWrite.data()
+  return Promise
+    .props({
+      docRead: firebase.firestore().doc('permissions/usersRead').get(),
+      docWrite: firebase.firestore().doc('permissions/usersWrite').get(),
+      docDelete: firebase.firestore().doc('permissions/usersDelete').get()
+    })
+    .then(({ docRead, docWrite, docDelete }) => {
       const dataRead = docRead.data()
+      const dataWrite = docWrite.data()
+      const dataDelete = docDelete.data()
       return {
         usersRead: dataRead,
-        usersWrite: dataWrite
+        usersWrite: dataWrite,
+        usersDelete: dataDelete
       }
     })
 }
