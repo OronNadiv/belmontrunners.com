@@ -13,6 +13,7 @@
     "final-form": "^4.13.1",
     "final-form-material-ui": "^0.3.0",
     "firebase": "^6.1.0",
+    "fuzzy-search": "^3.0.1",
     "google-libphonenumber": "^3.2.2",
     "google-maps-react": "^2.0.2",
     "history": "^4.9.0",

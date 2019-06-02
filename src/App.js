@@ -21,6 +21,7 @@ import {
   RESET_PASSWORD,
   ROOT,
   SIGN_IN,
+  SUBSCRIBERS,
   USERS
 } from './urls'
 import UsersPage from './pages/users-page/UsersPage'
@@ -31,6 +32,7 @@ import Complete from './pages/authentication/actions/Complete'
 import ChangeEmailPage from './pages/authentication/ChangeEmailPage'
 import ChangePasswordPage from './pages/authentication/ChangePasswordPage'
 import RecoverEmailPage from './pages/authentication/actions/RecoverEmailPage'
+import SubscribersPage from './pages/subscribers-page/SubscribersPage'
 
 class App extends Component {
   componentDidMount () {
@@ -51,7 +53,6 @@ class App extends Component {
         Sentry.configureScope((scope) => {
           scope.setUser({ email: undefined, displayName: undefined, uid: undefined })
         })
-
       }
     }
   }
@@ -93,6 +94,17 @@ class App extends Component {
               <div>
                 <HeaderArea />
                 <UsersPage />
+                <Footer />
+              </div>
+            )}
+          />
+          <Route
+            exact
+            path={SUBSCRIBERS}
+            render={() => (
+              <div>
+                <HeaderArea />
+                <SubscribersPage />
                 <Footer />
               </div>
             )}

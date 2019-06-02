@@ -265,8 +265,6 @@ class EnhancedTable extends Component {
 
     const { rowsPerPage, page, order, orderBy, dense, rows, rowToDelete } = this.state
 
-    const classes = {}
-
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage)
 
     return (
@@ -285,7 +283,6 @@ class EnhancedTable extends Component {
           <EnhancedTableToolbar />
           <div className={{ overflowX: 'auto' }}>
             <Table
-              className={classes.table}
               aria-labelledby="tableTitle"
               size={dense ? 'small' : 'medium'}
             >
@@ -337,7 +334,7 @@ class EnhancedTable extends Component {
                         {
                           allowDelete &&
                           <TableCell>
-                            <IconButton className={classes.button} aria-label="Delete" onClick={() => {
+                            <IconButton aria-label="Delete" onClick={() => {
                               this.setState({ rowToDelete: row })
                             }}>
                               <DeleteIcon />

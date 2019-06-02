@@ -25,18 +25,19 @@ const fetchUserData = () => {
 const fetchPermissions = () => {
   return Promise
     .props({
-      docRead: firebase.firestore().doc('permissions/usersRead').get(),
-      docWrite: firebase.firestore().doc('permissions/usersWrite').get(),
-      docDelete: firebase.firestore().doc('permissions/usersDelete').get()
+      docUsersRead: firebase.firestore().doc('permissions/usersRead').get(),
+      docUsersWrite: firebase.firestore().doc('permissions/usersWrite').get(),
+      docUsersDelete: firebase.firestore().doc('permissions/usersDelete').get(),
+      docSubscribersRead: firebase.firestore().doc('permissions/subscribersRead').get(),
+      docSubscribersWrite: firebase.firestore().doc('permissions/subscribersWrite').get()
     })
-    .then(({ docRead, docWrite, docDelete }) => {
-      const dataRead = docRead.data()
-      const dataWrite = docWrite.data()
-      const dataDelete = docDelete.data()
+    .then(({ docUsersRead, docUsersWrite, docUsersDelete, docSubscribersRead, docSubscribersWrite }) => {
       return {
-        usersRead: dataRead,
-        usersWrite: dataWrite,
-        usersDelete: dataDelete
+        usersRead: docUsersRead.data(),
+        usersWrite: docUsersWrite.data(),
+        usersDelete: docUsersDelete.data(),
+        subscribersRead: docSubscribersRead.data(),
+        subscribersWrite: docSubscribersWrite.data()
       }
     })
 }
@@ -120,7 +121,9 @@ const initialState = {
   currentUser: null,
   permissions: {
     usersRead: {},
-    usersWrite: {}
+    usersWrite: {},
+    usersDelete: {},
+    subscribersRead: {}
   },
   userData: {},
   userDataUpdating: false,
@@ -137,11 +140,6 @@ const ACTION_HANDLERS = {
     return state
   },
   [FETCHED_CURRENT_USER]: (state = initialState, { data: { permissions, currentUser, userData } }) => {
-    console.log('state:', state,
-      'currentUser:', currentUser,
-      'permissions:', permissions,
-      'userData:', userData
-    )
     state = {
       ...state,
       currentUser,
@@ -155,7 +153,6 @@ const ACTION_HANDLERS = {
 
 
   [USER_DATA_UPDATE_REQUEST]: (state = initialState) => {
-    console.log('state:', state)
     state = {
       ...state,
       userDataUpdating: true,
@@ -164,7 +161,6 @@ const ACTION_HANDLERS = {
     return state
   },
   [USER_DATA_UPDATE_SUCCESS]: (state = initialState, { data }) => {
-    console.log('state:', state, 'data:', data)
     state = {
       ...state,
       userData: data,
@@ -174,7 +170,6 @@ const ACTION_HANDLERS = {
     return state
   },
   [USER_DATA_UPDATE_FAILURE]: (state = initialState, { error }) => {
-    console.log('state:', state, 'error:', error)
     state = {
       ...state,
       userDataUpdating: false,

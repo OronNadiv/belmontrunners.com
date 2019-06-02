@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import rp from 'request-promise'
-import isEmail from 'isemail/lib/index'
+import isEmail from 'isemail'
 
 class Footer extends Component {
   constructor () {
@@ -87,7 +87,7 @@ My email address is: ${this.state.email}`
           </div>
           <div className='row'>
             <div className='col-lg-5 col-md-6 col-sm-6 mx-auto'>
-              <div className='single-footer-widget' >
+              <div className='single-footer-widget'>
                 <p className='text-center'>Get updates about runs, walks and other events.</p>
                 <div id='mc_embed_signup'>
                   <form target='_blank'

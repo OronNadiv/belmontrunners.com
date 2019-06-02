@@ -7,6 +7,7 @@ export const RESET_PASSWORD = '/resetPassword'
 export const RECOVER_EMAIL = '/recoverEmail'
 export const ROOT = '/'
 export const USERS = '/users'
+export const SUBSCRIBERS = '/subscribers'
 export const CHANGE_EMAIL = '/changeEmail'
 export const CHANGE_PASSWORD = '/changePassword'
 
