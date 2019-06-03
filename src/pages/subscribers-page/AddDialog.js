@@ -64,7 +64,7 @@ class AddDialog extends Component {
                   />
                 </DialogContent>
                 <DialogActions>
-                  <Button onClick={() => onCancel()} color="primary">
+                  <Button onClick={() => onCancel()}>
                     Cancel
                   </Button>
 

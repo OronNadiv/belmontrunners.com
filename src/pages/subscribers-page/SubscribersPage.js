@@ -282,12 +282,11 @@ class SubscribersPage extends Component {
         <div className='row my-4 mx-2'>
           <div className='col-6'>
             <Paper className='px-2 py-3'>
-              <Typography variant="h5" component="h3">
+              <Typography variant="h5" component="h3" className='ml-3'>
                 Active ({active.length})
                 <CopyToClipboard
                   text={this.state.copyToClipboard}
                   onCopy={() => {
-                    console.log('this.state.copyToClipboard:', this.state.copyToClipboard)
                     this.setState({ copied: true })
                   }}>
                   <IconButton>
@@ -300,7 +299,7 @@ class SubscribersPage extends Component {
           </div>
           <div className='col-6'>
             <Paper className='px-2 py-3'>
-              <Typography variant="h5" component="h3">
+              <Typography variant="h5" component="h3" className='ml-3'>
                 Inactive ({inactive.length})
               </Typography>
               {this.getChips(inactive, false)}
