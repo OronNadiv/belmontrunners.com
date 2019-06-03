@@ -18,6 +18,9 @@ import Promise from 'bluebird'
 import normalizeEmail from 'normalize-email'
 import _ from 'underscore'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
+import Snackbar from '@material-ui/core/Snackbar'
+import { UID } from '../../fields'
+import moment from 'moment'
 
 const ARRAY_KEY = 'values'
 
@@ -149,6 +152,7 @@ class SubscribersPage extends Component {
   }
 
   getChips (array, isActive) {
+    const { allowWrite } = this.props
     const { search } = this.state
     if (search) {
       const searcher = new FuzzySearch(array, ['displayName', 'email'], {
@@ -165,7 +169,7 @@ class SubscribersPage extends Component {
           key={index}
           label={label}
           color={isActive ? 'primary' : 'default'}
-          onDelete={() => this.handleMoveChip(item)}
+          onDelete={allowWrite ? () => this.handleMoveChip(item) : undefined}
           deleteIcon={!isActive ? <AddIcon /> : undefined}
         />
       }
@@ -175,6 +179,7 @@ class SubscribersPage extends Component {
 
   handleAdd (email) {
     let { active, inactive } = this.state
+    const { currentUser } = this.props
     let index = active.findIndex((curr) => {
       return normalizeEmail(curr.email) === normalizeEmail(email)
     })
@@ -192,7 +197,12 @@ class SubscribersPage extends Component {
         inactive.splice(index, 1)
         active.unshift(item)
       } else {
-        active.unshift({ email, isActive: true })
+        active.unshift({
+          email,
+          isActive: true,
+          addedBy: currentUser[UID],
+          addedAt: moment().utc().format()
+        })
       }
     }
     this.setState({ active, inactive, showAddDialog: false })
@@ -201,7 +211,7 @@ class SubscribersPage extends Component {
 
   render () {
     const { allowWrite } = this.props
-    const { active, inactive, showAddDialog } = this.state
+    const { active, inactive, showAddDialog, copied } = this.state
     return (
       <div className='container-fluid'>
         {
@@ -213,6 +223,17 @@ class SubscribersPage extends Component {
             }}
           />
         }
+        <Snackbar
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'center'
+          }}
+          open={copied}
+          autoHideDuration={6000}
+          onClose={() => this.setState({ copied: false })}
+          message={<span id="message-id">Copied to clipboard</span>}
+        />
+
         <div className='d-flex justify-content-center row'>
           <Paper style={{
             margin: '20px 0',
@@ -238,7 +259,7 @@ class SubscribersPage extends Component {
             }} aria-label="Search">
               <SearchIcon />
             </IconButton>
-            <Divider style={{ width: 1, height: 28, margin: 4 }} />
+            {allowWrite && <Divider style={{ width: 1, height: 28, margin: 4 }} />}
             {
               allowWrite && <IconButton
                 color="primary"
@@ -287,12 +308,14 @@ class SubscribersPage extends Component {
 }
 
 SubscribersPage.propTypes = {
-  allowWrite: PropTypes.bool.isRequired
+  allowWrite: PropTypes.bool.isRequired,
+  currentUser: PropTypes.object
 }
 
 const mapStateToProps = ({ currentUser: { permissions, currentUser } }) => {
   return {
-    allowWrite: !!currentUser && !!permissions.subscribersWrite[currentUser.uid]
+    allowWrite: !!currentUser && !!permissions.subscribersWrite[currentUser.uid],
+    currentUser
   }
 }
 

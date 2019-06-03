@@ -3,7 +3,7 @@ import firebase from 'firebase'
 import Avatar from 'react-avatar'
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import { CHANGE_EMAIL, CHANGE_PASSWORD, JOIN, ROOT, USERS } from '../urls'
+import { CHANGE_EMAIL, CHANGE_PASSWORD, JOIN, ROOT, SUBSCRIBERS, USERS } from '../urls'
 import { STEP_USER_DETAILS } from '../pages/sign-up-page/SignUpStepper'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -16,7 +16,7 @@ class Profile extends Component {
   }
 
   render () {
-    const { currentUser, allowUsersPage } = this.props
+    const { currentUser, allowUsersPage, allowSubscribersPage } = this.props
     return (
       <span className="dropdown signout-btn text-white-50">
         <a className="dropdown-toggle" id="dropdownMenuLink" href='/'
@@ -30,6 +30,12 @@ class Profile extends Component {
             allowUsersPage &&
             <Link to={USERS} className='dropdown-item'>
               Users
+            </Link>
+          }
+          {
+            allowSubscribersPage &&
+            <Link to={SUBSCRIBERS} className='dropdown-item'>
+              Subscribers
             </Link>
           }
           <Link className="dropdown-item"
@@ -68,6 +74,7 @@ class Profile extends Component {
 
 Profile.propTypes = {
   allowUsersPage: PropTypes.bool.isRequired,
+  allowSubscribersPage: PropTypes.bool.isRequired,
   currentUser: PropTypes.object.isRequired
 }
 
@@ -76,6 +83,9 @@ const mapStateToProps = ({ currentUser: { permissions, currentUser } }) => {
     allowUsersPage: !!currentUser && (
       !!permissions.usersRead[currentUser.uid] ||
       !!permissions.usersWrite[currentUser.uid]),
+    allowSubscribersPage: !!currentUser && (
+      !!permissions.subscribersRead[currentUser.uid] ||
+      !!permissions.subscribersWrite[currentUser.uid]),
     currentUser: currentUser || {}
   }
 }
