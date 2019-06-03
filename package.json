@@ -26,6 +26,7 @@
     "query-string": "^6.5.0",
     "react": "^16.8.6",
     "react-avatar": "^3.6.0",
+    "react-copy-to-clipboard": "^5.0.1",
     "react-dom": "^16.8.6",
     "react-final-form": "^5.1.2",
     "react-redux": "^7.0.3",

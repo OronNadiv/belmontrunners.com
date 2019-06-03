@@ -9,6 +9,7 @@ import Divider from '@material-ui/core/Divider'
 import IconButton from '@material-ui/core/IconButton'
 import SearchIcon from '@material-ui/icons/Search'
 import AddIcon from '@material-ui/icons/AddCircle'
+import CopyIcon from '@material-ui/icons/FileCopy'
 import * as PropTypes from 'prop-types'
 import LoggedInState from '../../components/LoggedInState'
 import { connect } from 'react-redux'
@@ -16,6 +17,7 @@ import Typography from '@material-ui/core/Typography'
 import Promise from 'bluebird'
 import normalizeEmail from 'normalize-email'
 import _ from 'underscore'
+import { CopyToClipboard } from 'react-copy-to-clipboard'
 
 const ARRAY_KEY = 'values'
 
@@ -29,6 +31,18 @@ class SubscribersPage extends Component {
       active: [],
       inactive: []
     }
+  }
+
+  copyToClipboard (active) {
+    const items = _.map(active, ({ displayName, email }) => {
+      if (displayName) {
+        return `${displayName} <${email}>`
+      } else {
+        return email
+      }
+    })
+    const copyToClipboard = items.join('; ')
+    this.setState({ copyToClipboard })
   }
 
   componentDidMount () {
@@ -94,21 +108,23 @@ class SubscribersPage extends Component {
 
 
         this.setState({ active, inactive })
+        this.copyToClipboard(active)
       })
       .catch(console.error)
   }
 
 
-  saveChanges (arr1, arr2) {
-    console.log('active size:', arr1.length)
-    console.log('inactive size:', arr2.length)
+  saveChanges (active, inactive) {
+    console.log('active size:', active.length)
+    console.log('inactive size:', inactive.length)
 
-    const values = arr1.concat(arr2)
+    const values = active.concat(inactive)
     this.docRef
       .set({ [ARRAY_KEY]: values })
       .then(() => {
         console.log('saved')
       })
+    this.copyToClipboard(active)
   }
 
 
@@ -127,7 +143,7 @@ class SubscribersPage extends Component {
     } else {
       const { from, to } = moveItem({ from: this.state.inactive, to: this.state.active })
       item.isActive = !item.isActive
-      this.saveChanges(from, to)
+      this.saveChanges(to, from)
       this.setState({ inactive: from, active: to })
     }
   }
@@ -143,7 +159,6 @@ class SubscribersPage extends Component {
 
     const res = array.map(
       (item, index) => {
-        console.log('active', item, index)
         const label = `${item.displayName || ''} ${item.email}`.trim()
         return <Chip
           className='my-1 mx-1'
@@ -152,7 +167,6 @@ class SubscribersPage extends Component {
           color={isActive ? 'primary' : 'default'}
           onDelete={() => this.handleMoveChip(item)}
           deleteIcon={!isActive ? <AddIcon /> : undefined}
-
         />
       }
     )
@@ -182,13 +196,12 @@ class SubscribersPage extends Component {
       }
     }
     this.setState({ active, inactive, showAddDialog: false })
-    this.saveChanges(inactive, active)
+    this.saveChanges(active, inactive)
   }
 
   render () {
     const { allowWrite } = this.props
     const { active, inactive, showAddDialog } = this.state
-    console.log('active:', active, 'inactive:', inactive)
     return (
       <div className='container-fluid'>
         {
@@ -245,6 +258,16 @@ class SubscribersPage extends Component {
             <Paper className='px-2 py-3'>
               <Typography variant="h5" component="h3">
                 Active ({active.length})
+                <CopyToClipboard
+                  text={this.state.copyToClipboard}
+                  onCopy={() => {
+                    console.log('this.state.copyToClipboard:', this.state.copyToClipboard)
+                    this.setState({ copied: true })
+                  }}>
+                  <IconButton>
+                    <CopyIcon />
+                  </IconButton>
+                </CopyToClipboard>
               </Typography>
               {this.getChips(active, true)}
             </Paper>
