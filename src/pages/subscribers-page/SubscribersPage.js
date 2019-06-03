@@ -163,7 +163,12 @@ class SubscribersPage extends Component {
 
     const res = array.map(
       (item, index) => {
-        const label = `${item.displayName || ''} ${item.email}`.trim()
+        let label
+        if (item.displayName) {
+          label = `${item.displayName || ''} (${item.email})`
+        } else {
+          label = item.email
+        }
         return <Chip
           className='my-1 mx-1'
           key={index}
