@@ -21,6 +21,7 @@
     "jquery": "^3.4.1",
     "moment": "^2.24.0",
     "node-sass": "^4.12.0",
+    "normalize-email": "^1.1.1",
     "prop-types": "^15.7.2",
     "query-string": "^6.5.0",
     "react": "^16.8.6",
@@ -35,6 +36,7 @@
     "redux-thunk": "^2.3.0",
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
+    "underscore": "^1.9.1",
     "underscore.string": "^3.3.5"
   },
   "scripts": {

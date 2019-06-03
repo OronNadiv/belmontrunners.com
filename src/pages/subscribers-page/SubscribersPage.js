@@ -13,6 +13,9 @@ import * as PropTypes from 'prop-types'
 import LoggedInState from '../../components/LoggedInState'
 import { connect } from 'react-redux'
 import Typography from '@material-ui/core/Typography'
+import Promise from 'bluebird'
+import normalizeEmail from 'normalize-email'
+import _ from 'underscore'
 
 const ARRAY_KEY = 'values'
 
@@ -30,30 +33,77 @@ class SubscribersPage extends Component {
 
   componentDidMount () {
     console.log('SubscribersPage.componentDidMount called')
-    this.docRef.get().then(doc => {
-      let data = doc.data()
 
-      if (!data || !data[ARRAY_KEY]) {
-        data = { [ARRAY_KEY]: [] }
-      }
-      console.log('data:', data)
-      const active = data[ARRAY_KEY].filter((item) => item.isActive)
-      const inactive = data[ARRAY_KEY].filter((item) => !item.isActive)
-      this.setState({ active, inactive })
-    })
+    Promise
+      .props({
+        usersCollection: firebase.firestore().collection('users').get(),
+        subscriptionsDoc: this.docRef.get()
+      })
+      .then(({ usersCollection, subscriptionsDoc }) => {
+        let data = subscriptionsDoc.data()
+
+        if (!data || !data[ARRAY_KEY]) {
+          data = { [ARRAY_KEY]: [] }
+        }
+        const subs = data[ARRAY_KEY]
+
+        const users = []
+        usersCollection.forEach(user => {
+          const data = user.data()
+          data.uid = user.id
+          users.push(data)
+        })
+        console.log('user:', users)
+        users.forEach((user) => {
+          const foundSub = subs.find((sub) => {
+            return sub.uid === user.uid
+          })
+          if (foundSub) {
+            foundSub.displayName = user.displayName
+            foundSub.email = user.email
+          }
+        })
+
+        // set user values for existing subs
+        console.log('subs:', subs)
+        subs.forEach((sub) => {
+          const foundUser = users.find((user) => {
+            return normalizeEmail(sub.email) === normalizeEmail(user.email)
+          })
+          if (foundUser) {
+            sub.displayName = foundUser.displayName
+            sub.email = foundUser.email
+            sub.uid = foundUser.uid
+          }
+        })
+
+        users.forEach((user) => {
+          const foundSub = _.findWhere(subs, { uid: user.uid })
+          if (foundSub) {
+            return
+          }
+          console.log('foundSub:', foundSub)
+          let newSub = _.pick(user, 'uid', 'displayName', 'email')
+          console.log('newSub:', newSub)
+          newSub.isActive = true
+          subs.push(newSub)
+        })
+
+        const active = subs.filter((item) => item.isActive)
+        const inactive = subs.filter((item) => !item.isActive)
+
+
+        this.setState({ active, inactive })
+      })
+      .catch(console.error)
   }
 
-  extracted ({ from, to }, item) {
-    from = from.filter((curr) => {
-      return curr !== item
-    })
-    to.unshift(item)
-    return { from, to }
-  }
 
-  saveChanges () {
-    const values = this.state.active.concat(this.state.inactive)
-    console.log('values:', values)
+  saveChanges (arr1, arr2) {
+    console.log('active size:', arr1.length)
+    console.log('inactive size:', arr2.length)
+
+    const values = arr1.concat(arr2)
     this.docRef
       .set({ [ARRAY_KEY]: values })
       .then(() => {
@@ -61,19 +111,25 @@ class SubscribersPage extends Component {
       })
   }
 
+
   handleMoveChip (item) {
-    const { isActive } = item
-    if (isActive) {
-      const { from, to } = this.extracted({ from: this.state.active, to: this.state.inactive }, item)
-      item.isActive = !isActive
+    const moveItem = ({ from, to }) => {
+      from = _.without(from, item)
+      to.unshift(item)
+      return { from, to }
+    }
+
+    if (item.isActive) {
+      const { from, to } = moveItem({ from: this.state.active, to: this.state.inactive })
+      item.isActive = !item.isActive
+      this.saveChanges(from, to)
       this.setState({ active: from, inactive: to })
     } else {
-      const { from, to } = this.extracted({ from: this.state.inactive, to: this.state.active }, item)
-      console.log('inactive:', from, 'active:', to)
-      item.isActive = !isActive
+      const { from, to } = moveItem({ from: this.state.inactive, to: this.state.active })
+      item.isActive = !item.isActive
+      this.saveChanges(from, to)
       this.setState({ inactive: from, active: to })
     }
-    this.saveChanges()
   }
 
   getChips (array, isActive) {
@@ -103,15 +159,30 @@ class SubscribersPage extends Component {
     return res
   }
 
-  findAndRemove (email, array) {
-    let item
-    const existingIndex = array.findIndex((curr) => {
-      return curr.email.trim().toLowerCase() === email.trim().toLowerCase()
+  handleAdd (email) {
+    let { active, inactive } = this.state
+    let index = active.findIndex((curr) => {
+      return normalizeEmail(curr.email) === normalizeEmail(email)
     })
-    if (existingIndex > -1) {
-      item = array.splice(existingIndex, 1)[0]
+
+    if (index > -1) {
+      const item = active[index]
+      active.splice(index, 1)
+      active.unshift(item)
+    } else {
+      index = inactive.findIndex((curr) => {
+        return normalizeEmail(curr.email) === normalizeEmail(email)
+      })
+      if (index > -1) {
+        const item = inactive[index]
+        inactive.splice(index, 1)
+        active.unshift(item)
+      } else {
+        active.unshift({ email, isActive: true })
+      }
     }
-    return item
+    this.setState({ active, inactive, showAddDialog: false })
+    this.saveChanges(inactive, active)
   }
 
   render () {
@@ -125,12 +196,7 @@ class SubscribersPage extends Component {
           <AddDialog
             onCancel={() => this.setState({ showAddDialog: false })}
             onAdd={(email) => {
-              let item = { email, isActive: true, key: email }
-              let foundItem = this.findAndRemove(email, this.state.active) || this.findAndRemove(email, this.state.inactive)
-              console.log('foundItem:', foundItem, 'item:', item)
-              active.unshift(foundItem || item)
-              this.setState({ active, showAddDialog: false })
-              this.saveChanges()
+              this.handleAdd(email)
             }}
           />
         }
@@ -178,7 +244,7 @@ class SubscribersPage extends Component {
           <div className='col-6'>
             <Paper className='px-2 py-3'>
               <Typography variant="h5" component="h3">
-                Active
+                Active ({active.length})
               </Typography>
               {this.getChips(active, true)}
             </Paper>
@@ -186,7 +252,7 @@ class SubscribersPage extends Component {
           <div className='col-6'>
             <Paper className='px-2 py-3'>
               <Typography variant="h5" component="h3">
-                Inactive
+                Inactive ({inactive.length})
               </Typography>
               {this.getChips(inactive, false)}
             </Paper>
