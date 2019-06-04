@@ -41,6 +41,9 @@ import s from 'underscore.string'
 import DeleteIcon from '@material-ui/icons/Delete'
 import ConfirmDeletion from './ConfirmDeletion'
 import IconButton from '@material-ui/core/IconButton'
+import InputBase from '@material-ui/core/InputBase'
+import SearchIcon from '@material-ui/icons/Search'
+import FuzzySearch from 'fuzzy-search'
 
 const ADDRESS = 'address'
 const PNF = googleLibPhoneNumber.PhoneNumberFormat
@@ -263,12 +266,20 @@ class EnhancedTable extends Component {
 
     // at that point, read is allowed
 
-    const { rowsPerPage, page, order, orderBy, dense, rows, rowToDelete } = this.state
+    const { rowsPerPage, page, order, orderBy, dense, rowToDelete, search } = this.state
+    let { rows } = this.state
+    if (search) {
+      const searcher = new FuzzySearch(rows, [DISPLAY_NAME, EMAIL], {
+        caseSensitive: false
+      })
+      rows = searcher.search(search)
+    }
+
 
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage)
 
     return (
-      <div style={{ marginTop: 100 }} className='mx-5 px-3'>
+      <div className='container-fluid'>
         {
           rowToDelete &&
           <ConfirmDeletion
@@ -279,99 +290,128 @@ class EnhancedTable extends Component {
             }}
           />
         }
-        <Paper style={{ width: 'fit-content' }}>
-          <EnhancedTableToolbar />
-          <div className={{ overflowX: 'auto' }}>
-            <Table
-              aria-labelledby="tableTitle"
-              size={dense ? 'small' : 'medium'}
-            >
-              <EnhancedTableHead
-                order={order}
-                orderBy={orderBy}
-                onRequestSort={this.handleRequestSort}
-                rowCount={rows.length}
-              />
-              <TableBody>
-                {stableSort(rows, getSorting(order, orderBy))
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row, index) => {
-                    return (
-                      <TableRow
-                        key={index}
-                        hover
-                      >
-                        <TableCell onClick={() => {
-                          console.log('uid:', row[UID])
-                        }}>{row[DISPLAY_NAME]}</TableCell>
-                        <TableCell>{row[EMAIL]}</TableCell>
-                        <TableCell>{row[PHONE]}</TableCell>
-                        <TableCell>{row[ADDRESS]}</TableCell>
-                        <TableCell>{row[DATE_OF_BIRTH]}</TableCell>
-                        <TableCell>{row[GENDER]}</TableCell>
-                        <TableCell>{row[SHIRT_GENDER]}</TableCell>
-                        <TableCell>{row[SHIRT_SIZE]}</TableCell>
-                        <TableCell style={{ color: getColor(row[MEMBERSHIP_EXPIRES_AT]) }}
-                        >{row[MEMBERSHIP_EXPIRES_AT]}</TableCell>
-                        <TableCell>
-                          <Checkbox
-                            checked={row[DID_RECEIVED_SHIRT]}
-                            disabled={!allowWrite}
-                            onChange={(event, checked) => {
-                              const index = rows.indexOf(row)
-                              rows[index][DID_RECEIVED_SHIRT] = checked
-                              console.log('val', checked, index, row)
-
-                              const userRef = firebase.firestore().doc(`users/${row[UID]}`)
-                              userRef.set({ [DID_RECEIVED_SHIRT]: checked }, { merge: true })
-                                .then(() => {
-                                  this.setState({ rows })
-                                  console.log('val', checked, index, row)
-                                })
-                            }}
-                          />
-                        </TableCell>
-                        {
-                          allowDelete &&
+        <div className='d-flex justify-content-center row'>
+          <Paper style={{
+            margin: '20px 0',
+            padding: '2px 4px',
+            display: 'flex',
+            alignItems: 'center',
+            width: 400
+          }}>
+            <InputBase
+              style={{
+                marginLeft: 8,
+                flex: 1
+              }}
+              placeholder="Fuzzy Search"
+              onChange={(event) => {
+                this.setState({
+                  search: event.target.value
+                })
+              }}
+            />
+            <IconButton style={{
+              padding: 10
+            }} aria-label="Search">
+              <SearchIcon />
+            </IconButton>
+          </Paper>
+        </div>
+        <div className='row mx-1'>
+          <Paper className=''>
+            <EnhancedTableToolbar />
+            <div className={{ overflowX: 'auto' }}>
+              <Table
+                aria-labelledby="tableTitle"
+                size={dense ? 'small' : 'medium'}
+              >
+                <EnhancedTableHead
+                  order={order}
+                  orderBy={orderBy}
+                  onRequestSort={this.handleRequestSort}
+                  rowCount={rows.length}
+                />
+                <TableBody>
+                  {stableSort(rows, getSorting(order, orderBy))
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((row, index) => {
+                      return (
+                        <TableRow
+                          key={index}
+                          hover
+                        >
+                          <TableCell onClick={() => {
+                            console.log('uid:', row[UID])
+                          }}>{row[DISPLAY_NAME]}</TableCell>
+                          <TableCell>{row[EMAIL]}</TableCell>
+                          <TableCell>{row[PHONE]}</TableCell>
+                          <TableCell>{row[ADDRESS]}</TableCell>
+                          <TableCell>{row[DATE_OF_BIRTH]}</TableCell>
+                          <TableCell>{row[GENDER]}</TableCell>
+                          <TableCell>{row[SHIRT_GENDER]}</TableCell>
+                          <TableCell>{row[SHIRT_SIZE]}</TableCell>
+                          <TableCell style={{ color: getColor(row[MEMBERSHIP_EXPIRES_AT]) }}
+                          >{row[MEMBERSHIP_EXPIRES_AT]}</TableCell>
                           <TableCell>
-                            <IconButton aria-label="Delete" onClick={() => {
-                              this.setState({ rowToDelete: row })
-                            }}>
-                              <DeleteIcon />
-                            </IconButton>
+                            <Checkbox
+                              checked={row[DID_RECEIVED_SHIRT]}
+                              disabled={!allowWrite}
+                              onChange={(event, checked) => {
+                                const index = rows.indexOf(row)
+                                rows[index][DID_RECEIVED_SHIRT] = checked
+                                console.log('val', checked, index, row)
+
+                                const userRef = firebase.firestore().doc(`users/${row[UID]}`)
+                                userRef.set({ [DID_RECEIVED_SHIRT]: checked }, { merge: true })
+                                  .then(() => {
+                                    this.setState({ rows })
+                                    console.log('val', checked, index, row)
+                                  })
+                              }}
+                            />
                           </TableCell>
-                        }
-                      </TableRow>
-                    )
-                  })}
-                {emptyRows > 0 && (
-                  <TableRow style={{ height: 49 * emptyRows }}>
-                    <TableCell colSpan={10} />
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={rows.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            backIconButtonProps={{
-              'aria-label': 'Previous Page'
-            }}
-            nextIconButtonProps={{
-              'aria-label': 'Next Page'
-            }}
-            onChangePage={this.handleChangePage}
-            onChangeRowsPerPage={this.handleChangeRowsPerPage}
+                          {
+                            allowDelete &&
+                            <TableCell>
+                              <IconButton aria-label="Delete" onClick={() => {
+                                this.setState({ rowToDelete: row })
+                              }}>
+                                <DeleteIcon />
+                              </IconButton>
+                            </TableCell>
+                          }
+                        </TableRow>
+                      )
+                    })}
+                  {emptyRows > 0 && (
+                    <TableRow style={{ height: 49 * emptyRows }}>
+                      <TableCell colSpan={10} />
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25]}
+              component="div"
+              count={rows.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              backIconButtonProps={{
+                'aria-label': 'Previous Page'
+              }}
+              nextIconButtonProps={{
+                'aria-label': 'Next Page'
+              }}
+              onChangePage={this.handleChangePage}
+              onChangeRowsPerPage={this.handleChangeRowsPerPage}
+            />
+          </Paper>
+          <FormControlLabel
+            control={<Switch checked={dense} onChange={this.handleChangeDense} />}
+            label="Dense padding"
           />
-        </Paper>
-        <FormControlLabel
-          control={<Switch checked={dense} onChange={this.handleChangeDense} />}
-          label="Dense padding"
-        />
+        </div>
       </div>
     )
   }

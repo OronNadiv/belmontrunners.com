@@ -259,7 +259,7 @@ class SubscribersPage extends Component {
                 marginLeft: 8,
                 flex: 1
               }}
-              placeholder="Search"
+              placeholder='Fuzzy Search'
               onChange={(event) => {
                 this.setState({
                   search: event.target.value
@@ -286,7 +286,7 @@ class SubscribersPage extends Component {
             }
           </Paper>
         </div>
-        <div className='row my-4 mx-2'>
+        <div className='row'>
           <div className='col-6'>
             <Paper className='px-2 py-3'>
               <Typography variant="h5" component="h3" className='ml-3'>
