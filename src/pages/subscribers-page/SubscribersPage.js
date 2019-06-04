@@ -22,6 +22,8 @@ import Snackbar from '@material-ui/core/Snackbar'
 import { UID } from '../../fields'
 import moment from 'moment'
 import { fromJS, List as IList } from 'immutable'
+import { ROOT } from '../../urls'
+import { Redirect } from 'react-router-dom'
 
 const ARRAY_KEY = 'values'
 
@@ -222,8 +224,13 @@ class SubscribersPage extends Component {
   }
 
   render () {
-    const { allowWrite } = this.props
+    const { currentUser, allowRead, allowWrite } = this.props
     const { active, inactive, showAddDialog, copied } = this.state
+
+    if (currentUser && !allowRead) {
+      return <Redirect to={ROOT} />
+    }
+
     return (
       <div className='container-fluid'>
         {
@@ -319,12 +326,14 @@ class SubscribersPage extends Component {
 }
 
 SubscribersPage.propTypes = {
+  allowRead: PropTypes.bool.isRequired,
   allowWrite: PropTypes.bool.isRequired,
   currentUser: PropTypes.object
 }
 
 const mapStateToProps = ({ currentUser: { permissions, currentUser } }) => {
   return {
+    allowRead: !!currentUser && !!permissions.subscribersRead[currentUser.uid],
     allowWrite: !!currentUser && !!permissions.subscribersWrite[currentUser.uid],
     currentUser
   }

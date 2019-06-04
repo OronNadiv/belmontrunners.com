@@ -260,8 +260,6 @@ class EnhancedTable extends Component {
 
     if (currentUser && !allowRead) {
       return <Redirect to={ROOT} />
-    } else if (!allowRead) {
-      return <div /> // todo: show loading spinner
     }
 
     // at that point, read is allowed
