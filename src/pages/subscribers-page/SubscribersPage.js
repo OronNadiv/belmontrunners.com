@@ -21,6 +21,7 @@ import { CopyToClipboard } from 'react-copy-to-clipboard'
 import Snackbar from '@material-ui/core/Snackbar'
 import { UID } from '../../fields'
 import moment from 'moment'
+import { fromJS, List as IList } from 'immutable'
 
 const ARRAY_KEY = 'values'
 
@@ -31,13 +32,15 @@ class SubscribersPage extends Component {
 
     this.state = {
       search: '',
-      active: [],
-      inactive: []
+      active: new IList(),
+      inactive: new IList()
     }
   }
 
-  copyToClipboard (active) {
-    const items = _.map(active, ({ displayName, email }) => {
+  copyToClipboard () {
+    const items = this.state.active.map(item => {
+      const displayName = item.get('displayName')
+      const email = item.get('email')
       if (displayName) {
         return `${displayName} <${email}>`
       } else {
@@ -99,54 +102,58 @@ class SubscribersPage extends Component {
           if (foundSub) {
             return
           }
-          console.log('foundSub:', foundSub)
           let newSub = _.pick(user, 'uid', 'displayName', 'email')
-          console.log('newSub:', newSub)
           newSub.isActive = true
           subs.push(newSub)
         })
 
-        const active = subs.filter((item) => item.isActive)
-        const inactive = subs.filter((item) => !item.isActive)
-
+        const active = fromJS(subs.filter((item) => item.isActive))
+        const inactive = fromJS(subs.filter((item) => !item.isActive))
 
         this.setState({ active, inactive })
-        this.copyToClipboard(active)
       })
       .catch(console.error)
   }
 
+  componentDidUpdate (prevProps, prevState, snapshot) {
+    if (!prevState.active.equals(this.state.active) || !prevState.inactive.equals(this.state.inactive)) {
+      this.saveChanges()
+    }
+    if (!prevState.active.equals(this.state.active)) {
+      this.copyToClipboard()
+    }
+  }
 
-  saveChanges (active, inactive) {
-    console.log('active size:', active.length)
-    console.log('inactive size:', inactive.length)
+  saveChanges () {
+    const { active, inactive } = this.state
 
-    const values = active.concat(inactive)
+    console.log('active size:', active.size)
+    console.log('inactive size:', inactive.size)
+
+    const values = active.concat(inactive).toJS()
     this.docRef
       .set({ [ARRAY_KEY]: values })
       .then(() => {
         console.log('saved')
       })
-    this.copyToClipboard(active)
   }
 
 
   handleMoveChip (item) {
     const moveItem = ({ from, to }) => {
-      from = _.without(from, item)
-      to.unshift(item)
+      const index = from.findIndex((curr) => curr.equals(item))
+      from = from.remove(index)
+      const newItem = item.set('isActive', !item.get('isActive'))
+
+      to = to.unshift(newItem)
       return { from, to }
     }
 
-    if (item.isActive) {
+    if (item.get('isActive')) {
       const { from, to } = moveItem({ from: this.state.active, to: this.state.inactive })
-      item.isActive = !item.isActive
-      this.saveChanges(from, to)
       this.setState({ active: from, inactive: to })
     } else {
       const { from, to } = moveItem({ from: this.state.inactive, to: this.state.active })
-      item.isActive = !item.isActive
-      this.saveChanges(to, from)
       this.setState({ inactive: from, active: to })
     }
   }
@@ -154,6 +161,7 @@ class SubscribersPage extends Component {
   getChips (array, isActive) {
     const { allowWrite } = this.props
     const { search } = this.state
+    array = array.toJS()
     if (search) {
       const searcher = new FuzzySearch(array, ['displayName', 'email'], {
         caseSensitive: false
@@ -174,7 +182,7 @@ class SubscribersPage extends Component {
           key={index}
           label={label}
           color={isActive ? 'primary' : 'default'}
-          onDelete={allowWrite ? () => this.handleMoveChip(item) : undefined}
+          onDelete={allowWrite ? () => this.handleMoveChip(fromJS(item)) : undefined}
           deleteIcon={!isActive ? <AddIcon /> : undefined}
         />
       }
@@ -186,32 +194,31 @@ class SubscribersPage extends Component {
     let { active, inactive } = this.state
     const { currentUser } = this.props
     let index = active.findIndex((curr) => {
-      return normalizeEmail(curr.email) === normalizeEmail(email)
+      return normalizeEmail(curr.get('email')) === normalizeEmail(email)
     })
 
     if (index > -1) {
-      const item = active[index]
-      active.splice(index, 1)
-      active.unshift(item)
+      const item = active.get(index)
+      active = active.remove(index)
+      active = active.unshift(item)
     } else {
       index = inactive.findIndex((curr) => {
-        return normalizeEmail(curr.email) === normalizeEmail(email)
+        return normalizeEmail(curr.get('email')) === normalizeEmail(email)
       })
       if (index > -1) {
-        const item = inactive[index]
-        inactive.splice(index, 1)
-        active.unshift(item)
+        const item = inactive.get(index)
+        inactive = inactive.remove(index)
+        active = active.unshift(item)
       } else {
-        active.unshift({
+        active = active.unshift(fromJS({
           email,
           isActive: true,
           addedBy: currentUser[UID],
           addedAt: moment().utc().format()
-        })
+        }))
       }
     }
     this.setState({ active, inactive, showAddDialog: false })
-    this.saveChanges(active, inactive)
   }
 
   render () {
@@ -283,7 +290,7 @@ class SubscribersPage extends Component {
           <div className='col-6'>
             <Paper className='px-2 py-3'>
               <Typography variant="h5" component="h3" className='ml-3'>
-                Active ({active.length})
+                Active ({active.size})
                 <CopyToClipboard
                   text={this.state.copyToClipboard}
                   onCopy={() => {
@@ -300,7 +307,7 @@ class SubscribersPage extends Component {
           <div className='col-6'>
             <Paper className='px-2 py-3'>
               <Typography variant="h5" component="h3" className='ml-3'>
-                Inactive ({inactive.length})
+                Inactive ({inactive.size})
               </Typography>
               {this.getChips(inactive, false)}
             </Paper>
