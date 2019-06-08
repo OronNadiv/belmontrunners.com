@@ -28,7 +28,7 @@ const MAX_YEAR = moment().year() - 5
 const MIN_YEAR = moment().year() - 120
 const birthday = value => {
   const val = moment(value, 'YYYY-MM-DD')
-  return val.year() < MIN_YEAR || val.year() > MAX_YEAR ? 'Invalid birthday' : undefined
+  return !val.isValid() || val.year() < MIN_YEAR || val.year() > MAX_YEAR ? 'Invalid birthday' : undefined
 }
 const composeValidators = (...validators) => value =>
   validators.reduce((error, validator) => error || validator(value), undefined)
@@ -65,6 +65,7 @@ class SignUpStepUserProfile extends Component {
         initialValues={userData}
         render={({ handleSubmit, form, values }) => (
           <form onSubmit={handleSubmit} className='container-fluid'>
+
             <div className='row'>
               <Field
                 label='Address 1'
@@ -104,28 +105,27 @@ class SignUpStepUserProfile extends Component {
               />
             </div>
 
-            <div className='row'>
-              <div style={{ margin: '16px 0 8px' }}>
-                <Field
-                  name={STATE}
-                  component={Select}
-                  validate={required}
-                  label='State'
-                  // margin='normal'
-                  initialValue='CA'
-                  width='auto'
-                >
-                  {
-                    states.map(
-                      ({ abbreviation, name }, key) =>
-                        <MenuItem key={key} value={abbreviation}>{name}</MenuItem>
-                    )
-                  }
-                </Field>
-              </div>
+            <div className='row mt-2 mb-1'>
+              <Field
+                style={{ width: 120 }}
+                name={STATE}
+                component={Select}
+                validate={required}
+                label='State'
+                // margin='normal'
+                initialValue='CA'
+                width='auto'
+              >
+                {
+                  states.map(
+                    ({ abbreviation, name }, key) =>
+                      <MenuItem key={key} value={abbreviation}>{name}</MenuItem>
+                  )
+                }
+              </Field>
             </div>
 
-            <div className='row d-flex justify-content-between align-items-end'>
+            <div className='row d-flex justify-content-between align-items-end mt-2 mb-1'>
               <Field
                 style={{ width: 120 }}
                 name={PHONE}
@@ -162,25 +162,23 @@ class SignUpStepUserProfile extends Component {
               />
             </div>
 
-            <div className='row'>
-              <div style={{ margin: '16px 0 8px' }}>
-                <Field
-                  style={{ minWidth: 120 }}
-                  name={GENDER}
-                  component={Select}
-                  validate={required}
-                  label='Gender'
-                  // margin='normal'
-                  width='auto'
-                >
-                  <MenuItem value={'F'}>Female</MenuItem>
-                  <MenuItem value={'M'}>Male</MenuItem>
-                  <MenuItem value={'O'}>Other</MenuItem>
-                </Field>
-              </div>
+            <div className='row mt-2 mb-1'>
+              <Field
+                style={{ minWidth: 120 }}
+                name={GENDER}
+                component={Select}
+                validate={required}
+                label='Gender'
+                // margin='normal'
+                width='auto'
+              >
+                <MenuItem value={'F'}>Female</MenuItem>
+                <MenuItem value={'M'}>Male</MenuItem>
+                <MenuItem value={'O'}>Other</MenuItem>
+              </Field>
             </div>
 
-            <div className='row mx-auto mt-2'>
+            <div className='row mx-auto mt-2 mb-2'>
               <div className='text-center'>
                 Each member receives the Belmont Runners official<a
                 target='_blank' rel='noopener noreferrer'
@@ -188,40 +186,35 @@ class SignUpStepUserProfile extends Component {
               </div>
             </div>
 
-            <div className='row d-flex justify-content-between'>
-              <div style={{ margin: '16px 0 8px' }}>
-                <Field
-                  className='mr-4'
-                  style={{ minWidth: 100 }}
-                  name={SHIRT_GENDER}
-                  component={Select}
-                  validate={required}
-                  label='Shirt gender'
-                  // margin='normal'
-                  width='auto'
-                >
-                  <MenuItem value={'F'}>Female</MenuItem>
-                  <MenuItem value={'M'}>Male</MenuItem>
-                </Field>
-              </div>
+            <div className='row d-flex justify-content-between mt-2 mb-1'>
+              <Field
+                style={{ minWidth: 120 }}
+                name={SHIRT_GENDER}
+                component={Select}
+                validate={required}
+                label='Shirt gender'
+                // margin='normal'
+                width='auto'
+              >
+                <MenuItem value={'F'}>Female</MenuItem>
+                <MenuItem value={'M'}>Male</MenuItem>
+              </Field>
 
-              <div style={{ margin: '16px 0 8px' }}>
-                <Field
-                  style={{ minWidth: 100 }}
-                  name={SHIRT_SIZE}
-                  component={Select}
-                  validate={required}
-                  label='Shirt size'
-                  // margin='normal'
-                  width='auto'
-                >
-                  {values.shirtGender === 'F' && <MenuItem value={'XS'}>X-Small</MenuItem>}
-                  <MenuItem value={'S'}>Small</MenuItem>
-                  <MenuItem value={'M'}>Medium</MenuItem>
-                  <MenuItem value={'L'}>Large</MenuItem>
-                  <MenuItem value={'XL'}>X-Large</MenuItem>
-                </Field>
-              </div>
+              <Field
+                style={{ minWidth: 150 }}
+                name={SHIRT_SIZE}
+                component={Select}
+                validate={required}
+                label='Shirt size'
+                // margin='normal'
+                width='auto'
+              >
+                {values.shirtGender === 'F' && <MenuItem value={'XS'}>X-Small</MenuItem>}
+                <MenuItem value={'S'}>Small</MenuItem>
+                <MenuItem value={'M'}>Medium</MenuItem>
+                <MenuItem value={'L'}>Large</MenuItem>
+                <MenuItem value={'XL'}>X-Large</MenuItem>
+              </Field>
             </div>
 
             <SignUpStepperButton
