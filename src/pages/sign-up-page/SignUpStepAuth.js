@@ -18,6 +18,7 @@ import s from 'underscore.string'
 import LoggedInState from '../../components/LoggedInState'
 import { PRIVACY_POLICY, PRIVACY_POLICY_FILE_NAME, TOS, TOS_FILE_NAME, WAVER, WAVER_FILE_NAME } from '../../urls'
 import moment from 'moment'
+import * as Sentry from '@sentry/browser'
 
 class View extends Component {
   constructor (props) {
@@ -64,8 +65,11 @@ class View extends Component {
     }
   }
 
-  signUp (providerName, fullName, email, password) {
+  async signUp (providerName, fullName, email, password) {
     console.log('signUp  called')
+    const displayName = s(fullName).clean().words().map((w) => s.capitalize(w)).join(" ")
+    console.log('displayName:', displayName)
+
     const { onNextClicked } = this.props
     this.setState({
       isSigningUp: true,
@@ -80,8 +84,6 @@ class View extends Component {
         promise = Promise.resolve(firebase.auth().createUserWithEmailAndPassword(email, password))
           .tap((user) => {
             console.log('calling updateProfile', user)
-            const displayName = s.words(fullName).map((w) => s.capitalize(w)).join(" ")
-            console.log('displayName:', displayName)
             return firebase.auth().currentUser.updateProfile({
               displayName
             })
@@ -98,51 +100,45 @@ class View extends Component {
         promise = firebase.auth().signInWithPopup(providerFacebook)
         break
     }
-
-    promise
-      .then(() => {
-        const currentUserRef = firebase.firestore().doc(`users/${firebase.auth().currentUser.uid}`)
-        return currentUserRef.get()
-      })
-      .then((doc) => {
-        let values = {}
-        if (!doc.exists) {
-          values = {
-            ...values,
-            tosUrl: TOS_FILE_NAME,
-            tosAcceptedAt: moment().format(),
-            waverUrl: WAVER_FILE_NAME,
-            waverAcceptedAt: moment().utc().format(),
-            privacyPolicyUrl: PRIVACY_POLICY_FILE_NAME,
-            privacyPolicyAcceptedAt: moment().utc().format()
-          }
-        }
-        const { email, displayName, photoURL } = firebase.auth().currentUser
+    try {
+      await promise
+      const currentUserRef = firebase.firestore().doc(`users/${firebase.auth().currentUser.uid}`)
+      const doc = await currentUserRef.get()
+      let values = {}
+      if (!doc.exists) {
         values = {
           ...values,
-          email,
-          displayName,
-          photoURL
+          tosUrl: TOS_FILE_NAME,
+          tosAcceptedAt: moment().format(),
+          waverUrl: WAVER_FILE_NAME,
+          waverAcceptedAt: moment().utc().format(),
+          privacyPolicyUrl: PRIVACY_POLICY_FILE_NAME,
+          privacyPolicyAcceptedAt: moment().utc().format()
         }
-        const currentUserRef = firebase.firestore().doc(`users/${firebase.auth().currentUser.uid}`)
-        return currentUserRef.set(values, { merge: true })
+      }
+      const { email, displayName, photoURL } = firebase.auth().currentUser
+      values = {
+        ...values,
+        email,
+        displayName,
+        photoURL
+      }
+      await currentUserRef.set(values, { merge: true })
+      this.setState({
+        signUpError: null
       })
-      .then(() => {
-        this.setState({
-          signUpError: null
-        })
-        onNextClicked()
+      onNextClicked()
+    } catch (error) {
+      Sentry.captureException(error)
+      console.error(error)
+      this.setState({
+        signUpError: error
       })
-      .catch((error) => {
-        this.setState({
-          signUpError: error
-        })
+    } finally {
+      this.setState({
+        isSigningUp: false
       })
-      .finally(() => {
-        this.setState({
-          isSigningUp: false
-        })
-      })
+    }
   }
 
   handleSignUpWithEmail () {

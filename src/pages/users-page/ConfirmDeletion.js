@@ -4,25 +4,25 @@ import Button from '@material-ui/core/Button'
 import Snackbar from '@material-ui/core/Snackbar'
 import PropTypes from 'prop-types'
 import { DISPLAY_NAME, EMAIL, UID } from '../../fields'
+import * as Sentry from '@sentry/browser'
 
 const confirmDeletion = (props) => {
   const { row, onClose } = props
 
-  const deleteUser = () => {
+  const deleteUser = async () => {
     let uid = row[UID]
     console.log(`Deleting: users/${uid}, row:`, row)
     const userRef = firebase.firestore().doc(`users/${uid}`)
-    return userRef.delete()
-      .then(() => {
-        console.log('Deleted successfully')
-      })
-      .catch((error) => {
-        console.log('Deletion failed.',
-          'error:', error)
-      })
-      .finally(() => {
-        onClose()
-      })
+    try {
+      await userRef.delete()
+      console.log('Deleted successfully')
+    } catch (error) {
+      Sentry.captureException(error)
+      console.log('Deletion failed.',
+        'error:', error)
+    } finally {
+      onClose()
+    }
   }
 
   return (

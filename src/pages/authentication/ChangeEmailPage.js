@@ -20,6 +20,7 @@ import {
 } from '../../messages'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
+import * as Sentry from '@sentry/browser'
 
 class ChangeEmailPage extends Component {
   constructor (props) {
@@ -43,7 +44,7 @@ class ChangeEmailPage extends Component {
 
   }
 
-  handleSubmit () {
+  async handleSubmit () {
     const { email1, email2, password } = this.state
     const { currentUser } = this.props
 
@@ -63,50 +64,51 @@ class ChangeEmailPage extends Component {
     this.setState({ isSubmitting: true })
     this.resetErrors()
     const credentials = firebase.auth.EmailAuthProvider.credential(currentUser.email, password)
-    currentUser.reauthenticateWithCredential(credentials)
-      .then(() => {
-        return currentUser.updateEmail(email1)
-          .then(() => {
-            this.setState({ successMessage: 'Email changed successfully.' })
-          })
-          .catch((error) => {
-            const { code, message } = error
-            switch (code) {
-              case 'auth/invalid-email':
-                this.setState({
-                  errorEmailMessage1: INVALID_EMAIL
-                })
-                return
-              case 'auth/email-already-in-use':
-                this.setState({
-                  errorEmailMessage1: EMAIL_ALREADY_IN_USE
-                })
-                return
-              default:
-                console.error('ChangeEmailPage.',
-                  'code:', code,
-                  'message:', message)
-                this.setState({
-                  generalErrorMessage: message
-                })
-            }
-          })
-      })
-      .catch((error) => {
+    try {
+      await currentUser.reauthenticateWithCredential(credentials)
+      try {
+        await currentUser.updateEmail(email1)
+        this.setState({ successMessage: 'Email changed successfully.' })
+      } catch (error) {
+        Sentry.captureException(error)
+        console.error(error)
         const { code, message } = error
-        if (code === 'auth/wrong-password') {
-          this.setState({
-            errorPasswordMessage: WRONG_PASSWORD
-          })
-        } else {
-          this.setState({
-            generalErrorMessage: message
-          })
+        switch (code) {
+          case 'auth/invalid-email':
+            this.setState({
+              errorEmailMessage1: INVALID_EMAIL
+            })
+            return
+          case 'auth/email-already-in-use':
+            this.setState({
+              errorEmailMessage1: EMAIL_ALREADY_IN_USE
+            })
+            return
+          default:
+            Sentry.captureException(error)
+            console.error('ChangeEmailPage.',
+              'code:', code,
+              'message:', message)
+            this.setState({
+              generalErrorMessage: message
+            })
         }
-      })
-      .finally(() => {
-        this.setState({ isSubmitting: false })
-      })
+      }
+    } catch (error) {
+      const { code, message } = error
+      if (code === 'auth/wrong-password') {
+        this.setState({
+          errorPasswordMessage: WRONG_PASSWORD
+        })
+      } else {
+        Sentry.captureException(error)
+        this.setState({
+          generalErrorMessage: message
+        })
+      }
+    } finally {
+      this.setState({ isSubmitting: false })
+    }
   }
 
   render () {

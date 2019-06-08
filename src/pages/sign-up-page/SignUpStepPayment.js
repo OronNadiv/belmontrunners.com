@@ -13,6 +13,7 @@ import { ROOT } from '../../urls'
 import { connect } from 'react-redux'
 import { DATE_OF_BIRTH, MEMBERSHIP_EXPIRES_AT } from '../../fields'
 import { updateUserData as updateUserDataAction } from '../../reducers/currentUser'
+import * as Sentry from '@sentry/browser'
 
 const MEMBERSHIP_FEE_ADULT = 25
 const MEMBERSHIP_FEE_KID = 15
@@ -54,90 +55,91 @@ class SignUpStepPayment extends Component {
     })
   }
 
-  handleSubmitPayment () {
+  async handleSubmitPayment () {
     const { currentUser: { displayName, uid, email }, updateUserData } = this.props
 
     this.setState({
       submitting: true
     })
 
-    return this.props.stripe
-      .createToken({ type: 'card' })
-      .then(stripeResponse => {
-        console.log('stripeResponse:', JSON.stringify(stripeResponse, 0, 2))
+    try {
+      const stripeResponse = await this.props.stripe
+        .createToken({ type: 'card' })
+      console.log('stripeResponse:', JSON.stringify(stripeResponse, 0, 2))
+      if (stripeResponse.error) {
+        this.setMessage(stripeResponse.error.message)
+        throw stripeResponse.error
+      }
+      const body = {
+        ...stripeResponse,
+        description: `Annual membership for Belmont Runners. name: ${displayName} email: ${email}  uid: ${uid}`,
+        amountInCents: this.props[TOTAL_AMOUNT_IN_DOLLARS] * 100
+      }
+      const options = {
+        method: 'POST',
+        uri: 'https://c0belq1th0.execute-api.us-west-1.amazonaws.com/default/stripe',
+        body,
+        json: true
+      }
+      try {
+        const chargeResponse = await rp(options)
+        const transactionsRef = firebase.firestore().doc(
+          `users/${uid}/transactions/${moment().utc().format()}`)
+        const transactionsLastRef = firebase.firestore().doc(
+          `users/${uid}/transactions/latest`)
+
+        let newMembershipExpiresAt
+        const yearFromNow = moment().add(1, 'year')
+        if (this.props[MEMBERSHIP_EXPIRES_AT]) {
+          const membershipExpiresAtPlusOneYear = moment(this.props[MEMBERSHIP_EXPIRES_AT]).add(1, 'year')
+          if (membershipExpiresAtPlusOneYear.isBefore(yearFromNow)) {
+            newMembershipExpiresAt = yearFromNow
+          } else {
+            newMembershipExpiresAt = membershipExpiresAtPlusOneYear
+          }
+        } else {
+          newMembershipExpiresAt = yearFromNow
+        }
+        this.setState({
+          [CONFIRMATION_NUMBER]: chargeResponse.id
+        })
+
+        let values = {
+          // stripeResponse: JSON.stringify(stripeResponse),
+          stripeResponse: stripeResponse,
+          paidAt: moment().utc().format(),
+          paidAmount: this.props[TOTAL_AMOUNT_IN_DOLLARS],
+          confirmationNumber: chargeResponse.id
+        }
+        await Promise.all([
+          transactionsRef.set(values),
+          transactionsLastRef.set(values)
+        ])
+        try {
+          updateUserData({
+            [MEMBERSHIP_EXPIRES_AT]: newMembershipExpiresAt.utc().format()
+          }, { merge: true })
+        } catch (error) {
+          Sentry.captureException(error)
+          console.error('failed to update user data.', error)
+        }
+      } catch (stripeResponse) {
         if (stripeResponse.error) {
           this.setMessage(stripeResponse.error.message)
-          throw stripeResponse.error
+          return
         }
-        const body = {
-          ...stripeResponse,
-          description: `Annual membership for Belmont Runners. name: ${displayName} email: ${email}  uid: ${uid}`,
-          amountInCents: this.props[TOTAL_AMOUNT_IN_DOLLARS] * 100
-        }
-        const options = {
-          method: 'POST',
-          uri: 'https://c0belq1th0.execute-api.us-west-1.amazonaws.com/default/stripe',
-          body,
-          json: true
-        }
-        return rp(options)
-          .then(chargeResponse => {
-            const transactionsRef = firebase.firestore().doc(
-              `users/${uid}/transactions/${moment().utc().format()}`)
-            const transactionsLastRef = firebase.firestore().doc(
-              `users/${uid}/transactions/latest`)
-
-            let newMembershipExpiresAt
-            const yearFromNow = moment().add(1, 'year')
-            if (this.props[MEMBERSHIP_EXPIRES_AT]) {
-              const membershipExpiresAtPlusOneYear = moment(this.props[MEMBERSHIP_EXPIRES_AT]).add(1, 'year')
-              if (membershipExpiresAtPlusOneYear.isBefore(yearFromNow)) {
-                newMembershipExpiresAt = yearFromNow
-              } else {
-                newMembershipExpiresAt = membershipExpiresAtPlusOneYear
-              }
-            } else {
-              newMembershipExpiresAt = yearFromNow
-            }
-            this.setState({
-              [CONFIRMATION_NUMBER]: chargeResponse.id
-            })
-
-            let values = {
-              // stripeResponse: JSON.stringify(stripeResponse),
-              stripeResponse: stripeResponse,
-              paidAt: moment().utc().format(),
-              paidAmount: this.props[TOTAL_AMOUNT_IN_DOLLARS],
-              confirmationNumber: chargeResponse.id
-            }
-            return Promise.all([
-              transactionsRef.set(values),
-              transactionsLastRef.set(values)
-            ])
-              .then(() => {
-                updateUserData({
-                  [MEMBERSHIP_EXPIRES_AT]: newMembershipExpiresAt.utc().format()
-                }, { merge: true })
-              })
-          })
-          .catch(stripeResponse => {
-            if (stripeResponse.error) {
-              this.setMessage(stripeResponse.error.message)
-              return
-            }
-            // todo: handle case where it's not stripe error.
-            throw stripeResponse
-          })
+        // todo: handle case where it's not stripe error.
+        throw stripeResponse
+      }
+    } catch (error) {
+      Sentry.captureException(error)
+      // todo:handle case where charge failed by showing an error message
+      console.error("stripeError:", error)
+    } finally {
+      this.setState({
+        submitting: false
       })
-      .catch(err => {
-        // todo:handle case where charge failed by showing an error message
-        console.error("stripeError:", err)
-      })
-      .finally(() => {
-        this.setState({
-          submitting: false
-        })
-      })
+    }
   }
 
   getBody () {

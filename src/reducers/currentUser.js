@@ -1,5 +1,6 @@
 import firebase from 'firebase'
 import Promise from 'bluebird'
+import * as Sentry from '@sentry/browser'
 
 const PREFIX = 'CURRENT_USER'
 
@@ -12,18 +13,15 @@ export const USER_DATA_UPDATE_FAILURE = `${PREFIX}USER_DATA_UPDATE_FAILURE`
 
 let isRegistered
 
-const fetchUserData = () => {
+const fetchUserData = async () => {
   const userRef = firebase.firestore().doc(`users/${firebase.auth().currentUser.uid}`)
-  return userRef
-    .get()
-    .then((userDoc) => {
-      const userData = userDoc.data() || {}
-      return userData
-    })
+  const userDoc = await userRef.get()
+  const userData = userDoc.data() || {}
+  return userData
 }
 
-const fetchPermissions = () => {
-  return Promise
+const fetchPermissions = async () => {
+  const { docUsersRead, docUsersWrite, docUsersDelete, docSubscribersRead, docSubscribersWrite } = await Promise
     .props({
       docUsersRead: firebase.firestore().doc('permissions/usersRead').get(),
       docUsersWrite: firebase.firestore().doc('permissions/usersWrite').get(),
@@ -31,15 +29,13 @@ const fetchPermissions = () => {
       docSubscribersRead: firebase.firestore().doc('permissions/subscribersRead').get(),
       docSubscribersWrite: firebase.firestore().doc('permissions/subscribersWrite').get()
     })
-    .then(({ docUsersRead, docUsersWrite, docUsersDelete, docSubscribersRead, docSubscribersWrite }) => {
-      return {
-        usersRead: docUsersRead.data(),
-        usersWrite: docUsersWrite.data(),
-        usersDelete: docUsersDelete.data(),
-        subscribersRead: docSubscribersRead.data(),
-        subscribersWrite: docSubscribersWrite.data()
-      }
-    })
+  return {
+    usersRead: docUsersRead.data(),
+    usersWrite: docUsersWrite.data(),
+    usersDelete: docUsersDelete.data(),
+    subscribersRead: docSubscribersRead.data(),
+    subscribersWrite: docSubscribersWrite.data()
+  }
 }
 
 export const fetchCurrentUser = () => {
@@ -52,7 +48,7 @@ export const fetchCurrentUser = () => {
     })
     if (!isRegistered) {
       isRegistered = true
-      firebase.auth().onAuthStateChanged(() => {
+      firebase.auth().onAuthStateChanged(async () => {
         if (!firebase.auth().currentUser) {
           console.log('current user is null')
           dispatch({
@@ -65,20 +61,23 @@ export const fetchCurrentUser = () => {
           })
         } else {
           console.log('current user is not null')
-          return Promise
-            .all([fetchPermissions(), fetchUserData()])
-            .spread((permissions, userData) => {
-              console.log('permissions', permissions)
-              console.log('userData', userData)
-              dispatch({
-                type: FETCHED_CURRENT_USER,
-                data: {
-                  currentUser: firebase.auth().currentUser,
-                  permissions,
-                  userData
-                }
-              })
+          try {
+            const [permissions, userData] = await Promise
+              .all([fetchPermissions(), fetchUserData()])
+            console.log('permissions', permissions)
+            console.log('userData', userData)
+            dispatch({
+              type: FETCHED_CURRENT_USER,
+              data: {
+                currentUser: firebase.auth().currentUser,
+                permissions,
+                userData
+              }
             })
+          } catch (error) {
+            Sentry.captureException(error)
+            console.error(error)
+          }
         }
       })
     }
@@ -86,7 +85,7 @@ export const fetchCurrentUser = () => {
 }
 
 export const updateUserData = (values, options) => {
-  return (dispatch, getState) => {
+  return async (dispatch, getState) => {
     if (getState().currentUser.isCurrentUserLoading) {
       return
     }
@@ -94,24 +93,22 @@ export const updateUserData = (values, options) => {
       type: USER_DATA_UPDATE_REQUEST
     })
     const userRef = firebase.firestore().doc(`users/${firebase.auth().currentUser.uid}`)
-    return userRef
-      .set(values, options)
-      .then((res) => {
-        console.log('res', res)
-        return fetchUserData()
+    try {
+      const res = await userRef.set(values, options)
+      console.log('res', res)
+      const userData = await fetchUserData()
+      dispatch({
+        type: USER_DATA_UPDATE_SUCCESS,
+        data: userData
       })
-      .then((userData) => {
-        dispatch({
-          type: USER_DATA_UPDATE_SUCCESS,
-          data: userData
-        })
+    } catch (error) {
+      Sentry.captureException(error)
+      console.error(error)
+      dispatch({
+        type: USER_DATA_UPDATE_FAILURE,
+        error
       })
-      .catch((error) => {
-        dispatch({
-          type: USER_DATA_UPDATE_FAILURE,
-          error
-        })
-      })
+    }
   }
 }
 

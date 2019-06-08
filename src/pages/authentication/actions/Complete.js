@@ -17,6 +17,7 @@ import DialogContent from '@material-ui/core/DialogContent'
 import DialogContentText from '@material-ui/core/DialogContentText'
 import DialogActions from '@material-ui/core/DialogActions'
 import Button from '@material-ui/core/Button'
+import * as Sentry from '@sentry/browser'
 
 class Complete extends Component {
   constructor (props) {
@@ -42,6 +43,7 @@ class Complete extends Component {
         this.setState({ errorMessage: USER_NOT_FOUND_INVALID_URL })
         break
       default:
+        Sentry.captureException(error)
         console.error('confirmPasswordReset',
           'code:', code,
           'message:', message)
@@ -49,38 +51,31 @@ class Complete extends Component {
     }
   }
 
-  componentDidMount () {
+  async componentDidMount () {
     const { search } = this.props.location
 
     const query = queryString.parse(search) || {}
     const { mode, oobCode } = query
 
     try {
-      firebase.auth().checkActionCode(oobCode)
-        .then((info) => {
-          let redirect
-          if (mode) {
-            redirect = (
-              <Redirect to={{
-                pathname: `/${mode}`,
-                state: {
-                  info,
-                  query
-                }
-              }} />
-            )
-          } else {
-            redirect = <Redirect to={ROOT} />
-          }
+      const info = await firebase.auth().checkActionCode(oobCode)
+      let redirect
+      if (mode) {
+        redirect = (
+          <Redirect to={{
+            pathname: `/${mode}`,
+            state: {
+              info,
+              query
+            }
+          }} />
+        )
+      } else {
+        redirect = <Redirect to={ROOT} />
+      }
 
-          this.setState({ redirect })
-        })
-        .catch((error) => {
-          console.log('in catch')
-          this.processError(error)
-        })
+      this.setState({ redirect })
     } catch (error) {
-      console.log('in try-catch')
       this.processError(error)
     }
   }

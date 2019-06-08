@@ -27,7 +27,7 @@ class ForgotPasswordPage extends Component {
     }
   }
 
-  sendPasswordReset () {
+  async sendPasswordReset () {
     const { email } = this.state
     if (!email || !isEmail.validate(email)) {
       this.setState({ invalidEmailMessage: INVALID_EMAIL })
@@ -38,19 +38,18 @@ class ForgotPasswordPage extends Component {
       isSendingPasswordResetEmail: true,
       sendPasswordResetEmailError: null
     })
-    firebase.auth().sendPasswordResetEmail(email)
-      .then(() => {
-        this.setState({
-          isSendingPasswordResetEmail: false,
-          sendPasswordResetEmailError: null
-        })
+    try {
+      await firebase.auth().sendPasswordResetEmail(email)
+      this.setState({
+        isSendingPasswordResetEmail: false,
+        sendPasswordResetEmailError: null
       })
-      .catch((error) => {
-        this.setState({
-          isSendingPasswordResetEmail: false,
-          sendPasswordResetEmailError: error
-        })
+    } catch (error) {
+      this.setState({
+        isSendingPasswordResetEmail: false,
+        sendPasswordResetEmailError: error
       })
+    }
   }
 
   componentDidUpdate (prevProps, prevState) {

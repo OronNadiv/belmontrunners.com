@@ -10,14 +10,10 @@ import { Redirect } from 'react-router-dom'
 import LoggedInState from '../../components/LoggedInState'
 import Button from '@material-ui/core/Button'
 import DialogTitle from '@material-ui/core/DialogTitle'
-import {
-  INVALID_PASSWORD_LENGTH,
-  MISSING_PASSWORD,
-  PASSWORDS_MISMATCH,
-  WRONG_PASSWORD
-} from '../../messages'
+import { INVALID_PASSWORD_LENGTH, MISSING_PASSWORD, PASSWORDS_MISMATCH, WRONG_PASSWORD } from '../../messages'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
+import * as Sentry from '@sentry/browser'
 
 class ChangePasswordPage extends Component {
   constructor (props) {
@@ -44,7 +40,7 @@ class ChangePasswordPage extends Component {
 
   }
 
-  handleSubmit () {
+  async handleSubmit () {
     const { password0, password1, password2 } = this.state
     const { currentUser } = this.props
 
@@ -76,37 +72,35 @@ class ChangePasswordPage extends Component {
     this.setState({ isSubmitting: true })
     this.resetErrors()
     const credentials = firebase.auth.EmailAuthProvider.credential(currentUser.email, password0)
-    currentUser.reauthenticateWithCredential(credentials)
-      .then(() => {
-        return currentUser.updatePassword(password1)
-          .then(() => {
-            this.setState({ successMessage: 'Password changed successfully.' })
-          })
-          .catch((error) => {
-            const { code, message } = error
-            console.error('unexpected code.',
-              'code:', code,
-              'message:', message)
-            this.setState({
-              generalErrorMessage: message
-            })
-          })
-      })
-      .catch((error) => {
+    try {
+      await currentUser.reauthenticateWithCredential(credentials)
+      try {
+        await currentUser.updatePassword(password1)
+        this.setState({ successMessage: 'Password changed successfully.' })
+      } catch (error) {
         const { code, message } = error
-        if (code === 'auth/wrong-password') {
-          this.setState({
-            errorPasswordMessage0: WRONG_PASSWORD
-          })
-        } else {
-          this.setState({
-            generalErrorMessage: message
-          })
-        }
-      })
-      .finally(() => {
-        this.setState({ isSubmitting: false })
-      })
+        Sentry.captureException(error)
+        console.error('unexpected code.',
+          'code:', code,
+          'message:', message)
+        this.setState({
+          generalErrorMessage: message
+        })
+      }
+    } catch (error) {
+      const { code, message } = error
+      if (code === 'auth/wrong-password') {
+        this.setState({
+          errorPasswordMessage0: WRONG_PASSWORD
+        })
+      } else {
+        this.setState({
+          generalErrorMessage: message
+        })
+      }
+    } finally {
+      this.setState({ isSubmitting: false })
+    }
   }
 
   render () {

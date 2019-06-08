@@ -20,6 +20,7 @@ import DialogActions from '@material-ui/core/DialogActions'
 import Button from '@material-ui/core/Button'
 import { FORGOT_PASSWORD, ROOT } from '../../urls'
 import LoggedInState from '../../components/LoggedInState'
+import * as Sentry from '@sentry/browser'
 
 const providerGoogle = new firebase.auth.GoogleAuthProvider()
 const providerFacebook = new firebase.auth.FacebookAuthProvider()
@@ -35,7 +36,7 @@ class SignInPage extends Component {
     }
   }
 
-  signIn (providerName, params) {
+  async signIn (providerName, params) {
     let promise
     switch (providerName.toLowerCase()) {
       case 'facebook':
@@ -55,25 +56,23 @@ class SignInPage extends Component {
       signInError: null
     })
 
-    promise
-      .then(() => {
-        this.setState({
-          isSignedIn: true,
-          signInError: null
-        })
+    try {
+      await promise
+      this.setState({
+        isSignedIn: true,
+        signInError: null
       })
-      .catch((error) => {
-        console.log('error while signing in', error)
-        this.setState({
-          isSignedIn: false,
-          signInError: error
-        })
+    } catch (error) {
+      console.log('error while signing in', error)
+      this.setState({
+        isSignedIn: false,
+        signInError: error
       })
-      .finally(() => {
-        this.setState({
-          isSigningIn: false
-        })
+    } finally {
+      this.setState({
+        isSigningIn: false
       })
+    }
     // todo: when sign-in is done via provider, redirect to user details and then maybe to payments
   }
 
@@ -120,6 +119,7 @@ class SignInPage extends Component {
           this.setState({ generalErrorMessage: POPUP_CLOSED_BEFORE_COMPLETION })
           break
         default:
+          Sentry.captureException(signInError)
           console.error('SignInPage',
             'code:', code,
             'message:', message)

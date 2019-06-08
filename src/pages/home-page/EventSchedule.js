@@ -9,25 +9,23 @@ class EventSchedule extends Component {
     this.state = { events: [] }
   }
 
-  componentDidMount () {
-    csv()
+  async componentDidMount () {
+    let events = await csv()
       .fromStream(request.get("https://docs.google.com/spreadsheets/d/1FZOB291KWLoutpr0s6VeK5EtvuiQ8uhe497nOmWoqPA/export?format=csv&usp=sharing"))
-      .then((events) => {
-        events = events.map(event => {
-          event.month--
-          event.moment = moment(event)
-          return event
-        })
-          .filter(event => {
-            return event.moment.isAfter(moment().subtract(1, 'day')) &&
-              event.moment.isBefore(moment().add(15, 'day'))
-          })
-          .sort((a, b) => {
-            return a.moment.valueOf() - b.moment.valueOf()
-          })
-
-        this.setState({ events })
+    events = events.map(event => {
+      event.month--
+      event.moment = moment(event)
+      return event
+    })
+      .filter(event => {
+        return event.moment.isAfter(moment().subtract(1, 'day')) &&
+          event.moment.isBefore(moment().add(15, 'day'))
       })
+      .sort((a, b) => {
+        return a.moment.valueOf() - b.moment.valueOf()
+      })
+
+    this.setState({ events })
   }
 
   render () {

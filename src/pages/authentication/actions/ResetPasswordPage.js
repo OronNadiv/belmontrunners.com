@@ -13,6 +13,7 @@ import Button from '@material-ui/core/Button'
 import { ROOT } from '../../../urls'
 import PropTypes from 'prop-types'
 import { INVALID_PASSWORD_LENGTH, MISSING_PASSWORD, RESET_PASSWORD_SUCCESS } from '../../../messages'
+import * as Sentry from '@sentry/browser'
 
 const WEAK_PASSWORD = 'Password is too weak.'
 
@@ -31,6 +32,7 @@ class ResetPasswordPage extends Component {
     if (code === 'auth/weak-password') {
       this.setState({ errorMessage: WEAK_PASSWORD })
     } else {
+      Sentry.captureException(error)
       console.error('confirmPasswordReset',
         'code:', code,
         'message:', message)
@@ -38,7 +40,7 @@ class ResetPasswordPage extends Component {
     }
   }
 
-  confirmPasswordReset () {
+  async confirmPasswordReset () {
     const { newPassword } = this.state
     if (!newPassword) {
       this.setState({ error: { message: MISSING_PASSWORD } })
@@ -52,23 +54,16 @@ class ResetPasswordPage extends Component {
 
     this.setState({ isRequesting: true })
     try {
-      firebase.auth().confirmPasswordReset(oobCode, newPassword)
-        .then(() => {
-          this.setState({
-            isSuccess: true,
-            error: null,
-            errorMessage: null
-          })
-        })
-        .catch((error) => {
-          console.log('in catch', error)
-          this.processError(error)
-        })
-        .finally(() => {
-          this.setState({ isRequesting: false })
-        })
+      await firebase.auth().confirmPasswordReset(oobCode, newPassword)
+      this.setState({
+        isSuccess: true,
+        error: null,
+        errorMessage: null
+      })
     } catch (error) {
       this.processError(error)
+    } finally {
+      this.setState({ isRequesting: false })
     }
   }
 

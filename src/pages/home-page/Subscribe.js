@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import rp from 'request-promise'
 import isEmail from 'isemail'
+import * as Sentry from '@sentry/browser'
 
 class Footer extends Component {
   constructor () {
@@ -14,7 +15,7 @@ class Footer extends Component {
     }
   }
 
-  subscribe (e) {
+  async subscribe (e) {
     e.preventDefault()
     if (this.state.isSubmitting) {
       return
@@ -39,43 +40,42 @@ class Footer extends Component {
       message: 'Submitting...',
       messageLevel: 'alert-info'
     })
-    rp({
-      method: 'POST',
-      uri: 'https://c0belq1th0.execute-api.us-west-1.amazonaws.com/default/contact',
-      body: {
-        name: this.state.email,
-        email: this.state.email,
-        subject: 'Subscription request',
-        comments: `Please subscribe me to the weekly emails from the Belmont Runners club.
+    try {
+      await rp({
+        method: 'POST',
+        uri: 'https://c0belq1th0.execute-api.us-west-1.amazonaws.com/default/contact',
+        body: {
+          name: this.state.email,
+          email: this.state.email,
+          subject: 'Subscription request',
+          comments: `Please subscribe me to the weekly emails from the Belmont Runners club.
 My email address is: ${this.state.email}`
-      },
-      json: true
-    })
-      .then(() => {
-        this.setState({
-          email: '',
-          message: 'Subscription complete successfully.',
-          messageLevel: 'alert-success'
-        })
-        setTimeout(() => {
-          this.setState({
-            message: '',
-            messageLevel: ''
-          })
-        }, 5000)
+        },
+        json: true
       })
-      .catch((response) => {
-        console.error('error response:', response)
-        this.setState({
-          message: 'Oops, something went wrong.  Please try again later.',
-          messageLevel: 'alert-danger'
-        })
+      this.setState({
+        email: '',
+        message: 'Subscription complete successfully.',
+        messageLevel: 'alert-success'
       })
-      .finally(() => {
+      setTimeout(() => {
         this.setState({
-          isSubmitting: false
+          message: '',
+          messageLevel: ''
         })
+      }, 5000)
+    } catch (error) {
+      Sentry.captureException(error)
+      console.error('error response:', error)
+      this.setState({
+        message: 'Oops, something went wrong.  Please try again later.',
+        messageLevel: 'alert-danger'
       })
+    } finally {
+      this.setState({
+        isSubmitting: false
+      })
+    }
   }
 
   render () {

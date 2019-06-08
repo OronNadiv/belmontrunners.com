@@ -16,6 +16,7 @@ import DialogContent from '@material-ui/core/DialogContent'
 import DialogContentText from '@material-ui/core/DialogContentText'
 import DialogActions from '@material-ui/core/DialogActions'
 import Button from '@material-ui/core/Button'
+import * as Sentry from '@sentry/browser'
 
 class RecoverEmailPage extends Component {
   constructor (props) {
@@ -48,6 +49,7 @@ class RecoverEmailPage extends Component {
         })
         return
       default:
+        Sentry.captureException(error)
         console.error('RecoverEmailPage',
           'code:', code,
           'message:', message)
@@ -55,40 +57,36 @@ class RecoverEmailPage extends Component {
     }
   }
 
-  componentDidMount () {
+  async componentDidMount () {
     // Get the restored email address.
     const oobCode = this.props.location.state.query.oobCode
     const restoredEmail = this.props.location.state.info.data.email
 
+    console.log('calling applyActionCode')
     try {
-      console.log('calling applyActionCode')
-      return firebase.auth()
+      await firebase.auth()
         .applyActionCode(oobCode)
-        .then(() => {
-          console.log('calling sendPasswordResetEmail')
-          return firebase.auth()
-            .sendPasswordResetEmail(restoredEmail)
-            .then(() => {
-              this.setState({
-                successMessage:
-                  <div className='text-success text-center '>
-                    Your email ({restoredEmail}) has been successfully recovered.<br />
-                    A password reset confirmation email has been sent to your email.
-                    Please follow the instructions in the email to reset your password.
-                  </div>,
-                errorMessage: ''
-              })
-            }).catch((error) => {
-              const { code, message } = error
-              console.error('RecoverEmailPage',
-                'code:', code,
-                'message:', message)
-              this.setState({ errorMessage: message })
-            })
+      console.log('calling sendPasswordResetEmail')
+      try {
+        await firebase.auth()
+          .sendPasswordResetEmail(restoredEmail)
+        this.setState({
+          successMessage:
+            <div className='text-success text-center '>
+              Your email ({restoredEmail}) has been successfully recovered.<br />
+              A password reset confirmation email has been sent to your email.
+              Please follow the instructions in the email to reset your password.
+            </div>,
+          errorMessage: ''
         })
-        .catch((error) => {
-          this.processError(error)
-        })
+      } catch (error) {
+        const { code, message } = error
+        Sentry.captureException(error)
+        console.error('RecoverEmailPage',
+          'code:', code,
+          'message:', message)
+        this.setState({ errorMessage: message })
+      }
     } catch (error) {
       this.processError(error)
     }

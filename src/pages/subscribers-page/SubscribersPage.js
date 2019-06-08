@@ -24,6 +24,7 @@ import moment from 'moment'
 import { fromJS, List as IList } from 'immutable'
 import { ROOT } from '../../urls'
 import { Redirect } from 'react-router-dom'
+import * as Sentry from '@sentry/browser'
 
 const ARRAY_KEY = 'values'
 
@@ -53,68 +54,70 @@ class SubscribersPage extends Component {
     this.setState({ copyToClipboard })
   }
 
-  componentDidMount () {
+  async componentDidMount () {
     console.log('SubscribersPage.componentDidMount called')
 
-    Promise
-      .props({
-        usersCollection: firebase.firestore().collection('users').get(),
-        subscriptionsDoc: this.docRef.get()
-      })
-      .then(({ usersCollection, subscriptionsDoc }) => {
-        let data = subscriptionsDoc.data()
+    try {
+      const { usersCollection, subscriptionsDoc } = await Promise
+        .props({
+          usersCollection: firebase.firestore().collection('users').get(),
+          subscriptionsDoc: this.docRef.get()
+        })
+      let data = subscriptionsDoc.data()
 
-        if (!data || !data[ARRAY_KEY]) {
-          data = { [ARRAY_KEY]: [] }
+      if (!data || !data[ARRAY_KEY]) {
+        data = { [ARRAY_KEY]: [] }
+      }
+      const subs = data[ARRAY_KEY]
+
+      const users = []
+      usersCollection.forEach(user => {
+        const data = user.data()
+        data.uid = user.id
+        users.push(data)
+      })
+      console.log('user:', users)
+      users.forEach((user) => {
+        const foundSub = subs.find((sub) => {
+          return sub.uid === user.uid
+        })
+        if (foundSub) {
+          foundSub.displayName = user.displayName
+          foundSub.email = user.email
         }
-        const subs = data[ARRAY_KEY]
-
-        const users = []
-        usersCollection.forEach(user => {
-          const data = user.data()
-          data.uid = user.id
-          users.push(data)
-        })
-        console.log('user:', users)
-        users.forEach((user) => {
-          const foundSub = subs.find((sub) => {
-            return sub.uid === user.uid
-          })
-          if (foundSub) {
-            foundSub.displayName = user.displayName
-            foundSub.email = user.email
-          }
-        })
-
-        // set user values for existing subs
-        console.log('subs:', subs)
-        subs.forEach((sub) => {
-          const foundUser = users.find((user) => {
-            return normalizeEmail(sub.email) === normalizeEmail(user.email)
-          })
-          if (foundUser) {
-            sub.displayName = foundUser.displayName
-            sub.email = foundUser.email
-            sub.uid = foundUser.uid
-          }
-        })
-
-        users.forEach((user) => {
-          const foundSub = _.findWhere(subs, { uid: user.uid })
-          if (foundSub) {
-            return
-          }
-          let newSub = _.pick(user, 'uid', 'displayName', 'email')
-          newSub.isActive = true
-          subs.push(newSub)
-        })
-
-        const active = fromJS(subs.filter((item) => item.isActive))
-        const inactive = fromJS(subs.filter((item) => !item.isActive))
-
-        this.setState({ active, inactive })
       })
-      .catch(console.error)
+
+      // set user values for existing subs
+      console.log('subs:', subs)
+      subs.forEach((sub) => {
+        const foundUser = users.find((user) => {
+          return normalizeEmail(sub.email) === normalizeEmail(user.email)
+        })
+        if (foundUser) {
+          sub.displayName = foundUser.displayName
+          sub.email = foundUser.email
+          sub.uid = foundUser.uid
+        }
+      })
+
+      users.forEach((user) => {
+        const foundSub = _.findWhere(subs, { uid: user.uid })
+        if (foundSub) {
+          return
+        }
+        let newSub = _.pick(user, 'uid', 'displayName', 'email')
+        newSub.isActive = true
+        subs.push(newSub)
+      })
+
+      const active = fromJS(subs.filter((item) => item.isActive))
+      const inactive = fromJS(subs.filter((item) => !item.isActive))
+
+      this.setState({ active, inactive })
+    } catch (error) {
+      Sentry.captureException(error)
+      console.error(error)
+    }
   }
 
   componentDidUpdate (prevProps, prevState, snapshot) {
@@ -126,18 +129,20 @@ class SubscribersPage extends Component {
     }
   }
 
-  saveChanges () {
+  async saveChanges () {
     const { active, inactive } = this.state
 
     console.log('active size:', active.size)
     console.log('inactive size:', inactive.size)
 
     const values = active.concat(inactive).toJS()
-    this.docRef
-      .set({ [ARRAY_KEY]: values })
-      .then(() => {
-        console.log('saved')
-      })
+    try {
+      await this.docRef.set({ [ARRAY_KEY]: values })
+      console.log('saved')
+    } catch (error) {
+      Sentry.captureException(error)
+      console.error(error)
+    }
   }
 
 

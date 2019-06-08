@@ -44,6 +44,7 @@ import IconButton from '@material-ui/core/IconButton'
 import InputBase from '@material-ui/core/InputBase'
 import SearchIcon from '@material-ui/icons/Search'
 import FuzzySearch from 'fuzzy-search'
+import * as Sentry from '@sentry/browser'
 
 const ADDRESS = 'address'
 const PNF = googleLibPhoneNumber.PhoneNumberFormat
@@ -158,7 +159,7 @@ const headRows = [
 ]
 
 function getColor (membershipExpires) {
-  if (moment(membershipExpires, MEMBERSHIP_EXPIRES_AT_FORMAT).isBefore(moment())) {
+  if (membershipExpires && moment(membershipExpires, MEMBERSHIP_EXPIRES_AT_FORMAT).isBefore(moment())) {
     return 'red'
   }
   return 'initial'
@@ -182,37 +183,34 @@ class EnhancedTable extends Component {
     this.handleRequestSort = this.handleRequestSort.bind(this)
   }
 
-  loadMembers () {
+  async loadMembers () {
     console.log('in loadMembers.')
 
     const usersRef = firebase.firestore().collection('users')
-    return usersRef.get()
-      .then((doc) => {
-          let rows = []
-          doc.forEach((doc) => {
-            let data
-            try {
-              console.log(doc)
-              data = doc.data()
-              data[UID] = doc.id
-              data[ADDRESS] = [data[ADDRESS1], data[ADDRESS2], data[CITY], data[STATE], data[ZIP]].join(' ').trim()
-              if (data[PHONE]) {
-                const number = phoneUtil.parseAndKeepRawInput(data[PHONE], 'US')
-                data[PHONE] = phoneUtil.format(number, PNF.NATIONAL)
-              }
-              data[DATE_OF_BIRTH] = data[DATE_OF_BIRTH] ? moment(data[DATE_OF_BIRTH]).format(DATE_OF_BIRTH_FORMAT) : ''
-              data[MEMBERSHIP_EXPIRES_AT] = data[MEMBERSHIP_EXPIRES_AT] ? moment(data[MEMBERSHIP_EXPIRES_AT]).format(MEMBERSHIP_EXPIRES_AT_FORMAT) : ''
-              data[DID_RECEIVED_SHIRT] = !!data[DID_RECEIVED_SHIRT]
-              rows.push(data)
-            } catch (err) {
-              console.error('ERROR PROCESSING USER.',
-                'data:', data,
-                'err:', err)
-            }
-          })
-          this.setState({ rows })
+    const doc = await usersRef.get()
+    // exception will be handled by ErrorBoundary
+    let rows = []
+    doc.forEach((doc) => {
+      let data
+      try {
+        data = doc.data()
+        data[UID] = doc.id
+        data[ADDRESS] = [data[ADDRESS1], data[ADDRESS2], data[CITY], data[STATE], data[ZIP]].join(' ').trim()
+        if (data[PHONE]) {
+          const number = phoneUtil.parseAndKeepRawInput(data[PHONE], 'US')
+          data[PHONE] = phoneUtil.format(number, PNF.NATIONAL)
         }
-      )
+        data[DATE_OF_BIRTH] = data[DATE_OF_BIRTH] ? moment(data[DATE_OF_BIRTH]).format(DATE_OF_BIRTH_FORMAT) : ''
+        data[MEMBERSHIP_EXPIRES_AT] = data[MEMBERSHIP_EXPIRES_AT] ? moment(data[MEMBERSHIP_EXPIRES_AT]).format(MEMBERSHIP_EXPIRES_AT_FORMAT) : ''
+        data[DID_RECEIVED_SHIRT] = !!data[DID_RECEIVED_SHIRT]
+        rows.push(data)
+      } catch (err) {
+        console.error('ERROR PROCESSING USER.',
+          'data:', data,
+          'err:', err)
+      }
+    })
+    this.setState({ rows })
   }
 
   componentDidMount () {
@@ -354,17 +352,20 @@ class EnhancedTable extends Component {
                             <Checkbox
                               checked={row[DID_RECEIVED_SHIRT]}
                               disabled={!allowWrite}
-                              onChange={(event, checked) => {
+                              onChange={async (event, checked) => {
                                 const index = rows.indexOf(row)
                                 rows[index][DID_RECEIVED_SHIRT] = checked
                                 console.log('val', checked, index, row)
 
                                 const userRef = firebase.firestore().doc(`users/${row[UID]}`)
-                                userRef.set({ [DID_RECEIVED_SHIRT]: checked }, { merge: true })
-                                  .then(() => {
-                                    this.setState({ rows })
-                                    console.log('val', checked, index, row)
-                                  })
+                                try {
+                                  await userRef.set({ [DID_RECEIVED_SHIRT]: checked }, { merge: true })
+                                  this.setState({ rows })
+                                  console.log('val', checked, index, row)
+                                } catch (error) {
+                                  Sentry.captureException(error)
+                                  console.log(error)
+                                }
                               }}
                             />
                           </TableCell>
