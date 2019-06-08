@@ -209,6 +209,7 @@ class EnhancedTable extends Component {
           const number = phoneUtil.parseAndKeepRawInput(data[PHONE], 'US')
           data[PHONE] = phoneUtil.format(number, PNF.NATIONAL)
         }
+        console.log(doc.id, data[DATE_OF_BIRTH])
         data[DATE_OF_BIRTH] = data[DATE_OF_BIRTH] ? moment(data[DATE_OF_BIRTH]).format(DATE_OF_BIRTH_FORMAT) : ''
         data[MEMBERSHIP_EXPIRES_AT] = data[MEMBERSHIP_EXPIRES_AT] ? moment(data[MEMBERSHIP_EXPIRES_AT]).format(MEMBERSHIP_EXPIRES_AT_FORMAT) : ''
         data[DID_RECEIVED_SHIRT] = !!data[DID_RECEIVED_SHIRT]

@@ -146,6 +146,16 @@ class SignUpStepUserProfile extends Component {
                 type='date'
                 component={TextField}
                 validate={composeValidators(required, birthday)}
+                parse={value => { // to json
+                  const res = moment(value).format("YYYY-MM-DD")
+                  console.log('parse', value, res)
+                  return res
+                }}
+                format={value => { // to field
+                  const res = moment(value).format("YYYY-MM-DD")
+                  console.log('format', value, res)
+                  return res
+                }}
                 InputLabelProps={{
                   shrink: true
                 }}
@@ -186,8 +196,6 @@ class SignUpStepUserProfile extends Component {
                   name={SHIRT_GENDER}
                   component={Select}
                   validate={required}
-                  parse={value => moment(value).format()} // to json
-                  format={value => moment(value).toDate()} // to field
                   label='Shirt gender'
                   // margin='normal'
                   width='auto'
