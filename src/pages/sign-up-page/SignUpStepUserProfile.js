@@ -186,6 +186,8 @@ class SignUpStepUserProfile extends Component {
                   name={SHIRT_GENDER}
                   component={Select}
                   validate={required}
+                  parse={value => moment(value).format()} // to json
+                  format={value => moment(value).toDate()} // to field
                   label='Shirt gender'
                   // margin='normal'
                   width='auto'
