@@ -12,6 +12,7 @@ import Toolbar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
 import Paper from '@material-ui/core/Paper'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
+import SaveIcon from '@material-ui/icons/SaveAlt'
 import Switch from '@material-ui/core/Switch'
 import { connect } from 'react-redux'
 import moment from 'moment'
@@ -45,6 +46,7 @@ import InputBase from '@material-ui/core/InputBase'
 import SearchIcon from '@material-ui/icons/Search'
 import FuzzySearch from 'fuzzy-search'
 import * as Sentry from '@sentry/browser'
+import { ExportToCsv } from 'export-to-csv'
 
 const ADDRESS = 'address'
 const PNF = googleLibPhoneNumber.PhoneNumberFormat
@@ -128,22 +130,29 @@ EnhancedTableHead.propTypes = {
 
 class EnhancedTableToolbar extends Component {
   render () {
-    const classes = {}
-
+    const { onExport } = this.props
     return (
-      <Toolbar>
-        <div className={classes.title}>
+      <Toolbar className='d-flex justify-content-between '>
+        <div>
           <Typography variant="h6" id="tableTitle">
             Users
           </Typography>
         </div>
-        <div className={classes.spacer} />
+        {
+          onExport && <IconButton aria-label="Export" onClick={() => {
+            onExport()
+          }}>
+            <SaveIcon />
+          </IconButton>
+        }
       </Toolbar>
     )
   }
 }
 
-EnhancedTableToolbar.propTypes = {}
+EnhancedTableToolbar.propTypes = {
+  onExport: PropTypes.func
+}
 
 const headRows = [
   { id: DISPLAY_NAME, numeric: false, disablePadding: false, label: 'Name' },
@@ -248,6 +257,21 @@ class EnhancedTable extends Component {
     this.setState({ dense: event.target.checked })
   }
 
+  handleExport () {
+    const options = {
+      fieldSeparator: ',',
+      quoteStrings: '"',
+      decimalSeparator: '.',
+      showLabels: true,
+      useBom: true,
+      useKeysAsHeaders: true,
+      filename: 'users-' + moment().format()
+    }
+
+    const csvExporter = new ExportToCsv(options)
+    csvExporter.generateCsv(this.state.rows)
+  }
+
   render () {
     const { currentUser, allowRead, allowWrite, allowDelete } = this.props
     console.log('render called.',
@@ -315,7 +339,7 @@ class EnhancedTable extends Component {
         </div>
         <div className='row mx-1'>
           <Paper className=''>
-            <EnhancedTableToolbar />
+            <EnhancedTableToolbar onExport={() => this.handleExport()} />
             <div className={{ overflowX: 'auto' }}>
               <Table
                 aria-labelledby="tableTitle"
