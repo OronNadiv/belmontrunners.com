@@ -7,7 +7,8 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import Profile from './Profile'
 import Button from '@material-ui/core/Button'
-import { FORGOT_PASSWORD, JOIN, RESET_PASSWORD, ROOT, SIGN_IN, USERS } from '../urls'
+import { FORGOT_PASSWORD, JOIN, RESET_PASSWORD, ROOT, SIGN_IN } from '../urls'
+import { STEP_USER_DETAILS } from '../pages/sign-up-page/SignUpStepper'
 
 class HeaderArea extends Component {
 
@@ -93,10 +94,15 @@ class HeaderArea extends Component {
                 <ul className='nav navbar-nav menu_nav ml-auto'>
                   <li className='nav-item'>
                     {
-                      allowUsersPage &&
-                      <Link to={USERS} className='nav-link'>
-                        Users
+                      isSignedIn &&
+                      <Link className='nav-link'
+                            to={{
+                              pathname: JOIN,
+                              state: { steps: [STEP_USER_DETAILS] }
+                            }}>
+                        My profile
                       </Link>
+
                     }
                     {
                       isSignedIn &&
