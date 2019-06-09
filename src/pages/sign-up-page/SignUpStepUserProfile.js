@@ -22,6 +22,7 @@ import {
 import { updateUserData as updateUserDataAction } from '../../reducers/currentUser'
 import { DatePicker, MuiPickersUtilsProvider } from "material-ui-pickers"
 import MomentUtils from '@date-io/moment'
+import _ from 'underscore'
 
 const states = require('./states_titlecase.json')
 const required = value => (value ? undefined : 'Required')
@@ -60,11 +61,12 @@ class SignUpStepUserProfile extends Component {
   render () {
     const { isLast, userData, isCurrentUserLoaded, userDataUpdating } = this.props
 
+    const initialValues = _.pick(userData, ADDRESS1, ADDRESS2, CITY, DATE_OF_BIRTH, GENDER, PHONE, SHIRT_GENDER, SHIRT_SIZE, STATE, ZIP)
     return !isCurrentUserLoaded ?
-      <div className="loading" /> :
+      '' :
       <Form
         onSubmit={(values) => this.handleSubmit(values)}
-        initialValues={userData}
+        initialValues={initialValues}
         render={({ handleSubmit, form, values }) => (
           <form onSubmit={handleSubmit} className='container-fluid'>
 

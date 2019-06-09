@@ -21,11 +21,13 @@ import {
   ADDRESS1,
   ADDRESS2,
   CITY,
+  CREATED_AT,
   DATE_OF_BIRTH,
   DID_RECEIVED_SHIRT,
   DISPLAY_NAME,
   EMAIL,
   GENDER,
+  LAST_SIGNED_IN_AT,
   MEMBERSHIP_EXPIRES_AT,
   PHONE,
   SHIRT_GENDER,
@@ -51,13 +53,17 @@ import { ExportToCsv } from 'export-to-csv'
 const ADDRESS = 'address'
 const PNF = googleLibPhoneNumber.PhoneNumberFormat
 const phoneUtil = googleLibPhoneNumber.PhoneNumberUtil.getInstance()
-const DATE_OF_BIRTH_FORMAT = 'MMMM D'
-const MEMBERSHIP_EXPIRES_AT_FORMAT = 'LLLL'
+const DATE_OF_BIRTH_FORMAT = 'MM/DD'
+const MEMBERSHIP_EXPIRES_AT_FORMAT = 'YYYY-MM-DD HH:mm'
 
 const SHIRT_SIZES_ORDER = ['XXXS', 'XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL']
 
 function desc (rowA, rowB, columnName) {
   switch (columnName) {
+    case CREATED_AT:
+      return moment(rowB[columnName] || moment(0), MEMBERSHIP_EXPIRES_AT_FORMAT).diff(moment(rowA[columnName] || moment(0), MEMBERSHIP_EXPIRES_AT_FORMAT))
+    case LAST_SIGNED_IN_AT:
+      return moment(rowB[columnName] || moment(0), MEMBERSHIP_EXPIRES_AT_FORMAT).diff(moment(rowA[columnName] || moment(0), MEMBERSHIP_EXPIRES_AT_FORMAT))
     case MEMBERSHIP_EXPIRES_AT:
       return moment(rowB[columnName] || moment(0), MEMBERSHIP_EXPIRES_AT_FORMAT).diff(moment(rowA[columnName] || moment(0), MEMBERSHIP_EXPIRES_AT_FORMAT))
     case DATE_OF_BIRTH:
@@ -163,6 +169,8 @@ const headRows = [
   { id: GENDER, numeric: false, disablePadding: false, label: 'Gender' },
   { id: SHIRT_GENDER, numeric: false, disablePadding: false, label: 'Shirt Gender' },
   { id: SHIRT_SIZE, numeric: false, disablePadding: false, label: 'Shirt Size' },
+  { id: CREATED_AT, numeric: false, disablePadding: false, label: 'Account Creation' },
+  { id: LAST_SIGNED_IN_AT, numeric: false, disablePadding: false, label: 'Last Signed In' },
   { id: MEMBERSHIP_EXPIRES_AT, numeric: false, disablePadding: false, label: 'Membership Expires' },
   { id: DID_RECEIVED_SHIRT, numeric: false, disablePadding: false, label: 'Received Shirt' }
 ]
@@ -211,6 +219,8 @@ class EnhancedTable extends Component {
         }
         console.log(doc.id, data[DATE_OF_BIRTH])
         data[DATE_OF_BIRTH] = data[DATE_OF_BIRTH] ? moment(data[DATE_OF_BIRTH]).format(DATE_OF_BIRTH_FORMAT) : ''
+        data[LAST_SIGNED_IN_AT] = moment(data[LAST_SIGNED_IN_AT]).format(MEMBERSHIP_EXPIRES_AT_FORMAT)
+        data[CREATED_AT] = moment(data[CREATED_AT]).format(MEMBERSHIP_EXPIRES_AT_FORMAT)
         data[MEMBERSHIP_EXPIRES_AT] = data[MEMBERSHIP_EXPIRES_AT] ? moment(data[MEMBERSHIP_EXPIRES_AT]).format(MEMBERSHIP_EXPIRES_AT_FORMAT) : ''
         data[DID_RECEIVED_SHIRT] = !!data[DID_RECEIVED_SHIRT]
         rows.push(data)
@@ -371,6 +381,8 @@ class EnhancedTable extends Component {
                           <TableCell>{row[GENDER]}</TableCell>
                           <TableCell>{row[SHIRT_GENDER]}</TableCell>
                           <TableCell>{row[SHIRT_SIZE]}</TableCell>
+                          <TableCell>{row[CREATED_AT]}</TableCell>
+                          <TableCell>{row[LAST_SIGNED_IN_AT]}</TableCell>
                           <TableCell style={{ color: getColor(row[MEMBERSHIP_EXPIRES_AT]) }}
                           >{row[MEMBERSHIP_EXPIRES_AT]}</TableCell>
                           <TableCell>

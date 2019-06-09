@@ -1,6 +1,7 @@
 import firebase from 'firebase'
 import Promise from 'bluebird'
 import * as Sentry from '@sentry/browser'
+import moment from 'moment'
 
 const PREFIX = 'CURRENT_USER'
 
@@ -74,6 +75,10 @@ export const fetchCurrentUser = () => {
                 userData
               }
             })
+            const { metadata: { creationTime, lastSignInTime } } = firebase.auth().currentUser
+            const createdAt = moment(creationTime).utc().format()
+            const lastSignedInAt = moment(lastSignInTime).utc().format()
+            updateUserData({ createdAt, lastSignedInAt }, { merge: true })(dispatch, getState)
           } catch (error) {
             Sentry.captureException(error)
             console.error(error)
