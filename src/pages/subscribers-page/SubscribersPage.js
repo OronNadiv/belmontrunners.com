@@ -25,6 +25,7 @@ import { fromJS, List as IList } from 'immutable'
 import { ROOT } from '../../urls'
 import { Redirect } from 'react-router-dom'
 import * as Sentry from '@sentry/browser'
+import CloseIcon from '@material-ui/icons/Close'
 
 const ARRAY_KEY = 'values'
 
@@ -256,6 +257,11 @@ class SubscribersPage extends Component {
           autoHideDuration={6000}
           onClose={() => this.setState({ copied: false })}
           message={<span id="message-id">Copied to clipboard</span>}
+          action={[
+            <IconButton key="close" aria-label="Close" color="inherit" onClick={() => this.setState({ copied: false })}>
+              <CloseIcon />
+            </IconButton>
+          ]}
         />
 
         <div className='d-flex justify-content-center row'>
