@@ -20,6 +20,8 @@ import {
   ZIP
 } from '../../fields'
 import { updateUserData as updateUserDataAction } from '../../reducers/currentUser'
+import { DatePicker, MuiPickersUtilsProvider } from "material-ui-pickers"
+import MomentUtils from '@date-io/moment'
 
 const states = require('./states_titlecase.json')
 const required = value => (value ? undefined : 'Required')
@@ -144,15 +146,22 @@ class SignUpStepUserProfile extends Component {
                 margin='normal'
                 name={DATE_OF_BIRTH}
                 type='date'
-                component={TextField}
+                component={DatePickerWrapper}
+                disableFuture
+                openTo="year"
+                views={['year', 'month', 'day']}
                 validate={composeValidators(required, birthday)}
+                emptyLabel={''}
                 parse={value => { // to json
-                  const res = moment(value).format("YYYY-MM-DD")
+                  const res = value.format("YYYY-MM-DD")
                   console.log('parse', value, res)
                   return res
                 }}
                 format={value => { // to field
-                  const res = moment(value).format("YYYY-MM-DD")
+                  if (!value) {
+                    return null
+                  }
+                  const res = moment(value, "YYYY-MM-DD")
                   console.log('format', value, res)
                   return res
                 }}
@@ -227,6 +236,37 @@ class SignUpStepUserProfile extends Component {
         )}
       />
   }
+}
+
+function DatePickerWrapper (props) {
+  const {
+    input: { name, onChange, value, ...restInput },
+    meta,
+    ...rest
+  } = props
+  const showError =
+    ((meta.submitError && !meta.dirtySinceLastSubmit) || meta.error) &&
+    meta.touched
+
+  return (
+    <MuiPickersUtilsProvider utils={MomentUtils}>
+      <DatePicker
+        {...rest}
+        name={name}
+        format={'LL'}
+        helperText={showError ? meta.error || meta.submitError : undefined}
+        error={showError}
+        inputProps={restInput}
+        onChange={onChange}
+        value={value === '' ? null : value}
+      />
+    </MuiPickersUtilsProvider>
+  )
+}
+
+DatePickerWrapper.propTypes = {
+  input: PropTypes.object,
+  meta: PropTypes.object
 }
 
 SignUpStepUserProfile.propTypes = {
