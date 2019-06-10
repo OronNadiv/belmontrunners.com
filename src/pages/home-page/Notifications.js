@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import Button from '@material-ui/core/Button/index'
-import Snackbar from '@material-ui/core/Snackbar/index'
+import Button from '@material-ui/core/Button'
+import Snackbar from '@material-ui/core/Snackbar'
 import { Link } from 'react-router-dom'
 import { JOIN } from '../../urls'
 import { STEP_MEMBERSHIP, STEP_USER_DETAILS } from '../sign-up-page/SignUpStepper'

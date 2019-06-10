@@ -2,6 +2,11 @@ import React, { Component } from 'react'
 import rp from 'request-promise'
 import isEmail from 'isemail'
 import * as Sentry from '@sentry/browser'
+import 'firebase/auth'
+import firebase from 'firebase'
+import Snackbar from '@material-ui/core/Snackbar'
+import IconButton from '@material-ui/core/IconButton'
+import CloseIcon from '@material-ui/icons/Close'
 
 class Footer extends Component {
   constructor () {
@@ -15,8 +20,27 @@ class Footer extends Component {
     }
   }
 
+  componentDidMount () {
+    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(this.recaptcha, {
+      size: 'invisible',
+      callback: (response) => {
+        console.log('captcha succeeded.', response)
+        this.notRobot = true
+        window.recaptchaVerifier.clear()
+        this.subscribe()
+      },
+      'expired-callback': () => {
+        console.log('captcha failed.')
+        this.setState({ captchaFailed: true })
+      }
+    })
+    window.recaptchaVerifier.render().then((widgetId) => {
+      window.recaptchaWidgetId = widgetId
+    })
+  }
+
   async subscribe (e) {
-    e.preventDefault()
+    e && e.preventDefault()
     if (this.state.isSubmitting) {
       return
     }
@@ -90,9 +114,7 @@ My email address is: ${this.state.email}`
               <div className='single-footer-widget'>
                 <p className='text-center'>Get updates about runs, walks and other events.</p>
                 <div id='mc_embed_signup'>
-                  <form target='_blank'
-                        action='https://spondonit.us12.list-manage.com/subscribe/post?u=1462626880ade1ac87bd9c93a&amp;id=92a4423d01'
-                        method='get' className='subscribe_form relative'>
+                  <div className='subscribe_form relative'>
                     <div className='input-group d-flex flex-row'>
                       <input name='EMAIL' placeholder={this.state.placeholder}
                              onFocus={() => this.setState({ placeholder: '' })}
@@ -103,16 +125,47 @@ My email address is: ${this.state.email}`
 
                       </input>
                       <button className='btn sub-btn' disabled={this.state.isSubmitting}
-                              onClick={(e) => this.subscribe(e)}>Subscribe
+                              ref={(ref) => this.recaptcha = ref}
+                              onClick={(e) => this.notRobot && this.subscribe(e)}>
+                        Subscribe
                       </button>
                     </div>
                     <div role='alert' className={'mt-10 alert ' + this.state.messageLevel}>{this.state.message}</div>
-                  </form>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+        {
+          this.state.captchaFailed &&
+          <Snackbar
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'center'
+            }}
+            open
+            autoHideDuration={6000}
+            onClose={() => {
+              console.log('onClose')
+              this.setState({ captchaFailed: false })
+            }}
+            message={"Submission failed."}
+            action={[
+              <IconButton
+                key="close"
+                aria-label="Close"
+                color="inherit"
+                onClick={() => {
+                  console.log('onClick')
+                  this.setState({ captchaFailed: false })
+                }}
+              >
+                <CloseIcon />
+              </IconButton>
+            ]}
+          />
+        }
       </section>
     )
   }
