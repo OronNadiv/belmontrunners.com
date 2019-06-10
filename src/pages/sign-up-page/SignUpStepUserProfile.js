@@ -38,6 +38,7 @@ const composeValidators = (...validators) => value =>
 
 class SignUpStepUserProfile extends Component {
   handleSubmit (values) {
+    this.submitting = true
     const { updateUserData } = this.props
     console.log('submitting values:', JSON.stringify(values, 0, 2))
     return updateUserData(values, { merge: true })
@@ -48,7 +49,8 @@ class SignUpStepUserProfile extends Component {
   }
 
   componentDidUpdate (prevProps, prevState, snapshot) {
-    if (prevProps.userDataUpdating && !this.props.userDataUpdating) {
+    if (prevProps.userDataUpdating && !this.props.userDataUpdating && this.submitting) {
+      this.submitting = false
       if (!this.props.userDataUpdateError) {
         const { onNextClicked } = this.props
         onNextClicked()

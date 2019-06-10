@@ -162,7 +162,9 @@ class SignUpStepPayment extends Component {
             &bull; Adult (18 and over): $25<br />
             &bull; Kids: $15.<br />
 
-            <h4 className='my-4'>Total amount: ${this.props[TOTAL_AMOUNT_IN_DOLLARS] || ''}</h4>
+            <h4 className='my-4'>Total amount:
+              ${this.props[TOTAL_AMOUNT_IN_DOLLARS] > 0 ? this.props[TOTAL_AMOUNT_IN_DOLLARS] : ''}
+            </h4>
             {this.props[MEMBERSHIP_EXPIRES_AT] &&
             <div className='text-warning mb-2 text-center'>
               {
@@ -268,8 +270,8 @@ const mapDispatchToProps = {
 const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, currentUser, userData, userDataUpdating, userDataUpdateError } }) => {
 
   let membershipExpiresAt = null
-  let needToPay
-  let totalAmount = 0
+  let needToPay = false
+  let totalAmount = -1
 
   if (isCurrentUserLoaded && currentUser) {
     const dateOfBirth = moment(userData[DATE_OF_BIRTH])

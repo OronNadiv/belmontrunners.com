@@ -1,14 +1,12 @@
 import 'firebase/auth'
 import firebase from 'firebase'
 import React, { Component } from 'react'
-import TextField from '@material-ui/core/TextField/index'
-import isEmail from 'isemail/lib/index'
+import { TextField } from 'final-form-material-ui'
+import isEmail from 'isemail'
 import {
   EMAIL_ALREADY_IN_USE,
   INVALID_EMAIL,
-  INVALID_FULL_NAME,
   INVALID_PASSWORD_LENGTH,
-  MISSING_PASSWORD,
   POPUP_CLOSED_BEFORE_COMPLETION
 } from '../../messages'
 import * as PropTypes from 'prop-types'
@@ -19,6 +17,13 @@ import LoggedInState from '../../components/LoggedInState'
 import { PRIVACY_POLICY, PRIVACY_POLICY_FILE_NAME, TOS, TOS_FILE_NAME, WAVER, WAVER_FILE_NAME } from '../../urls'
 import moment from 'moment'
 import * as Sentry from '@sentry/browser'
+import { Field, Form } from 'react-final-form'
+import { DISPLAY_NAME, EMAIL, PASSWORD } from '../../fields'
+
+const required = value => (value ? undefined : 'Required')
+const isemail = value => (!value || !isEmail.validate(value) ? INVALID_EMAIL : undefined)
+const minPasswordLength = value => (value.length < 6 ? INVALID_PASSWORD_LENGTH(6) : undefined)
+const composeValidators = (...validators) => value => validators.reduce((error, validator) => error || validator(value), undefined)
 
 class View extends Component {
   constructor (props) {
@@ -27,10 +32,7 @@ class View extends Component {
       fullName: '',
       email: '',
       password: '',
-      invalidFullNameMessage: '',
-      invalidEmailMessage: '',
-      invalidPasswordMessage: '',
-      generalErrorMessage: '',
+      errorMessage: '',
       success: false
     }
   }
@@ -39,41 +41,20 @@ class View extends Component {
     window.scrollTo(0, 0)
   }
 
-  componentDidUpdate (prevProps, prevState) {
-    const {
-      signUpError
-    } = this.state
-    if (signUpError && prevState.signUpError !== signUpError) {
-      const {
-        code,
-        message
-      } = signUpError
-      switch (code) {
-        case 'auth/invalid-email':
-          this.setState({ invalidEmailMessage: INVALID_EMAIL })
-          break
-        case 'auth/email-already-in-use':
-          this.setState({ invalidEmailMessage: EMAIL_ALREADY_IN_USE })
-          break
-        case 'auth/popup-closed-by-user':
-          this.setState({ generalErrorMessage: POPUP_CLOSED_BEFORE_COMPLETION })
-          break
-        default:
-          console.log('signUpError', 'code:', code, 'message:', message)
-          this.setState({ generalErrorMessage: message })
-      }
-    }
+  _resetErrors () {
+    this.setState({
+      errorMessage: ''
+    })
+
   }
 
   async signUp (providerName, fullName, email, password) {
-    console.log('signUp  called')
     const displayName = s(fullName).clean().words().map((w) => s.capitalize(w)).join(" ")
-    console.log('displayName:', displayName)
 
     const { onNextClicked } = this.props
+    this._resetErrors()
     this.setState({
-      isSigningUp: true,
-      signUpError: null
+      isSigningUp: true
     })
     const providerGoogle = new firebase.auth.GoogleAuthProvider()
     const providerFacebook = new firebase.auth.FacebookAuthProvider()
@@ -124,16 +105,9 @@ class View extends Component {
         photoURL
       }
       await currentUserRef.set(values, { merge: true })
-      this.setState({
-        signUpError: null
-      })
       onNextClicked()
     } catch (error) {
-      Sentry.captureException(error)
-      console.error(error)
-      this.setState({
-        signUpError: error
-      })
+      this.handleSignUpError(error)
     } finally {
       this.setState({
         isSigningUp: false
@@ -141,22 +115,31 @@ class View extends Component {
     }
   }
 
-  handleSignUpWithEmail () {
-    this.setState({ generalErrorMessage: '' })
-    const { fullName, email, password } = this.state
+  handleSignUpError (error) {
+    const {
+      code,
+      message
+    } = error
+    switch (code) {
+      case 'auth/invalid-email':
+        this.setState({ errorMessage: INVALID_EMAIL })
+        break
+      case 'auth/email-already-in-use':
+        this.setState({ errorMessage: EMAIL_ALREADY_IN_USE })
+        break
+      case 'auth/popup-closed-by-user':
+        this.setState({ errorMessage: POPUP_CLOSED_BEFORE_COMPLETION })
+        break
+      default:
+        Sentry.captureException(error)
+        console.error('signUpError', error)
+        this.setState({ errorMessage: message })
+    }
+  }
 
-    if (!email || !isEmail.validate(email)) {
-      this.setState({ invalidEmailMessage: INVALID_EMAIL })
-    }
-    if (!fullName) {
-      this.setState({ invalidFullNameMessage: INVALID_FULL_NAME })
-    }
-    if (!password) {
-      this.setState({ invalidPasswordMessage: MISSING_PASSWORD })
-    } else if (password.length < 6) {
-      this.setState({ invalidPasswordMessage: INVALID_PASSWORD_LENGTH(6) })
-    }
-    this.signUp('email', fullName, email, password)
+  handleSignUpWithEmail (values) {
+    console.log('handleSignUpWithEmail called.  Values:', values)
+    this.signUp('email', values[DISPLAY_NAME], values[EMAIL], values[PASSWORD])
   }
 
 
@@ -166,10 +149,7 @@ class View extends Component {
 
   render () {
     const {
-      generalErrorMessage,
-      invalidEmailMessage,
-      invalidFullNameMessage,
-      invalidPasswordMessage,
+      errorMessage,
       isSigningUp
     } = this.state
 
@@ -194,79 +174,73 @@ class View extends Component {
 */}
 
         {
-          generalErrorMessage &&
-          <div className='mt-2 text-danger text-center'>{generalErrorMessage}</div>
+          errorMessage &&
+          <div className='mt-2 text-danger text-center'>{errorMessage}</div>
         }
 
-        <TextField
-          style={{ minHeight: 68 }}
-          label='Your email'
-          type='email'
-          fullWidth
-          margin='normal'
-          onChange={(event) => {
-            this.setState({
-              invalidEmailMessage: '',
-              email: event.target.value
-            })
-          }}
-          error={!!invalidEmailMessage}
-          helperText={invalidEmailMessage}
-        />
+        <Form
+          onSubmit={(values) => this.handleSignUpWithEmail(values)}
+          render={({ handleSubmit, form }) => (
+            <form onSubmit={handleSubmit} className='container-fluid'>
 
-        <TextField
-          style={{ minHeight: 68 }}
-          label='Your full name'
-          margin='normal'
-          fullWidth
-          onChange={(event) => {
-            this.setState({
-              invalidFullNameMessage: '',
-              fullName: event.target.value
-            })
-          }}
-          error={!!invalidFullNameMessage}
-          helperText={invalidFullNameMessage}
-        />
+              <div className='row'>
+                <Field
+                  style={{ minHeight: 68 }}
+                  label='Your email'
+                  type='email'
+                  fullWidth
+                  margin='normal'
+                  name={EMAIL}
+                  component={TextField}
+                  validate={composeValidators(required, isemail)}
+                />
+              </div>
 
-        <TextField
-          style={{ minHeight: 68 }}
-          label='Your password'
-          type='password'
-          margin='normal'
-          fullWidth
-          onChange={(event) => {
-            this.setState({
-              invalidPasswordMessage: '',
-              password: event.target.value
-            })
-          }}
-          error={!!invalidPasswordMessage}
-          helperText={invalidPasswordMessage}
-          onKeyPress={(ev) => {
-            console.log(`Pressed keyCode ${ev.key}`)
-            if (ev.key === 'Enter') {
-              ev.preventDefault()
-              this.handleSignUpWithEmail()
-            }
-          }}
-        />
-        {
-          // todo: add 'confirm password' field
-        }
-        <div className='mt-2 mb-2 text-center'>
-          By clicking “NEXT”, you agree to our <a href={TOS}
-                                                  target='_blank' rel='noopener noreferrer'>terms of service</a>, <a
-          href={PRIVACY_POLICY} target='_blank'
-          rel='noopener noreferrer'>privacy statement</a> and <a
-          href={WAVER} target='_blank'
-          rel='noopener noreferrer'>release of liability</a>. We’ll occasionally send you account related emails.
-        </div>
-        <SignUpStepperButton
-          handlePrimaryClicked={() => this.handleSignUpWithEmail()}
-          primaryText={isLast ? 'Create Account' : 'Next'}
-          showPrimary
-          primaryDisabled={!!isSigningUp}
+              <div className='row'>
+                <Field
+                  style={{ minHeight: 68 }}
+                  label='Your full name'
+                  margin='normal'
+                  fullWidth
+                  name={DISPLAY_NAME}
+                  component={TextField}
+                  validate={required}
+                />
+              </div>
+
+              <div className='row'>
+                <Field
+                  style={{ minHeight: 68 }}
+                  label='Your password'
+                  type='password'
+                  margin='normal'
+                  fullWidth
+                  name={PASSWORD}
+                  component={TextField}
+                  validate={composeValidators(required, minPasswordLength)}
+                />
+              </div>
+
+              {
+                // todo: add 'confirm password' field
+              }
+              <div className='mt-2 mb-2 text-center'>
+                By clicking “NEXT”, you agree to our <a href={TOS}
+                                                        target='_blank' rel='noopener noreferrer'>terms of
+                service</a>, <a
+                href={PRIVACY_POLICY} target='_blank'
+                rel='noopener noreferrer'>privacy statement</a> and <a
+                href={WAVER} target='_blank'
+                rel='noopener noreferrer'>release of liability</a>. We’ll occasionally send you account related emails.
+              </div>
+              <SignUpStepperButton
+                handlePrimaryClicked={() => form.submit()}
+                primaryText={isLast ? 'Create Account' : 'Next'}
+                showPrimary
+                primaryDisabled={!!isSigningUp}
+              />
+            </form>
+          )}
         />
       </div>
     )

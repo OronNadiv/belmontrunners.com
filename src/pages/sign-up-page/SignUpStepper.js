@@ -21,7 +21,6 @@ class SignUpStepper extends Component {
     super(props)
     const steps = this.props.steps || [STEP_AUTHENTICATION, STEP_USER_DETAILS, STEP_MEMBERSHIP]
 
-    this.state = {}
     this.state = {
       activeStep: 0,
       steps
