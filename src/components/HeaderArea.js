@@ -70,11 +70,10 @@ class HeaderArea extends Component {
   }
 
   render () {
-    const { isCurrentUserLoaded, currentUser, allowUsersPage } = this.props
+    const { isCurrentUserLoaded, currentUser } = this.props
     let totalNavItems = 0
-    allowUsersPage && (totalNavItems += 1)
     const isSignedOut = isCurrentUserLoaded && !currentUser && (totalNavItems += 2)
-    const isSignedIn = isCurrentUserLoaded && currentUser && (totalNavItems += 1)
+    const isSignedIn = isCurrentUserLoaded && currentUser && (totalNavItems += 2)
 
     return (
       <header className='header_area'>
@@ -203,7 +202,6 @@ class HeaderArea extends Component {
 }
 
 HeaderArea.propTypes = {
-  allowUsersPage: PropTypes.bool.isRequired,
   isCurrentUserLoaded: PropTypes.bool.isRequired,
   currentUser: PropTypes.object,
   location: PropTypes.shape({
@@ -213,9 +211,6 @@ HeaderArea.propTypes = {
 
 const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, currentUser, permissions } }) => {
   return {
-    allowUsersPage: !!currentUser && (
-      !!permissions.usersRead[currentUser.uid] ||
-      !!permissions.usersWrite[currentUser.uid]),
     isCurrentUserLoaded,
     currentUser
   }
