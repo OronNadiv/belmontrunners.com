@@ -1,7 +1,6 @@
 // import 'firebase/auth'
 import firebase from 'firebase'
 import React, { Component } from 'react'
-import '../../sign-in-page/Signin.scss'
 import { Redirect, withRouter } from 'react-router-dom'
 import Dialog from '@material-ui/core/Dialog'
 import DialogContent from '@material-ui/core/DialogContent'

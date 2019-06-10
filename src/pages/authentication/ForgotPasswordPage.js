@@ -1,7 +1,6 @@
 import 'firebase/auth'
 import firebase from 'firebase'
 import React, { Component } from 'react'
-import '../sign-in-page/Signin.scss'
 import { Redirect } from 'react-router-dom'
 import isEmail from 'isemail'
 import { INVALID_EMAIL, USER_NOT_FOUND_EXPLICIT } from '../../messages'

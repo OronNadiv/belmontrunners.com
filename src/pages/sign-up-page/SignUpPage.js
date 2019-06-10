@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 
-import './Signup.scss'
 import SignUpStepper from './SignUpStepper'
 import PropTypes from 'prop-types'
 import { withRouter } from 'react-router-dom'

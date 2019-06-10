@@ -2,7 +2,7 @@ import 'firebase/auth'
 import firebase from 'firebase'
 import React, { Component } from 'react'
 import { TextField } from 'final-form-material-ui'
-import isEmail from 'isemail'
+import isEmailComponent from 'isemail'
 import {
   EMAIL_ALREADY_IN_USE,
   INVALID_EMAIL,
@@ -21,7 +21,7 @@ import { Field, Form } from 'react-final-form'
 import { DISPLAY_NAME, EMAIL, PASSWORD } from '../../fields'
 
 const required = value => (value ? undefined : 'Required')
-const isemail = value => (!value || !isEmail.validate(value) ? INVALID_EMAIL : undefined)
+const isemail = value => (!value || !isEmailComponent.validate(value) ? INVALID_EMAIL : undefined)
 const minPasswordLength = value => (value.length < 6 ? INVALID_PASSWORD_LENGTH(6) : undefined)
 const composeValidators = (...validators) => value => validators.reduce((error, validator) => error || validator(value), undefined)
 
@@ -41,19 +41,12 @@ class View extends Component {
     window.scrollTo(0, 0)
   }
 
-  _resetErrors () {
-    this.setState({
-      errorMessage: ''
-    })
-
-  }
-
   async signUp (providerName, fullName, email, password) {
     const displayName = s(fullName).clean().words().map((w) => s.capitalize(w)).join(" ")
 
     const { onNextClicked } = this.props
-    this._resetErrors()
     this.setState({
+      errorMessage: '',
       isSigningUp: true
     })
     const providerGoogle = new firebase.auth.GoogleAuthProvider()
@@ -116,6 +109,7 @@ class View extends Component {
   }
 
   handleSignUpError (error) {
+    window.scrollTo(0, 0)
     const {
       code,
       message
