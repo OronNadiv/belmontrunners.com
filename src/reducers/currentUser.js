@@ -75,10 +75,24 @@ export const fetchCurrentUser = () => {
                 userData
               }
             })
-            const { metadata: { creationTime, lastSignInTime } } = firebase.auth().currentUser
+            // if (
+            //   userData.lastEmailVerificationSentAt && moment(userData.lastEmailVerificationSentAt).isBefore(moment().subtract(1, 'day')))
+            const { metadata: { creationTime, lastSignInTime }, emailVerified } = firebase.auth().currentUser
+            console.log('emailVerified:', emailVerified)
+            // if (!emailVerified) {
+            //   try {
+            //     console.log('sending sendEmailVerification')
+            //     await firebase.auth().currentUser.sendEmailVerification()
+            //   } catch (error) {
+            //     Sentry.captureException(error)
+            //     console.error(error)
+            //
+            //   }
+            // }
+            console.log('firebase.auth().currentUser:', firebase.auth().currentUser)
             const createdAt = moment(creationTime).utc().format()
             const lastSignedInAt = moment(lastSignInTime).utc().format()
-            updateUserData({ createdAt, lastSignedInAt }, { merge: true })(dispatch, getState)
+            updateUserData({ createdAt, lastSignedInAt, emailVerified }, { merge: true })(dispatch, getState)
           } catch (error) {
             Sentry.captureException(error)
             console.error(error)

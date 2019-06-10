@@ -26,6 +26,7 @@ import {
   DID_RECEIVED_SHIRT,
   DISPLAY_NAME,
   EMAIL,
+  EMAIL_VERIFIED,
   GENDER,
   LAST_SIGNED_IN_AT,
   MEMBERSHIP_EXPIRES_AT,
@@ -170,7 +171,7 @@ const headRows = [
   { id: SHIRT_GENDER, numeric: false, disablePadding: false, label: 'Shirt Gender' },
   { id: SHIRT_SIZE, numeric: false, disablePadding: false, label: 'Shirt Size' },
   { id: CREATED_AT, numeric: false, disablePadding: false, label: 'Account Creation' },
-  { id: LAST_SIGNED_IN_AT, numeric: false, disablePadding: false, label: 'Last Signed In' },
+  { id: EMAIL_VERIFIED, numeric: false, disablePadding: false, label: 'Email Verified' },
   { id: MEMBERSHIP_EXPIRES_AT, numeric: false, disablePadding: false, label: 'Membership Expires' },
   { id: DID_RECEIVED_SHIRT, numeric: false, disablePadding: false, label: 'Received Shirt' }
 ]
@@ -222,6 +223,7 @@ class EnhancedTable extends Component {
         data[LAST_SIGNED_IN_AT] = moment(data[LAST_SIGNED_IN_AT]).format(MEMBERSHIP_EXPIRES_AT_FORMAT)
         data[CREATED_AT] = moment(data[CREATED_AT]).format(MEMBERSHIP_EXPIRES_AT_FORMAT)
         data[MEMBERSHIP_EXPIRES_AT] = data[MEMBERSHIP_EXPIRES_AT] ? moment(data[MEMBERSHIP_EXPIRES_AT]).format(MEMBERSHIP_EXPIRES_AT_FORMAT) : ''
+        data[EMAIL_VERIFIED] = !!data[EMAIL_VERIFIED]
         data[DID_RECEIVED_SHIRT] = !!data[DID_RECEIVED_SHIRT]
         rows.push(data)
       } catch (err) {
@@ -382,7 +384,12 @@ class EnhancedTable extends Component {
                           <TableCell>{row[SHIRT_GENDER]}</TableCell>
                           <TableCell>{row[SHIRT_SIZE]}</TableCell>
                           <TableCell>{row[CREATED_AT]}</TableCell>
-                          <TableCell>{row[LAST_SIGNED_IN_AT]}</TableCell>
+                          <TableCell>
+                            <Checkbox
+                              checked={row[EMAIL_VERIFIED]}
+                              disabled
+                            />
+                          </TableCell>
                           <TableCell style={{ color: getColor(row[MEMBERSHIP_EXPIRES_AT]) }}
                           >{row[MEMBERSHIP_EXPIRES_AT]}</TableCell>
                           <TableCell>

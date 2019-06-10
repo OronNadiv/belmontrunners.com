@@ -17,11 +17,11 @@ const listAllUsers = async (nextPageToken) => {
   const listUsersResult = await auth.listUsers(1000, nextPageToken)
   listUsersResult.users.forEach(async (userRecord) => {
     try {
-      const { uid, metadata: { creationTime, lastSignInTime } } = userRecord.toJSON()
+      const { uid, emailVerified, metadata: { creationTime, lastSignInTime } } = userRecord.toJSON()
       let createdAt = moment(creationTime).utc().format()
       let lastSignedInAt = moment(lastSignInTime).utc().format()
       const userRef = firestore.doc(`users/${uid}`)
-      await userRef.set({ createdAt, lastSignedInAt }, { merge: true })
+      await userRef.set({ createdAt, lastSignedInAt, emailVerified }, { merge: true })
       console.log(`Updated ${uid} ${createdAt} ${lastSignedInAt}`)
     } catch (err) {
       console.error(err)
