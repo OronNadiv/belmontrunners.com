@@ -21,7 +21,7 @@ import { Field, Form } from 'react-final-form'
 import { DISPLAY_NAME, EMAIL, PASSWORD } from '../../fields'
 
 const required = value => (value ? undefined : 'Required')
-const isemail = value => (!value || !isEmailComponent.validate(value) ? INVALID_EMAIL : undefined)
+const isEmail = value => (!value || !isEmailComponent.validate(value) ? INVALID_EMAIL : undefined)
 const minPasswordLength = value => (value.length < 6 ? INVALID_PASSWORD_LENGTH(6) : undefined)
 const composeValidators = (...validators) => value => validators.reduce((error, validator) => error || validator(value), undefined)
 
@@ -186,7 +186,7 @@ class View extends Component {
                   margin='normal'
                   name={EMAIL}
                   component={TextField}
-                  validate={composeValidators(required, isemail)}
+                  validate={composeValidators(required, isEmail)}
                 />
               </div>
 
