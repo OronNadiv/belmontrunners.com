@@ -157,7 +157,8 @@ class Notifications extends Component {
   }
 
   processNotifications () {
-    const { currentUser, userData } = this.props
+    const { currentUser } = this.props
+    const userData = this.props.userData.toJS()
     if (!currentUser) {
       this.setState({ notification: null })
       return
@@ -195,7 +196,7 @@ const mapDispatchToProps = {
 const mapStateToProps = ({ currentUser: { currentUser, userData } }) => {
   return {
     currentUser,
-    userData: userData ? userData.toJS() : userData
+    userData
   }
 }
 

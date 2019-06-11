@@ -61,7 +61,8 @@ class MyProfilePage extends Component {
   }
 
   render () {
-    const { userData, isCurrentUserLoaded } = this.props
+    const { isCurrentUserLoaded } = this.props
+    const userData = this.props.userData.toJS()
     const { close, showChangeEmailDialog, showChangePasswordDialog, isSubmitting, isSuccess } = this.state
     if (close || isSuccess) {
       return <Redirect to={ROOT} />
@@ -171,7 +172,7 @@ const mapDispatchToProps = {
 const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, userData, userDataUpdating, userDataUpdateError } }) => {
   return {
     isCurrentUserLoaded,
-    userData: userData ? userData.toJS() : userData,
+    userData,
     userDataUpdating,
     userDataUpdateError
   }

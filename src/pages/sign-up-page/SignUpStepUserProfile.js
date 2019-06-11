@@ -47,7 +47,8 @@ class SignUpStepUserProfile extends Component {
   }
 
   render () {
-    const { isLast, userData, isCurrentUserLoaded, userDataUpdating } = this.props
+    const { isLast, isCurrentUserLoaded, userDataUpdating } = this.props
+    const userData = this.props.userData.toJS()
 
     const initialValues = _.pick(userData, ADDRESS1, ADDRESS2, CITY, DATE_OF_BIRTH, GENDER, PHONE, SHIRT_GENDER, SHIRT_SIZE, STATE, ZIP)
     return !isCurrentUserLoaded ?
@@ -121,7 +122,7 @@ const mapDispatchToProps = {
 const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, userData, userDataUpdating, userDataUpdateError } }) => {
   return {
     isCurrentUserLoaded,
-    userData: userData ? userData.toJS() : userData,
+    userData,
     userDataUpdating,
     userDataUpdateError
   }
