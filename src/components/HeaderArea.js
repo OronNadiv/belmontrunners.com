@@ -7,8 +7,7 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import Profile from './Profile'
 import Button from '@material-ui/core/Button'
-import { FORGOT_PASSWORD, JOIN, RESET_PASSWORD, ROOT, SIGN_IN } from '../urls'
-import { STEP_USER_DETAILS } from '../pages/sign-up-page/SignUpStepper'
+import { FORGOT_PASSWORD, JOIN, MY_PROFILE, RESET_PASSWORD, ROOT, SIGN_IN } from '../urls'
 
 class HeaderArea extends Component {
 
@@ -73,7 +72,7 @@ class HeaderArea extends Component {
     const { isCurrentUserLoaded, currentUser } = this.props
     let totalNavItems = 0
     const isSignedOut = isCurrentUserLoaded && !currentUser && (totalNavItems += 2)
-    const isSignedIn = isCurrentUserLoaded && currentUser && (totalNavItems += 2)
+    const isSignedIn = isCurrentUserLoaded && currentUser && (totalNavItems += 3)
 
     return (
       <header className='header_area'>
@@ -94,11 +93,14 @@ class HeaderArea extends Component {
                   <li className='nav-item'>
                     {
                       isSignedIn &&
+                      <Link to={ROOT} className='nav-link'>
+                        Home
+                      </Link>
+                    }
+                    {
+                      isSignedIn &&
                       <Link className='nav-link'
-                            to={{
-                              pathname: JOIN,
-                              state: { steps: [STEP_USER_DETAILS] }
-                            }}>
+                            to={MY_PROFILE}>
                         My profile
                       </Link>
 

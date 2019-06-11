@@ -3,8 +3,7 @@ import firebase from 'firebase'
 import Avatar from 'react-avatar'
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import { CHANGE_EMAIL, CHANGE_PASSWORD, JOIN, ROOT, SUBSCRIBERS, USERS } from '../urls'
-import { STEP_USER_DETAILS } from '../pages/sign-up-page/SignUpStepper'
+import { ROOT, SUBSCRIBERS, MY_PROFILE, USERS } from '../urls'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import LoggedInState from './LoggedInState'
@@ -38,25 +37,8 @@ class Profile extends Component {
               Subscribers
             </Link>
           }
-          <Link className="dropdown-item"
-                to={{
-                  pathname: CHANGE_EMAIL
-                }}>
-            Change Email
-          </Link>
 
-          <Link className="dropdown-item"
-                to={{
-                  pathname: CHANGE_PASSWORD
-                }}>
-            Change Password
-          </Link>
-
-          <Link className="dropdown-item"
-                to={{
-                  pathname: JOIN,
-                  state: { steps: [STEP_USER_DETAILS] }
-                }}>
+          <Link to={MY_PROFILE} className="dropdown-item">
             My profile
           </Link>
 

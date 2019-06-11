@@ -195,7 +195,7 @@ const mapDispatchToProps = {
 const mapStateToProps = ({ currentUser: { currentUser, userData } }) => {
   return {
     currentUser,
-    userData
+    userData: userData ? userData.toJS() : userData
   }
 }
 

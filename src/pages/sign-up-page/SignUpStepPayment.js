@@ -269,6 +269,7 @@ const mapDispatchToProps = {
 
 const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, currentUser, userData, userDataUpdating, userDataUpdateError } }) => {
 
+  userData = userData ? userData.toJS() : userData
   let membershipExpiresAt = null
   let needToPay = false
   let totalAmount = -1

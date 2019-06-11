@@ -8,8 +8,7 @@ export const RECOVER_EMAIL = '/recoverEmail'
 export const ROOT = '/'
 export const USERS = '/users'
 export const SUBSCRIBERS = '/subscribers'
-export const CHANGE_EMAIL = '/changeEmail'
-export const CHANGE_PASSWORD = '/changePassword'
+export const MY_PROFILE = '/myProfile'
 
 // documents
 export const TOS_FILE_NAME = '2019-04-01_tos.pdf'

@@ -12,11 +12,10 @@ import HomePage from './pages/home-page'
 import HeaderArea from './components/HeaderArea'
 import SignUpPage from './pages/sign-up-page/SignUpPage'
 import {
-  CHANGE_EMAIL,
-  CHANGE_PASSWORD,
   COMPLETE,
   FORGOT_PASSWORD,
   JOIN,
+  MY_PROFILE,
   RECOVER_EMAIL,
   RESET_PASSWORD,
   ROOT,
@@ -29,10 +28,9 @@ import Drift from './components/Drift'
 import * as Sentry from '@sentry/browser'
 import ResetPasswordPage from './pages/authentication/actions/ResetPasswordPage'
 import Complete from './pages/authentication/actions/Complete'
-import ChangeEmailPage from './pages/authentication/ChangeEmailPage'
-import ChangePasswordPage from './pages/authentication/ChangePasswordPage'
 import RecoverEmailPage from './pages/authentication/actions/RecoverEmailPage'
 import SubscribersPage from './pages/subscribers-page/SubscribersPage'
+import MyProfilePage from './pages/my-profile-page/MyProfilePage'
 
 class App extends Component {
   componentDidMount () {
@@ -89,6 +87,17 @@ class App extends Component {
           />
           <Route
             exact
+            path={MY_PROFILE}
+            render={() => (
+              <div>
+                <HeaderArea />
+                <MyProfilePage />
+                <Footer />
+              </div>
+            )}
+          />
+          <Route
+            exact
             path={USERS}
             render={() => (
               <div>
@@ -119,32 +128,6 @@ class App extends Component {
                 <Footer />
 
                 <ForgotPasswordPage />
-              </div>
-            )}
-          />
-          <Route
-            exact
-            path={CHANGE_EMAIL}
-            render={() => (
-              <div>
-                <HeaderArea />
-                <HomePage />
-                <Footer />
-
-                <ChangeEmailPage />
-              </div>
-            )}
-          />
-          <Route
-            exact
-            path={CHANGE_PASSWORD}
-            render={() => (
-              <div>
-                <HeaderArea />
-                <HomePage />
-                <Footer />
-
-                <ChangePasswordPage />
               </div>
             )}
           />

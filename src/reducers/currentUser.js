@@ -2,6 +2,7 @@ import firebase from 'firebase'
 import Promise from 'bluebird'
 import * as Sentry from '@sentry/browser'
 import moment from 'moment'
+import { fromJS } from 'immutable'
 
 const PREFIX = 'CURRENT_USER'
 
@@ -103,7 +104,7 @@ export const fetchCurrentUser = () => {
   }
 }
 
-export const updateUserData = (values, options) => {
+export const updateUserData = (values, options = { merge: true }) => {
   return async (dispatch, getState) => {
     if (getState().currentUser.isCurrentUserLoading) {
       return
@@ -113,8 +114,7 @@ export const updateUserData = (values, options) => {
     })
     const userRef = firebase.firestore().doc(`users/${firebase.auth().currentUser.uid}`)
     try {
-      const res = await userRef.set(values, options)
-      console.log('res', res)
+      await userRef.set(values, options)
       const userData = await fetchUserData()
       dispatch({
         type: USER_DATA_UPDATE_SUCCESS,
@@ -141,7 +141,7 @@ const initialState = {
     usersDelete: {},
     subscribersRead: {}
   },
-  userData: {},
+  userData: fromJS({}),
   userDataUpdating: false,
   userDataUpdateError: null
 }
@@ -160,7 +160,7 @@ const ACTION_HANDLERS = {
       ...state,
       currentUser,
       permissions,
-      userData,
+      userData: fromJS(userData),
       isCurrentUserLoading: false,
       isCurrentUserLoaded: true
     }
@@ -179,7 +179,7 @@ const ACTION_HANDLERS = {
   [USER_DATA_UPDATE_SUCCESS]: (state = initialState, { data }) => {
     state = {
       ...state,
-      userData: data,
+      userData: fromJS(data),
       userDataUpdating: false,
       userDataUpdateError: null
     }
