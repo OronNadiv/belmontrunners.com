@@ -170,10 +170,10 @@ const headRows = [
   { id: GENDER, numeric: false, disablePadding: false, label: 'Gender' },
   { id: SHIRT_GENDER, numeric: false, disablePadding: false, label: 'Shirt Gender' },
   { id: SHIRT_SIZE, numeric: false, disablePadding: false, label: 'Shirt Size' },
-  { id: CREATED_AT, numeric: false, disablePadding: false, label: 'Account Creation' },
-  { id: EMAIL_VERIFIED, numeric: false, disablePadding: false, label: 'Email Verified' },
   { id: MEMBERSHIP_EXPIRES_AT, numeric: false, disablePadding: false, label: 'Membership Expires' },
-  { id: DID_RECEIVED_SHIRT, numeric: false, disablePadding: false, label: 'Received Shirt' }
+  { id: DID_RECEIVED_SHIRT, numeric: false, disablePadding: false, label: 'Received Shirt' },
+  { id: CREATED_AT, numeric: false, disablePadding: false, label: 'Account Creation' },
+  { id: EMAIL_VERIFIED, numeric: false, disablePadding: false, label: 'Email Verified' }
 ]
 
 function getColor (membershipExpires) {
@@ -383,15 +383,9 @@ class EnhancedTable extends Component {
                           <TableCell>{row[GENDER]}</TableCell>
                           <TableCell>{row[SHIRT_GENDER]}</TableCell>
                           <TableCell>{row[SHIRT_SIZE]}</TableCell>
-                          <TableCell>{row[CREATED_AT]}</TableCell>
-                          <TableCell>
-                            <Checkbox
-                              checked={row[EMAIL_VERIFIED]}
-                              disabled
-                            />
+                          <TableCell style={{ color: getColor(row[MEMBERSHIP_EXPIRES_AT]) }}>
+                            {row[MEMBERSHIP_EXPIRES_AT]}
                           </TableCell>
-                          <TableCell style={{ color: getColor(row[MEMBERSHIP_EXPIRES_AT]) }}
-                          >{row[MEMBERSHIP_EXPIRES_AT]}</TableCell>
                           <TableCell>
                             <Checkbox
                               checked={row[DID_RECEIVED_SHIRT]}
@@ -411,6 +405,13 @@ class EnhancedTable extends Component {
                                   console.log(error)
                                 }
                               }}
+                            />
+                          </TableCell>
+                          <TableCell>{row[CREATED_AT]}</TableCell>
+                          <TableCell>
+                            <Checkbox
+                              checked={row[EMAIL_VERIFIED]}
+                              disabled
                             />
                           </TableCell>
                           {

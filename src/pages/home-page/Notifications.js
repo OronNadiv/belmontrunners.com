@@ -4,7 +4,7 @@ import Snackbar from '@material-ui/core/Snackbar'
 import { Link } from 'react-router-dom'
 import { JOIN } from '../../urls'
 import { STEP_MEMBERSHIP, STEP_USER_DETAILS } from '../sign-up-page/SignUpStepper'
-import { MEMBERSHIP_EXPIRES_AT } from '../../fields'
+import { DID_RECEIVED_SHIRT, MEMBERSHIP_EXPIRES_AT } from '../../fields'
 import moment from 'moment/moment'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -111,10 +111,15 @@ class Notifications extends Component {
   }
 
   processReceivedShirt ({ userData }) {
+    const { updateUserData } = this.props
     if (this.wasPopupDismissed({
       userData,
       notificationKey: POPUP_RECEIVED_SHIRT_AT
     }) || !this.didPayMembership({ userData })) {
+      return
+    }
+
+    if (userData[DID_RECEIVED_SHIRT]) {
       return
     }
 
@@ -144,7 +149,9 @@ class Notifications extends Component {
           <Button
             color='secondary'
             size="small"
-            onClick={() => this.dismissNotification({ notificationKey: POPUP_RECEIVED_SHIRT_AT })}>
+            onClick={() => {
+              updateUserData({ DID_RECEIVED_SHIRT: true }, { merge: true })
+            }}>
             YES
           </Button> / <Button
           color='secondary'

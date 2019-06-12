@@ -39,7 +39,7 @@ class MyProfilePage extends Component {
   }
 
   handleSubmit (values) {
-    this.setState({ submitting: true })
+    this.setState({ isSubmitting: true })
     const { updateUserData } = this.props
     console.log('submitting values:', JSON.stringify(values, 0, 2))
     return updateUserData(values, { merge: true })
@@ -50,8 +50,8 @@ class MyProfilePage extends Component {
   }
 
   componentDidUpdate (prevProps, prevState, snapshot) {
-    if (prevProps.userDataUpdating && !this.props.userDataUpdating && this.state.submitting) {
-      this.setState({ submitting: false })
+    if (prevProps.userDataUpdating && !this.props.userDataUpdating && this.state.isSubmitting) {
+      this.setState({ isSubmitting: false })
       if (!this.props.userDataUpdateError) {
         this.setState({ isSuccess: true })
       } else {
