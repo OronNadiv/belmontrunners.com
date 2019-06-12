@@ -60,8 +60,13 @@ class MyProfilePage extends Component {
     }
   }
 
+  async sendVerificationEmail () {
+    await this.props.currentUser.sendEmailVerification()
+    this.setState({ emailVerificationSent: true })
+  }
+
   render () {
-    const { isCurrentUserLoaded } = this.props
+    const { isCurrentUserLoaded, currentUser } = this.props
     const userData = this.props.userData.toJS()
     const { close, showChangeEmailDialog, showChangePasswordDialog, isSubmitting, isSuccess } = this.state
     if (close || isSuccess) {
@@ -69,8 +74,7 @@ class MyProfilePage extends Component {
     }
 
     const initialValues = _.pick(userData, ADDRESS1, ADDRESS2, CITY, DATE_OF_BIRTH, GENDER, PHONE, SHIRT_GENDER, SHIRT_SIZE, STATE, ZIP)
-    return !isCurrentUserLoaded ?
-      '' :
+    return isCurrentUserLoaded &&
       <div className='mx-auto py-5 px-3' style={{ maxWidth: 500 }}>
         <Typography component="h5" variant="h5">
           My Profile
@@ -83,7 +87,32 @@ class MyProfilePage extends Component {
                 Email Address
               </Typography>
               <Typography variant="subtitle1" color="textSecondary">
-                {userData.email} {/*({userData.emailVerified ? 'verified' : 'not verified'})*/}
+                {currentUser.email} (
+                {
+                  currentUser.emailVerified === false
+                    ?
+                    <span className='text-danger text-center'>not verified</span>
+                    :
+                    'verified'
+                }
+                )
+                <div>
+                  <small>
+                    {
+                      !currentUser.emailVerified &&
+                      !this.state.emailVerificationSent &&
+                      <span>
+                        Click <a onClick={() => this.sendVerificationEmail()} className="text-primary">here</a> to
+                        send me a verification email
+                      </span>
+                    }
+                    {
+                      !currentUser.emailVerified &&
+                      this.state.emailVerificationSent &&
+                      <span className='text-success text-center'>Sent</span>
+                    }
+                  </small>
+                </div>
               </Typography>
             </CardContent>
           </div>
@@ -160,6 +189,7 @@ class MyProfilePage extends Component {
 MyProfilePage.propTypes = {
   updateUserData: PropTypes.func.isRequired,
   isCurrentUserLoaded: PropTypes.bool.isRequired,
+  currentUser: PropTypes.object,
   userData: PropTypes.object.isRequired,
   userDataUpdating: PropTypes.bool.isRequired,
   userDataUpdateError: PropTypes.object
@@ -169,9 +199,10 @@ const mapDispatchToProps = {
   updateUserData: updateUserDataAction
 }
 
-const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, userData, userDataUpdating, userDataUpdateError } }) => {
+const mapStateToProps = ({ currentUser: { currentUser, isCurrentUserLoaded, userData, userDataUpdating, userDataUpdateError } }) => {
   return {
     isCurrentUserLoaded,
+    currentUser,
     userData,
     userDataUpdating,
     userDataUpdateError

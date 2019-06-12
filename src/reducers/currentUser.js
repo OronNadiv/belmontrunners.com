@@ -66,34 +66,41 @@ export const fetchCurrentUser = () => {
           try {
             const [permissions, userData] = await Promise
               .all([fetchPermissions(), fetchUserData()])
+            const currentUser = firebase.auth().currentUser
             console.log('permissions', permissions)
             console.log('userData', userData)
             dispatch({
               type: FETCHED_CURRENT_USER,
               data: {
-                currentUser: firebase.auth().currentUser,
+                currentUser,
                 permissions,
                 userData
               }
             })
-            // if (
-            //   userData.lastEmailVerificationSentAt && moment(userData.lastEmailVerificationSentAt).isBefore(moment().subtract(1, 'day')))
-            const { metadata: { creationTime, lastSignInTime }, emailVerified } = firebase.auth().currentUser
-            console.log('emailVerified:', emailVerified)
-            // if (!emailVerified) {
-            //   try {
-            //     console.log('sending sendEmailVerification')
-            //     await firebase.auth().currentUser.sendEmailVerification()
-            //   } catch (error) {
-            //     Sentry.captureException(error)
-            //     console.error(error)
-            //
-            //   }
-            // }
+            const { metadata: { creationTime, lastSignInTime }, emailVerified } = currentUser
+            let emailVerificationSentAt = userData.emailVerificationSentAt
+            console.log('emailVerified:', emailVerified,
+              'emailVerificationSentAt:', emailVerificationSentAt)
+            try {
+              if (!emailVerified) {
+                if (!emailVerificationSentAt || moment(emailVerificationSentAt).add(1, 'day').isBefore(moment())) {
+                  await currentUser.sendEmailVerification()
+                  emailVerificationSentAt = moment().utc().format()
+                }
+              }
+            } catch (error) {
+              Sentry.captureException(error)
+              console.error('email verification.', error)
+            }
             console.log('firebase.auth().currentUser:', firebase.auth().currentUser)
             const createdAt = moment(creationTime).utc().format()
             const lastSignedInAt = moment(lastSignInTime).utc().format()
-            updateUserData({ createdAt, lastSignedInAt, emailVerified }, { merge: true })(dispatch, getState)
+            updateUserData({
+              createdAt,
+              lastSignedInAt,
+              emailVerified,
+              emailVerificationSentAt
+            }, { merge: true })(dispatch, getState)
           } catch (error) {
             Sentry.captureException(error)
             console.error(error)

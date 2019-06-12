@@ -179,8 +179,8 @@ class SignInPage extends Component {
                   validate={composeValidators(required, minPasswordLength)}
                 />
 
-                <p className="font-small blue-text d-flex justify-content-end">
-                  Forgot&nbsp;<Link to={FORGOT_PASSWORD} className="blue-text ml-1">Password?</Link>
+                <p className="float-right">
+                  Forgot<Link to={FORGOT_PASSWORD} className="ml-2">Password?</Link>
                 </p>
 
               </DialogContent>

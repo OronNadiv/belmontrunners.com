@@ -20,6 +20,7 @@ import { connect } from 'react-redux'
 import * as Sentry from '@sentry/browser'
 import { Field, Form } from 'react-final-form'
 import { PASSWORD } from '../fields'
+import { updateUserData } from '../reducers/currentUser'
 
 const required = value => (value ? undefined : 'Required')
 const isEmail = value => (!value || !isEmailComponent.validate(value) ? INVALID_EMAIL : undefined)
@@ -64,6 +65,9 @@ class ChangeEmailDialog extends Component {
       await currentUser.reauthenticateWithCredential(credentials)
       try {
         await currentUser.updateEmail(email1)
+        await currentUser.sendEmailVerification()
+        await updateUserData({ email: email1, emailVerified: currentUser.emailVerified })
+
         this.setState({
           [STATE_IS_SUCCESS]: true
         })

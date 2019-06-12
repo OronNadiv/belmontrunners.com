@@ -21,7 +21,8 @@ import {
   ROOT,
   SIGN_IN,
   SUBSCRIBERS,
-  USERS
+  USERS,
+  VERIFY_EMAIL
 } from './urls'
 import UsersPage from './pages/users-page/UsersPage'
 import Drift from './components/Drift'
@@ -31,6 +32,7 @@ import Complete from './pages/authentication/actions/Complete'
 import RecoverEmailPage from './pages/authentication/actions/RecoverEmailPage'
 import SubscribersPage from './pages/subscribers-page/SubscribersPage'
 import MyProfilePage from './pages/my-profile-page/MyProfilePage'
+import VerifyEmailPage from './pages/authentication/actions/VerifyEmailPage'
 
 class App extends Component {
   componentDidMount () {
@@ -167,6 +169,19 @@ class App extends Component {
                 <Footer />
 
                 <RecoverEmailPage />
+              </div>
+            )}
+          />
+          <Route
+            exact
+            path={VERIFY_EMAIL}
+            render={() => (
+              <div>
+                <HeaderArea />
+                <HomePage />
+                <Footer />
+
+                <VerifyEmailPage />
               </div>
             )}
           />
