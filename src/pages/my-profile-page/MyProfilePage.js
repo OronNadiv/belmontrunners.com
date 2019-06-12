@@ -15,7 +15,10 @@ import {
   STATE,
   ZIP
 } from '../../fields'
-import { updateUserData as updateUserDataAction } from '../../reducers/currentUser'
+import {
+  sendEmailVerification as sendEmailVerificationAction,
+  updateUserData as updateUserDataAction
+} from '../../reducers/currentUser'
 import _ from 'underscore'
 import UserDetails from '../../components/UserDetails'
 import { ROOT } from '../../urls'
@@ -61,7 +64,8 @@ class MyProfilePage extends Component {
   }
 
   async sendVerificationEmail () {
-    await this.props.currentUser.sendEmailVerification()
+    const { sendEmailVerification } = this.props
+    sendEmailVerification()
     this.setState({ emailVerificationSent: true })
   }
 
@@ -102,7 +106,7 @@ class MyProfilePage extends Component {
                       !currentUser.emailVerified &&
                       !this.state.emailVerificationSent &&
                       <span>
-                        Click <a onClick={() => this.sendVerificationEmail()} className="text-primary">here</a> to
+                        Click <span onClick={() => this.sendVerificationEmail()} className="text-primary">here</span> to
                         send me a verification email
                       </span>
                     }
@@ -187,6 +191,7 @@ class MyProfilePage extends Component {
 }
 
 MyProfilePage.propTypes = {
+  sendEmailVerification: PropTypes.func.isRequired,
   updateUserData: PropTypes.func.isRequired,
   isCurrentUserLoaded: PropTypes.bool.isRequired,
   currentUser: PropTypes.object,
@@ -196,6 +201,7 @@ MyProfilePage.propTypes = {
 }
 
 const mapDispatchToProps = {
+  sendEmailVerification: sendEmailVerificationAction,
   updateUserData: updateUserDataAction
 }
 

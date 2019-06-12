@@ -78,14 +78,14 @@ export const fetchCurrentUser = () => {
               }
             })
             const { metadata: { creationTime, lastSignInTime }, emailVerified } = currentUser
-            let emailVerificationSentAt = userData.emailVerificationSentAt
-            console.log('emailVerified:', emailVerified,
-              'emailVerificationSentAt:', emailVerificationSentAt)
+            console.log('emailVerified:', emailVerified)
             try {
               if (!emailVerified) {
+                const emailVerificationSentAt = userData.emailVerificationSentAt
+                console.log('emailVerificationSentAt:', emailVerificationSentAt)
+
                 if (!emailVerificationSentAt || moment(emailVerificationSentAt).add(1, 'day').isBefore(moment())) {
-                  await currentUser.sendEmailVerification()
-                  emailVerificationSentAt = moment().utc().format()
+                  sendEmailVerification()(dispatch, getState)
                 }
               }
             } catch (error) {
@@ -98,8 +98,7 @@ export const fetchCurrentUser = () => {
             updateUserData({
               createdAt,
               lastSignedInAt,
-              emailVerified,
-              emailVerificationSentAt
+              emailVerified
             }, { merge: true })(dispatch, getState)
           } catch (error) {
             Sentry.captureException(error)
@@ -108,6 +107,17 @@ export const fetchCurrentUser = () => {
         }
       })
     }
+  }
+}
+
+export const sendEmailVerification = () => {
+  return async (dispatch, getState) => {
+    await getState().currentUser.currentUser.sendEmailVerification()
+    const emailVerificationSentAt = moment().utc().format()
+    updateUserData({
+      emailVerificationSentAt
+    }, { merge: true })(dispatch, getState)
+
   }
 }
 

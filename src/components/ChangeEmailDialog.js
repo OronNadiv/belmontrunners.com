@@ -20,7 +20,7 @@ import { connect } from 'react-redux'
 import * as Sentry from '@sentry/browser'
 import { Field, Form } from 'react-final-form'
 import { PASSWORD } from '../fields'
-import { updateUserData } from '../reducers/currentUser'
+import { sendEmailVerification as sendEmailVerificationAction } from '../reducers/currentUser'
 
 const required = value => (value ? undefined : 'Required')
 const isEmail = value => (!value || !isEmailComponent.validate(value) ? INVALID_EMAIL : undefined)
@@ -49,7 +49,7 @@ class ChangeEmailDialog extends Component {
     const email1 = values[EMAIL1]
     const email2 = values[EMAIL2]
     const password = values[PASSWORD]
-    const { currentUser } = this.props
+    const { currentUser, sendEmailVerification } = this.props
 
     if (email1 !== email2) {
       return { [EMAIL2]: EMAILS_DONT_MATCH }
@@ -65,8 +65,7 @@ class ChangeEmailDialog extends Component {
       await currentUser.reauthenticateWithCredential(credentials)
       try {
         await currentUser.updateEmail(email1)
-        await currentUser.sendEmailVerification()
-        await updateUserData({ email: email1, emailVerified: currentUser.emailVerified })
+        await sendEmailVerification()
 
         this.setState({
           [STATE_IS_SUCCESS]: true
@@ -228,7 +227,12 @@ class ChangeEmailDialog extends Component {
 
 ChangeEmailDialog.propTypes = {
   currentUser: PropTypes.object.isRequired,
-  onClose: PropTypes.func.isRequired
+  onClose: PropTypes.func.isRequired,
+  sendEmailVerification: PropTypes.func.isRequired
+}
+
+const mapDispatchToProps = {
+  sendEmailVerification: sendEmailVerificationAction
 }
 
 const mapStateToProps = ({ currentUser: { currentUser } }) => {
@@ -237,4 +241,4 @@ const mapStateToProps = ({ currentUser: { currentUser } }) => {
   }
 }
 
-export default connect(mapStateToProps)(ChangeEmailDialog)
+export default connect(mapStateToProps, mapDispatchToProps)(ChangeEmailDialog)
