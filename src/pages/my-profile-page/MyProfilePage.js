@@ -97,7 +97,7 @@ class MyProfilePage extends Component {
                     ?
                     <span className='text-danger text-center'>not verified</span>
                     :
-                    'verified'
+                    <span className='text-success text-center'>verified</span>
                 }
                 )
                 <div>

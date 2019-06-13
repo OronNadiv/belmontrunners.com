@@ -139,7 +139,7 @@ class EnhancedTableToolbar extends Component {
   render () {
     const { onExport } = this.props
     return (
-      <Toolbar className='d-flex justify-content-between '>
+      <Toolbar className='d-flex'>
         <div>
           <Typography variant="h6" id="tableTitle">
             Users
@@ -351,7 +351,7 @@ class EnhancedTable extends Component {
           </Paper>
         </div>
         <div className='row mx-1'>
-          <Paper className=''>
+          <Paper>
             <EnhancedTableToolbar onExport={() => this.handleExport()} />
             <div className={{ overflowX: 'auto' }}>
               <Table
