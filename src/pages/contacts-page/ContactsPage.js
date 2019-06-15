@@ -29,7 +29,7 @@ import CloseIcon from '@material-ui/icons/Close'
 
 const ARRAY_KEY = 'values'
 
-class SubscribersPage extends Component {
+class ContactsPage extends Component {
   constructor (props) {
     super(props)
     this.docRef = firebase.firestore().doc('subscribers/items')
@@ -56,20 +56,20 @@ class SubscribersPage extends Component {
   }
 
   async componentDidMount () {
-    console.log('SubscribersPage.componentDidMount called')
+    console.log('ContactsPage.componentDidMount called')
 
     try {
-      const { usersCollection, subscriptionsDoc } = await Promise
+      const { usersCollection, contactsDoc } = await Promise
         .props({
           usersCollection: firebase.firestore().collection('users').get(),
-          subscriptionsDoc: this.docRef.get()
+          contactsDoc: this.docRef.get()
         })
-      let data = subscriptionsDoc.data()
+      let data = contactsDoc.data()
 
       if (!data || !data[ARRAY_KEY]) {
         data = { [ARRAY_KEY]: [] }
       }
-      const subs = data[ARRAY_KEY]
+      const contacts = data[ARRAY_KEY]
 
       const users = []
       usersCollection.forEach(user => {
@@ -79,40 +79,40 @@ class SubscribersPage extends Component {
       })
       console.log('user:', users)
       users.forEach((user) => {
-        const foundSub = subs.find((sub) => {
-          return sub.uid === user.uid
+        const foundContact = contacts.find((contact) => {
+          return contact.uid === user.uid
         })
-        if (foundSub) {
-          foundSub.displayName = user.displayName
-          foundSub.email = user.email
+        if (foundContact) {
+          foundContact.displayName = user.displayName
+          foundContact.email = user.email
         }
       })
 
-      // set user values for existing subs
-      console.log('subs:', subs)
-      subs.forEach((sub) => {
+      // set user values for existing contacts
+      console.log('contacts:', contacts)
+      contacts.forEach((contact) => {
         const foundUser = users.find((user) => {
-          return normalizeEmail(sub.email) === normalizeEmail(user.email)
+          return normalizeEmail(contact.email) === normalizeEmail(user.email)
         })
         if (foundUser) {
-          sub.displayName = foundUser.displayName
-          sub.email = foundUser.email
-          sub.uid = foundUser.uid
+          contact.displayName = foundUser.displayName
+          contact.email = foundUser.email
+          contact.uid = foundUser.uid
         }
       })
 
       users.forEach((user) => {
-        const foundSub = _.findWhere(subs, { uid: user.uid })
-        if (foundSub) {
+        const foundContact = _.findWhere(contacts, { uid: user.uid })
+        if (foundContact) {
           return
         }
-        let newSub = _.pick(user, 'uid', 'displayName', 'email')
-        newSub.isActive = true
-        subs.push(newSub)
+        let newContact = _.pick(user, 'uid', 'displayName', 'email')
+        newContact.isActive = true
+        contacts.push(newContact)
       })
 
-      const active = fromJS(subs.filter((item) => item.isActive))
-      const inactive = fromJS(subs.filter((item) => !item.isActive))
+      const active = fromJS(contacts.filter((item) => item.isActive))
+      const inactive = fromJS(contacts.filter((item) => !item.isActive))
 
       this.setState({ active, inactive })
     } catch (error) {
@@ -336,7 +336,7 @@ class SubscribersPage extends Component {
   }
 }
 
-SubscribersPage.propTypes = {
+ContactsPage.propTypes = {
   allowRead: PropTypes.bool.isRequired,
   allowWrite: PropTypes.bool.isRequired,
   currentUser: PropTypes.object
@@ -344,13 +344,13 @@ SubscribersPage.propTypes = {
 
 const mapStateToProps = ({ currentUser: { permissions, currentUser } }) => {
   return {
-    allowRead: !!currentUser && !!permissions.subscribersRead[currentUser.uid],
-    allowWrite: !!currentUser && !!permissions.subscribersWrite[currentUser.uid],
+    allowRead: !!currentUser && !!permissions.contactsRead[currentUser.uid],
+    allowWrite: !!currentUser && !!permissions.contactsWrite[currentUser.uid],
     currentUser
   }
 }
 
 export default LoggedInState({
-  name: 'SubscribersPage',
+  name: 'ContactsPage',
   isRequiredToBeLoggedIn: true
-})(connect(mapStateToProps)(SubscribersPage))
+})(connect(mapStateToProps)(ContactsPage))

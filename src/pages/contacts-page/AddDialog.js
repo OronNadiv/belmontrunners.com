@@ -35,7 +35,7 @@ class AddDialog extends Component {
         aria-labelledby="form-dialog-title"
       >
         <DialogTitle>
-          Add subscriber
+          Add contact
         </DialogTitle>
 
         <Form

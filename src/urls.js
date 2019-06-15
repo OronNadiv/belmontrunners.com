@@ -8,7 +8,7 @@ export const RECOVER_EMAIL = '/recoverEmail'
 export const VERIFY_EMAIL = '/verifyEmail'
 export const ROOT = '/'
 export const USERS = '/users'
-export const SUBSCRIBERS = '/subscribers'
+export const CONTACTS = '/contacts'
 export const GALLERY = '/gallery'
 export const MY_PROFILE = '/myProfile'
 

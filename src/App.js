@@ -13,6 +13,7 @@ import HeaderArea from './components/HeaderArea'
 import SignUpPage from './pages/sign-up-page/SignUpPage'
 import {
   COMPLETE,
+  CONTACTS,
   FORGOT_PASSWORD,
   GALLERY,
   JOIN,
@@ -21,7 +22,6 @@ import {
   RESET_PASSWORD,
   ROOT,
   SIGN_IN,
-  SUBSCRIBERS,
   USERS,
   VERIFY_EMAIL
 } from './urls'
@@ -32,7 +32,7 @@ import * as Sentry from '@sentry/browser'
 import ResetPasswordPage from './pages/authentication/actions/ResetPasswordPage'
 import Complete from './pages/authentication/actions/Complete'
 import RecoverEmailPage from './pages/authentication/actions/RecoverEmailPage'
-import SubscribersPage from './pages/subscribers-page/SubscribersPage'
+import ContactsPage from './pages/contacts-page/ContactsPage'
 import MyProfilePage from './pages/my-profile-page/MyProfilePage'
 import VerifyEmailPage from './pages/authentication/actions/VerifyEmailPage'
 
@@ -113,11 +113,11 @@ class App extends Component {
           />
           <Route
             exact
-            path={SUBSCRIBERS}
+            path={CONTACTS}
             render={() => (
               <div>
                 <HeaderArea />
-                <SubscribersPage />
+                <ContactsPage />
                 <Footer />
               </div>
             )}

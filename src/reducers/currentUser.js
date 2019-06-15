@@ -23,20 +23,20 @@ const fetchUserData = async () => {
 }
 
 const fetchPermissions = async () => {
-  const { docUsersRead, docUsersWrite, docUsersDelete, docSubscribersRead, docSubscribersWrite } = await Promise
+  const { docUsersRead, docUsersWrite, docUsersDelete, docContactsRead, docContactsWrite } = await Promise
     .props({
       docUsersRead: firebase.firestore().doc('permissions/usersRead').get(),
       docUsersWrite: firebase.firestore().doc('permissions/usersWrite').get(),
       docUsersDelete: firebase.firestore().doc('permissions/usersDelete').get(),
-      docSubscribersRead: firebase.firestore().doc('permissions/subscribersRead').get(),
-      docSubscribersWrite: firebase.firestore().doc('permissions/subscribersWrite').get()
+      docContactsRead: firebase.firestore().doc('permissions/subscribersRead').get(),
+      docContactsWrite: firebase.firestore().doc('permissions/subscribersWrite').get()
     })
   return {
     usersRead: docUsersRead.data(),
     usersWrite: docUsersWrite.data(),
     usersDelete: docUsersDelete.data(),
-    subscribersRead: docSubscribersRead.data(),
-    subscribersWrite: docSubscribersWrite.data()
+    contactsRead: docContactsRead.data(),
+    contactsWrite: docContactsWrite.data()
   }
 }
 
@@ -156,7 +156,7 @@ const initialState = {
     usersRead: {},
     usersWrite: {},
     usersDelete: {},
-    subscribersRead: {}
+    contactsRead: {}
   },
   userData: fromJS({}),
   userDataUpdating: false,
