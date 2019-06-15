@@ -1,6 +1,6 @@
 /public/js/**
 /public/vendors/**
-/node_modules/**
+**/node_modules
 /dist/**
 /original/**
 /build/**

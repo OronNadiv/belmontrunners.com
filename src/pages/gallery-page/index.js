@@ -2,7 +2,7 @@ import 'firebase/firestore'
 import 'firebase/storage'
 import firebase from 'firebase'
 import React, { useEffect, useState } from "react"
-import SelectFileButton from './uploader/SelectFileButton'
+import SelectFileButton from './SelectFileButton'
 import Button from '@material-ui/core/Button'
 import _ from 'underscore'
 import Promise from 'bluebird'
@@ -101,6 +101,10 @@ function App () {
             case firebase.storage.TaskState.RUNNING: // or 'running'
               console.log('Upload is running')
               break
+            default:
+              console.error('Unknown upload state.', snapshot.state)
+              break
+
           }
         }, (error) => {
           console.log('error:', error)
@@ -117,6 +121,9 @@ function App () {
 
             case 'storage/unknown':
               // Unknown error occurred, inspect error.serverResponse
+              break
+            default:
+              console.error('Unknown error code.', error.code)
               break
           }
         }, async () => {
