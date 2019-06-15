@@ -9,6 +9,7 @@ export const VERIFY_EMAIL = '/verifyEmail'
 export const ROOT = '/'
 export const USERS = '/users'
 export const SUBSCRIBERS = '/subscribers'
+export const GALLERY = '/gallery'
 export const MY_PROFILE = '/myProfile'
 
 // documents

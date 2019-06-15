@@ -14,6 +14,7 @@ import SignUpPage from './pages/sign-up-page/SignUpPage'
 import {
   COMPLETE,
   FORGOT_PASSWORD,
+  GALLERY,
   JOIN,
   MY_PROFILE,
   RECOVER_EMAIL,
@@ -25,6 +26,7 @@ import {
   VERIFY_EMAIL
 } from './urls'
 import UsersPage from './pages/users-page/UsersPage'
+import GalleryPage from './pages/gallery-page/'
 import Drift from './components/Drift'
 import * as Sentry from '@sentry/browser'
 import ResetPasswordPage from './pages/authentication/actions/ResetPasswordPage'
@@ -116,6 +118,17 @@ class App extends Component {
               <div>
                 <HeaderArea />
                 <SubscribersPage />
+                <Footer />
+              </div>
+            )}
+          />
+          <Route
+            exact
+            path={GALLERY}
+            render={() => (
+              <div>
+                <HeaderArea />
+                <GalleryPage />
                 <Footer />
               </div>
             )}

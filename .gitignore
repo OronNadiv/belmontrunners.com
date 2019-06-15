@@ -26,3 +26,5 @@ yarn-error.log*
 **/deploy.sh
 **/lambda.zip
 eventure
+
+react-file-uploader
