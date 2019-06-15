@@ -9,7 +9,6 @@ import { SortableContainer, SortableElement } from "react-sortable-hoc"
 import Carousel, { Modal, ModalGateway } from "react-images"
 import SelectFileButton from './uploader/SelectFileButton'
 import Button from '@material-ui/core/Button'
-import moment from 'moment'
 import _ from 'underscore'
 import Promise from 'bluebird'
 
@@ -39,21 +38,20 @@ function App () {
     const docData = await docRef.get()
     console.log('docData:', docData)
     const data = docData.data()
-    _.each(data, async (entries) => {
-      const values = _.values(entries)
-      let photos = await Promise.map(values, async ({ thumbnailHeight, thumbnailWidth, thumbnailFileName }) => {
-        const storageRef = firebase.storage().ref()
-        let downloadURL = await storageRef.child(thumbnailFileName).getDownloadURL()
-        return {
-          src: downloadURL,
-          height: thumbnailHeight,
-          width: thumbnailWidth
-        }
-      })
-      photos = _.filter(photos, x => !!x.src)
-      console.log('photos:', photos)
-      setItems(photos)
+    let photos = await Promise.map(data.values, async (entry) => {
+      const { thumbnailWidth, thumbnailHeight, thumbnailFileName } = entry
+      console.log('entry:', entry)
+      const storageRef = firebase.storage().ref()
+      let downloadURL = await storageRef.child(thumbnailFileName).getDownloadURL()
+      return {
+        src: downloadURL,
+        width: thumbnailWidth,
+        height: thumbnailHeight
+      }
     })
+    photos = _.filter(photos, x => !!x.src)
+    console.log('photos:', photos)
+    setItems(photos)
   }, [])
 
   const openLightbox = (event, obj) => {
@@ -116,24 +114,23 @@ function App () {
           try {
             const downloadURL = await uploadTask.snapshot.ref.getDownloadURL()
             setDownloadURL(downloadURL)
-            let DATE = moment().utc().format('YYYY-MM-DD')
-            let ENTRY = moment().utc().format() + '-' + index
-            const docRef = firebase.firestore().doc(`${PHOTOS}/${ITEMS}`)
-            await docRef.set({
-              [DATE]: {
-                [ENTRY]: {
-                  originalFileName,
-                  originalUrl: downloadURL,
-                  uploadedBy: firebase.auth().currentUser.uid
-                }
-              }
-            }, { merge: true })
+            // let DATE = moment().utc().format('YYYY-MM-DD')
+            // let ENTRY = moment().utc().format() + '-' + index
+            // const docRef = firebase.firestore().doc(`${PHOTOS}/${ITEMS}`)
+            // await docRef.set({
+            //   [DATE]: {
+            //     [ENTRY]: {
+            //       originalFileName,
+            //       originalUrl: downloadURL,
+            //       uploadedBy: firebase.auth().currentUser.uid
+            //     }
+            //   }
+            // }, { merge: true })
             console.log('after firestore.set.')
             const updatePhotosHTTP = firebase.functions().httpsCallable('updatePhotosHTTP')
             const resp = await updatePhotosHTTP({
               doc: `${PHOTOS}/${ITEMS}`,
-              date: DATE,
-              entry: ENTRY
+              fileName: originalFileName
             })
             console.log('function returned a response.', resp)
           } catch (err) {
@@ -150,22 +147,22 @@ function App () {
   return (
     <div>
       <SelectFileButton className='my-4'
-        multiple
-        onChange={event => {
-          uploadFiles([].concat(Array.from(event.target.files)))
-          // this.setState({ files: this.state.files.concat(Array.from(event.target.files)) })
-        }}
-        button={(
-          <Button
-            variant="contained"
-            size="large"
-            color="primary"
-            // style={styles.controlStyle}
-          >
-            Upload images
-            {/*<Icon style={{ marginLeft: 10 }}>cloud_upload</Icon>*/}
-          </Button>
-        )}
+                        multiple
+                        onChange={event => {
+                          uploadFiles([].concat(Array.from(event.target.files)))
+                          // this.setState({ files: this.state.files.concat(Array.from(event.target.files)) })
+                        }}
+                        button={(
+                          <Button
+                            variant="contained"
+                            size="large"
+                            color="primary"
+                            // style={styles.controlStyle}
+                          >
+                            Upload images
+                            {/*<Icon style={{ marginLeft: 10 }}>cloud_upload</Icon>*/}
+                          </Button>
+                        )}
       />
       {
         isSortable
