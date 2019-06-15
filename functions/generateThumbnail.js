@@ -24,7 +24,7 @@ module.exports = (admin) => {
       let currData = docData.data()
 
       let values = currData && currData.values || []
-      console.log('entry.md5:', entry.md5)
+      console.info('entry.md5:', entry.md5)
       const foundEntry = values.find((currEntry) => {
         return currEntry.md5 === entry.md5
       })
@@ -43,7 +43,7 @@ module.exports = (admin) => {
       entry.md5 = md5File.sync(originalFileNameLocal)
 
       await setIsDuplicate(entry)
-      console.log('entry.isDuplicate:', entry.isDuplicate)
+      console.info('entry.isDuplicate:', entry.isDuplicate)
       if (entry.isDuplicate) {
         return
       }
@@ -61,10 +61,15 @@ module.exports = (admin) => {
         const buffer = fs.readFileSync(originalFileNameLocal)
         const parser = exif.create(buffer)
         const result = parser.parse()
-        console.log()
-        console.log('exif:', JSON.stringify(result, null, 2))
-        console.log()
-        entry.createdAt = result && result.tags && result.tags.CreateDate ? moment(result.tags.CreateDate).format() : moment().utc().format()
+        console.info()
+        console.info('exif:', JSON.stringify(result, null, 2))
+        const DateTimeOriginal = result && result.tags && result.tags.DateTimeOriginal
+        const CreateDate = result && result.tags && result.tags.CreateDate
+        console.info('DateTimeOriginal:', DateTimeOriginal)
+        console.info('CreateDate:', CreateDate)
+
+        console.info()
+        entry.createdAt = moment.unix(CreateDate || DateTimeOriginal || 0).utc().format()
       }
 
 
@@ -108,6 +113,8 @@ module.exports = (admin) => {
           .resize(entry.thumbnailWidth, entry.thumbnailHeight) // resize
           .write(thumbnailFileNameLocal) // save
       }
+      entry.thumbnailSize = fs.statSync(thumbnailFileNameLocal).size
+
       console.info('Uploading thumbnail to storage. entry.thumbnailFileName:', entry.thumbnailFileName)
       await bucket.upload(thumbnailFileNameLocal, {
         // Support for HTTP requests made with `Accept-Encoding: gzip`
@@ -125,7 +132,7 @@ module.exports = (admin) => {
       console.info('Thumbnail uploaded successfully.')
       if (!entry.isDuplicate) {
         const values = await setIsDuplicate(entry)
-        console.log('entry.isDuplicate:', entry.isDuplicate)
+        console.info('entry.isDuplicate:', entry.isDuplicate)
         if (!entry.isDuplicate) {
           values.unshift(entry)
           await docRef.set({ values }, { merge: true })
