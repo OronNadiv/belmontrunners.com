@@ -19,6 +19,12 @@ jobs:
           name: Build Application
           command: npm run build
       - run:
+          name: Install Firebase Tools
+          command: npm install --prefix=./firebase-deploy firebase-tools
+      - run:
+          name: Deploy to Firebase
+          command: ./firebase-deploy/node_modules/.bin/firebase deploy --token=$FIREBASE_DEPLOY_TOKEN --only hosting
+      - run:
           name: Install AWS CLI
           command: |
             sudo apt-get install -y python-pip libyaml-dev python-dev jq
