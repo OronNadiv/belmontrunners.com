@@ -26,10 +26,15 @@ import { ROOT } from '../../urls'
 import { Redirect } from 'react-router-dom'
 import * as Sentry from '@sentry/browser'
 import CloseIcon from '@material-ui/icons/Close'
+import Checkbox from '@material-ui/core/Checkbox'
 
 const ARRAY_KEY = 'values'
 const IS_ACTIVE = 'isActive'
 const IS_MEMBER = 'isMember'
+
+const SHOW_MEMBERS = 'showMembers'
+const SHOW_USERS = 'showUsers'
+const SHOW_SUBSCRIBERS = 'showSubscribers'
 
 class ContactsPage extends Component {
   constructor (props) {
@@ -38,8 +43,9 @@ class ContactsPage extends Component {
 
     this.state = {
       search: '',
-      showMembersOnly: false,
-      showUsersOnly: false,
+      [SHOW_MEMBERS]: true,
+      [SHOW_USERS]: true,
+      [SHOW_SUBSCRIBERS]: true,
       active: new IList(),
       inactive: new IList(),
       filteredActive: new IList(),
@@ -157,8 +163,9 @@ class ContactsPage extends Component {
       // apply filter if active or inactive has changed.
       this.applyFilter()
     } else if (prevState.search !== this.state.search ||
-      prevState.showMembersOnly !== this.state.showMembersOnly ||
-      prevState.showUsersOnly !== this.state.showUsersOnly) {
+      prevState[SHOW_MEMBERS] !== this.state[SHOW_MEMBERS] ||
+      prevState[SHOW_USERS] !== this.state[SHOW_USERS] ||
+      prevState[SHOW_SUBSCRIBERS] !== this.state[SHOW_SUBSCRIBERS]) {
       // apply filter if filter criteria have changed.
       this.applyFilter()
     }
@@ -206,7 +213,10 @@ class ContactsPage extends Component {
   }
 
   applyFilter () {
-    const { active, inactive, showMembersOnly, showUsersOnly, search } = this.state
+    const { active, inactive, search } = this.state
+    const showMembers = this.state[SHOW_MEMBERS]
+    const showUsers = this.state[SHOW_USERS]
+    const showSubscribers = this.state[SHOW_SUBSCRIBERS]
 
     const applyFilterInner = (contacts) => {
       contacts = contacts.toJS()
@@ -216,11 +226,11 @@ class ContactsPage extends Component {
         })
         contacts = searcher.search(search)
       }
-      if (showMembersOnly) {
-        contacts = contacts.filter(contact => contact[IS_MEMBER])
-      } else if (showUsersOnly) {
-        contacts = contacts.filter(contact => contact[UID])
-      }
+      contacts = contacts.filter(contact => {
+        return (showMembers && contact[IS_MEMBER]) ||
+          (showUsers && ((showMembers && contact[UID]) || (contact[UID] && !contact[IS_MEMBER]))) ||
+          (showSubscribers && !contact[UID])
+      })
       return fromJS(contacts)
     }
     this.setState({
@@ -233,7 +243,7 @@ class ContactsPage extends Component {
   getChips (contacts, isActive) {
     const { allowWrite } = this.props
     return contacts.toJS().map(
-      (contact, index) => {
+      (contact) => {
         let label
         if (contact[DISPLAY_NAME]) {
           label = `${contact[DISPLAY_NAME] || ''} (${contact[EMAIL]})`
@@ -307,7 +317,7 @@ class ContactsPage extends Component {
     }
 
     return (
-      <div className='container-fluid'>
+      <div className='container-fluid mb-4'>
         {
           showAddDialog &&
           <AddDialog
@@ -372,6 +382,44 @@ class ContactsPage extends Component {
               </IconButton>
             }
           </Paper>
+        </div>
+        <div className='row mb-3'>
+          <div className='d-flex flex-row mx-auto'>
+            <div className='d-flex flex-row align-items-center'
+                 onClick={() => this.setState({ [SHOW_MEMBERS]: !this.state[SHOW_MEMBERS] })}
+            >
+              <Checkbox
+                checked={this.state[SHOW_MEMBERS]}
+
+              />
+              <Chip
+                label='Members'
+                color='primary'
+              />
+            </div>
+            <div className='d-flex flex-row align-items-center mx-4'
+                 onClick={() => this.setState({ [SHOW_USERS]: !this.state[SHOW_USERS] })}
+            >
+              <Checkbox
+                checked={this.state[SHOW_USERS]}
+              />
+              <Chip
+                label='Users'
+                color='secondary'
+              />
+            </div>
+            <div className='d-flex flex-row align-items-center'
+                 onClick={() => this.setState({ [SHOW_SUBSCRIBERS]: !this.state[SHOW_SUBSCRIBERS] })}
+            >
+              <Checkbox
+                checked={this.state[SHOW_SUBSCRIBERS]}
+              />
+              <Chip
+                label='Subscribers'
+                color='default'
+              />
+            </div>
+          </div>
         </div>
         <div className='row'>
           <div className='col-6'>
