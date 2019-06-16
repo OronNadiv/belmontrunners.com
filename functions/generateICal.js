@@ -2,6 +2,7 @@ const request = require('request')
 const md5 = require('md5')
 const csv = require('csvtojson')
 const moment = require('moment')
+const _ = require('underscore')
 
 const HEADER = `BEGIN:VCALENDAR
 VERSION:2.0
@@ -48,9 +49,47 @@ SUMMARY:Track Thursday
 TRANSP:TRANSPARENT
 END:VEVENT
  */
+const getDescription = ({ description, facebookEventId, googleMapId }) => {
+  let facebookEvent
+  let googleMap
+  if (facebookEventId) {
+    facebookEvent = `
+
+Facebook event: https://www.facebook.com/events/${facebookEventId}`
+  }
+  if (googleMapId) {
+    googleMap = `
+
+Exact meeting location: https://goo.gl/maps/${googleMapId}`
+  }
+  return `${description}${facebookEvent || ''}${googleMap || ''}`
+}
+
+
+const handleNewlines = (val, isAllow = false) => {
+  if (!val || !_.isString(val)) {
+    return ''
+  }
+  val = val.toString()
+  console.log(JSON.stringify(val), val, typeof val)
+  if (isAllow) {
+    return val.replace(/\n/g, '\n\\n')
+  }
+  return val.replace(/\n/g, '')
+}
+
 const getICalEvent = ({ start, end, subject, description, location, facebookEventId, googleMapId }) => {
-  let startFormatted = start.format('YYYYMMDDTHHmmSS')
-  let endFormatted = end.format('YYYYMMDDTHHmmSS')
+
+  description = getDescription({ description, facebookEventId, googleMapId })
+
+  subject = handleNewlines(subject)
+  description = handleNewlines(description, true)
+  location = handleNewlines(location)
+  facebookEventId = handleNewlines(facebookEventId)
+  googleMapId = handleNewlines(googleMapId)
+
+  const startFormatted = start.format('YYYYMMDDTHHmmSS')
+  const endFormatted = end.format('YYYYMMDDTHHmmSS')
   return `BEGIN:VEVENT
 DTSTART;TZID=America/Los_Angeles:${startFormatted}
 DTEND;TZID=America/Los_Angeles:${endFormatted}

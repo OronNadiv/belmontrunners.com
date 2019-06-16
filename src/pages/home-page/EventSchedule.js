@@ -35,6 +35,12 @@ class EventSchedule extends Component {
           <div className="main_title">
             <h2>Upcoming Events</h2>
           </div>
+          <a className='d-flex flex-row-reverse mb-3'
+             href='https://calendar.google.com/calendar?cid=guvk2qu1oo369ns50tvatdot7v8chd1t@import.calendar.google.com'
+             rel='noopener noreferrer'
+             target='_blank'>
+            Follow in Google Calendar
+          </a>
           <div className="event_schedule_inner">
             <div className="tab-content" id="myTabContent">
               <div className="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
@@ -84,15 +90,15 @@ class EventSchedule extends Component {
 
   static getMapLink (eventElement) {
     return <span style={{ paddingRight: "1em" }}>
-      <a target="_blank" rel="noopener noreferrer" href={`https://goo.gl/maps/${eventElement}`}>
-        <i className="fas fa-map-marker-alt" />&nbsp;Meeting Point</a>
+    <a target="_blank" rel="noopener noreferrer" href={`https://goo.gl/maps/${eventElement}`}>
+    <i className="fas fa-map-marker-alt" />&nbsp;Meeting Point</a>
     </span>
   }
 
   static getFacebookEventLink (eventElement) {
     return <span>
-      <a target="_blank" rel="noopener noreferrer" href={`https://www.facebook.com/events/${eventElement}`}>
-      <i className="fab fa-facebook-square" />&nbsp;Facebook Event</a>
+    <a target="_blank" rel="noopener noreferrer" href={`https://www.facebook.com/events/${eventElement}`}>
+    <i className="fab fa-facebook-square" />&nbsp;Facebook Event</a>
     </span>
   }
 }
