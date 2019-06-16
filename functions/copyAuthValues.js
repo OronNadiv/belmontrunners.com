@@ -18,7 +18,7 @@ module.exports = (admin) => {
         let lastSignedInAt = moment(lastSignInTime).utc().format()
         const userRef = firestore.doc(`users/${uid}`)
         await userRef.set({ createdAt, lastSignedInAt, emailVerified }, { merge: true })
-        console.log(`Updated ${uid} ${createdAt} ${lastSignedInAt}`)
+        console.info(`Updated ${uid} ${createdAt} ${lastSignedInAt}`)
       } catch (err) {
         console.error(err)
       }
@@ -29,14 +29,11 @@ module.exports = (admin) => {
       await listAllUsers(listUsersResult.pageToken)
     } else {
       console.info('Done.  Exiting...')
-      process.exit(0)
     }
   }
 
 // Start listing users from the beginning, 1000 at a time.
 
 
-  return async () => {
-    await listAllUsers()
-  }
+  return listAllUsers
 }

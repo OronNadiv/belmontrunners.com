@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
 import request from 'request'
 import csv from 'csvtojson'
-import moment from 'moment/moment'
+import moment from 'moment'
 
 class EventSchedule extends Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.state = { events: [] }
   }
 
