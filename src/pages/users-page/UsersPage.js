@@ -202,8 +202,6 @@ class EnhancedTable extends Component {
   }
 
   async loadMembers () {
-    console.log('in loadMembers.')
-
     const usersRef = firebase.firestore().collection('users')
     const doc = await usersRef.get()
     // exception will be handled by ErrorBoundary
@@ -218,7 +216,6 @@ class EnhancedTable extends Component {
           const number = phoneUtil.parseAndKeepRawInput(data[PHONE], 'US')
           data[PHONE] = phoneUtil.format(number, PNF.NATIONAL)
         }
-        console.log(doc.id, data[DATE_OF_BIRTH])
         data[DATE_OF_BIRTH] = data[DATE_OF_BIRTH] ? moment(data[DATE_OF_BIRTH]).format(DATE_OF_BIRTH_FORMAT) : ''
         data[LAST_SIGNED_IN_AT] = moment(data[LAST_SIGNED_IN_AT]).format(MEMBERSHIP_EXPIRES_AT_FORMAT)
         data[CREATED_AT] = moment(data[CREATED_AT]).format(MEMBERSHIP_EXPIRES_AT_FORMAT)
@@ -287,11 +284,6 @@ class EnhancedTable extends Component {
 
   render () {
     const { currentUser, allowRead, allowWrite, allowDelete } = this.props
-    console.log('render called.',
-      'allowRead:', allowRead,
-      'allowWrite:', allowWrite,
-      'allowDelete:', allowDelete
-    )
 
     if (currentUser && !allowRead) {
       return <Redirect to={ROOT} />
@@ -393,13 +385,10 @@ class EnhancedTable extends Component {
                               onChange={async (event, checked) => {
                                 const index = rows.indexOf(row)
                                 rows[index][DID_RECEIVED_SHIRT] = checked
-                                console.log('val', checked, index, row)
-
                                 const userRef = firebase.firestore().doc(`users/${row[UID]}`)
                                 try {
                                   await userRef.set({ [DID_RECEIVED_SHIRT]: checked }, { merge: true })
                                   this.setState({ rows })
-                                  console.log('val', checked, index, row)
                                 } catch (error) {
                                   Sentry.captureException(error)
                                   console.log(error)

@@ -27,4 +27,4 @@ yarn-error.log*
 **/lambda.zip
 eventure
 
-react-file-uploader
+.firebase

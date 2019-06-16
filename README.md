@@ -7,8 +7,8 @@ On-boarding new board members:
 * Grant permissions for Stripe.
 
 Third parties:
-* Firebase - Authentication, Firestore.
-* AWS - S3 (static html/css/js files),
+* Firebase - Authentication, Firestore, Functions, Storage & Hosting.
+* AWS - S3 (static html/css/js files).
 * AWS - Lambda functions.
 * Stripe - payments.
 * Mailgun - send emails.
