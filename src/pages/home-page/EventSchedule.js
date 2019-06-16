@@ -50,7 +50,7 @@ class EventSchedule extends Component {
                         return (
                           <div key={index} className="media">
                             <div className="d-flex">
-                              <img src="../../img/schedule-3.png" alt="" />
+                              <img src="img/schedule-3.png" alt="" />
                             </div>
                             <div className="media-body">
                               <h5>{event.moment.format('MMMM D h:mm a')}</h5>
@@ -75,6 +75,10 @@ class EventSchedule extends Component {
                                   : <span />
                               }
                             </div>
+                            {
+                              event['is-members-only-event'] === 'TRUE' &&
+                              <img src="img/members-only-t.png" alt="" style={{ width: 58 }} />
+                            }
                           </div>
                         )
                       }
