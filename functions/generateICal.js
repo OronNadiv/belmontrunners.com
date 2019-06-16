@@ -73,7 +73,7 @@ const handleNewlines = (val, isAllow = false) => {
   val = val.toString()
   console.log(JSON.stringify(val), val, typeof val)
   if (isAllow) {
-    return val.replace(/\n/g, '\n\\n')
+    return val.replace(/\n/g, '\\n')
   }
   return val.replace(/\n/g, '')
 }
