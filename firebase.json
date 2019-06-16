@@ -14,6 +14,10 @@
     ],
     "rewrites": [
       {
+        "source": "/public/basic.ical",
+        "function": "ical"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
