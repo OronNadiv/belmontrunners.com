@@ -12,7 +12,9 @@ jobs:
           name: Install Dependencies
           command: |
             npm install
-            cd lambda
+            cd functions
+            npm install
+            cd ../lambda
             npm install
             zip -r ../public/lambda.zip .
       - run:
@@ -23,7 +25,7 @@ jobs:
           command: npm install --prefix=./firebase-deploy firebase-tools
       - run:
           name: Deploy to Firebase
-          command: ./firebase-deploy/node_modules/.bin/firebase deploy --token=$FIREBASE_DEPLOY_TOKEN --only hosting
+          command: ./firebase-deploy/node_modules/.bin/firebase deploy --token=$FIREBASE_DEPLOY_TOKEN
       - run:
           name: Install AWS CLI
           command: |

@@ -71,7 +71,6 @@ const handleNewlines = (val, isAllow = false) => {
     return ''
   }
   val = val.toString()
-  console.log(JSON.stringify(val), val, typeof val)
   if (isAllow) {
     return val.replace(/\n/g, '\\n')
   }
@@ -134,7 +133,7 @@ module.exports = () => async () => {
           googleMapId: event['google-map-id']
         })
       })
-    return `${HEADER}\n${icalEvents.join('')}${FOOTER}`
+    return `${HEADER}${icalEvents.join('')}${FOOTER}`
   } catch (err) {
     console.error(err)
     throw err

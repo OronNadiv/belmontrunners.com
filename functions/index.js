@@ -18,9 +18,11 @@ exports.copyAuthValuesCrontab = functions.pubsub
   .onRun(async () => {
     try {
       await copyAuthValues()
+      console.info('Calling process.exit(0)')
       process.exit(0)
     } catch (err) {
       console.error(err)
+      console.info('Calling process.exit(1)')
       process.exit(1)
     }
   })
