@@ -4,8 +4,8 @@ const { membership_fee_in_cents, secret_keys: { live, test } } = functions.confi
 const stripeLive = require('stripe')(live)
 const stripeTest = require('stripe')(test)
 
-module.exports = async (data, context) => {
-  console.info('stripe() called.', 'data:', data, 'context:', context)
+module.exports = async (data) => {
+  console.info('stripe() called.', 'data:', data)
 
   const { token: { id }, description, amountInCents, origin } = data
 

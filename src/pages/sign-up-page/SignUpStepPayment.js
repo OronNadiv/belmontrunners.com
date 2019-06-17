@@ -1,7 +1,7 @@
+import 'firebase/functions'
 import firebase from 'firebase'
 import React, { Component } from 'react'
 import { CardElement, injectStripe } from 'react-stripe-elements'
-import rp from 'request-promise'
 import SignUpStepperButton from './SignUpStepperButton'
 import './Stripe.scss'
 import PropTypes from 'prop-types'
@@ -72,17 +72,15 @@ class SignUpStepPayment extends Component {
       }
       const body = {
         ...stripeResponse,
+        origin: window.origin,
         description: `Annual membership for Belmont Runners. name: ${displayName} email: ${email}  uid: ${uid}`,
         amountInCents: this.props[TOTAL_AMOUNT_IN_DOLLARS] * 100
       }
-      const options = {
-        method: 'POST',
-        uri: 'https://c0belq1th0.execute-api.us-west-1.amazonaws.com/default/stripe',
-        body,
-        json: true
-      }
+      const stripe = firebase.functions().httpsCallable('stripe')
+
       try {
-        const chargeResponse = await rp(options)
+        const response = await stripe(body)
+        console.log('response:', response)
         const transactionsRef = firebase.firestore().doc(
           `users/${uid}/transactions/${moment().utc().format()}`)
         const transactionsLastRef = firebase.firestore().doc(
@@ -101,7 +99,7 @@ class SignUpStepPayment extends Component {
           newMembershipExpiresAt = yearFromNow
         }
         this.setState({
-          [CONFIRMATION_NUMBER]: chargeResponse.id
+          [CONFIRMATION_NUMBER]: response.data.id
         })
 
         let values = {
@@ -109,7 +107,7 @@ class SignUpStepPayment extends Component {
           stripeResponse: stripeResponse,
           paidAt: moment().utc().format(),
           paidAmount: this.props[TOTAL_AMOUNT_IN_DOLLARS],
-          confirmationNumber: chargeResponse.id
+          confirmationNumber: response.data.id
         }
         await Promise.all([
           transactionsRef.set(values),
@@ -123,9 +121,12 @@ class SignUpStepPayment extends Component {
           Sentry.captureException(error)
           console.error('failed to update user data.', error)
         }
-      } catch (stripeResponse) {
-        if (stripeResponse.error) {
-          this.setMessage(stripeResponse.error.message)
+      } catch (error) {
+        console.warn('Error from stripe.  error:', error)
+        if (error && error.message) {
+          const stripeError = JSON.parse(error.message)
+          console.warn('stripeError:', stripeError)
+          this.setMessage(stripeError.message)
           return
         }
         // todo: handle case where it's not stripe error.
