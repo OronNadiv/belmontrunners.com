@@ -4,6 +4,7 @@ admin.initializeApp()
 const generateThumbnail = require('./generateThumbnail')(admin)
 const copyAuthValues = require('./copyAuthValues')(admin)
 const generateICal = require('./generateICal')(admin)
+const stripe = require('./stripe')
 
 const runtimeOpts = {
   timeoutSeconds: 120,
@@ -49,3 +50,6 @@ exports.ical = functions.https.onRequest(async (req, res) => {
     res.status(500).send('Internal Server Error')
   }
 })
+
+exports.stripe = functions
+  .https.onCall(stripe)

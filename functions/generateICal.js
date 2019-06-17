@@ -60,7 +60,7 @@ Facebook event: https://www.facebook.com/events/${facebookEventId}`
   if (googleMapId) {
     googleMap = `
 
-Exact meeting location: https://goo.gl/maps/${googleMapId}`
+Meeting point: https://goo.gl/maps/${googleMapId}`
   }
   return `${description}${facebookEvent || ''}${googleMap || ''}`
 }
