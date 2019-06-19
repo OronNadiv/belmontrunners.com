@@ -23,9 +23,11 @@
     "md5": "^2.2.1",
     "md5-file": "^4.0.0",
     "moment": "^2.24.0",
+    "normalize-email": "^1.1.1",
+    "parse-full-name": "^1.2.3",
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
-    "stripe": "^7.1.0",
+    "stripe": "^7.2.0",
     "underscore": "^1.9.1"
   },
   "devDependencies": {

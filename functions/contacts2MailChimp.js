@@ -1,4 +1,4 @@
-const { DISPLAY_NAME, EMAIL, IS_ACTIVE } = require('./fields')
+const { DISPLAY_NAME, EMAIL } = require('./fields')
 
 const { parseFullName } = require('parse-full-name')
 const rp = require('request-promise')
