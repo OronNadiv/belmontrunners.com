@@ -14,12 +14,10 @@ import * as PropTypes from 'prop-types'
 import LoggedInState from '../../components/LoggedInState'
 import { connect } from 'react-redux'
 import Typography from '@material-ui/core/Typography'
-import Promise from 'bluebird'
 import normalizeEmail from 'normalize-email'
-import _ from 'underscore'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import Snackbar from '@material-ui/core/Snackbar'
-import { DISPLAY_NAME, EMAIL, MEMBERSHIP_EXPIRES_AT, UID } from '../../fields'
+import { DISPLAY_NAME, EMAIL, UID } from '../../fields'
 import moment from 'moment'
 import { fromJS, List as IList } from 'immutable'
 import { ROOT } from '../../urls'
@@ -27,6 +25,9 @@ import { Redirect } from 'react-router-dom'
 import * as Sentry from '@sentry/browser'
 import CloseIcon from '@material-ui/icons/Close'
 import Checkbox from '@material-ui/core/Checkbox'
+import { ExportToCsv } from 'export-to-csv'
+import { parseFullName } from 'parse-full-name'
+import SaveIcon from '@material-ui/icons/SaveAlt'
 
 const ARRAY_KEY = 'values'
 const IS_ACTIVE = 'isActive'
@@ -39,8 +40,6 @@ const SHOW_SUBSCRIBERS = 'showSubscribers'
 class ContactsPage extends Component {
   constructor (props) {
     super(props)
-    this.docRef = firebase.firestore().doc('subscribers/items')
-
     this.state = {
       search: '',
       [SHOW_MEMBERS]: true,
@@ -51,6 +50,34 @@ class ContactsPage extends Component {
       filteredActive: new IList(),
       filteredInactive: new IList()
     }
+  }
+
+  exportToCSV () {
+    const options = {
+      fieldSeparator: ',',
+      quoteStrings: '"',
+      decimalSeparator: '.',
+      showLabels: true,
+      useBom: true,
+      useKeysAsHeaders: true,
+      filename: 'contacts-' + moment().format()
+    }
+
+    const csvExporter = new ExportToCsv(options)
+    const { filteredActive } = this.state
+    const items = filteredActive
+      .map(item => {
+        const displayName = item.get(DISPLAY_NAME)
+        const email = item.get(EMAIL)
+        const name = parseFullName(displayName)
+        return {
+          "Email Address": email,
+          "First Name": name.first || '',
+          "Last Name": name.last || ''
+        }
+      })
+    console.log(items.toJS())
+    csvExporter.generateCsv(items.toJS())
   }
 
   copyToClipboard () {
@@ -70,81 +97,8 @@ class ContactsPage extends Component {
 
   async componentDidMount () {
     try {
-      const { usersCollection, contactsDoc } = await Promise
-        .props({
-          usersCollection: firebase.firestore().collection('users').get(),
-          contactsDoc: this.docRef.get()
-        })
-      let data = contactsDoc.data()
-
-      if (!data || !data[ARRAY_KEY]) {
-        data = { [ARRAY_KEY]: [] }
-      }
-      const contacts = data[ARRAY_KEY]
-
-      // load all users
-      const users = []
-      usersCollection.forEach(userDoc => {
-        const user = userDoc.data()
-        user[UID] = userDoc.id
-        users.push(user)
-      })
-
-      /*
-      Update contacts information from users by UID.
-      Handles case where a user changed a displayName or email
-       */
-      users.forEach((user) => {
-        const foundContact = contacts.find((contact) => {
-          return contact[UID] === user[UID]
-        })
-        if (foundContact) {
-          foundContact[DISPLAY_NAME] = user[DISPLAY_NAME] || ''
-          foundContact[EMAIL] = user[EMAIL]
-          foundContact[MEMBERSHIP_EXPIRES_AT] = user[MEMBERSHIP_EXPIRES_AT] || ''
-        }
-      })
-
-      /*
-      Update contacts information from users by EMAIL.
-      This handles cases where a user was created with an email of an existing subscriber.
-      Now we "promote" this subscriber to be a user.
-       */
-      contacts.forEach((contact) => {
-        const foundUser = users.find((user) => {
-          return normalizeEmail(contact[EMAIL]) === normalizeEmail(user[EMAIL])
-        })
-        if (foundUser) {
-          contact[UID] = foundUser[UID]
-          contact[DISPLAY_NAME] = foundUser[DISPLAY_NAME] || ''
-          contact[MEMBERSHIP_EXPIRES_AT] = foundUser[MEMBERSHIP_EXPIRES_AT] || ''
-        }
-      })
-
-      /*
-      Add new users to the contacts list
-       */
-      users.forEach((user) => {
-        const foundContact = _.findWhere(contacts, { [UID]: user[UID] })
-        if (foundContact) {
-          return
-        }
-        const contact = {
-          [UID]: user[UID],
-          [DISPLAY_NAME]: user[DISPLAY_NAME] || '',
-          [EMAIL]: user[EMAIL],
-          [MEMBERSHIP_EXPIRES_AT]: user[MEMBERSHIP_EXPIRES_AT] || '',
-          [IS_ACTIVE]: true
-        }
-        contacts.push(contact)
-      })
-
-      // set isMember
-      contacts.forEach((contact) => {
-        const membershipExpiresAt = contact[MEMBERSHIP_EXPIRES_AT]
-        const isMember = membershipExpiresAt && moment(membershipExpiresAt).isAfter(moment())
-        contact[IS_MEMBER] = !!isMember
-      })
+      const contactsData = await firebase.firestore().doc('subscribers/items').get()
+      const contacts = contactsData.data()[ARRAY_KEY]
 
       const active = fromJS(contacts.filter((item) => item[IS_ACTIVE]))
       const inactive = fromJS(contacts.filter((item) => !item[IS_ACTIVE]))
@@ -184,14 +138,13 @@ class ContactsPage extends Component {
 
     const contacts = active.concat(inactive).toJS()
     try {
-      await this.docRef.set({ [ARRAY_KEY]: contacts })
+      await firebase.firestore().doc('subscribers/items').set({ [ARRAY_KEY]: contacts })
       console.log('saved')
     } catch (error) {
       Sentry.captureException(error)
       console.error(error)
     }
   }
-
 
   handleMoveChip (item) {
     const moveItem = ({ from, to }) => {
@@ -241,7 +194,7 @@ class ContactsPage extends Component {
   }
 
   getChips (contacts, isActive) {
-    const { allowWrite } = this.props
+    // const { allowWrite } = this.props
     return contacts.toJS().map(
       (contact) => {
         let label
@@ -266,8 +219,8 @@ class ContactsPage extends Component {
           key={contact[UID] || normalizeEmail(contact[EMAIL])}
           label={label}
           color={getColor()}
-          onDelete={allowWrite ? () => this.handleMoveChip(fromJS(contact)) : undefined}
-          deleteIcon={!isActive ? <AddIcon /> : undefined}
+          // onDelete={allowWrite ? () => this.handleMoveChip(fromJS(contact)) : undefined}
+          // deleteIcon={!isActive ? <AddIcon /> : undefined}
         />
       }
     )
@@ -310,7 +263,7 @@ class ContactsPage extends Component {
     console.log('render()  called')
 
     const { currentUser, allowRead, allowWrite } = this.props
-    const { filteredActive, filteredInactive, showAddDialog, copied } = this.state
+    const { filteredActive, /*filteredInactive,*/ showAddDialog, copied } = this.state
 
     if (currentUser && !allowRead) {
       return <Redirect to={ROOT} />
@@ -422,10 +375,10 @@ class ContactsPage extends Component {
           </div>
         </div>
         <div className='row'>
-          <div className='col-6'>
+          <div className='col-12'>
             <Paper className='px-2 py-3'>
               <Typography variant="h5" component="h3" className='ml-3'>
-                Active ({filteredActive.size})
+                Contacts ({filteredActive.size})
                 <CopyToClipboard
                   text={this.state.copyToClipboard}
                   onCopy={() => {
@@ -435,10 +388,17 @@ class ContactsPage extends Component {
                     <CopyIcon />
                   </IconButton>
                 </CopyToClipboard>
+                <IconButton onClick={() => this.exportToCSV()}>
+                  <SaveIcon />
+                </IconButton>
+
               </Typography>
+              <div className='d-flex justify-content-between flex-wrap'>
               {this.getChips(filteredActive, true)}
+              </div>
             </Paper>
           </div>
+{/*
           <div className='col-6'>
             <Paper className='px-2 py-3'>
               <Typography variant="h5" component="h3" className='ml-3'>
@@ -447,6 +407,7 @@ class ContactsPage extends Component {
               {this.getChips(filteredInactive, false)}
             </Paper>
           </div>
+*/}
         </div>
       </div>
     )

@@ -10,12 +10,9 @@ admin.initializeApp({
 
 const copyAuthValues = require('./copyAuthValues')
 
-copyAuthValues(admin)()
-  .then(() => {
-    process.exit(0)
-    return 0
-  })
-  .catch((err) => {
-    console.error(err)
-    process.exit(1)
-  })
+const run = async () => {
+  await copyAuthValues(admin)()
+  console.info('done')
+}
+
+run()

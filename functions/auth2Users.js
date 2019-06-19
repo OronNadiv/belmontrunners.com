@@ -1,8 +1,5 @@
-#!/usr/bin/env node
-
 const moment = require('moment')
 const Promise = require('bluebird')
-
 
 module.exports = (admin) => {
   const firestore = admin.firestore()
