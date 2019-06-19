@@ -394,20 +394,22 @@ class ContactsPage extends Component {
 
               </Typography>
               <div className='d-flex justify-content-between flex-wrap'>
-              {this.getChips(filteredActive, true)}
+                {this.getChips(filteredActive, true)}
               </div>
             </Paper>
           </div>
-{/*
-          <div className='col-6'>
-            <Paper className='px-2 py-3'>
-              <Typography variant="h5" component="h3" className='ml-3'>
-                Inactive ({filteredInactive.size})
-              </Typography>
-              {this.getChips(filteredInactive, false)}
-            </Paper>
-          </div>
-*/}
+          {
+            /*
+            <div className='col-6'>
+              <Paper className='px-2 py-3'>
+                <Typography variant="h5" component="h3" className='ml-3'>
+                  Inactive ({filteredInactive.size})
+                </Typography>
+                {this.getChips(filteredInactive, false)}
+              </Paper>
+            </div>
+            */
+          }
         </div>
       </div>
     )
