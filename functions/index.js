@@ -8,15 +8,13 @@ const contacts2MailChimp = require('./contacts2MailChimp')(admin)
 const generateICal = require('./generateICal')(admin)
 const stripe = require('./stripe')
 
-const runtimeOpts = {
-  timeoutSeconds: 120,
-  memory: '1GB'
-}
 exports.generateThumbnailHTTP = functions
-  .runWith(runtimeOpts)
-  .https.onCall(generateThumbnail)
+  .runWith({ timeoutSeconds: 120, memory: '1GB' })
+  .https
+  .onCall(generateThumbnail)
 
-exports.auth2UsersCronJob = functions.pubsub
+exports.auth2UsersCronJob = functions
+  .pubsub
   .schedule('0 */6 * * *')
   .onRun(async () => {
     try {
@@ -41,7 +39,9 @@ exports.users2ContactsCronJab = functions.pubsub
     }
   })
 
-exports.contacts2MailChimpCronJab = functions.pubsub
+exports.contacts2MailChimpCronJab = functions
+  .runWith({ timeoutSeconds: 180 })
+  .pubsub
   .schedule('40 */6 * * *')
   .onRun(async () => {
     try {
@@ -55,28 +55,30 @@ exports.contacts2MailChimpCronJab = functions.pubsub
     }
   })
 
-exports.ical = functions.https.onRequest(async (req, res) => {
-  try {
-    const body = await generateICal(req)
-    res.set({
-      'cache-control': 'no-cache, no-store, max-age=0, must-revalidate',
-      // 'content-security-policy': "script-src 'report-sample' 'nonce-b3O76BbGW8VYkTGK5Nxtvw' 'unsafe-inline' 'strict-dynamic' https: http: 'unsafe-eval';object-src 'none';base-uri 'self';report-uri /calendar/cspreport",
-      'content-type': 'text/calendar; charset=UTF-8',
-      // 'date': 'Sat, 15 Jun 2019 22:23:46 GMT',
-      'expires': 'Mon, 01 Jan 1990 00:00:00 GMT',
-      'pragma': 'no-cache',
-      // 'server': 'GSE',
-      'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
-      'x-content-type-options': 'nosniff',
-      'x-frame-options': 'SAMEORIGIN',
-      'x-xss-protection': '1; mode=block'
-    })
-    res.send(Buffer.from(body))
-  } catch (err) {
-    console.error('ical generation got an err:', err)
-    res.status(500).send('Internal Server Error')
-  }
-})
+exports.ical = functions
+  .https
+  .onRequest(async (req, res) => {
+    try {
+      const body = await generateICal(req)
+      res.set({
+        'cache-control': 'no-cache, no-store, max-age=0, must-revalidate',
+        // 'content-security-policy': "script-src 'report-sample' 'nonce-b3O76BbGW8VYkTGK5Nxtvw' 'unsafe-inline' 'strict-dynamic' https: http: 'unsafe-eval';object-src 'none';base-uri 'self';report-uri /calendar/cspreport",
+        'content-type': 'text/calendar; charset=UTF-8',
+        // 'date': 'Sat, 15 Jun 2019 22:23:46 GMT',
+        'expires': 'Mon, 01 Jan 1990 00:00:00 GMT',
+        'pragma': 'no-cache',
+        // 'server': 'GSE',
+        'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+        'x-content-type-options': 'nosniff',
+        'x-frame-options': 'SAMEORIGIN',
+        'x-xss-protection': '1; mode=block'
+      })
+      res.send(Buffer.from(body))
+    } catch (err) {
+      console.error('ical generation got an err:', err)
+      res.status(500).send('Internal Server Error')
+    }
+  })
 
 exports.stripe = functions
   .https.onCall(stripe)
