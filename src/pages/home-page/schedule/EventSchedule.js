@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import request from 'request'
 import csv from 'csvtojson'
 import moment from 'moment'
+import CalendarSelector from './CalendarSelector'
 
 class EventSchedule extends Component {
   constructor (props) {
@@ -35,12 +36,9 @@ class EventSchedule extends Component {
           <div className="main_title">
             <h2>Upcoming Events</h2>
           </div>
-          <a className='d-flex flex-row-reverse mb-3'
-             href='https://calendar.google.com/calendar?cid=guvk2qu1oo369ns50tvatdot7v8chd1t@import.calendar.google.com'
-             rel='noopener noreferrer'
-             target='_blank'>
-            Follow in Google Calendar
-          </a>
+          <div className='d-flex flex-row-reverse mb-3'>
+            <CalendarSelector />
+          </div>
           <div className="event_schedule_inner">
             <div className="tab-content" id="myTabContent">
               <div className="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
@@ -50,7 +48,7 @@ class EventSchedule extends Component {
                         return (
                           <div key={index} className="media">
                             <div className="d-flex">
-                              <img src="img/schedule-3.png" alt="" />
+                              <img src="img/schedule/schedule-3.png" alt="" />
                             </div>
                             <div className="media-body">
                               <h5>{event.moment.format('MMMM D h:mm a')}</h5>
@@ -77,7 +75,7 @@ class EventSchedule extends Component {
                             </div>
                             {
                               event['is-members-only-event'] === 'TRUE' &&
-                              <img src="img/members-only-t.png" alt="" style={{ width: 58 }} />
+                              <img src="img/schedule/members-only-t.png" alt="" style={{ width: 58 }} />
                             }
                           </div>
                         )
