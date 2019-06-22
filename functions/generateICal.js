@@ -5,6 +5,7 @@ const moment = require('moment')
 const _ = require('underscore')
 
 const HEADER = `BEGIN:VCALENDAR
+PRODID:-//Belmont Runners//Belmont Runners 1.0//EN
 VERSION:2.0
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
