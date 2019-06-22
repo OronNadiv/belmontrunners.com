@@ -25,7 +25,7 @@ const isEmail = value => (!value || !isEmailComponent.validate(value) ? INVALID_
 const minPasswordLength = value => (value.length < 6 ? INVALID_PASSWORD_LENGTH(6) : undefined)
 const composeValidators = (...validators) => value => validators.reduce((error, validator) => error || validator(value), undefined)
 
-class View extends Component {
+class SignUpStepAuth extends Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -241,9 +241,13 @@ class View extends Component {
   }
 }
 
-View.propTypes = {
+SignUpStepAuth.propTypes = {
   isLast: PropTypes.bool,
   onNextClicked: PropTypes.func.isRequired
 }
 
-export default LoggedInState({ name: 'SignUpStepAuth', isRequiredToBeLoggedIn: false, canSwitchToLogin: true })(View)
+export default LoggedInState({
+  name: 'SignUpStepAuth',
+  isRequiredToBeLoggedIn: false,
+  canSwitchToLogin: true
+})(SignUpStepAuth)

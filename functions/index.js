@@ -56,6 +56,7 @@ exports.contacts2MailChimpCronJab = functions
   })
 
 exports.ical = functions
+  .runWith({ memory: '512MB' })
   .https
   .onRequest(async (req, res) => {
     try {
