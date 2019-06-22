@@ -5,8 +5,9 @@ import ListItemIcon from '@material-ui/core/ListItemIcon'
 import ListItemText from '@material-ui/core/ListItemText'
 import MenuItem from '@material-ui/core/MenuItem'
 import GoogleCalendarIcon from './GoogleCalendarIcon'
-import YahooIcon from './YahooIcon'
+import IosIcon from './IosIcon'
 import MicrosoftOutlookIcon from './MicrosoftOutlookIcon'
+import YahooIcon from './YahooIcon'
 import Paper from '@material-ui/core/Paper'
 import Dialog from '@material-ui/core/Dialog'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
@@ -15,11 +16,12 @@ import LinkIcon from './LinkIcon'
 import MacOSIcon from './MacOSIcon'
 
 const GOOGLE = 'GOOGLE'
-const YAHOO = 'YAHOO'
-const OUTLOOK = 'OUTLOOK'
-const ICLOUND = 'iCLOUD'
-const MACOS = 'MACOS'
 const ICAL = 'ICAL'
+const IOS = 'IOS'
+const MACOS = 'MACOS'
+const OUTLOOK = 'OUTLOOK'
+const YAHOO = 'YAHOO'
+
 const ICAL_LINK = 'https://www.belmontrunners.com/public/basic.ical'
 export default function CalendarSelector () {
   const [anchorEl, setAnchorEl] = React.useState(null)
@@ -35,24 +37,24 @@ export default function CalendarSelector () {
     setAnchorEl(null)
     setShowDialog(true)
     switch (provider) {
-      case MACOS:
-        setVideoId('xBKVO3Iv41s')
-        break
-      case YAHOO:
-        setVideoId('3jaueqrriLE')
-        break
-      case OUTLOOK:
-        setVideoId('h_V0FQ3REgk')
-        break
-      case ICLOUND:
-        window.open("https://calendar.google.com/calendar?cid=guvk2qu1oo369ns50tvatdot7v8chd1t@import.calendar.google.com", "_blank")
-        break
       case GOOGLE:
         setShowDialog(false)
         window.open("https://calendar.google.com/calendar?cid=guvk2qu1oo369ns50tvatdot7v8chd1t@import.calendar.google.com", "_blank")
         break
       case ICAL:
         setVideoId('')
+        break
+      case IOS:
+        setVideoId('3vN7CrKi2FQ')
+        break
+      case MACOS:
+        setVideoId('xBKVO3Iv41s')
+        break
+      case OUTLOOK:
+        setVideoId('h_V0FQ3REgk')
+        break
+      case YAHOO:
+        setVideoId('3jaueqrriLE')
         break
       default:
         setShowDialog(false)
@@ -75,6 +77,7 @@ export default function CalendarSelector () {
       />
 
       <Dialog onClose={handleClose} open={showDialog}
+              fullScreen
               aria-labelledby="simple-dialog-title">
         <div className='mx-auto my-4'>
           <Paper className='d-flex align-items-center mx-4' elevation={3}>
@@ -91,8 +94,8 @@ export default function CalendarSelector () {
         </div>
         {
           videoId &&
-          <div className='mx-4 mb-4'>
-            <iframe className='mx-auto' width="560" height="315" title='Add to my calendar'
+          <div className='mx-auto mb-4'>
+            <iframe width="560" height="315" title='Add to my calendar'
                     src={`https://www.youtube.com/embed/${videoId}?rel=0`}
                     frameBorder="0"
                     allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
@@ -154,18 +157,18 @@ export default function CalendarSelector () {
             </ListItemIcon>
             <ListItemText primary="MacOS Calendar (Desktop)" />
           </MenuItem>
+          <MenuItem onClick={() => handleClose(IOS)}>
+            <ListItemIcon>
+              <IosIcon />
+            </ListItemIcon>
+            <ListItemText primary="iOS (iPhone/iPad)" />
+          </MenuItem>
           <MenuItem onClick={() => handleClose(ICAL)}>
             <ListItemIcon>
               <LinkIcon />
             </ListItemIcon>
             <ListItemText primary="iCal Link" />
           </MenuItem>
-          {/*<MenuItem onClick={() => handleClose(ICLOUND)}>*/}
-          {/*  <ListItemIcon>*/}
-          {/*    <ICloudIcon />*/}
-          {/*  </ListItemIcon>*/}
-          {/*  <ListItemText primary="iCloud" />*/}
-          {/*</MenuItem>*/}
         </Paper>
       </Menu>
     </div>
