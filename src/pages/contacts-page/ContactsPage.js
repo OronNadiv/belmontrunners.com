@@ -113,7 +113,9 @@ class ContactsPage extends Component {
   async componentDidUpdate (prevProps, prevState, snapshot) {
     if (!prevState.active.equals(this.state.active) ||
       !prevState.inactive.equals(this.state.inactive)) {
-      await this.saveChanges()
+      if (this.props.allowWrite) {
+        await this.saveChanges()
+      }
       // apply filter if active or inactive has changed.
       this.applyFilter()
     } else if (prevState.search !== this.state.search ||
