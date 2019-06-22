@@ -24,6 +24,7 @@
     "md5": "^2.2.1",
     "md5-file": "^4.0.0",
     "moment": "^2.24.0",
+    "moment-timezone": "^0.5.25",
     "normalize-email": "^1.1.1",
     "parse-full-name": "^1.2.3",
     "request": "^2.88.0",

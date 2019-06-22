@@ -34,7 +34,7 @@ module.exports = () => async () => {
     events
       .map(event => {
         event.month--
-        event.moment = moment(event)
+        event.moment = moment.tz(event, 'America/Los_Angeles')
         return event
       })
       .filter(event => {
@@ -49,7 +49,8 @@ module.exports = () => async () => {
             start: event.moment,
             end: moment(event.moment).add(2, 'hours'),
             summary: event.subject,
-            description: description = getDescription({
+            location: event.where,
+            description: getDescription({
               description: event.what,
               facebookEventId: event['facebook-event-id'],
               googleMapId: event['google-map-id']
