@@ -2,4 +2,8 @@
 
 const generateICal = require('./generateICal')
 
-generateICal()().then(console.info).catch(console.error)
+const run = async () => {
+  const res = await generateICal()()
+  console.info(res)
+}
+run()

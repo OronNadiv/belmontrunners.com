@@ -14,9 +14,6 @@ jobs:
             npm install
             cd functions
             npm install
-            cd ../lambda
-            npm install
-            zip -r ../public/lambda.zip .
       - run:
           name: Build Application
           command: npm run build
@@ -26,11 +23,3 @@ jobs:
       - run:
           name: Deploy to Firebase
           command: ./firebase-deploy/node_modules/.bin/firebase deploy --token=$FIREBASE_DEPLOY_TOKEN --force
-      - run:
-          name: Install AWS CLI
-          command: |
-            sudo apt-get install -y python-pip libyaml-dev python-dev jq
-            sudo pip install awscli
-      - run:
-          name: Push to S3
-          command: aws s3 sync build s3://www.belmontrunners.com --delete
