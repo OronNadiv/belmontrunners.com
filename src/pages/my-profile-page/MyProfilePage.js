@@ -70,7 +70,7 @@ class MyProfilePage extends Component {
   }
 
   render () {
-    const { isCurrentUserLoaded, currentUser } = this.props
+    const { currentUser } = this.props
     const userData = this.props.userData.toJS()
     const { close, showChangeEmailDialog, showChangePasswordDialog, isSubmitting, isSuccess } = this.state
     if (close || isSuccess) {
@@ -78,7 +78,7 @@ class MyProfilePage extends Component {
     }
 
     const initialValues = _.pick(userData, ADDRESS1, ADDRESS2, CITY, DATE_OF_BIRTH, GENDER, PHONE, SHIRT_GENDER, SHIRT_SIZE, STATE, ZIP)
-    return isCurrentUserLoaded &&
+    return currentUser &&
       <div className='mx-auto py-5 px-3' style={{ maxWidth: 500 }}>
         <Typography component="h5" variant="h5">
           My Profile
@@ -193,7 +193,6 @@ class MyProfilePage extends Component {
 MyProfilePage.propTypes = {
   sendEmailVerification: PropTypes.func.isRequired,
   updateUserData: PropTypes.func.isRequired,
-  isCurrentUserLoaded: PropTypes.bool.isRequired,
   currentUser: PropTypes.object,
   userData: PropTypes.object.isRequired,
   userDataUpdating: PropTypes.bool.isRequired,
@@ -205,9 +204,8 @@ const mapDispatchToProps = {
   updateUserData: updateUserDataAction
 }
 
-const mapStateToProps = ({ currentUser: { currentUser, isCurrentUserLoaded, userData, userDataUpdating, userDataUpdateError } }) => {
+const mapStateToProps = ({ currentUser: { currentUser, userData, userDataUpdating, userDataUpdateError } }) => {
   return {
-    isCurrentUserLoaded,
     currentUser,
     userData,
     userDataUpdating,

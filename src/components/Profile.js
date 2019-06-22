@@ -3,7 +3,7 @@ import firebase from 'firebase'
 import Avatar from 'react-avatar'
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import { ROOT, CONTACTS, MY_PROFILE, USERS } from '../urls'
+import { CONTACTS, MY_PROFILE, ROOT, USERS } from '../urls'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import LoggedInState from './LoggedInState'
@@ -72,4 +72,4 @@ const mapStateToProps = ({ currentUser: { permissions, currentUser } }) => {
   }
 }
 
-export default connect(mapStateToProps)(LoggedInState({ name: 'profile', isRequiredToBeLoggedIn: true })(Profile))
+export default LoggedInState({ name: 'profile', isRequiredToBeLoggedIn: true })(connect(mapStateToProps)(Profile))

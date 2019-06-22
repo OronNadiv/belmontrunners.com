@@ -10,15 +10,21 @@ export default ({ name, isRequiredToBeLoggedIn, canSwitchToLogin }) => {
       constructor (props) {
         super(props)
         this.state = {
-          initialIsLoggedIn: null
+          initialIsLoggedIn: null,
+          redirectToRoot: false
         }
       }
 
       checkLoginState () {
         console.log('checkLoginState called.  name:', name)
         const { isCurrentUserLoaded, currentUser } = this.props
+        const { initialIsLoggedIn, redirectToRoot } = this.state
         if (!isCurrentUserLoaded) {
           console.log(`user hasn't been fetched yet.`)
+          return
+        }
+        if (redirectToRoot) {
+          console.log('initialed redirect.  skipping.')
           return
         }
 
@@ -26,14 +32,14 @@ export default ({ name, isRequiredToBeLoggedIn, canSwitchToLogin }) => {
         const isLoggedIn = !!currentUser
 
         // save state login for later
-        if (this.state.initialIsLoggedIn === null) {
+        if (initialIsLoggedIn === null) {
           this.setState({ initialIsLoggedIn: isLoggedIn })
         }
 
         isRequiredToBeLoggedIn = !!isRequiredToBeLoggedIn
         if (isLoggedIn === isRequiredToBeLoggedIn) {
           console.log('state is as expected',
-            'initialIsLoggedIn', this.state.initialIsLoggedIn,
+            'initialIsLoggedIn', initialIsLoggedIn,
             'isLoggedIn:', isLoggedIn,
             'isRequiredToBeLoggedIn:', isRequiredToBeLoggedIn)
           return
@@ -47,7 +53,7 @@ export default ({ name, isRequiredToBeLoggedIn, canSwitchToLogin }) => {
         }
 
         // ok, can switch but only to login state.  Let's see if the user was previously logged in')'
-        if (!this.state.initialIsLoggedIn && isLoggedIn) {
+        if (!initialIsLoggedIn && isLoggedIn) {
           console.log('the user switched from not logged in to logged in.  We are all good.')
           return
         }
@@ -69,10 +75,12 @@ export default ({ name, isRequiredToBeLoggedIn, canSwitchToLogin }) => {
 
       render () {
         const { isCurrentUserLoaded } = this.props
+        const { redirectToRoot } = this.state
+
         if (!isCurrentUserLoaded) {
           return null // todo: better to show loading spinner
         }
-        return this.state.redirectToRoot ?
+        return redirectToRoot ?
           <Redirect to={ROOT} /> :
           <WrappedComponent {...this.props} />
       }
