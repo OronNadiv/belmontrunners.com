@@ -221,9 +221,9 @@ class App extends Component {
               avatar_url: currentUser && currentUser.photoURL,
               displayName: currentUser && currentUser.displayName
             }}
-            // config={{
-            //   enableCampaigns: false
-            // }}
+            config={{
+              enableCampaigns: window.innerHeight >= 770
+            }}
           />
         }
       </div>
