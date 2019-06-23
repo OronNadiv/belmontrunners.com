@@ -109,10 +109,6 @@ function CalendarSelector ({ fullScreen }) {
             </CopyToClipboard>
           </Paper>
         </div>
-        {/*
-        <div className='mx-auto mb-4'>
-        <div className='d-flex justify-content-center mb-4'>
-        */}
         {
           videoId &&
           <div className='mx-auto mb-4'>

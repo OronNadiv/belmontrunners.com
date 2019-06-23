@@ -90,7 +90,7 @@ class HeaderArea extends Component {
               <div className='collapse navbar-collapse offset' id='navbarSupportedContent'
                    style={{ maxHeight: 10 + 41 * totalNavItems }}>
                 <ul className='nav navbar-nav menu_nav ml-auto'>
-                  <li className='nav-item'>
+                  <li className='nav-item' data-toggle='collapse' data-target='#navbarSupportedContent'>
                     {
                       isSignedIn &&
                       <Link to={ROOT} className='nav-link'>
@@ -99,15 +99,15 @@ class HeaderArea extends Component {
                     }
                     {
                       isSignedIn &&
-                      <Link className='nav-link'
-                            to={MY_PROFILE}>
+                      <Link to={MY_PROFILE} className='nav-link'>
                         My profile
                       </Link>
 
                     }
                     {
                       isSignedIn &&
-                      <Link to={ROOT} className='nav-link' onClick={() => firebase.auth().signOut()}>
+                      <Link to={ROOT} className='nav-link'
+                            onClick={() => firebase.auth().signOut()}>
                         Sign out
                       </Link>
                     }
