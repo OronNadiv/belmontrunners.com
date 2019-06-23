@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Button from '@material-ui/core/Button'
 import Menu from '@material-ui/core/Menu'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
@@ -14,6 +14,12 @@ import { CopyToClipboard } from 'react-copy-to-clipboard'
 import Snackbar from '@material-ui/core/Snackbar'
 import LinkIcon from './LinkIcon'
 import MacOSIcon from './MacOSIcon'
+import './schedule.scss'
+import Toolbar from '@material-ui/core/Toolbar'
+import IconButton from '@material-ui/core/IconButton'
+import CloseIcon from '@material-ui/icons/Close'
+import withMobileDialog from '@material-ui/core/withMobileDialog'
+import PropTypes from 'prop-types'
 
 const GOOGLE = 'GOOGLE'
 const ICAL = 'ICAL'
@@ -23,11 +29,12 @@ const OUTLOOK = 'OUTLOOK'
 const YAHOO = 'YAHOO'
 
 const ICAL_LINK = 'https://www.belmontrunners.com/public/basic.ical'
-export default function CalendarSelector () {
-  const [anchorEl, setAnchorEl] = React.useState(null)
-  const [showDialog, setShowDialog] = React.useState(false)
-  const [videoId, setVideoId] = React.useState(null)
-  const [copied, setCopied] = React.useState(false)
+
+function CalendarSelector ({ fullScreen }) {
+  const [anchorEl, setAnchorEl] = useState(null)
+  const [showDialog, setShowDialog] = useState(false)
+  const [videoId, setVideoId] = useState(null)
+  const [copied, setCopied] = useState(false)
 
   function handleClick (event) {
     setAnchorEl(event.currentTarget)
@@ -62,7 +69,7 @@ export default function CalendarSelector () {
   }
 
   return (
-    <div>
+    <div className='ical-tutorials'>
       <Snackbar
         anchorOrigin={{
           vertical: 'bottom',
@@ -77,11 +84,21 @@ export default function CalendarSelector () {
       />
 
       <Dialog onClose={handleClose} open={showDialog}
-              fullScreen
+              fullScreen={fullScreen}
               aria-labelledby="simple-dialog-title">
+        {
+          fullScreen &&
+          <Toolbar>
+            <IconButton edge="start" color="inherit" onClick={handleClose} aria-label="Close">
+              <CloseIcon />
+            </IconButton>
+          </Toolbar>
+
+        }
+
         <div className='mx-auto my-4'>
-          <Paper className='d-flex align-items-center mx-4' elevation={3}>
-            <div className='ml-3'>{ICAL_LINK}</div>
+          <Paper className='d-flex align-items-center mx-2' elevation={3}>
+            <div className='ical-link ml-3'>{ICAL_LINK}</div>
             <CopyToClipboard className='ml-3' text={ICAL_LINK} onCopy={() => {
               setCopied(true)
               !videoId && setShowDialog(false)
@@ -92,10 +109,14 @@ export default function CalendarSelector () {
             </CopyToClipboard>
           </Paper>
         </div>
+        {/*
+        <div className='mx-auto mb-4'>
+        <div className='d-flex justify-content-center mb-4'>
+        */}
         {
           videoId &&
           <div className='mx-auto mb-4'>
-            <iframe width="560" height="315" title='Add to my calendar'
+            <iframe title='Add to my calendar' className='mx-2'
                     src={`https://www.youtube.com/embed/${videoId}?rel=0`}
                     frameBorder="0"
                     allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
@@ -174,3 +195,9 @@ export default function CalendarSelector () {
     </div>
   )
 }
+
+
+CalendarSelector.propTypes = {
+  fullScreen: PropTypes.bool.isRequired
+}
+export default withMobileDialog()(CalendarSelector)
