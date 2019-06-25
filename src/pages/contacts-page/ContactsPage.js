@@ -17,7 +17,7 @@ import Typography from '@material-ui/core/Typography'
 import normalizeEmail from 'normalize-email'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import Snackbar from '@material-ui/core/Snackbar'
-import { DISPLAY_NAME, EMAIL, UID } from '../../fields'
+import { DISPLAY_NAME, EMAIL, SUBSCRIBER_IS_ACTIVE, SUBSCRIBERS_ARRAY_KEY, UID } from '../../fields'
 import moment from 'moment'
 import { fromJS, List as IList } from 'immutable'
 import { ROOT } from '../../urls'
@@ -29,8 +29,6 @@ import { ExportToCsv } from 'export-to-csv'
 import { parseFullName } from 'parse-full-name'
 import SaveIcon from '@material-ui/icons/SaveAlt'
 
-const ARRAY_KEY = 'values'
-const IS_ACTIVE = 'isActive'
 const IS_MEMBER = 'isMember'
 
 const SHOW_MEMBERS = 'showMembers'
@@ -98,10 +96,10 @@ class ContactsPage extends Component {
   async componentDidMount () {
     try {
       const contactsData = await firebase.firestore().doc('subscribers/items').get()
-      const contacts = contactsData.data()[ARRAY_KEY]
+      const contacts = contactsData.data()[SUBSCRIBERS_ARRAY_KEY]
 
-      const active = fromJS(contacts.filter((item) => item[IS_ACTIVE]))
-      const inactive = fromJS(contacts.filter((item) => !item[IS_ACTIVE]))
+      const active = fromJS(contacts.filter((item) => item[SUBSCRIBER_IS_ACTIVE]))
+      const inactive = fromJS(contacts.filter((item) => !item[SUBSCRIBER_IS_ACTIVE]))
 
       this.setState({ active, inactive })
     } catch (error) {
@@ -140,7 +138,7 @@ class ContactsPage extends Component {
 
     const contacts = active.concat(inactive).toJS()
     try {
-      await firebase.firestore().doc('subscribers/items').set({ [ARRAY_KEY]: contacts })
+      await firebase.firestore().doc('subscribers/items').set({ [SUBSCRIBERS_ARRAY_KEY]: contacts })
       console.log('saved')
     } catch (error) {
       Sentry.captureException(error)
@@ -152,13 +150,13 @@ class ContactsPage extends Component {
     const moveItem = ({ from, to }) => {
       const index = from.findIndex((curr) => curr.equals(item))
       from = from.remove(index)
-      const newItem = item.set(IS_ACTIVE, !item.get(IS_ACTIVE))
+      const newItem = item.set(SUBSCRIBER_IS_ACTIVE, !item.get(SUBSCRIBER_IS_ACTIVE))
 
       to = to.unshift(newItem)
       return { from, to }
     }
 
-    if (item.get(IS_ACTIVE)) {
+    if (item.get(SUBSCRIBER_IS_ACTIVE)) {
       const { from, to } = moveItem({ from: this.state.active, to: this.state.inactive })
       this.setState({ active: from, inactive: to })
     } else {
@@ -246,13 +244,13 @@ class ContactsPage extends Component {
       })
       if (indexInactive > -1) {
         let item = inactive.get(indexInactive)
-        item = item.set(IS_ACTIVE, true)
+        item = item.set(SUBSCRIBER_IS_ACTIVE, true)
         inactive = inactive.remove(indexInactive)
         active = active.unshift(item)
       } else {
         active = active.unshift(fromJS({
           [EMAIL]: email,
-          [IS_ACTIVE]: true,
+          [SUBSCRIBER_IS_ACTIVE]: true,
           addedBy: currentUser[UID],
           addedAt: moment().utc().format()
         }))

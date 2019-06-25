@@ -7,6 +7,7 @@ const users2Contacts = require('./users2Contacts')(admin)
 const contacts2MailChimp = require('./contacts2MailChimp')(admin)
 const generateICal = require('./generateICal')(admin)
 const stripe = require('./stripe')
+const addContact = require('./addContact')(admin)
 
 exports.generateThumbnailHTTP = functions
   .runWith({ timeoutSeconds: 120, memory: '1GB' })
@@ -83,3 +84,6 @@ exports.ical = functions
 
 exports.stripe = functions
   .https.onCall(stripe)
+
+exports.addContact = functions
+  .https.onCall(addContact)

@@ -13,7 +13,7 @@ module.exports = (admin) => {
     const docData = await docRef.get()
     const contacts = docData.data().values
     const active = contacts
-    // const inactive = contacts.filter(contact => !contact[IS_ACTIVE])
+    // const inactive = contacts.filter(contact => !contact[SUBSCRIBER_IS_ACTIVE])
 
     // const syncInactive = async () => {
     //   await Promise.each(inactive, async (contact) => {

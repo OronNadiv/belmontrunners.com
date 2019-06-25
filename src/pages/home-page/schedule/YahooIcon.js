@@ -3,7 +3,7 @@ import SvgIcon from '@material-ui/core/SvgIcon'
 
 function YahooIcon () {
   return (
-    <div>
+    <>
       <SvgIcon width={24} height={24}>
         <svg xmlns='http://www.w3.org/2000/svg' id='Layer_1' width='24' height='24' viewBox='0 0 512 512'>
           <path fill='#8A4581'
@@ -23,7 +23,7 @@ function YahooIcon () {
           />
         </svg>
       </SvgIcon>
-    </div>
+    </>
   )
 }
 

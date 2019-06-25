@@ -49,7 +49,6 @@ function EventSchedule () {
 
   useEffect(() => {
     (async function () {
-      console.log('events:', events)
       const filteredEvents = events
         .filter(event => {
           return event.moment.isBefore(moment().add(daysAhead, 'day'))

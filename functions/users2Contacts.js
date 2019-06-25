@@ -1,4 +1,4 @@
-const { ARRAY_KEY, DISPLAY_NAME, EMAIL, IS_ACTIVE, IS_MEMBER, MEMBERSHIP_EXPIRES_AT, UID } = require('./fields')
+const { ARRAY_KEY, DISPLAY_NAME, EMAIL, SUBSCRIBER_IS_ACTIVE, IS_MEMBER, MEMBERSHIP_EXPIRES_AT, UID } = require('./fields')
 
 const moment = require('moment')
 const Promise = require('bluebird')
@@ -72,7 +72,7 @@ module.exports = (admin) => {
         [DISPLAY_NAME]: user[DISPLAY_NAME] || '',
         [EMAIL]: user[EMAIL],
         [MEMBERSHIP_EXPIRES_AT]: user[MEMBERSHIP_EXPIRES_AT] || '',
-        [IS_ACTIVE]: true
+        [SUBSCRIBER_IS_ACTIVE]: true
       }
       contacts.push(contact)
     })
