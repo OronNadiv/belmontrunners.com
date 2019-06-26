@@ -1,5 +1,6 @@
 const functions = require('firebase-functions')
 const { membership_fee_in_cents, secret_keys: { live, test } } = functions.config().stripe
+const _ = require('underscore')
 
 const stripeLive = require('stripe')(live)
 const stripeTest = require('stripe')(test)
@@ -11,7 +12,8 @@ module.exports = async (data) => {
 
   let charge
   try {
-    const isProduction = origin === 'https://www.belmontrunners.com'
+    const isLocal = _.isString(origin) && (origin.indexOf('localhost') > -1 || origin.indexOf('127.0.0.1') > -1)
+    const isProduction = !isLocal
     console.info('isProduction:', isProduction, 'origin:', origin)
     const stripe = isProduction ? stripeLive : stripeTest
     charge = await stripe.charges.create({
