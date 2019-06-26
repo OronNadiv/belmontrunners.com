@@ -1,6 +1,7 @@
 const moment = require('moment')
 const { UID, EMAIL, SUBSCRIBER_IS_ACTIVE, SUBSCRIBERS_ARRAY_KEY } = require('./fields')
 const _ = require('underscore')
+const functions = require('firebase-functions')
 
 module.exports = (admin) => {
   const firestore = admin.firestore()
@@ -38,7 +39,7 @@ module.exports = (admin) => {
       console.info('contact has been added and saved successfully.')
     } catch (err) {
       console.error('error:', err)
-      throw new Error('Something went wrong...')
+      throw new functions.https.HttpsError('internal', 'Something went wrong...')
     }
   }
 }

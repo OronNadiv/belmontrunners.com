@@ -23,6 +23,7 @@
     "google-maps-react": "^2.0.2",
     "history": "^4.9.0",
     "immutable": "^4.0.0-rc.12",
+    "initials": "^3.0.1",
     "isemail": "^3.2.0",
     "jquery": "^3.4.1",
     "material-ui-pickers": "^2.2.4",

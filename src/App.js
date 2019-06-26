@@ -17,6 +17,7 @@ import {
   FORGOT_PASSWORD,
   GALLERY,
   JOIN,
+  MEMBERS_DIRECTORY,
   MY_PROFILE,
   RECOVER_EMAIL,
   RESET_PASSWORD,
@@ -35,6 +36,7 @@ import RecoverEmailPage from './pages/authentication/actions/RecoverEmailPage'
 import ContactsPage from './pages/contacts-page/ContactsPage'
 import MyProfilePage from './pages/my-profile-page/MyProfilePage'
 import VerifyEmailPage from './pages/authentication/actions/VerifyEmailPage'
+import MembersDirectory from './pages/members-directory/MembersDirectory'
 
 class App extends Component {
   componentDidMount () {
@@ -96,6 +98,17 @@ class App extends Component {
               <div>
                 <HeaderArea />
                 <MyProfilePage />
+                <Footer />
+              </div>
+            )}
+          />
+          <Route
+            exact
+            path={MEMBERS_DIRECTORY}
+            render={() => (
+              <div>
+                <HeaderArea />
+                <MembersDirectory />
                 <Footer />
               </div>
             )}
