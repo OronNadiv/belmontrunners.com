@@ -120,12 +120,10 @@ class UserDetails extends Component {
                 return null
               }
               const res = moment(value, "YYYY-MM-DD")
-              console.log('format', value, res)
               return res
             }}
             parse={value => { // to json
               const res = value.format("YYYY-MM-DD")
-              console.log('parse', value, res)
               return res
             }}
             InputLabelProps={{

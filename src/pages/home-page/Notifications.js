@@ -10,6 +10,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import SnackbarContent from '@material-ui/core/SnackbarContent/index'
 import { updateUserData as updateUserDataAction } from '../../reducers/currentUser'
+import * as Sentry from '@sentry/browser'
 
 const POPUP_PAY_MEMBERSHIP_SNOOZED_AT = 'popupPayMembershipSnoozedAt'
 const POPUP_RECEIVED_SHIRT_AT = 'popupReceivedShirtSnoozedAt'
@@ -79,13 +80,13 @@ class Notifications extends Component {
 
   processPayMembershipNotification ({ userData }) {
     if (this.wasPopupDismissed({ userData, notificationKey: POPUP_PAY_MEMBERSHIP_SNOOZED_AT })) {
-      return
+      return false
     }
 
     // ok, we can show the popup.
 
     if (this.didPayMembership({ userData })) {
-      return
+      return false
     }
 
     const isExistingMember = !!userData[MEMBERSHIP_EXPIRES_AT]
@@ -108,19 +109,21 @@ class Notifications extends Component {
           Remind me later
         </Button>
     })
+    return true
   }
 
   processReceivedShirt ({ userData }) {
+    console.log('processReceivedShirt called.', userData)
     const { updateUserData } = this.props
     if (this.wasPopupDismissed({
       userData,
       notificationKey: POPUP_RECEIVED_SHIRT_AT
     }) || !this.didPayMembership({ userData })) {
-      return
+      return false
     }
 
     if (userData[DID_RECEIVED_SHIRT]) {
-      return
+      return false
     }
 
     // ok, we can show the popup.
@@ -150,7 +153,12 @@ class Notifications extends Component {
             color='secondary'
             size="small"
             onClick={() => {
-              updateUserData({ DID_RECEIVED_SHIRT: true }, { merge: true })
+              try {
+                updateUserData({ [DID_RECEIVED_SHIRT]: true }, { merge: true })
+              } catch (error) {
+                Sentry.captureException(error)
+                console.error('error while updating [DID_RECEIVED_SHIRT] to true.  error:', error)
+              }
             }}>
             YES
           </Button> / <Button
@@ -161,6 +169,7 @@ class Notifications extends Component {
         </Button>
         </div>
     })
+    return true
   }
 
   processNotifications () {
@@ -170,7 +179,7 @@ class Notifications extends Component {
       this.setState({ notification: null })
       return
     }
-    this.processPayMembershipNotification({ userData }) || this.processReceivedShirt({ userData })
+    this.processPayMembershipNotification({ userData }) || this.processReceivedShirt({ userData }) || this.setState({ notification: null })
   }
 
   componentDidMount () {
@@ -178,7 +187,8 @@ class Notifications extends Component {
   }
 
   componentDidUpdate (prevProps) {
-    prevProps.currentUser !== this.props.currentUser && this.processNotifications()
+    (prevProps.currentUser !== this.props.currentUser ||
+      prevProps.userData !== this.props.userData) && this.processNotifications()
   }
 
   render () {
