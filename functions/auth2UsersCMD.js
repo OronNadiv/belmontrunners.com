@@ -8,7 +8,7 @@ admin.initializeApp({
   databaseURL: "https://belmont-runners-1548537264040.firebaseio.com"
 })
 
-const copyAuthValues = require('./copyAuthValues')
+const copyAuthValues = require('./auth2Users')
 
 const run = async () => {
   await copyAuthValues(admin)()

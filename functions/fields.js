@@ -2,7 +2,7 @@ module.exports = {
   UID: 'uid',
   DISPLAY_NAME: 'displayName',
   EMAIL: 'email',
-  PHOTO_URL: 'photoUrl',
+  PHOTO_URL: 'photoURL',
   MEMBERSHIP_EXPIRES_AT: 'membershipExpiresAt',
   SUBSCRIBER_IS_ACTIVE: 'isActive',
   ARRAY_KEY: 'values',
