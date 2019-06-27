@@ -1,6 +1,6 @@
 import firebase from 'firebase'
 import React, { Component } from 'react'
-import PropTypes from 'prop-types'
+import * as PropTypes from 'prop-types'
 import Table from '@material-ui/core/Table'
 import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'

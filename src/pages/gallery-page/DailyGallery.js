@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import Gallery from "react-photo-gallery"
 import Carousel, { Modal, ModalGateway } from "react-images"
-import PropTypes from 'prop-types'
+import * as PropTypes from 'prop-types'
 
 function DailyGallery ({ date, items }) {
   const [currentImage, setCurrentImage] = useState(0)

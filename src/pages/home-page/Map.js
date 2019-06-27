@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { GoogleApiWrapper, Map as GoogleMap } from 'google-maps-react'
-import PropTypes from 'prop-types'
+import * as PropTypes from 'prop-types'
 
 class Map extends Component {
   render () {

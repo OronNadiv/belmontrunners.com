@@ -19,7 +19,7 @@ import Toolbar from '@material-ui/core/Toolbar'
 import IconButton from '@material-ui/core/IconButton'
 import CloseIcon from '@material-ui/icons/Close'
 import withMobileDialog from '@material-ui/core/withMobileDialog'
-import PropTypes from 'prop-types'
+import * as PropTypes from 'prop-types'
 
 const GOOGLE = 'GOOGLE'
 const ICAL = 'ICAL'

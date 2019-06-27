@@ -15,7 +15,7 @@ import {
   INVALID_PASSWORD_LENGTH,
   WRONG_PASSWORD
 } from '../messages'
-import PropTypes from 'prop-types'
+import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import * as Sentry from '@sentry/browser'
 import { Field, Form } from 'react-final-form'

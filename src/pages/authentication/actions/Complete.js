@@ -2,7 +2,7 @@ import 'firebase/auth'
 import firebase from 'firebase'
 import React, { Component } from 'react'
 import queryString from 'query-string'
-import PropTypes from 'prop-types'
+import * as PropTypes from 'prop-types'
 import { ROOT } from '../../../urls'
 import { Redirect, withRouter } from 'react-router-dom'
 import {

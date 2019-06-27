@@ -1,6 +1,6 @@
 import Button from '@material-ui/core/Button/index'
 import React from 'react'
-import PropTypes from 'prop-types'
+import * as PropTypes from 'prop-types'
 
 class SignUpStepperButton extends React.Component {
   render () {

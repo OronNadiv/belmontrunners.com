@@ -1,7 +1,7 @@
 // import 'firebase/auth'
 import firebase from 'firebase'
 import React, { Component } from 'react'
-import PropTypes from 'prop-types'
+import * as PropTypes from 'prop-types'
 import {
   EXPIRED_ACTION_CODE,
   INVALID_ACTION_CODE_INVALID_URL,

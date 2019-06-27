@@ -1,6 +1,6 @@
 import { Component } from 'react'
 import * as Sentry from '@sentry/browser'
-import PropTypes from 'prop-types'
+import * as PropTypes from 'prop-types'
 
 class ErrorBoundary extends Component {
   constructor (props) {

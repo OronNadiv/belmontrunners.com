@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 
 import SignUpStepper from './SignUpStepper'
-import PropTypes from 'prop-types'
+import * as PropTypes from 'prop-types'
 import { withRouter } from 'react-router-dom'
 
 class SignUpPage extends Component {
