@@ -3,23 +3,22 @@ import firebase from 'firebase'
 import React, { useEffect, useState } from "react"
 import { DISPLAY_NAME, PHOTO_URL, UID } from '../../fields'
 import Chip from '@material-ui/core/Chip'
-import PropTypes from 'prop-types'
+import * as PropTypes from 'prop-types'
 import { updateUserData as updateUserDataAction } from '../../reducers/currentUser'
 import { connect } from 'react-redux'
 import SearchIcon from '@material-ui/icons/Search'
 import IconButton from '@material-ui/core/IconButton'
 import Paper from '@material-ui/core/Paper'
 import InputBase from '@material-ui/core/InputBase'
+import FaceIcon from '@material-ui/icons/Face'
 import Avatar from '@material-ui/core/Avatar'
-import initials from 'initials'
 import FuzzySearch from 'fuzzy-search'
 import LoggedInState from '../../components/LoggedInState'
-import Drawer from '@material-ui/core/Drawer'
-
-// const items = require('./members.json')
+import UserProfile from './UserProfile'
 
 function MembersDirectory ({ currentUser }) {
   const [items, setItems] = useState([])
+  // const [items, setItems] = useState(require('./members.json'))
   const [selected, setSelected] = useState()
   const [search, setSearch] = useState('')
 
@@ -55,7 +54,7 @@ function MembersDirectory ({ currentUser }) {
 
         return <Chip
           className='my-1 mx-1'
-          avatar={item[PHOTO_URL] ? <Avatar src={item[PHOTO_URL]} /> : <Avatar>{initials(item[DISPLAY_NAME])}</Avatar>}
+          avatar={item[PHOTO_URL] ? <Avatar src={item[PHOTO_URL]} /> : <Avatar><FaceIcon /></Avatar>}
           onClick={() => setSelected(item)}
           key={item[UID]}
           label={label}
@@ -65,22 +64,19 @@ function MembersDirectory ({ currentUser }) {
     )
   }
 
-  const showSelected = () => {
-    return JSON.stringify(selected)
-  }
-  console.log(JSON.stringify(items))
-
   return !currentUser ?
     <></> :
     <div className='container-fluid mb-4'>
-      <Drawer
-        anchor="right"
-        open={!!selected}
-        onClose={() => setSelected(0)}
-        style={{ width: 250 }}
-      >
-        {showSelected()}
-      </Drawer>
+      {
+        !!selected &&
+        <UserProfile
+          item={selected}
+          style={{ width: 250 }}
+          onClose={() => {
+            setSelected()
+          }}
+        />
+      }
       <div className='d-flex justify-content-center row'>
         <Paper style={{
           margin: '20px 0',
