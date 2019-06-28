@@ -15,6 +15,15 @@ import Avatar from '@material-ui/core/Avatar'
 import FuzzySearch from 'fuzzy-search'
 import LoggedInState from '../../components/LoggedInState'
 import UserProfile from './UserProfile'
+import { makeStyles } from '@material-ui/core'
+
+const useStyles = makeStyles({
+  avatar: {
+    width: 32,
+    height: 32
+  }
+})
+
 
 function MembersDirectory ({ currentUser }) {
   const [users, setUsers] = useState([])
@@ -53,7 +62,11 @@ function MembersDirectory ({ currentUser }) {
 
         return <Chip
           className='my-1 mx-1'
-          avatar={user[PHOTO_URL] ? <Avatar src={user[PHOTO_URL]} /> : <Avatar><DirectionsRun /></Avatar>}
+          avatar={
+            user[PHOTO_URL] ?
+              <Avatar className={useStyles.avatar} src={user[PHOTO_URL]} /> :
+              <Avatar className={useStyles.avatar}><DirectionsRun /></Avatar>
+          }
           onClick={() => setSelected(user)}
           key={user[UID]}
           label={label}

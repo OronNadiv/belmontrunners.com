@@ -3,7 +3,6 @@ import SvgIcon from '@material-ui/core/SvgIcon'
 
 function LinkIcon () {
   return (
-    <>
       <SvgIcon width={24} height={24}>
         <svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' className='text-primary'>
           <path d='M0 0h24v24H0z' fill='none' />
@@ -12,7 +11,6 @@ function LinkIcon () {
           />
         </svg>
       </SvgIcon>
-    </>
   )
 }
 
