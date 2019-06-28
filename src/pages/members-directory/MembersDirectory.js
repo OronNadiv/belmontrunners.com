@@ -10,15 +10,14 @@ import SearchIcon from '@material-ui/icons/Search'
 import IconButton from '@material-ui/core/IconButton'
 import Paper from '@material-ui/core/Paper'
 import InputBase from '@material-ui/core/InputBase'
-import FaceIcon from '@material-ui/icons/Face'
+import DirectionsRun from '@material-ui/icons/DirectionsRun'
 import Avatar from '@material-ui/core/Avatar'
 import FuzzySearch from 'fuzzy-search'
 import LoggedInState from '../../components/LoggedInState'
 import UserProfile from './UserProfile'
 
 function MembersDirectory ({ currentUser }) {
-  const [items, setItems] = useState([])
-  // const [items, setItems] = useState(require('./members.json'))
+  const [users, setUsers] = useState([])
   const [selected, setSelected] = useState()
   const [search, setSearch] = useState('')
 
@@ -28,25 +27,25 @@ function MembersDirectory ({ currentUser }) {
     }
     (async function () {
       const resp = await firebase.functions().httpsCallable('getMembers')()
-      setItems(resp.data)
+      setUsers(resp.data)
     })()
   }, [currentUser])
 
   const getChips = () => {
-    let filteredItems = items
+    let filteredUsers = users
     if (search) {
-      const searcher = new FuzzySearch(items, [DISPLAY_NAME], {
+      const searcher = new FuzzySearch(users, [DISPLAY_NAME], {
         caseSensitive: false
       })
-      filteredItems = searcher.search(search)
+      filteredUsers = searcher.search(search)
     }
 
-    return filteredItems.map(
-      (item) => {
-        let label = item[DISPLAY_NAME]
+    return filteredUsers.map(
+      (user) => {
+        let label = user[DISPLAY_NAME]
 
         function getColor () {
-          if (item.uid === currentUser.uid) {
+          if (user.uid === currentUser.uid) {
             return 'primary'
           }
           return 'default'
@@ -54,9 +53,9 @@ function MembersDirectory ({ currentUser }) {
 
         return <Chip
           className='my-1 mx-1'
-          avatar={item[PHOTO_URL] ? <Avatar src={item[PHOTO_URL]} /> : <Avatar><FaceIcon /></Avatar>}
-          onClick={() => setSelected(item)}
-          key={item[UID]}
+          avatar={user[PHOTO_URL] ? <Avatar src={user[PHOTO_URL]} /> : <Avatar><DirectionsRun /></Avatar>}
+          onClick={() => setSelected(user)}
+          key={user[UID]}
           label={label}
           color={getColor()}
         />
@@ -70,7 +69,7 @@ function MembersDirectory ({ currentUser }) {
       {
         !!selected &&
         <UserProfile
-          item={selected}
+          user={selected}
           style={{ width: 250 }}
           onClose={() => {
             setSelected()

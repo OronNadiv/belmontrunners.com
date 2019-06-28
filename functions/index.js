@@ -1,7 +1,7 @@
 const functions = require('firebase-functions')
 const admin = require('firebase-admin')
 admin.initializeApp()
-const generateThumbnail = require('./generateThumbnail')(admin)
+// const generateThumbnail = require('./generateThumbnail')(admin)
 const auth2Users = require('./auth2Users')(admin)
 const users2Contacts = require('./users2Contacts')(admin)
 const contacts2MailChimp = require('./contacts2MailChimp')(admin)
@@ -10,36 +10,33 @@ const stripe = require('./stripe')
 const addContact = require('./addContact')(admin)
 const getMembers = require('./getMembers')(admin)
 
-exports.generateThumbnailHTTP = functions
-  .runWith({ timeoutSeconds: 120, memory: '1GB' })
-  .https
-  .onCall(generateThumbnail)
+// exports.generateThumbnailHTTP = functions
+//   .runWith({ timeoutSeconds: 120, memory: '1GB' })
+//   .https
+//   .onCall(generateThumbnail)
 
-exports.auth2UsersCronJob = functions
-  .pubsub
-  .schedule('0 */6 * * *')
-  .onRun(async () => {
-    try {
-      await auth2Users()
-      console.info('Calling process.exit(0)')
-      process.exit(0)
-    } catch (err) {
-      console.error(err)
-      console.info('Calling process.exit(1)')
-      process.exit(1)
-    }
-  })
+const auth2UsersExec = async () => {
+  try {
+    await auth2Users()
+    console.info('Calling process.exit(0)')
+    process.exit(0)
+  } catch (err) {
+    console.error(err)
+    console.info('Calling process.exit(1)')
+    process.exit(1)
+  }
+}
+exports.auth2UsersCronJob = functions.pubsub.schedule('0 */6 * * *').onRun(auth2UsersExec)
+exports.auth2UsersOnCreate = functions.auth.user().onCreate(auth2UsersExec)
 
-exports.users2ContactsCronJab = functions.pubsub
-  .schedule('20 */6 * * *')
-  .onRun(async () => {
-    try {
-      await users2Contacts()
-      console.info('users2ContactsCronJab: done')
-    } catch (err) {
-      console.error('users2ContactsCronJab: error:', err)
-    }
-  })
+exports.users2ContactsCronJab = functions.pubsub.schedule('20 */6 * * *').onRun(async () => {
+  try {
+    await users2Contacts()
+    console.info('users2ContactsCronJab: done')
+  } catch (err) {
+    console.error('users2ContactsCronJab: error:', err)
+  }
+})
 
 exports.contacts2MailChimpCronJab = functions
   .runWith({ timeoutSeconds: 180 })

@@ -3,10 +3,12 @@ import firebase from 'firebase'
 import Avatar from 'react-avatar'
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import { CONTACTS, MY_PROFILE, ROOT, USERS } from '../urls'
-import PropTypes from 'prop-types'
+import { CONTACTS, MEMBERS_DIRECTORY, MY_PROFILE, ROOT, USERS } from '../urls'
+import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import LoggedInState from './LoggedInState'
+import { MEMBERSHIP_EXPIRES_AT } from '../fields'
+import moment from 'moment'
 
 class Profile extends Component {
   constructor (props) {
@@ -15,7 +17,9 @@ class Profile extends Component {
   }
 
   render () {
-    const { currentUser, allowUsersPage, allowContactsPage } = this.props
+    const { currentUser, allowUsersPage, allowContactsPage, userData } = this.props
+    const isMember = userData && userData.get(MEMBERSHIP_EXPIRES_AT) && moment(userData.get(MEMBERSHIP_EXPIRES_AT)).isAfter(moment())
+
     return (
       <span className="dropdown signout-btn text-white-50">
         <a className="dropdown-toggle" id="dropdownMenuLink" href='/'
@@ -41,6 +45,12 @@ class Profile extends Component {
           <Link to={MY_PROFILE} className="dropdown-item">
             My profile
           </Link>
+          {
+            isMember &&
+            <Link to={MEMBERS_DIRECTORY} className="dropdown-item">
+              Members Directory
+            </Link>
+          }
 
           <div className="dropdown-divider" />
 
@@ -57,10 +67,12 @@ class Profile extends Component {
 Profile.propTypes = {
   allowUsersPage: PropTypes.bool.isRequired,
   allowContactsPage: PropTypes.bool.isRequired,
-  currentUser: PropTypes.object.isRequired
+  currentUser: PropTypes.object.isRequired,
+  userData: PropTypes.object.isRequired
+
 }
 
-const mapStateToProps = ({ currentUser: { permissions, currentUser } }) => {
+const mapStateToProps = ({ currentUser: { permissions, currentUser, userData } }) => {
   return {
     allowUsersPage: !!currentUser && (
       !!permissions.usersRead[currentUser.uid] ||
@@ -68,7 +80,8 @@ const mapStateToProps = ({ currentUser: { permissions, currentUser } }) => {
     allowContactsPage: !!currentUser && (
       !!permissions.contactsRead[currentUser.uid] ||
       !!permissions.contactsWrite[currentUser.uid]),
-    currentUser: currentUser || {}
+    currentUser: currentUser || {},
+    userData: userData || {}
   }
 }
 

@@ -29,9 +29,13 @@ import Typography from '@material-ui/core/Typography'
 import Button from '@material-ui/core/Button'
 import ChangePasswordDialog from '../../components/ChangePasswordDialog'
 import ChangeEmailDialog from '../../components/ChangeEmailDialog'
+import Snackbar from '@material-ui/core/Snackbar'
+import IconButton from '@material-ui/core/IconButton'
+import CloseIcon from '@material-ui/icons/Close'
+import 'firebase/auth'
+import firebase from 'firebase'
 
-
-class MyProfilePage extends Component {
+class MyProfile extends Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -69,21 +73,51 @@ class MyProfilePage extends Component {
     this.setState({ emailVerificationSent: true })
   }
 
+  async handleLinkToFacebook () {
+    try {
+      console.log('handleLinkToFacebook called.')
+      const { currentUser } = this.props
+      await currentUser.linkWithPopup(new firebase.auth.FacebookAuthProvider())
+      this.forceUpdate()
+    } catch (err) {
+      console.log('err:', err)
+      this.setState({ linkWithProviderErrorMessage: `Connection failed` })
+    }
+  }
+
+  async handleUnlinkToFacebook () {
+    try {
+      console.log('handleUnlinkToFacebook called.')
+      const { currentUser } = this.props
+      await currentUser.unlink('facebook.com')
+      this.forceUpdate()
+    } catch (err) {
+      console.log('err:', err)
+      this.setState({ linkWithProviderErrorMessage: `Disconnection failed` })
+    }
+  }
+
+
   render () {
     const { currentUser } = this.props
+    const connectedToFacebook = !!_.findWhere(firebase.auth().currentUser.providerData, { providerId: 'facebook.com' })
     const userData = this.props.userData.toJS()
-    const { close, showChangeEmailDialog, showChangePasswordDialog, isSubmitting, isSuccess } = this.state
+    const {
+      close,
+      showChangeEmailDialog,
+      showChangePasswordDialog,
+      isSubmitting,
+      isSuccess,
+      linkWithProviderErrorMessage
+    } = this.state
     if (close || isSuccess) {
       return <Redirect to={ROOT} />
     }
 
     const initialValues = _.pick(userData, ADDRESS1, ADDRESS2, CITY, DATE_OF_BIRTH, GENDER, PHONE, SHIRT_GENDER, SHIRT_SIZE, STATE, ZIP)
-    return currentUser &&
-      <div className='mx-auto py-5 px-3' style={{ maxWidth: 500 }}>
-        <Typography component="h5" variant="h5">
-          My Profile
-        </Typography>
 
+    return currentUser &&
+      <>
         <Card className='d-flex flex-row align-content-center my-4'>
           <div className='mr-auto'>
             <CardContent>
@@ -93,10 +127,8 @@ class MyProfilePage extends Component {
               <Typography variant="subtitle1" color="textSecondary">
                 {currentUser.email} (
                 {
-                  currentUser.emailVerified === false
-                    ?
-                    <span className='text-danger text-center'>not verified</span>
-                    :
+                  currentUser.emailVerified === false ?
+                    <span className='text-danger text-center'>not verified</span> :
                     <span className='text-success text-center'>verified</span>
                 }
                 )
@@ -155,6 +187,58 @@ class MyProfilePage extends Component {
           <ChangePasswordDialog onClose={() => this.setState({ showChangePasswordDialog: false })} />
         }
 
+        <Card className='d-flex flex-row align-content-center my-4'>
+          <div className='mr-auto'>
+            <CardContent>
+              <Typography component="h6" variant="h6">
+                Facebook
+              </Typography>
+              <Typography variant="subtitle1" color="textSecondary">
+                <span className={connectedToFacebook ? 'text-success' : 'text-danger'}>
+                  {connectedToFacebook ? 'Connected' : 'Disconnected'}
+                </span>
+              </Typography>
+            </CardContent>
+          </div>
+          <span className='px-3 d-flex'>
+            <Button variant="contained" color={connectedToFacebook ? "default" : "primary"}
+                    className='align-self-center'
+                    onClick={() => connectedToFacebook ? this.handleUnlinkToFacebook() : this.handleLinkToFacebook()}>
+              {connectedToFacebook ? 'Disconnect' : 'Connect'}
+            </Button>
+          </span>
+        </Card>
+
+        {
+          linkWithProviderErrorMessage &&
+          <Snackbar
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'center'
+            }}
+            open
+            autoHideDuration={6000}
+            onClose={() => {
+              console.log('onClose')
+              this.setState({ linkWithProviderErrorMessage: '' })
+            }}
+            message={linkWithProviderErrorMessage}
+            action={[
+              <IconButton
+                key="close"
+                aria-label="Close"
+                color="inherit"
+                onClick={() => {
+                  console.log('onClick')
+                  this.setState({ linkWithProviderErrorMessage: '' })
+                }}
+              >
+                <CloseIcon />
+              </IconButton>
+            ]}
+          />
+        }
+
         <Form onSubmit={(values) => this.handleSubmit(values)}
               initialValues={initialValues}
               render={({ handleSubmit, form, values }) => (
@@ -186,11 +270,11 @@ class MyProfilePage extends Component {
                 </form>
               )}
         />
-      </div>
+      </>
   }
 }
 
-MyProfilePage.propTypes = {
+MyProfile.propTypes = {
   sendEmailVerification: PropTypes.func.isRequired,
   updateUserData: PropTypes.func.isRequired,
   currentUser: PropTypes.object,
@@ -216,4 +300,4 @@ const mapStateToProps = ({ currentUser: { currentUser, userData, userDataUpdatin
 export default LoggedInState({
   name: 'MyProfilePage',
   isRequiredToBeLoggedIn: true
-})(connect(mapStateToProps, mapDispatchToProps)(MyProfilePage))
+})(connect(mapStateToProps, mapDispatchToProps)(MyProfile))

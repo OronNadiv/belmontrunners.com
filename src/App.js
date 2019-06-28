@@ -34,7 +34,7 @@ import ResetPasswordPage from './pages/authentication/actions/ResetPasswordPage'
 import Complete from './pages/authentication/actions/Complete'
 import RecoverEmailPage from './pages/authentication/actions/RecoverEmailPage'
 import ContactsPage from './pages/contacts-page/ContactsPage'
-import MyProfilePage from './pages/my-profile-page/MyProfilePage'
+import MyProfilePage from './pages/my-profile-page'
 import VerifyEmailPage from './pages/authentication/actions/VerifyEmailPage'
 import MembersDirectory from './pages/members-directory/MembersDirectory'
 

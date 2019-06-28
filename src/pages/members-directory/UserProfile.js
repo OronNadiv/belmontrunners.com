@@ -1,5 +1,5 @@
 import * as PropTypes from 'prop-types'
-import React from 'react'
+import React, { useState } from 'react'
 import Avatar from 'react-avatar'
 import moment from 'moment'
 import {
@@ -9,9 +9,12 @@ import {
   DATE_OF_BIRTH,
   DISPLAY_NAME,
   EMAIL,
+  MEMBERS,
+  ONLY_ME,
   PHONE,
   PHOTO_URL,
   STATE,
+  UID,
   ZIP
 } from '../../fields'
 import googleLibPhoneNumber from 'google-libphonenumber'
@@ -19,47 +22,126 @@ import CloseIcon from '@material-ui/icons/Close'
 import SmartPhoneIcon from '@material-ui/icons/Smartphone'
 import HomeIcon from '@material-ui/icons/Home'
 import EmailIcon from '@material-ui/icons/Email'
+import PersonIcon from '@material-ui/icons/Person'
+import GroupIcon from '@material-ui/icons/Group'
 import CakeIcon from '@material-ui/icons/Cake'
 import IconButton from '@material-ui/core/IconButton'
 import SwipeableDrawer from '@material-ui/core/SwipeableDrawer'
+import { connect } from 'react-redux'
+import { Map as IMap } from 'immutable'
+import { updateUserData as updateUserDataAction } from '../../reducers/currentUser'
+import Menu from '@material-ui/core/Menu'
+import MenuItem from '@material-ui/core/MenuItem'
+import ListItemText from '@material-ui/core/ListItemText'
+import ListItemIcon from '@material-ui/core/ListItemIcon'
+
+const defaultVisibility = {
+  [EMAIL]: ONLY_ME,
+  [PHONE]: ONLY_ME,
+  [ADDRESS1]: ONLY_ME,
+  [DATE_OF_BIRTH]: ONLY_ME
+}
 
 const PNF = googleLibPhoneNumber.PhoneNumberFormat
 const phoneUtil = googleLibPhoneNumber.PhoneNumberUtil.getInstance()
 
-function UserProfile ({ onClose, item }) {
+function UserProfile ({ onClose, user, visibility, updateUserData, currentUser }) {
+  const [refs, setRefs] = useState({})
+  const [openMenus, setOpenMenus] = useState({})
+
   function getPhone () {
-    if (!item[PHONE]) {
+    if (!user[PHONE]) {
       return
     }
-    const number = phoneUtil.parseAndKeepRawInput(item[PHONE], 'US')
+    const number = phoneUtil.parseAndKeepRawInput(user[PHONE], 'US')
     return phoneUtil.format(number, PNF.NATIONAL)
   }
 
-  function getEmail () {
-    return item[EMAIL] && <a href={`mailto:${item[EMAIL]}`} target='_blank' rel='noopener noreferrer'>{item[EMAIL]}</a>
-  }
-
   function getAddress () {
-    if (item[ADDRESS1] || item[ADDRESS2] || item[CITY] || item[STATE] || item[ZIP]) {
+    if (user[ADDRESS1] || user[ADDRESS2] || user[CITY] || user[STATE] || user[ZIP]) {
       return <div>
-        {item[ADDRESS1] && <div>{item[ADDRESS1]}<br /></div>}
-        {item[ADDRESS2] && <div>{item[ADDRESS2]}<br /></div>}
-        {item[CITY] && <span>{item[CITY]}, </span>}
-        {item[STATE] && <span>{item[STATE]} </span>}
-        {item[ZIP] && <span>{item[ZIP]}</span>}
+        {user[ADDRESS1] && <div>{user[ADDRESS1]}<br /></div>}
+        {user[ADDRESS2] && <div>{user[ADDRESS2]}<br /></div>}
+        {user[CITY] && <span>{user[CITY]}, </span>}
+        {user[STATE] && <span>{user[STATE]} </span>}
+        {user[ZIP] && <span>{user[ZIP]}</span>}
       </div>
     }
     return null
   }
 
-  function getKeyVal (label, value, icon) {
+  function getKeyVal (label, value, icon, currVisibility, onVisibilityChanged) {
+    const handleOpen = () => {
+      openMenus[label] = true
+      setOpenMenus({ ...openMenus })
+    }
+
+    const handleClose = () => {
+      openMenus[label] = false
+      setOpenMenus({ ...openMenus })
+    }
+
+    const handleRef = (ref) => {
+      refs[label] = ref
+      setRefs(refs)
+    }
+
     return !value ? null : (
-      <div className='d-flex mb-2 align-items-top'>
-        {icon}
-        {/*<div className='mr-1 text-secondary' style={{ width: 90 }}>{label}:</div>*/}
-        <div>{value}</div>
+      <div className='mb-4'>
+        <div className='d-flex align-items-top'>
+          {icon}
+          {/*<div className='mr-1 text-secondary' style={{ width: 90 }}>{label}:</div>*/}
+          <div>{value}</div>
+        </div>
+        {
+          currentUser[UID] === user[UID] &&
+          <small
+            onClick={handleOpen}
+            ref={handleRef}
+          >
+            <span className='text-muted'>Visible to: </span>
+            {currVisibility === ONLY_ME && 'Only me'}
+            {currVisibility === MEMBERS && 'Club members'}
+            <span className='text-primary' style={{ cursor: 'pointer' }}> (change)</span>
+          </small>
+        }
+        <Menu
+          id="customized-menu"
+          anchorEl={refs[label]}
+          keepMounted
+          open={!!openMenus[label]}
+          onClose={handleClose}
+        >
+          <MenuItem onClick={() => {
+            onVisibilityChanged(ONLY_ME)
+            handleClose()
+          }}>
+            <ListItemIcon>
+              <PersonIcon />
+            </ListItemIcon>
+            <ListItemText primary="Only me" />
+          </MenuItem>
+          <MenuItem onClick={() => {
+            onVisibilityChanged(MEMBERS)
+            handleClose()
+          }}>
+            <ListItemIcon>
+              <GroupIcon />
+            </ListItemIcon>
+            <ListItemText primary="Club members" />
+          </MenuItem>
+        </Menu>
       </div>
     )
+  }
+
+  function handleVisibilityChanged (keys) {
+    return (val) => {
+      keys.forEach(key => {
+        visibility = visibility.set(key, val)
+      })
+      updateUserData({ visibility: visibility.toJS() }, { merge: true })
+    }
   }
 
   return (
@@ -70,7 +152,7 @@ function UserProfile ({ onClose, item }) {
       }}
       onClose={() => onClose()}
     >
-      <div className='clearfix' style={{ minWidth: 200 }}>
+      <div className='clearfix' style={{ minWidth: 270 }}>
         <IconButton
           className='float-left'
           key="close"
@@ -82,40 +164,48 @@ function UserProfile ({ onClose, item }) {
         </IconButton>
       </div>
       <div className='mx-5'>
-        <div className='d-flex justify-content-center mb-3 align-items-center'>
-          <Avatar name={item[DISPLAY_NAME]} round color='#6247ea' size={40}
-                  src={item[PHOTO_URL]} />
+        <div className='d-flex justify-content-center mb-4 align-items-center'>
+          <Avatar name={user[DISPLAY_NAME]} round color='#6247ea' size={40}
+                  src={user[PHOTO_URL]} />
         </div>
 
-        <div className='d-flex justify-content-center mb-3 align-items-center'>
-          {item[DISPLAY_NAME]}
+        <div className='d-flex justify-content-center mb-5 align-items-center'>
+          {user[DISPLAY_NAME]}
         </div>
         {
           getKeyVal(
             'Phone',
             getPhone(),
-            <SmartPhoneIcon className='mr-2' style={{ fill: '#D2D6DB' }} />
+            <SmartPhoneIcon className='mr-2' style={{ fill: '#D2D6DB' }} />,
+            visibility.get(PHONE) || defaultVisibility[PHONE],
+            (val) => handleVisibilityChanged([PHONE])(val)
           )
         }
         {
           getKeyVal(
             'Address',
             getAddress(),
-            <HomeIcon className='mr-2' style={{ fill: '#D2D6DB' }} />
+            <HomeIcon className='mr-2' style={{ fill: '#D2D6DB' }} />,
+            visibility.get(ADDRESS1) || defaultVisibility[ADDRESS1],
+            (val) => handleVisibilityChanged([ADDRESS1, ADDRESS2, CITY, STATE, ZIP])(val)
           )
         }
         {
           getKeyVal(
             'Email',
-            getEmail(),
-            <EmailIcon className='mr-2' style={{ fill: '#D2D6DB' }} />
+            user[EMAIL], // getEmail(),
+            <EmailIcon className='mr-2' style={{ fill: '#D2D6DB' }} />,
+            visibility.get(EMAIL) || defaultVisibility[EMAIL],
+            (val) => handleVisibilityChanged([EMAIL])(val)
           )
         }
         {
           getKeyVal(
             'Birthday',
-            item[DATE_OF_BIRTH] && moment(item[DATE_OF_BIRTH]).format('MMMM D'),
-            <CakeIcon className='mr-2' style={{ fill: '#D2D6DB' }} />
+            user[DATE_OF_BIRTH] && moment(user[DATE_OF_BIRTH]).format('MMMM D'),
+            <CakeIcon className='mr-2' style={{ fill: '#D2D6DB' }} />,
+            visibility.get(DATE_OF_BIRTH) || defaultVisibility[DATE_OF_BIRTH],
+            (val) => handleVisibilityChanged([DATE_OF_BIRTH])(val)
           )
         }
       </div>
@@ -123,9 +213,24 @@ function UserProfile ({ onClose, item }) {
   )
 }
 
+
 UserProfile.propTypes = {
-  item: PropTypes.object.isRequired,
-  onClose: PropTypes.func.isRequired
+  user: PropTypes.object.isRequired,
+  onClose: PropTypes.func.isRequired,
+  updateUserData: PropTypes.func.isRequired,
+  currentUser: PropTypes.object,
+  visibility: PropTypes.object.isRequired
 }
 
-export default UserProfile
+const mapDispatchToProps = {
+  updateUserData: updateUserDataAction
+}
+
+const mapStateToProps = ({ currentUser: { currentUser, userData } }) => {
+  return {
+    currentUser,
+    visibility: userData.get('visibility') || new IMap()
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(UserProfile)

@@ -19,7 +19,7 @@ const {
 const moment = require('moment')
 const _ = require('underscore')
 const functions = require('firebase-functions')
-
+const IS_MEMBER = 'isMember'
 const isMember = (user) => user[MEMBERSHIP_EXPIRES_AT] && moment(user[MEMBERSHIP_EXPIRES_AT]).isAfter(moment())
 
 const defaultVisibility = {
@@ -34,7 +34,8 @@ const defaultVisibility = {
   [STATE]: ONLY_ME,
   [ZIP]: ONLY_ME,
   [GENDER]: ONLY_ME,
-  [DATE_OF_BIRTH]: ONLY_ME
+  [DATE_OF_BIRTH]: ONLY_ME,
+  [IS_MEMBER]: MEMBERS
 }
 module.exports = (admin) => {
   const firestore = admin.firestore()
@@ -72,13 +73,13 @@ module.exports = (admin) => {
     usersCollection.forEach(userDoc => {
       const user = userDoc.data()
       user[UID] = userDoc.id
-      user.isMember = isMember(user)
+      user[IS_MEMBER] = isMember(user)
       users.push(user)
     })
 
     users = _.chain(users)
       .map(applyFilters)
-      .filter((user) => user.isMember)
+      .filter((user) => user[IS_MEMBER])
       .sortBy((user) => user[DISPLAY_NAME].toLowerCase())
       .value()
     return users
