@@ -15,5 +15,8 @@ module.exports = {
   STATE: 'state',
   PHONE: 'phone',
   DATE_OF_BIRTH: 'dateOfBirth',
-  GENDER: 'gender'
+  GENDER: 'gender',
+
+  ONLY_ME: 'ONLY_ME',
+  MEMBERS: 'MEMBERS'
 }

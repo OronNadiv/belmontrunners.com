@@ -6,9 +6,11 @@ const {
   DISPLAY_NAME,
   EMAIL,
   GENDER,
+  MEMBERS,
   MEMBERSHIP_EXPIRES_AT,
   PHONE,
   PHOTO_URL,
+  ONLY_ME,
   STATE,
   UID,
   ZIP
@@ -17,9 +19,6 @@ const {
 const moment = require('moment')
 const _ = require('underscore')
 const functions = require('firebase-functions')
-
-const ONLY_ME = 'ONLY_ME'
-const MEMBERS = 'MEMBERS'
 
 const isMember = (user) => user[MEMBERSHIP_EXPIRES_AT] && moment(user[MEMBERSHIP_EXPIRES_AT]).isAfter(moment())
 
@@ -78,8 +77,8 @@ module.exports = (admin) => {
     })
 
     users = _.chain(users)
-      .filter((user) => user.isMember)
       .map(applyFilters)
+      .filter((user) => user.isMember)
       .sortBy((user) => user[DISPLAY_NAME].toLowerCase())
       .value()
     return users
