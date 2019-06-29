@@ -18,7 +18,7 @@ const Subscribe = () => {
   const [messageLevel, setMessageLevel] = useState('')
   const [placeholder, setPlaceholder] = useState(DEFAULT_PLACE_HOLDER)
   const [captchaFailed, setCaptchaFailed] = useState(false)
-  const [notRobot, setNotRobot] = useState(false)
+  const [notRobot, setNotRobot] = useState(true) // NOTE: setting to true disables the captcha verification.
 
   useEffect(() => {
     (async function () {

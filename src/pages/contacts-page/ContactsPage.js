@@ -303,7 +303,7 @@ class ContactsPage extends Component {
           }
         </SearchBox>
 
-        <div className='row mb-3'>
+        <div className='row mb-4'>
           <div className='d-flex flex-row mx-auto'>
             <div className='d-flex flex-row align-items-center'
                  onClick={() => this.setState({ [SHOW_MEMBERS]: !this.state[SHOW_MEMBERS] })}
