@@ -44,11 +44,12 @@ module.exports = () => async () => {
         return a.moment.valueOf() - b.moment.valueOf()
       })
       .forEach((event) => {
+        const isMembersOnly = event['is-members-only-event'] === 'TRUE'
         cal.createEvent(
           {
             start: event.moment,
             end: moment(event.moment).add(2, 'hours'),
-            summary: event.subject,
+            summary: (isMembersOnly ? '[MEMBERS ONLY] ' : '') + event.subject,
             location: event.where,
             description: getDescription({
               description: event.what,
