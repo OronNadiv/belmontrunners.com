@@ -4,10 +4,8 @@ import Chip from '@material-ui/core/Chip'
 import FuzzySearch from 'fuzzy-search'
 import AddDialog from './AddDialog'
 import Paper from '@material-ui/core/Paper'
-import InputBase from '@material-ui/core/InputBase'
 import Divider from '@material-ui/core/Divider'
 import IconButton from '@material-ui/core/IconButton'
-import SearchIcon from '@material-ui/icons/Search'
 import AddIcon from '@material-ui/icons/AddCircle'
 import CopyIcon from '@material-ui/icons/FileCopy'
 import * as PropTypes from 'prop-types'
@@ -28,6 +26,7 @@ import Checkbox from '@material-ui/core/Checkbox'
 import { ExportToCsv } from 'export-to-csv'
 import { parseFullName } from 'parse-full-name'
 import SaveIcon from '@material-ui/icons/SaveAlt'
+import SearchBox from '../../components/SearchBox'
 
 const IS_MEMBER = 'isMember'
 
@@ -74,7 +73,6 @@ class ContactsPage extends Component {
           "Last Name": name.last || ''
         }
       })
-    console.log(items.toJS())
     csvExporter.generateCsv(items.toJS())
   }
 
@@ -130,16 +128,11 @@ class ContactsPage extends Component {
   }
 
   async saveChanges () {
-    console.log('saveChanges  called')
     const { active, inactive } = this.state
-
-    console.log('active size:', active.size)
-    console.log('inactive size:', inactive.size)
 
     const contacts = active.concat(inactive).toJS()
     try {
       await firebase.firestore().doc('subscribers/items').set({ [SUBSCRIBERS_ARRAY_KEY]: contacts })
-      console.log('saved')
     } catch (error) {
       Sentry.captureException(error)
       console.error(error)
@@ -260,8 +253,6 @@ class ContactsPage extends Component {
   }
 
   render () {
-    console.log('render()  called')
-
     const { currentUser, allowRead, allowWrite } = this.props
     const { filteredActive, /*filteredInactive,*/ showAddDialog, copied } = this.state
 
@@ -296,46 +287,22 @@ class ContactsPage extends Component {
           ]}
         />
 
-        <div className='d-flex justify-content-center row'>
-          <Paper style={{
-            margin: '20px 0',
-            padding: '2px 4px',
-            display: 'flex',
-            alignItems: 'center',
-            width: 400
-          }}>
-            <InputBase
-              style={{
-                marginLeft: 8,
-                flex: 1
+        <SearchBox placeholder="Fuzzy Search" onChange={(search) => this.setState({ search })}>
+          {allowWrite && <Divider style={{ width: 1, height: 28, margin: 4 }} />}
+          {
+            allowWrite && <IconButton
+              color="primary"
+              style={{ padding: 10 }}
+              aria-label="Directions"
+              onClick={() => {
+                this.setState({ showAddDialog: true })
               }}
-              placeholder='Fuzzy Search'
-              onChange={(event) => {
-                this.setState({
-                  search: event.target.value
-                })
-              }}
-            />
-            <IconButton style={{
-              padding: 10
-            }} aria-label="Search">
-              <SearchIcon />
+            >
+              <AddIcon />
             </IconButton>
-            {allowWrite && <Divider style={{ width: 1, height: 28, margin: 4 }} />}
-            {
-              allowWrite && <IconButton
-                color="primary"
-                style={{ padding: 10 }}
-                aria-label="Directions"
-                onClick={() => {
-                  this.setState({ showAddDialog: true })
-                }}
-              >
-                <AddIcon />
-              </IconButton>
-            }
-          </Paper>
-        </div>
+          }
+        </SearchBox>
+
         <div className='row mb-3'>
           <div className='d-flex flex-row mx-auto'>
             <div className='d-flex flex-row align-items-center'

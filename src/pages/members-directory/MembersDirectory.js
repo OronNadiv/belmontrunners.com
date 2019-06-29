@@ -6,30 +6,29 @@ import Chip from '@material-ui/core/Chip'
 import * as PropTypes from 'prop-types'
 import { updateUserData as updateUserDataAction } from '../../reducers/currentUser'
 import { connect } from 'react-redux'
-import SearchIcon from '@material-ui/icons/Search'
-import IconButton from '@material-ui/core/IconButton'
 import Paper from '@material-ui/core/Paper'
-import InputBase from '@material-ui/core/InputBase'
 import DirectionsRun from '@material-ui/icons/DirectionsRun'
 import Avatar from '@material-ui/core/Avatar'
 import FuzzySearch from 'fuzzy-search'
 import LoggedInState from '../../components/LoggedInState'
 import UserProfile from './UserProfile'
 import { makeStyles } from '@material-ui/core'
+import { withRouter } from 'react-router-dom'
+import _ from 'underscore'
+import { MEMBERS_DIRECTORY } from '../../urls'
+import SearchBox from '../../components/SearchBox'
 
-const useStyles = makeStyles({
-  avatar: {
-    width: 32,
-    height: 32
-  }
-})
+function MembersDirectory ({ currentUser, location, history }) {
+  const { pathname } = location
+  const useStyles = makeStyles(theme => ({
+    chipAvatar: {
+      width: 32,
+      height: 32
+    }
+  }))
+  const classes = useStyles()
 
-
-function MembersDirectory ({ currentUser }) {
   const [users, setUsers] = useState([])
-  const [selected, setSelected] = useState()
-  const [search, setSearch] = useState('')
-
   useEffect(() => {
     if (!currentUser) {
       return
@@ -39,6 +38,35 @@ function MembersDirectory ({ currentUser }) {
       setUsers(resp.data)
     })()
   }, [currentUser])
+
+  const [selected, setSelected] = useState()
+  useEffect(() => {
+    if (users.length === 0) {
+      return
+    }
+    const pathnames = pathname.split('/').filter((val) => !!val)
+    if (pathnames.length < 2) {
+      setSelected()
+      return
+    }
+    const selected = _.findWhere(users, { [UID]: pathnames[1] })
+    if (selected) {
+      setSelected(selected)
+    } else {
+      history.push(MEMBERS_DIRECTORY)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [users, pathname])
+
+  const [search, setSearch] = useState('')
+
+  const handleChipSelected = (user) => {
+    history.push(`${MEMBERS_DIRECTORY}/${user[UID]}`)
+  }
+
+  const handleDrawerClosed = () => {
+    history.push(`${MEMBERS_DIRECTORY}`)
+  }
 
   const getChips = () => {
     let filteredUsers = users
@@ -64,10 +92,10 @@ function MembersDirectory ({ currentUser }) {
           className='my-1 mx-1'
           avatar={
             user[PHOTO_URL] ?
-              <Avatar className={useStyles.avatar} src={user[PHOTO_URL]} /> :
-              <Avatar className={useStyles.avatar}><DirectionsRun /></Avatar>
+              <Avatar className={classes.chipAvatar} src={user[PHOTO_URL]} /> :
+              <Avatar className={classes.chipAvatar}><DirectionsRun /></Avatar>
           }
-          onClick={() => setSelected(user)}
+          onClick={() => handleChipSelected(user)}
           key={user[UID]}
           label={label}
           color={getColor()}
@@ -84,36 +112,10 @@ function MembersDirectory ({ currentUser }) {
         <UserProfile
           user={selected}
           style={{ width: 250 }}
-          onClose={() => {
-            setSelected()
-          }}
+          onClose={handleDrawerClosed}
         />
       }
-      <div className='d-flex justify-content-center row'>
-        <Paper style={{
-          margin: '20px 0',
-          padding: '2px 4px',
-          display: 'flex',
-          alignItems: 'center',
-          width: 400
-        }}>
-          <InputBase
-            style={{
-              marginLeft: 8,
-              flex: 1
-            }}
-            placeholder='Search'
-            onChange={(event) => {
-              setSearch(event.target.value)
-            }}
-          />
-          <IconButton style={{
-            padding: 10
-          }} aria-label="Search">
-            <SearchIcon />
-          </IconButton>
-        </Paper>
-      </div>
+      <SearchBox onChange={setSearch} />
       <div className='row'>
         <div className='col-12'>
           <Paper className='px-2 py-3'>
@@ -129,7 +131,9 @@ function MembersDirectory ({ currentUser }) {
 MembersDirectory.propTypes = {
   currentUser: PropTypes.object,
   updateUserData: PropTypes.func.isRequired,
-  userData: PropTypes.object.isRequired
+  userData: PropTypes.object.isRequired,
+  location: PropTypes.object.isRequired,
+  history: PropTypes.object.isRequired
 }
 
 const mapDispatchToProps = {
@@ -146,4 +150,4 @@ const mapStateToProps = ({ currentUser: { currentUser, userData } }) => {
 export default LoggedInState({
   name: 'membersDirectory',
   isRequiredToBeLoggedIn: true
-})(connect(mapStateToProps, mapDispatchToProps)(MembersDirectory))
+})(connect(mapStateToProps, mapDispatchToProps)(withRouter(MembersDirectory)))

@@ -45,11 +45,10 @@ import s from 'underscore.string'
 import DeleteIcon from '@material-ui/icons/Delete'
 import ConfirmDeletion from './ConfirmDeletion'
 import IconButton from '@material-ui/core/IconButton'
-import InputBase from '@material-ui/core/InputBase'
-import SearchIcon from '@material-ui/icons/Search'
 import FuzzySearch from 'fuzzy-search'
 import * as Sentry from '@sentry/browser'
 import { ExportToCsv } from 'export-to-csv'
+import SearchBox from '../../components/SearchBox'
 
 const ADDRESS = 'address'
 const PNF = googleLibPhoneNumber.PhoneNumberFormat
@@ -315,33 +314,7 @@ class EnhancedTable extends Component {
             }}
           />
         }
-        <div className='d-flex justify-content-center row'>
-          <Paper style={{
-            margin: '20px 0',
-            padding: '2px 4px',
-            display: 'flex',
-            alignItems: 'center',
-            width: 400
-          }}>
-            <InputBase
-              style={{
-                marginLeft: 8,
-                flex: 1
-              }}
-              placeholder="Fuzzy Search"
-              onChange={(event) => {
-                this.setState({
-                  search: event.target.value
-                })
-              }}
-            />
-            <IconButton style={{
-              padding: 10
-            }} aria-label="Search">
-              <SearchIcon />
-            </IconButton>
-          </Paper>
-        </div>
+        <SearchBox placeholder="Fuzzy Search" onChange={(search) => this.setState({ search })} />
         <div className='row mx-1'>
           <Paper>
             <EnhancedTableToolbar onExport={() => this.handleExport()} />

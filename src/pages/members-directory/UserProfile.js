@@ -165,7 +165,7 @@ function UserProfile ({ onClose, user, visibility, updateUserData, currentUser }
       </div>
       <div className='mx-5'>
         <div className='d-flex justify-content-center mb-4 align-items-center'>
-          <Avatar name={user[DISPLAY_NAME]} round color='#6247ea' size={40}
+          <Avatar name={user[DISPLAY_NAME]} round color='#6247ea' size={60}
                   src={user[PHOTO_URL]} />
         </div>
 

@@ -103,7 +103,6 @@ class App extends Component {
             )}
           />
           <Route
-            exact
             path={MEMBERS_DIRECTORY}
             render={() => (
               <div>
@@ -213,7 +212,6 @@ class App extends Component {
           />
 
           <Route
-            exact
             path={ROOT}
             render={() => (
               <div>
