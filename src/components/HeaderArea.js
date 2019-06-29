@@ -16,7 +16,7 @@ import { Link, withRouter } from 'react-router-dom'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import { useTheme } from '@material-ui/core'
 import $ from 'jquery'
-import Drawer from '@material-ui/core/Drawer'
+import SwipeableDrawer from '@material-ui/core/SwipeableDrawer'
 import CloseIcon from '@material-ui/icons/Close'
 import Divider from '@material-ui/core/Divider'
 import firebase from 'firebase'
@@ -134,6 +134,10 @@ function HeaderArea ({ location: { pathname }, isCurrentUserLoaded, currentUser 
   }))
   const classes = useStyles()
 
+  const handleOpenDrawer = () => {
+    setShowDrawer(true)
+  }
+
   const handleDrawerClose = (event = {}) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return
@@ -149,11 +153,11 @@ function HeaderArea ({ location: { pathname }, isCurrentUserLoaded, currentUser 
       <AppBar position="absolute" className={classes.appBar}>
         {
           isSmallDevice &&
-          <Drawer
+          <SwipeableDrawer
             className={classes.drawer}
-
             anchor="right"
             open={showDrawer}
+            onOpen={handleOpenDrawer}
             classes={{
               paper: classes.drawerPaper
             }}
@@ -220,7 +224,7 @@ function HeaderArea ({ location: { pathname }, isCurrentUserLoaded, currentUser 
                 </Link>
               }
             </List>
-          </Drawer>
+          </SwipeableDrawer>
         }
 
         <Toolbar className={classes.toolbar}>
