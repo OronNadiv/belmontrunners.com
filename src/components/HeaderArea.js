@@ -170,7 +170,7 @@ function HeaderArea ({ location: { pathname }, isCurrentUserLoaded, currentUser 
                 isSignedIn &&
                 <Link to={ROOT} onClick={handleDrawerClose}>
                   <ListItem button>
-                    <ListItemIcon><HomeIcon /></ListItemIcon>
+                    <ListItemIcon><HomeIcon color='primary' /></ListItemIcon>
                     <ListItemText primary='Home' className={classes.drawerLink} />
                   </ListItem>
                 </Link>
@@ -179,7 +179,7 @@ function HeaderArea ({ location: { pathname }, isCurrentUserLoaded, currentUser 
                 isSignedIn &&
                 <Link to={MY_PROFILE} onClick={handleDrawerClose}>
                   <ListItem button>
-                    <ListItemIcon><MyProfileIcon /></ListItemIcon>
+                    <ListItemIcon><MyProfileIcon color='primary' /></ListItemIcon>
                     <ListItemText primary='My profile' className={classes.drawerLink} />
                   </ListItem>
                 </Link>
@@ -192,7 +192,7 @@ function HeaderArea ({ location: { pathname }, isCurrentUserLoaded, currentUser 
                         firebase.auth().signOut()
                       }}>
                   <ListItem button>
-                    <ListItemIcon><SignOutIcon /></ListItemIcon>
+                    <ListItemIcon><SignOutIcon color='primary' /></ListItemIcon>
                     <ListItemText primary='Sign out' className={classes.drawerLink} />
                   </ListItem>
                 </Link>
@@ -201,7 +201,7 @@ function HeaderArea ({ location: { pathname }, isCurrentUserLoaded, currentUser 
                 isSignedOut &&
                 <Link to={SIGN_IN} onClick={handleDrawerClose}>
                   <ListItem button>
-                    <ListItemIcon><SignInIcon /></ListItemIcon>
+                    <ListItemIcon><SignInIcon color='primary' /></ListItemIcon>
                     <ListItemText primary='Sign in' className={classes.drawerLink} />
                   </ListItem>
 
@@ -214,7 +214,7 @@ function HeaderArea ({ location: { pathname }, isCurrentUserLoaded, currentUser 
                   state: { steps: undefined }
                 }} onClick={handleDrawerClose}>
                   <ListItem button>
-                    <ListItemIcon><JoinUsIcon /></ListItemIcon>
+                    <ListItemIcon><JoinUsIcon color='primary' /></ListItemIcon>
                     <ListItemText primary='Join us' className={classes.drawerLink} />
                   </ListItem>
                 </Link>
@@ -233,7 +233,7 @@ function HeaderArea ({ location: { pathname }, isCurrentUserLoaded, currentUser 
           {
             /*
             Disabling for now until we have multiple menu item.  Only one item does not look good.
-            
+
             !isSmallDevice &&
             <Link to={MEMBERS_DIRECTORY} className={classes.membersDirectory}>
               <div className='text-white' style={{ marginLeft: 250 }}>
@@ -269,7 +269,7 @@ function HeaderArea ({ location: { pathname }, isCurrentUserLoaded, currentUser 
               pathname: JOIN,
               state: { steps: undefined }
             }}>
-              <Button variant='contained' color='primary'>
+              <Button variant='contained' color='primary' className='ml-5'>
                 Join Us
               </Button>
             </Link>
