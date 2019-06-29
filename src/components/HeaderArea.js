@@ -1,206 +1,286 @@
-import 'firebase/auth'
-import firebase from 'firebase'
-import React, { Component } from 'react'
-import { Link, withRouter } from 'react-router-dom'
-import $ from 'jquery'
-import { connect } from 'react-redux'
-import * as PropTypes from 'prop-types'
-import Profile from './Profile'
+import React, { useEffect, useState } from 'react'
+import { makeStyles } from '@material-ui/core/styles'
+import AppBar from '@material-ui/core/AppBar'
 import Button from '@material-ui/core/Button'
+import IconButton from '@material-ui/core/IconButton'
+import MenuIcon from '@material-ui/icons/Menu'
+import HomeIcon from '@material-ui/icons/Home'
+import MyProfileIcon from '@material-ui/icons/AccountCircle'
+import SignOutIcon from '@material-ui/icons/PowerSettingsNew'
+import SignInIcon from '@material-ui/icons/ExitToApp'
+import JoinUsIcon from '@material-ui/icons/PersonAdd'
+
+import Profile from './Profile'
 import { FORGOT_PASSWORD, JOIN, MY_PROFILE, RESET_PASSWORD, ROOT, SIGN_IN } from '../urls'
+import { Link, withRouter } from 'react-router-dom'
+import useMediaQuery from '@material-ui/core/useMediaQuery'
+import { useTheme } from '@material-ui/core'
+import $ from 'jquery'
+import Drawer from '@material-ui/core/Drawer'
+import CloseIcon from '@material-ui/icons/Close'
+import Divider from '@material-ui/core/Divider'
+import firebase from 'firebase'
+import ListItem from '@material-ui/core/ListItem'
+import List from '@material-ui/core/List'
+import ListItemText from '@material-ui/core/ListItemText'
+import ListItemIcon from '@material-ui/core/ListItemIcon'
+import Toolbar from '@material-ui/core/Toolbar'
+import * as PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 
-class HeaderArea extends Component {
+const TOOLBAR_HEIGHT = 72
+const DRAWER_WIDTH = 240
+const BACKGROUND_IMAGE = 'linear-gradient(90deg,#141da2,#9b5cf6)'
 
-  evalNavbarFixed () {
-    const nav_offset_top = $('.header_area').height() + 50
 
-    const scroll = $(window).scrollTop()
-    if (scroll >= nav_offset_top) {
-      $('.header_area').addClass('navbar_fixed')
-    } else {
-      $('.header_area').removeClass('navbar_fixed')
+function HeaderArea ({ location: { pathname }, isCurrentUserLoaded, currentUser }) {
+  const [transparentBackground, setTransparentBackground] = useState(true)
+  const [showDrawer, setShowDrawer] = useState(false)
+
+  useEffect(() => {
+    const evalBackground = () => {
+      if (
+        pathname !== ROOT &&
+        pathname !== SIGN_IN &&
+        pathname !== FORGOT_PASSWORD &&
+        pathname !== RESET_PASSWORD
+      ) {
+        setTransparentBackground(false)
+        return
+      }
+      const nav_offset_top = TOOLBAR_HEIGHT + 50
+
+      const scroll = $(window).scrollTop()
+      if (scroll >= nav_offset_top) {
+        setTransparentBackground(false)
+      } else {
+        setTransparentBackground(true)
+      }
     }
+    $(window).scroll(evalBackground)
+    evalBackground()
+    return () => {
+      $(window).unbind('scroll')
+    }
+  }, [pathname])
+
+  const theme = useTheme()
+  const isSmallDevice = useMediaQuery(theme.breakpoints.down('sm'))
+
+  const rootStyle = {}
+  const appBarStyle = {}
+  if (transparentBackground && !isSmallDevice) {
+    appBarStyle.background = 'transparent'
+  } else {
+    appBarStyle.position = `fixed`
+    appBarStyle.transform = `translateY(${TOOLBAR_HEIGHT}px)`
+    if (!isSmallDevice) {
+      appBarStyle.transition = 'transform 500ms ease, background 500ms ease'
+    }
+    appBarStyle.backgroundImage = BACKGROUND_IMAGE
+    appBarStyle.top = -TOOLBAR_HEIGHT
+    rootStyle.height = TOOLBAR_HEIGHT
+
+  }
+  const useStyles = makeStyles(theme => ({
+    root: {
+      flexGrow: 1,
+      ...rootStyle
+    },
+    appBar: {
+      boxShadow: 'none',
+      ...appBarStyle
+    },
+    toolbar: {
+      height: TOOLBAR_HEIGHT,
+      margin: isSmallDevice ? 0 : '0 3em'
+    },
+    growLeft: {},
+    growMiddle: {
+      flexGrow: 1
+    },
+    growRight: {},
+    membersDirectory: {
+      font: '500 12px/80px "Roboto", sans-serif',
+      textTransform: 'uppercase',
+      color: 'white'
+    },
+    drawer: {
+      width: DRAWER_WIDTH,
+      flexShrink: 0
+    },
+    drawerPaper: {
+      width: DRAWER_WIDTH
+    },
+    drawerHeader: {
+      display: 'flex',
+      alignItems: 'center',
+      padding: '0 8px',
+      ...theme.mixins.toolbar,
+      justifyContent: 'flex-start',
+      backgroundColor: '#9b5cf6',
+      height: TOOLBAR_HEIGHT
+    },
+    drawerHeaderCloseIcon: {
+      color: 'white'
+    },
+    drawerList: {
+      paddingTop: 20,
+      paddingLeft: 20
+    },
+    drawerLink: {
+      color: theme.palette.text.primary
+    }
+  }))
+  const classes = useStyles()
+
+  const handleDrawerClose = (event = {}) => {
+    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+      return
+    }
+    setShowDrawer(false)
   }
 
+  const isSignedOut = isCurrentUserLoaded && !currentUser
+  const isSignedIn = isCurrentUserLoaded && currentUser
 
-  checkIsFixed (pathname) {
-    console.log('checkIsFixed:', pathname)
-    if (
-      pathname !== ROOT &&
-      pathname !== SIGN_IN &&
-      pathname !== FORGOT_PASSWORD &&
-      pathname !== RESET_PASSWORD
-    ) {
-      $('.header_area').addClass('navbar_fixed')
-      $('.header_area').addClass('navbar_fixed_not_root')
-      return true
-    } else {
-      $('.header_area').removeClass('navbar_fixed_not_root')
-      this.evalNavbarFixed()
-      return false
-    }
-  }
+  return (
+    <div className={classes.root}>
+      <AppBar position="absolute" className={classes.appBar}>
+        {
+          isSmallDevice &&
+          <Drawer
+            className={classes.drawer}
 
-  componentDidMount () {
-    const navbarFixed = () => {
-      if ($('.header_area').length) {
-        if (this.checkIsFixed()) {
-          return
+            anchor="right"
+            open={showDrawer}
+            classes={{
+              paper: classes.drawerPaper
+            }}
+            onClose={handleDrawerClose}
+          >
+            <div className={classes.drawerHeader}>
+              <IconButton onClick={handleDrawerClose}>
+                <CloseIcon className={classes.drawerHeaderCloseIcon} />
+              </IconButton>
+            </div>
+            <Divider />
+            <List className={classes.drawerList}>
+              {
+                isSignedIn &&
+                <Link to={ROOT} onClick={handleDrawerClose}>
+                  <ListItem button>
+                    <ListItemIcon><HomeIcon /></ListItemIcon>
+                    <ListItemText primary='Home' className={classes.drawerLink} />
+                  </ListItem>
+                </Link>
+              }
+              {
+                isSignedIn &&
+                <Link to={MY_PROFILE} onClick={handleDrawerClose}>
+                  <ListItem button>
+                    <ListItemIcon><MyProfileIcon /></ListItemIcon>
+                    <ListItemText primary='My profile' className={classes.drawerLink} />
+                  </ListItem>
+                </Link>
+              }
+              {
+                isSignedIn &&
+                <Link to={ROOT}
+                      onClick={() => {
+                        handleDrawerClose()
+                        firebase.auth().signOut()
+                      }}>
+                  <ListItem button>
+                    <ListItemIcon><SignOutIcon /></ListItemIcon>
+                    <ListItemText primary='Sign out' className={classes.drawerLink} />
+                  </ListItem>
+                </Link>
+              }
+              {
+                isSignedOut &&
+                <Link to={SIGN_IN} onClick={handleDrawerClose}>
+                  <ListItem button>
+                    <ListItemIcon><SignInIcon /></ListItemIcon>
+                    <ListItemText primary='Sign in' className={classes.drawerLink} />
+                  </ListItem>
+
+                </Link>
+              }
+              {
+                isSignedOut &&
+                <Link to={{
+                  pathname: JOIN,
+                  state: { steps: undefined }
+                }} onClick={handleDrawerClose}>
+                  <ListItem button>
+                    <ListItemIcon><JoinUsIcon /></ListItemIcon>
+                    <ListItemText primary='Join us' className={classes.drawerLink} />
+                  </ListItem>
+                </Link>
+              }
+            </List>
+          </Drawer>
         }
 
-        $(window).scroll(() => {
-          if (this.checkIsFixed()) {
-            return
-          }
-          this.evalNavbarFixed()
-        })
-      }
+        <Toolbar className={classes.toolbar}>
 
-    }
+          <div className={classes.growLeft} />
 
-    navbarFixed()
-  }
-
-  componentDidUpdate (prevProps) {
-    if (prevProps.location.pathname.trim() !== this.props.location.pathname.trim()) {
-      this.checkIsFixed()
-    }
-
-  }
-
-  render () {
-    const { isCurrentUserLoaded, currentUser } = this.props
-    let totalNavItems = 0
-    const isSignedOut = isCurrentUserLoaded && !currentUser && (totalNavItems += 2)
-    const isSignedIn = isCurrentUserLoaded && currentUser && (totalNavItems += 3)
-
-    return (
-      <header className='header_area'>
-        <div className='main_menu'>
-          <nav className='navbar navbar-expand-lg navbar-light'>
-            <div className='container box_1620'>
-              <Link className='navbar-brand logo_h' to={ROOT}><img src="img/logo.png" alt='' /></Link>
-              <button className='navbar-toggler' type='button' data-toggle='collapse'
-                      data-target='#navbarSupportedContent' aria-controls='navbarSupportedContent'
-                      aria-expanded='false' aria-label='Toggle navigation'>
-                <span className='icon-bar' />
-                <span className='icon-bar' />
-                <span className='icon-bar' />
-              </button>
-              <div className='collapse navbar-collapse offset' id='navbarSupportedContent'
-                   style={{ maxHeight: 10 + 41 * totalNavItems }}>
-                <ul className='nav navbar-nav menu_nav ml-auto'>
-                  <li className='nav-item' data-toggle='collapse' data-target='#navbarSupportedContent'>
-                    {
-                      isSignedIn &&
-                      <Link to={ROOT} className='nav-link'>
-                        Home
-                      </Link>
-                    }
-                    {
-                      isSignedIn &&
-                      <Link to={MY_PROFILE} className='nav-link'>
-                        My profile
-                      </Link>
-
-                    }
-                    {
-                      isSignedIn &&
-                      <Link to={ROOT} className='nav-link'
-                            onClick={() => firebase.auth().signOut()}>
-                        Sign out
-                      </Link>
-                    }
-                    {
-                      isSignedOut &&
-                      <Link to={SIGN_IN} className='nav-link'>
-                        Sign in
-                      </Link>
-                    }
-                    {
-                      isSignedOut &&
-                      <Link to={{
-                        pathname: JOIN,
-                        state: { steps: undefined }
-                      }} className='nav-link'>
-                        Join Us
-                      </Link>
-                    }
-                  </li>
-                  {/*<li className='nav-item submenu dropdown'>*/}
-                  {/*<a href='#' className='nav-link dropdown-toggle' data-toggle='dropdown' role='button'*/}
-                  {/*   aria-haspopup='true' aria-expanded='false'>Pages</a>*/}
-                  {/*<ul className='dropdown-menu'>*/}
-                  {/*  <li className='nav-item'>*/}
-                  {/*    <a className='nav-link' href='schedule.html'>Schedule</a>*/}
-                  {/*    <li className='nav-item'>*/}
-                  {/*      <a className='nav-link' href='venue.html'>Venue</a>*/}
-                  {/*      <li className='nav-item'>*/}
-                  {/*        <a className='nav-link' href='price.html'>Pricing</a>*/}
-                  {/*        <li className='nav-item'>*/}
-                  {/*          <a className='nav-link' href='elements.html'>Elements</a>*/}
-                  {/*        </li>*/}
-                  {/*      </li>*/}
-                  {/*    </li>*/}
-                  {/*  </li>*/}
-                  {/*</ul>*/}
-                  {/*</li>*/}
-                  {/*<li className='nav-item submenu dropdown'>*/}
-                  {/*<a href='#' className='nav-link dropdown-toggle' data-toggle='dropdown' role='button'*/}
-                  {/*   aria-haspopup='true' aria-expanded='false'>Blog</a>*/}
-                  {/*<ul className='dropdown-menu'>*/}
-                  {/*  <li className='nav-item'><a className='nav-link' href='blog.html'>Blog</a></li>*/}
-                  {/*  <li className='nav-item'><a className='nav-link' href='single-blog.html'>Blog Details</a></li>*/}
-                  {/*</ul>*/}
-                  {/*</li>*/}
-                  {/*<li className='nav-item'>*/}
-                  {/*<a className='nav-link' href='contact.html'>Contact</a>*/}
-                  {/*</li>*/}
-                </ul>
-                <ul className='nav navbar-nav navbar-right mt-3 mb-3'>
-                  {/*<li className='nav-item'><a href='#' className='tickets_btn'>Get Tickets</a></li>*/}
-                  {/*<li className='nav-item'>*/}
-                  {/*  <a href='#' className='search'>*/}
-                  {/*    <i className='lnr lnr-magnifier' />*/}
-                  {/*  </a>*/}
-                  {/*</li>*/}
-                  {
-                    isCurrentUserLoaded && currentUser &&
-                    <li className='nav-item'>
-                      <Profile />
-                    </li>
-                  }
-                  {
-                    isCurrentUserLoaded && !currentUser &&
-                    <li className='nav-item'>
-                      <Link to={SIGN_IN} className='signin-btn text-white'>
-                        <Button className='text-white'>
-                          Sign in
-                        </Button>
-                      </Link>
-                    </li>
-                  }
-                  {
-                    isCurrentUserLoaded && !currentUser && this.props.location.pathname.trim() !== JOIN &&
-                    <li className='nav-item'>
-                      <Link to={{
-                        pathname: JOIN,
-                        state: { steps: undefined }
-                      }}>
-                        <Button variant='contained' color='primary'>
-                          Join Us
-                        </Button>
-                      </Link>
-                    </li>
-                  }
-                </ul>
+          <Link to={ROOT}>
+            <img src="img/logo.png" alt='' />
+          </Link>
+          {
+            /*
+            Disabling for now until we have multiple menu item.  Only one item does not look good.
+            
+            !isSmallDevice &&
+            <Link to={MEMBERS_DIRECTORY} className={classes.membersDirectory}>
+              <div className='text-white' style={{ marginLeft: 250 }}>
+                Members
               </div>
-            </div>
-          </nav>
-        </div>
-      </header>
-    )
-  }
+            </Link>
+            */
+          }
+          <div className={classes.growMiddle} />
+
+          {
+            isSmallDevice &&
+            <IconButton edge="start" color="inherit" aria-label="Menu" onClick={() => setShowDrawer(!showDrawer)}>
+              <MenuIcon fontSize="large" />
+            </IconButton>
+          }
+
+          {
+            !isSmallDevice && isCurrentUserLoaded && currentUser &&
+            <Profile />
+          }
+          {
+            !isSmallDevice && isCurrentUserLoaded && !currentUser &&
+            <Link to={SIGN_IN} className='signin-btn text-white'>
+              <Button className='text-white'>
+                Sign in
+              </Button>
+            </Link>
+          }
+          {
+            !isSmallDevice && isCurrentUserLoaded && !currentUser && pathname.trim() !== JOIN &&
+            <Link to={{
+              pathname: JOIN,
+              state: { steps: undefined }
+            }}>
+              <Button variant='contained' color='primary'>
+                Join Us
+              </Button>
+            </Link>
+          }
+
+          <div className={classes.growRight} />
+
+        </Toolbar>
+      </AppBar>
+    </div>
+  )
 }
 
 HeaderArea.propTypes = {

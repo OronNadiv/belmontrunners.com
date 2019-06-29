@@ -102,7 +102,7 @@ function MembersDirectory ({ currentUser }) {
               marginLeft: 8,
               flex: 1
             }}
-            placeholder='Fuzzy Search'
+            placeholder='Search'
             onChange={(event) => {
               setSearch(event.target.value)
             }}
