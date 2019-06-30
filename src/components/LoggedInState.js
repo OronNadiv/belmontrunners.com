@@ -1,24 +1,37 @@
-import React, { Component } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Redirect } from 'react-router-dom'
 import { ROOT } from '../urls'
 import { connect } from 'react-redux'
 import * as PropTypes from 'prop-types'
+import usePrevious from './usePrevious'
 
-export default ({ name, isRequiredToBeLoggedIn, canSwitchToLogin }) => {
-  return (WrappedComponent) => {
-    class HOC extends Component {
-      constructor (props) {
-        super(props)
-        this.state = {
-          initialIsLoggedIn: null,
-          redirectToRoot: false
+const outer = ({ name, isRequiredToBeLoggedIn, canSwitchToLogin }) => {
+  const inner = (WrappedComponent) => {
+    const HOC = (props) => {
+      const { isCurrentUserLoaded, currentUser } = props
+      const [redirectToRoot, setRedirectToRoot] = useState(false)
+
+      const [initialIsLoggedIn, setInitialIsLoggedIn] = useState(null)
+      useEffect(() => {
+        if (!isCurrentUserLoaded) {
+          console.log(`user hasn't been fetched yet.`)
+          return
         }
-      }
+        if (redirectToRoot) {
+          console.log('initialed redirect.  skipping.')
+          return
+        }
+        console.log('user has been fetched.')
+        const isLoggedIn = !!currentUser
 
-      checkLoginState () {
+        // save state login for later
+        if (initialIsLoggedIn === null) {
+          setInitialIsLoggedIn(isLoggedIn)
+        }
+      }, [currentUser, initialIsLoggedIn, isCurrentUserLoaded, redirectToRoot])
+
+      const checkLoginState = useCallback(() => {
         console.log('checkLoginState called.  name:', name)
-        const { isCurrentUserLoaded, currentUser } = this.props
-        const { initialIsLoggedIn, redirectToRoot } = this.state
         if (!isCurrentUserLoaded) {
           console.log(`user hasn't been fetched yet.`)
           return
@@ -30,11 +43,6 @@ export default ({ name, isRequiredToBeLoggedIn, canSwitchToLogin }) => {
 
         console.log('user has been fetched.')
         const isLoggedIn = !!currentUser
-
-        // save state login for later
-        if (initialIsLoggedIn === null) {
-          this.setState({ initialIsLoggedIn: isLoggedIn })
-        }
 
         isRequiredToBeLoggedIn = !!isRequiredToBeLoggedIn
         if (isLoggedIn === isRequiredToBeLoggedIn) {
@@ -49,7 +57,8 @@ export default ({ name, isRequiredToBeLoggedIn, canSwitchToLogin }) => {
         canSwitchToLogin = !!canSwitchToLogin
         if (!canSwitchToLogin) {
           console.log('cannot switch to a valid state.  that means redirect to root.')
-          return this.setState({ redirectToRoot: true })
+          setRedirectToRoot(true)
+          return
         }
 
         // ok, can switch but only to login state.  Let's see if the user was previously logged in')'
@@ -59,36 +68,27 @@ export default ({ name, isRequiredToBeLoggedIn, canSwitchToLogin }) => {
         }
 
         console.log('user switched state to not logged in and it\'s not allowed.')
-        return this.setState({ redirectToRoot: true })
+        return setRedirectToRoot(true)
+      }, [currentUser, initialIsLoggedIn, isCurrentUserLoaded, redirectToRoot])
 
-      }
+      useEffect(checkLoginState, [])
 
-      componentDidMount () {
-        this.checkLoginState()
-      }
-
-      componentDidUpdate (prevProps, prevState, snapshot) {
-        if (prevProps.isCurrentUserLoaded !== this.props.isCurrentUserLoaded) {
-          this.checkLoginState()
+      const prevIsCurrentUserLoaded = usePrevious(isCurrentUserLoaded)
+      useEffect(() => {
+        if (prevIsCurrentUserLoaded !== isCurrentUserLoaded) {
+          checkLoginState()
         }
+      }, [prevIsCurrentUserLoaded, isCurrentUserLoaded, checkLoginState])
+
+      if (!isCurrentUserLoaded) {
+        return null // todo: better to show loading spinner
       }
-
-      render () {
-        const { isCurrentUserLoaded } = this.props
-        const { redirectToRoot } = this.state
-
-        if (!isCurrentUserLoaded) {
-          return null // todo: better to show loading spinner
-        }
-        return redirectToRoot ?
-          <Redirect to={ROOT} /> :
-          <WrappedComponent {...this.props} />
-      }
-    }
-
-    HOC.propTypes = {
-      isCurrentUserLoaded: PropTypes.bool.isRequired,
-      currentUser: PropTypes.object
+      const filteredProps = { ...props }
+      delete filteredProps.currentUser
+      delete filteredProps.isCurrentUserLoaded
+      return redirectToRoot ?
+        <Redirect to={ROOT} /> :
+        <WrappedComponent {...filteredProps} />
     }
 
     const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, currentUser } }) => {
@@ -97,7 +97,19 @@ export default ({ name, isRequiredToBeLoggedIn, canSwitchToLogin }) => {
         currentUser
       }
     }
-
+    HOC.propTypes = {
+      isCurrentUserLoaded: PropTypes.bool.isRequired,
+      currentUser: PropTypes.object
+    }
     return connect(mapStateToProps)(HOC)
   }
+  return inner
 }
+
+outer.propTypes = {
+  name: PropTypes.string.isRequired,
+  isRequiredToBeLoggedIn: PropTypes.bool.isRequired,
+  canSwitchToLogin: PropTypes.bool
+}
+
+export default outer

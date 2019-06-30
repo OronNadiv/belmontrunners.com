@@ -1,7 +1,7 @@
 import 'firebase/auth'
 import firebase from 'firebase'
 import Avatar from 'react-avatar'
-import React, { Component } from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
 import { CONTACTS, MEMBERS_DIRECTORY, MY_PROFILE, ROOT, USERS } from '../urls'
 import * as PropTypes from 'prop-types'
@@ -10,17 +10,9 @@ import LoggedInState from './LoggedInState'
 import { MEMBERSHIP_EXPIRES_AT, UID } from '../fields'
 import moment from 'moment'
 
-class Profile extends Component {
-  constructor (props) {
-    super(props)
-    this.state = {}
-  }
-
-  render () {
-    const { currentUser, allowUsersPage, allowContactsPage, isMember } = this.props
-
-    return (
-      <span className="dropdown signout-btn text-white-50">
+function Profile ({ currentUser, allowUsersPage, allowContactsPage, isMember }) {
+  return (
+    <span className="dropdown signout-btn text-white-50">
         <a className="dropdown-toggle" id="dropdownMenuLink" href='/'
            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <Avatar name={currentUser.displayName} round color='#6247ea' size={40}
@@ -28,6 +20,15 @@ class Profile extends Component {
         </a>
 
         <div className="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
+          <Link to={MY_PROFILE} className="dropdown-item">
+            My profile
+          </Link>
+          {
+            isMember &&
+            <Link to={MEMBERS_DIRECTORY} className="dropdown-item">
+              Members Directory
+            </Link>
+          }
           {
             allowUsersPage &&
             <Link to={USERS} className='dropdown-item'>
@@ -40,17 +41,6 @@ class Profile extends Component {
               Contacts
             </Link>
           }
-
-          <Link to={MY_PROFILE} className="dropdown-item">
-            My profile
-          </Link>
-          {
-            isMember &&
-            <Link to={MEMBERS_DIRECTORY} className="dropdown-item">
-              Members Directory
-            </Link>
-          }
-
           <div className="dropdown-divider" />
 
           <Link className='dropdown-item' to={ROOT}
@@ -59,15 +49,13 @@ class Profile extends Component {
           </Link>
         </div>
       </span>
-    )
-  }
+  )
 }
 
 Profile.propTypes = {
   allowUsersPage: PropTypes.bool.isRequired,
   allowContactsPage: PropTypes.bool.isRequired,
   currentUser: PropTypes.object.isRequired,
-  userData: PropTypes.object.isRequired,
   isMember: PropTypes.bool.isRequired
 }
 

@@ -1,6 +1,6 @@
 import 'firebase/functions'
 import firebase from 'firebase'
-import React, { Component } from 'react'
+import React, { useEffect, useState } from 'react'
 import { CardElement, injectStripe } from 'react-stripe-elements'
 import SignUpStepperButton from './SignUpStepperButton'
 import './Stripe.scss'
@@ -8,78 +8,74 @@ import * as PropTypes from 'prop-types'
 import LoggedInState from '../../components/LoggedInState'
 import moment from 'moment'
 import Promise from 'bluebird'
-import { Redirect } from 'react-router-dom'
 import { ROOT } from '../../urls'
 import { connect } from 'react-redux'
 import { DATE_OF_BIRTH, MEMBERSHIP_EXPIRES_AT } from '../../fields'
 import { updateUserData as updateUserDataAction } from '../../reducers/currentUser'
 import * as Sentry from '@sentry/browser'
+import { withRouter } from 'react-router-dom'
+import usePrevious from '../../components/usePrevious'
 
 const MEMBERSHIP_FEE_ADULT = 25
 const MEMBERSHIP_FEE_KID = 15
-const NEED_TO_PAY = 'needToPay'
-const CONFIRMATION_NUMBER = 'CONFIRMATION_NUMBER'
-const TOTAL_AMOUNT_IN_DOLLARS = 'TOTAL_AMOUNT_IN_DOLLARS'
 
-// TODO: allow the user to change their personal information.
-class SignUpStepPayment extends Component {
-
-  constructor (props) {
-    super(props)
-    this.state = {}
-  }
-
-  componentDidMount () {
+function SignUpStepPayment ({
+                              currentUser: { displayName, uid, email }, history,
+                              updateUserData, stripe, isLast, userDataUpdating, userDataUpdateError,
+                              needToPay, totalAmount, membershipExpiresAt, onNextClicked
+                            }) {
+  useEffect(() => {
     window.scrollTo(0, 0)
-  }
+  }, [])
 
-  componentDidUpdate (prevProps) {
-    if (prevProps.userDataUpdating && !this.props.userDataUpdating) {
-      if (!this.props.userDataUpdateError) {
-        this.setMessage('',
+  const [successMessage, setSuccessMessage] = useState()
+  const [errorMessage, setErrorMessage] = useState()
+  const [success, setSuccess] = useState()
+  const [submitting, setSubmitting] = useState()
+  const [confirmationNumber, setConfirmationNumber] = useState()
+
+  const prevUserDataUpdating = usePrevious(userDataUpdating)
+  useEffect(() => {
+    if (prevUserDataUpdating && !userDataUpdating) {
+      if (!userDataUpdateError && confirmationNumber) {
+        setMessage('',
           <div>
             <div>Complete successfully</div>
-            <div>Confirmation: {this.state[CONFIRMATION_NUMBER].substring(3)}</div>
+            <div>Confirmation: {confirmationNumber.substring(3)}</div>
           </div>)
       } else {
         // todo: show message if user data update failed.
       }
     }
+
+  }, [prevUserDataUpdating, userDataUpdating, userDataUpdateError, confirmationNumber])
+
+  const setMessage = (errorMessage = '', successMessage = '') => {
+    setSuccessMessage(successMessage)
+    setErrorMessage(errorMessage)
+    setSuccess(!!successMessage)
   }
 
-  setMessage (errorMessage = '', successMessage = '') {
-    this.setState({
-      successMessage,
-      errorMessage,
-      success: !!successMessage
-    })
-  }
-
-  async handleSubmitPayment () {
-    const { currentUser: { displayName, uid, email }, updateUserData } = this.props
-
-    this.setState({
-      submitting: true
-    })
+  const handleSubmitPayment = async () => {
+    setSubmitting(true)
 
     try {
-      const stripeResponse = await this.props.stripe
-        .createToken({ type: 'card' })
+      const stripeResponse = await stripe.createToken({ type: 'card' })
       console.log('stripeResponse:', JSON.stringify(stripeResponse, 0, 2))
       if (stripeResponse.error) {
-        this.setMessage(stripeResponse.error.message)
+        setMessage(stripeResponse.error.message)
         throw stripeResponse.error
       }
       const body = {
         ...stripeResponse,
         origin: window.origin,
         description: `Annual membership for Belmont Runners. name: ${displayName} email: ${email}  uid: ${uid}`,
-        amountInCents: this.props[TOTAL_AMOUNT_IN_DOLLARS] * 100
+        amountInCents: totalAmount * 100
       }
-      const stripe = firebase.functions().httpsCallable('stripe')
+      const stripeFunction = firebase.functions().httpsCallable('stripe')
 
       try {
-        const response = await stripe(body)
+        const response = await stripeFunction(body)
         console.log('response:', response)
         const transactionsRef = firebase.firestore().doc(
           `users/${uid}/transactions/${moment().utc().format()}`)
@@ -88,8 +84,8 @@ class SignUpStepPayment extends Component {
 
         let newMembershipExpiresAt
         const yearFromNow = moment().add(1, 'year')
-        if (this.props[MEMBERSHIP_EXPIRES_AT]) {
-          const membershipExpiresAtPlusOneYear = moment(this.props[MEMBERSHIP_EXPIRES_AT]).add(1, 'year')
+        if (membershipExpiresAt) {
+          const membershipExpiresAtPlusOneYear = moment(membershipExpiresAt).add(1, 'year')
           if (membershipExpiresAtPlusOneYear.isBefore(yearFromNow)) {
             newMembershipExpiresAt = yearFromNow
           } else {
@@ -98,15 +94,13 @@ class SignUpStepPayment extends Component {
         } else {
           newMembershipExpiresAt = yearFromNow
         }
-        this.setState({
-          [CONFIRMATION_NUMBER]: response.data.id
-        })
+        setConfirmationNumber(response.data.id)
 
         let values = {
           // stripeResponse: JSON.stringify(stripeResponse),
           stripeResponse: stripeResponse,
           paidAt: moment().utc().format(),
-          paidAmount: this.props[TOTAL_AMOUNT_IN_DOLLARS],
+          paidAmount: totalAmount,
           confirmationNumber: response.data.id
         }
         await Promise.all([
@@ -126,7 +120,7 @@ class SignUpStepPayment extends Component {
         if (error && error.message) {
           const stripeError = JSON.parse(error.message)
           console.warn('stripeError:', stripeError)
-          this.setMessage(stripeError.message)
+          setMessage(stripeError.message)
           return
         }
         // todo: handle case where it's not stripe error.
@@ -137,111 +131,104 @@ class SignUpStepPayment extends Component {
       // todo:handle case where charge failed by showing an error message
       console.error("stripeError:", error)
     } finally {
-      this.setState({
-        submitting: false
-      })
+      setSubmitting(false)
     }
   }
 
-  getBody () {
-    const { success, errorMessage, successMessage } = this.state
+  const getBody = () => {
     if (!success) {
-      if (this.props[NEED_TO_PAY] === false) {
+      if (needToPay === false) {
         return (
-          <div>
+          <>
             <div className='text-success text-center mt-4'>Your membership expires
-              on {moment(this.props[MEMBERSHIP_EXPIRES_AT]).format("MMMM Do YYYY")}</div>
+              on {moment(membershipExpiresAt).format("MMMM Do YYYY")}</div>
             <div className='text-success text-center'>You can renew it
-              after {moment(this.props[MEMBERSHIP_EXPIRES_AT]).subtract(1, 'month').format("MMMM Do YYYY")}
+              after {moment(membershipExpiresAt).subtract(1, 'month').format("MMMM Do YYYY")}
             </div>
-          </div>
+          </>
         )
-      } else if (this.props[NEED_TO_PAY] === true) {
+      } else if (needToPay === true) {
         // need to pay.
-        return (<div>
+        return (<>
             <h6 className='mt-3'>Membership fees</h6>
             &bull; Adult (18 and over): $25<br />
             &bull; Kids: $15.<br />
 
             <h4 className='my-4'>Total amount:
-              ${this.props[TOTAL_AMOUNT_IN_DOLLARS] > 0 ? this.props[TOTAL_AMOUNT_IN_DOLLARS] : ''}
+              ${totalAmount > 0 ? totalAmount : ''}
             </h4>
-            {this.props[MEMBERSHIP_EXPIRES_AT] &&
-            <div className='text-warning mb-2 text-center'>
-              {
-                moment(this.props[MEMBERSHIP_EXPIRES_AT]).isAfter(moment()) ?
-                  `Membership will expire on ${moment(this.props[MEMBERSHIP_EXPIRES_AT]).format("MMMM Do YYYY")}` :
-                  `Membership expired on ${moment(this.props[MEMBERSHIP_EXPIRES_AT]).format("MMMM Do YYYY")}`
-              }
-            </div>
+            {
+              membershipExpiresAt &&
+              <div className='text-warning mb-2 text-center'>
+                {
+                  moment(membershipExpiresAt).isAfter(moment()) ?
+                    `Membership will expire on ${moment(membershipExpiresAt).format("MMMM Do YYYY")}` :
+                    `Membership expired on ${moment(membershipExpiresAt).format("MMMM Do YYYY")}`
+                }
+              </div>
             }
             <h5 className='mb-2'>
               Credit or debit card
             </h5>
             <CardElement onReady={(el) => el.focus()} />
             {errorMessage && <div className='text-danger text-center'>{errorMessage}</div>}
-          </div>
+          </>
         )
       }
-    } else if (this.state.success) {
+    } else if (success) {
       return <div className='text-success text-center mt-4'>{successMessage}</div>
     }
   }
 
-  render () {
-    console.log('SignUpStepPayment.render() called.')
-    const { submitting, success, close } = this.state
-    const { isLast, userDataUpdating } = this.props
+  console.log('SignUpStepPayment.render() called.')
 
-    if (close) {
-      return <Redirect to={ROOT} />
-    }
-
-    return (
-      <div className="justify-content-center">
-        <h5 className='mt-5'>
-          Benefits to being part of Belmont Runners
-        </h5>
-        &bull; Each member receives the Belmont Runners official&nbsp;<a
-        target='_blank' rel='noopener noreferrer'
-        href={`https://www.belmontrunners.com/documents/running-shirt.png`}>Running Shirt</a>
-        <br />
-        &bull; Training at group runs and walks<br />
-        &bull; Free or discounted workshops, clinics, and classes<br />
-        &bull; Discounted entry to the Belmont Water Dog Run<br />
-        &bull; Discounted entry to other local races<br />
-        &bull; Membership with the Road Runners Club of America<br />
-        &bull; Liability insurance coverage<br />
-        &bull; Discounts at local restaurants<br />
-        &bull; Social events with fun, active local runners and walkers<br />
-        &bull; 10% discount at <a target='_blank' rel='noopener noreferrer' href='https://arunnersmind.com'>A Runner’s
-        Mind</a><br />
-
-        <div>
-          {
-            this.getBody()
-          }
-        </div>
-        {
-          (this.props[NEED_TO_PAY] === false || this.props[NEED_TO_PAY] === true) &&
-          <SignUpStepperButton
-            handlePrimaryClicked={() => success || this.props[NEED_TO_PAY] === false ? this.props.onNextClicked() : this.handleSubmitPayment()}
-            primaryText={success || this.props[NEED_TO_PAY] === false ?
-              (isLast ? 'Finish' : 'Next')
-              : "Pay Now"}
-            primaryDisabled={!!submitting || userDataUpdating}
-            showPrimary
-
-            handleSecondaryClicked={() => this.setState({ close: true })}
-            secondaryText={'Finish later'}
-            secondaryDisabled={!!submitting || userDataUpdating}
-            showSecondary={this.props[NEED_TO_PAY] === true && !success}
-          />
-        }
-      </div>
-    )
+  const handleClose = () => {
+    history.push(ROOT)
   }
 
+  function handleNextClicked () {
+    success || needToPay === false ? onNextClicked() : handleSubmitPayment()
+  }
+
+  return (
+    <div className="justify-content-center">
+      <h5 className='mt-5'>
+        Benefits to being part of Belmont Runners
+      </h5>
+      &bull; Each member receives the Belmont Runners official&nbsp;<a
+      target='_blank' rel='noopener noreferrer'
+      href={`https://www.belmontrunners.com/documents/running-shirt.png`}>Running Shirt</a>
+      <br />
+      &bull; Training at group runs and walks<br />
+      &bull; Free or discounted workshops, clinics, and classes<br />
+      &bull; Discounted entry to the Belmont Water Dog Run<br />
+      &bull; Discounted entry to other local races<br />
+      &bull; Membership with the Road Runners Club of America<br />
+      &bull; Liability insurance coverage<br />
+      &bull; Discounts at local restaurants<br />
+      &bull; Social events with fun, active local runners and walkers<br />
+      &bull; 10% discount at <a target='_blank' rel='noopener noreferrer' href='https://arunnersmind.com'>A Runner’s
+      Mind</a><br />
+
+      {getBody()}
+      {
+        (needToPay === false || needToPay === true) &&
+        <SignUpStepperButton
+          handlePrimaryClicked={handleNextClicked}
+          primaryText={success || needToPay === false ?
+            (isLast ? 'Finish' : 'Next')
+            : "Pay Now"}
+          primaryDisabled={!!submitting || userDataUpdating}
+          showPrimary
+
+          handleSecondaryClicked={handleClose}
+          secondaryText={'Finish later'}
+          secondaryDisabled={!!submitting || userDataUpdating}
+          showSecondary={needToPay === true && !success}
+        />
+      }
+    </div>
+  )
 }
 
 SignUpStepPayment.propTypes = {
@@ -250,8 +237,8 @@ SignUpStepPayment.propTypes = {
   userDataUpdating: PropTypes.bool.isRequired,
   userDataUpdateError: PropTypes.object,
   updateUserData: PropTypes.func.isRequired,
-  [NEED_TO_PAY]: PropTypes.bool,
-  [MEMBERSHIP_EXPIRES_AT]: PropTypes.string,
+  needToPay: PropTypes.bool,
+  membershipExpiresAt: PropTypes.string,
   totalAmount: PropTypes.number.isRequired,
 
   // from HOC
@@ -261,7 +248,11 @@ SignUpStepPayment.propTypes = {
 
   // from parent
   isLast: PropTypes.bool,
-  onNextClicked: PropTypes.func.isRequired
+  onNextClicked: PropTypes.func.isRequired,
+
+  // from router-dom
+  history: PropTypes.object.isRequired
+
 }
 
 const mapDispatchToProps = {
@@ -292,19 +283,18 @@ const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, currentUser, user
     }
   }
 
-
   return {
     currentUser,
     userDataUpdating,
     userDataUpdateError,
 
-    [NEED_TO_PAY]: needToPay,
-    [MEMBERSHIP_EXPIRES_AT]: membershipExpiresAt,
-    [TOTAL_AMOUNT_IN_DOLLARS]: totalAmount
+    needToPay,
+    membershipExpiresAt,
+    totalAmount
   }
 }
 
-export default injectStripe(LoggedInState({
+export default withRouter(injectStripe(LoggedInState({
   name: 'SignUpStepPayment',
   isRequiredToBeLoggedIn: true
-})(connect(mapStateToProps, mapDispatchToProps)(SignUpStepPayment)))
+})(connect(mapStateToProps, mapDispatchToProps)(SignUpStepPayment))))

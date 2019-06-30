@@ -38,7 +38,7 @@ import MyProfilePage from './pages/my-profile-page/MyProfilePage'
 import VerifyEmailPage from './pages/authentication/VerifyEmailPage'
 import MembersDirectoryPage from './pages/members-directory/MembersDirectoryPage'
 import usePrevious from './components/usePrevious'
-import { DISPLAY_NAME, EMAIL, UID } from './fields'
+import { DISPLAY_NAME, EMAIL, PHOTO_URL, UID } from './fields'
 
 const pageWrapperClassNames = 'mb-4 mx-1 mx-sm-2 mx-md-3'
 
@@ -66,7 +66,6 @@ function App ({ fetchCurrentUser, isCurrentUserLoaded, currentUser }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser])
 
-  console.log('render called')
   return (
     <>
       <Switch>
@@ -241,11 +240,11 @@ function App ({ fetchCurrentUser, isCurrentUserLoaded, currentUser }) {
         isCurrentUserLoaded &&
         <Drift
           appId='fxagpvvrufk4'
-          userId={currentUser && currentUser.uid}
+          userId={currentUser ? currentUser[UID] : undefined}
           attributes={{
-            email: currentUser && currentUser.email,
-            avatar_url: currentUser && currentUser.photoURL,
-            displayName: currentUser && currentUser.displayName
+            email: currentUser && currentUser[EMAIL],
+            avatar_url: currentUser && currentUser[PHOTO_URL],
+            displayName: currentUser && currentUser[DISPLAY_NAME]
           }}
           config={{
             enableCampaigns: window.innerHeight >= 770

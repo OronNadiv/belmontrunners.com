@@ -1,16 +1,24 @@
 /* global drift */
-import React from "react"
-import PropTypes from "prop-types"
+import React, { useCallback, useEffect } from "react"
+import * as PropTypes from "prop-types"
+import { Map as IMap } from 'immutable'
 
-class Drift extends React.Component {
-  insertScript (scriptText) {
-    const script = document.createElement("script")
-    script.innerText = scriptText
-    script.async = true
-    document.body.appendChild(script)
+const Drift = ({ appId, config, userId, attributes }) => {
+  config = new IMap(config)
+  attributes = new IMap(attributes)
+  const insertScript = (scriptText) => {
+    const element = document.createElement("script")
+    element.innerText = scriptText
+    element.async = true
+    document.body.appendChild(element)
+    return element
   }
 
-  addMainScript () {
+  const removeElement = (element) => {
+    document.body.removeChild(element)
+  }
+
+  const addMainScript = useCallback(() => {
     const scriptText = `!function() {
         var t = window.driftt = window.drift = window.driftt || [];
         if (!t.init) {
@@ -32,52 +40,42 @@ class Drift extends React.Component {
         }
       }();
       drift.SNIPPET_VERSION = '0.3.1';
-      drift.load('${this.props.appId}');
-      drift.config(${JSON.stringify(this.props.config || {})});
+      drift.load('${appId}');
+      drift.config(${JSON.stringify(config ? config.toJS() : {})});
       `
 
-    this.insertScript(scriptText)
-  }
+    return insertScript(scriptText)
+  }, [appId, config])
 
-  addIdentityVariables () {
-    if (this.props.userId) {
-      const scriptText = `
-        drift.identify('${this.props.userId}', ${JSON.stringify(this.props.attributes)});
+  const addIdentityVariables = useCallback(() => {
+    const scriptText = `
+        drift.identify('${userId}', ${JSON.stringify(attributes.toJS())});
       `
-      this.insertScript(scriptText)
-    }
-  }
+    return insertScript(scriptText)
+  }, [userId, attributes])
 
-  componentDidMount () {
+  useEffect(() => {
+    let elem
     if (typeof window !== "undefined") {
-      this.addMainScript()
-      this.addIdentityVariables()
+      elem = addMainScript()
     }
-  }
-
-  componentWillUnmount () {
-    drift && drift.reset()
-  }
-
-  componentDidUpdate (prevProps) {
-    if (prevProps.config !== this.props.config) {
-      console.error('config cannot be changed once the component is mounted.')
+    return () => {
+      elem && removeElement(elem)
     }
-    if (drift && (
-      prevProps.userId !== this.props.userId ||
-      prevProps.attributes !== this.props.attributes
-    )) {
-      if (this.props.userId) {
-        this.addIdentityVariables()
-      } else if (prevProps.userId) {
-        drift.reset()
-      }
-    }
-  }
+  }, [userId, appId, config, addMainScript])
 
-  render () {
-    return ""
-  }
+  useEffect(() => {
+    let elem
+    if (typeof window !== "undefined" && drift) {
+      elem = addIdentityVariables()
+    }
+    return () => {
+      elem && removeElement(elem)
+      drift && drift.reset()
+    }
+  }, [userId, attributes, addIdentityVariables])
+
+  return <></>
 }
 
 const propTypes = {

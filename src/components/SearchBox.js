@@ -51,7 +51,10 @@ function SearchBox ({ onChange, placeholder = 'Search', children }) {
 SearchBox.propTypes = {
   onChange: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
-  children: PropTypes.element
+  children: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.node),
+    PropTypes.node
+  ])
 }
 
 export default SearchBox

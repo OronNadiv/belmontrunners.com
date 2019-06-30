@@ -4,9 +4,13 @@ import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 function SignUpPage ({ isCurrentUserLoaded, currentUser }) {
-  const [steps, setSteps] = useState([])
+  const [steps, setSteps] = useState()
   useEffect(() => {
     if (!isCurrentUserLoaded) {
+      return
+    }
+    if (steps) {
+      // num of steps already decided based on the user's state.
       return
     }
     if (currentUser) {
@@ -14,10 +18,10 @@ function SignUpPage ({ isCurrentUserLoaded, currentUser }) {
     } else {
       setSteps([STEP_AUTHENTICATION, STEP_USER_DETAILS, STEP_MEMBERSHIP])
     }
-  }, [isCurrentUserLoaded, currentUser])
+  }, [isCurrentUserLoaded, currentUser, steps])
 
 
-  if (!isCurrentUserLoaded || !steps.length) {
+  if (!isCurrentUserLoaded || !steps) {
     // todo: show loading
     return <></>
   }
