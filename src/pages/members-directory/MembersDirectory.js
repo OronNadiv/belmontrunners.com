@@ -18,9 +18,8 @@ import _ from 'underscore'
 import { MEMBERS_DIRECTORY } from '../../urls'
 import SearchBox from '../../components/SearchBox'
 
-function MembersDirectory ({ currentUser, location, history }) {
-  const { pathname } = location
-  const useStyles = makeStyles(theme => ({
+function MembersDirectory ({ currentUser, location: { pathname }, history }) {
+  const useStyles = makeStyles(() => ({
     chipAvatar: {
       width: 32,
       height: 32

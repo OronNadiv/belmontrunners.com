@@ -1,0 +1,41 @@
+[
+  {
+    "name": "Oron Nadiv",
+    "title": "Webmaster",
+    "image": "oron.jpg",
+    "facebook": "oronnadiv",
+    "linkedin": "oronnadiv",
+    "website": "www.oronnadiv.com"
+  },
+  {
+    "name": "Doug Kim",
+    "title": "President",
+    "image": "doug.png",
+    "facebook": "dougebob",
+    "twitter": "douglasckim"
+  },
+  {
+    "name": "Kelsey Homyk",
+    "title": "Activities Director",
+    "image": "kelsey.png"
+  },
+  {
+    "name": "Theresa Saito",
+    "title": "Vice President",
+    "image": "theresa.png"
+  },
+  {
+    "name": "Shelly Kim",
+    "title": "Treasurer",
+    "image": "shelly.png",
+    "facebook": "shelly.b.kim",
+    "email": "shellybkim@gmail.com"
+  },
+  {
+    "name": "Jon VanHorn",
+    "title": "Communications Director",
+    "image": "jon.png",
+    "facebook": "jon.vanhorn",
+    "instagram": "thisisjvh"
+  }
+]

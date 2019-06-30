@@ -7,7 +7,7 @@ import * as PropTypes from 'prop-types'
 import { makeStyles } from '@material-ui/core'
 
 function SearchBox ({ onChange, placeholder = 'Search', children }) {
-  const useStyles = makeStyles(theme => ({
+  const useStyles = makeStyles(() => ({
     paper: {
       // margin: '20px 10px',
       padding: '2px 4px',

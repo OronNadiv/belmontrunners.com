@@ -82,7 +82,7 @@ function HeaderArea ({ location: { pathname }, isCurrentUserLoaded, currentUser 
     rootStyle.height = TOOLBAR_HEIGHT
 
   }
-  const useStyles = makeStyles(theme => ({
+  const useStyles = makeStyles(() => ({
     root: {
       flexGrow: 1,
       ...rootStyle

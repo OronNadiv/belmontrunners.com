@@ -5,8 +5,7 @@ import CloseIcon from '@material-ui/icons/Close'
 import Typography from '@material-ui/core/Typography'
 import * as PropTypes from 'prop-types'
 
-const DialogTitle = (props => {
-  const { children, onClose } = props
+const DialogTitle = ({ children, onClose }) => {
   return (
     <MuiDialogTitle disableTypography>
       <div className='d-flex justify-content-between align-items-center'>
@@ -23,7 +22,8 @@ const DialogTitle = (props => {
       </div>
     </MuiDialogTitle>
   )
-})
+}
+
 DialogTitle.propTypes = {
   onClose: PropTypes.func.isRequired,
   children: PropTypes.element.isRequired
