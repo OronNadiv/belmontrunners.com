@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { useState } from 'react'
 
 import Stepper from '@material-ui/core/Stepper'
 import Step from '@material-ui/core/Step'
@@ -15,34 +15,14 @@ export const STEP_AUTHENTICATION = 'STEP_AUTHENTICATION'
 export const STEP_USER_DETAILS = 'STEP_USER_DETAILS'
 export const STEP_MEMBERSHIP = 'STEP_MEMBERSHIP'
 
-class SignUpStepper extends Component {
-  constructor (props) {
-    super(props)
-    const steps = this.props.steps || [STEP_AUTHENTICATION, STEP_USER_DETAILS, STEP_MEMBERSHIP]
+function SignUpStepper ({ steps }) {
+  const [activeStep, setActiveStep] = useState(0)
 
-    this.state = {
-      activeStep: 0,
-      steps
-    }
-    this.handleNext = this.handleNext.bind(this)
-    this.handleBack = this.handleBack.bind(this)
+  const handleNext = () => {
+    setActiveStep(activeStep + 1)
   }
 
-  handleNext = () => {
-    console.log('handleNext called')
-    this.setState(state => ({
-      activeStep: state.activeStep + 1
-    }))
-  }
-
-  handleBack = () => {
-    this.setState(state => ({
-      activeStep: state.activeStep - 1
-    }))
-  }
-
-  getStepsHeaders () {
-    const { steps } = this.state
+  const getStepsHeaders = () => {
     return steps.map((step) => {
       switch (step) {
         case STEP_AUTHENTICATION:
@@ -71,42 +51,37 @@ class SignUpStepper extends Component {
     })
   }
 
-  render () {
-    const { activeStep, steps } = this.state
-
-    return (
-      <div>
-        {
-          steps.length > 1 &&
-          <Stepper alternativeLabel className="justify-content-center" activeStep={activeStep}>
-            {this.getStepsHeaders()}
-          </Stepper>
-        }
-        {
-          this.getStep()
-        }
-      </div>
-    )
-  }
-
-  getStep () {
-    const { activeStep, steps } = this.state
+  const getStep = () => {
     switch (steps[activeStep]) {
       case STEP_AUTHENTICATION:
-        return <SignUpStepAuth isLast={activeStep === steps.length - 1} onNextClicked={this.handleNext} />
+        return <SignUpStepAuth isLast={activeStep === steps.length - 1} onNextClicked={handleNext} />
       case STEP_USER_DETAILS:
-        return <SignUpStepUserProfile isLast={activeStep === steps.length - 1} onNextClicked={this.handleNext} />
+        return <SignUpStepUserProfile isLast={activeStep === steps.length - 1} onNextClicked={handleNext} />
       case STEP_MEMBERSHIP:
-        return <SignUpStepPayment isLast={activeStep === steps.length - 1} onNextClicked={this.handleNext} />
+        return <SignUpStepPayment isLast={activeStep === steps.length - 1} onNextClicked={handleNext} />
       default:
         return <Redirect to={ROOT} />
 
     }
   }
+
+  return (
+    <div>
+      {
+        steps.length > 1 &&
+        <Stepper alternativeLabel className="justify-content-center" activeStep={activeStep}>
+          {getStepsHeaders()}
+        </Stepper>
+      }
+      {
+        getStep()
+      }
+    </div>
+  )
 }
 
 SignUpStepper.propTypes = {
-  steps: PropTypes.arrayOf(PropTypes.string)
+  steps: PropTypes.arrayOf(PropTypes.string).isRequired
 }
 
 export default SignUpStepper

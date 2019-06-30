@@ -3,7 +3,6 @@ import Button from '@material-ui/core/Button'
 import Snackbar from '@material-ui/core/Snackbar'
 import { Link } from 'react-router-dom'
 import { JOIN } from '../../urls'
-import { STEP_MEMBERSHIP, STEP_USER_DETAILS } from '../sign-up-page/SignUpStepper'
 import { DID_RECEIVED_SHIRT, MEMBERSHIP_EXPIRES_AT } from '../../fields'
 import moment from 'moment/moment'
 import * as PropTypes from 'prop-types'
@@ -97,8 +96,7 @@ class Notifications extends Component {
           Click <Link
           style={{ color: LINK_COLOR }}
           to={{
-            pathname: JOIN,
-            state: { steps: [STEP_USER_DETAILS, STEP_MEMBERSHIP] }
+            pathname: JOIN
           }}>HERE</Link> to {!isExistingMember ? 'become a member' : 'renew your membership'}
         </div>,
       action:

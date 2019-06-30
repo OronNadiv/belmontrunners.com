@@ -214,8 +214,7 @@ function HeaderArea ({ location: { pathname }, isCurrentUserLoaded, currentUser 
               {
                 isSignedOut &&
                 <Link to={{
-                  pathname: JOIN,
-                  state: { steps: undefined }
+                  pathname: JOIN
                 }} onClick={handleDrawerClose}>
                   <ListItem button>
                     <ListItemIcon><JoinUsIcon color='primary' /></ListItemIcon>
@@ -270,8 +269,7 @@ function HeaderArea ({ location: { pathname }, isCurrentUserLoaded, currentUser 
           {
             !isSmallDevice && isCurrentUserLoaded && !currentUser && pathname.trim() !== JOIN &&
             <Link to={{
-              pathname: JOIN,
-              state: { steps: undefined }
+              pathname: JOIN
             }}>
               <Button variant='contained' color='primary' className='ml-5'>
                 Join Us
