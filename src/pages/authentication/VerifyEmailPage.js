@@ -7,9 +7,9 @@ import {
   INVALID_ACTION_CODE_INVALID_URL,
   USER_DISABLED_INVALID_URL,
   USER_NOT_FOUND_INVALID_URL
-} from '../../../messages'
+} from '../../messages'
 import { Redirect, withRouter } from 'react-router-dom'
-import { ROOT } from '../../../urls'
+import { ROOT } from '../../urls'
 import Dialog from '@material-ui/core/Dialog'
 import DialogTitle from '@material-ui/core/DialogTitle'
 import DialogContent from '@material-ui/core/DialogContent'
@@ -22,7 +22,7 @@ const STATE_CLOSE = 'close'
 const STATE_ERROR_MESSAGE = 'errorMessage'
 const STATE_IS_SUCCESS = 'isSuccess'
 
-class RecoverEmailPage extends Component {
+class VerifyEmailPage extends Component {
   constructor (props) {
     console.log('RecoverEmailPage ctor')
     super(props)
@@ -61,39 +61,18 @@ class RecoverEmailPage extends Component {
         console.error('RecoverEmailPage',
           'code:', code,
           'message:', message)
-        this.setState({
-          [STATE_ERROR_MESSAGE]: message
-        })
+        this.setState({ errorMessage: message })
     }
   }
 
   async componentDidMount () {
     // Get the restored email address.
     const oobCode = this.props.location.state.query.oobCode
-    const restoredEmail = this.props.location.state.info.data.email
 
     console.log('calling applyActionCode')
     try {
-      await firebase.auth()
-        .applyActionCode(oobCode)
-      console.log('calling sendPasswordResetEmail')
-      try {
-        await firebase.auth()
-          .sendPasswordResetEmail(restoredEmail)
-        this.setState({
-          [STATE_IS_SUCCESS]: true,
-          [STATE_ERROR_MESSAGE]: ''
-        })
-      } catch (error) {
-        const { code, message } = error
-        Sentry.captureException(error)
-        console.error('RecoverEmailPage',
-          'code:', code,
-          'message:', message)
-        this.setState({
-          [STATE_ERROR_MESSAGE]: message
-        })
-      }
+      await firebase.auth().applyActionCode(oobCode)
+      this.setState({ [STATE_IS_SUCCESS]: true })
     } catch (error) {
       this.processError(error)
     }
@@ -103,8 +82,6 @@ class RecoverEmailPage extends Component {
     const close = this.state[STATE_CLOSE]
     const errorMessage = this.state[STATE_ERROR_MESSAGE]
     const isSuccess = this.state[STATE_IS_SUCCESS]
-
-    const restoredEmail = this.props.location.state.info.data.email
 
     if (close) {
       console.log('redirecting to root', close)
@@ -120,17 +97,15 @@ class RecoverEmailPage extends Component {
         aria-labelledby="form-dialog-title"
       >
         <DialogTitle>
-          Recover Email
+          Verify Email
         </DialogTitle>
 
         <DialogContent>
           <DialogContentText>
             {
               isSuccess &&
-              <div className='text-success text-center '>
-                Your email ({restoredEmail}) has been successfully recovered.<br />
-                A password reset confirmation email has been sent to your email.
-                Please follow the instructions in the email to reset your password.
+              <div className='text-success text-center'>
+                Your email has been verified
               </div>
             }
             {errorMessage}
@@ -146,7 +121,7 @@ class RecoverEmailPage extends Component {
   }
 }
 
-RecoverEmailPage.propTypes = {
+VerifyEmailPage.propTypes = {
   location: PropTypes.shape({
     state: PropTypes.shape({
       info: PropTypes.shape({
@@ -161,4 +136,4 @@ RecoverEmailPage.propTypes = {
   }).isRequired
 }
 
-export default withRouter(RecoverEmailPage)
+export default withRouter(VerifyEmailPage)

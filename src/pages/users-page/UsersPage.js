@@ -303,7 +303,7 @@ class EnhancedTable extends Component {
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage)
 
     return (
-      <div className='container-fluid'>
+      <>
         {
           rowToDelete &&
           <ConfirmDeletion
@@ -418,7 +418,7 @@ class EnhancedTable extends Component {
             label="Dense padding"
           />
         </div>
-      </div>
+      </>
     )
   }
 }

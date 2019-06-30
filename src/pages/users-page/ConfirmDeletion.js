@@ -6,9 +6,7 @@ import * as PropTypes from 'prop-types'
 import { DISPLAY_NAME, EMAIL, UID } from '../../fields'
 import * as Sentry from '@sentry/browser'
 
-const confirmDeletion = (props) => {
-  const { row, onClose } = props
-
+const confirmDeletion = ({ row, onClose }) => {
   const deleteUser = async () => {
     let uid = row[UID]
     console.log(`Deleting: users/${uid}, row:`, row)

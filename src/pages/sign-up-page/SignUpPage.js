@@ -23,10 +23,8 @@ function SignUpPage ({ isCurrentUserLoaded, currentUser }) {
   }
   console.log('steps:', steps)
   return (
-    <div className='container-fluid'>
-      <div className='d-flex justify-content-center'>
-        <SignUpStepper steps={steps} />
-      </div>
+    <div className='d-flex justify-content-center'>
+      <SignUpStepper steps={steps} />
     </div>
   )
 }

@@ -57,7 +57,7 @@ class SignUpStepUserProfile extends Component {
         onSubmit={(values) => this.handleSubmit(values)}
         initialValues={initialValues}
         render={({ handleSubmit, form, values }) => (
-          <form onSubmit={handleSubmit} className='container-fluid'>
+          <form onSubmit={handleSubmit}>
 
             <UserDetails values={values} />
 

@@ -18,7 +18,7 @@ import _ from 'underscore'
 import { MEMBERS_DIRECTORY } from '../../urls'
 import SearchBox from '../../components/SearchBox'
 
-function MembersDirectory ({ currentUser, location: { pathname }, history }) {
+function MembersDirectoryPage ({ currentUser, location: { pathname }, history }) {
   const useStyles = makeStyles(() => ({
     chipAvatar: {
       width: 32,
@@ -103,9 +103,12 @@ function MembersDirectory ({ currentUser, location: { pathname }, history }) {
     )
   }
 
-  return !currentUser ?
-    <></> :
-    <div className='container-fluid mb-4'>
+  if (!currentUser) {
+    // todo: show loading
+    return <></>
+  }
+  return (
+    <div className='mb-4'>
       {
         !!selected &&
         <UserProfile
@@ -125,9 +128,10 @@ function MembersDirectory ({ currentUser, location: { pathname }, history }) {
         </div>
       </div>
     </div>
+  )
 }
 
-MembersDirectory.propTypes = {
+MembersDirectoryPage.propTypes = {
   currentUser: PropTypes.object,
   updateUserData: PropTypes.func.isRequired,
   userData: PropTypes.object.isRequired,
@@ -149,4 +153,4 @@ const mapStateToProps = ({ currentUser: { currentUser, userData } }) => {
 export default LoggedInState({
   name: 'membersDirectory',
   isRequiredToBeLoggedIn: true
-})(connect(mapStateToProps, mapDispatchToProps)(withRouter(MembersDirectory)))
+})(connect(mapStateToProps, mapDispatchToProps)(withRouter(MembersDirectoryPage)))

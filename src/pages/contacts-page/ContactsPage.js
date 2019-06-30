@@ -261,7 +261,7 @@ class ContactsPage extends Component {
     }
 
     return (
-      <div className='container-fluid mb-4'>
+      <div className='mb-4'>
         {
           showAddDialog &&
           <AddDialog

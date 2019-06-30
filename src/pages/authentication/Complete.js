@@ -3,14 +3,14 @@ import firebase from 'firebase'
 import React, { Component } from 'react'
 import queryString from 'query-string'
 import * as PropTypes from 'prop-types'
-import { ROOT } from '../../../urls'
+import { ROOT } from '../../urls'
 import { Redirect, withRouter } from 'react-router-dom'
 import {
   EXPIRED_ACTION_CODE,
   INVALID_ACTION_CODE_INVALID_URL,
   USER_DISABLED_INVALID_URL,
   USER_NOT_FOUND_INVALID_URL
-} from '../../../messages'
+} from '../../messages'
 import Dialog from '@material-ui/core/Dialog'
 import DialogTitle from '@material-ui/core/DialogTitle'
 import DialogContent from '@material-ui/core/DialogContent'
