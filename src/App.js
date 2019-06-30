@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { useEffect } from 'react'
 import Footer from './components/Footer'
 import './App.css'
 import './scss/style.scss'
@@ -36,21 +36,25 @@ import RecoverEmailPage from './pages/authentication/RecoverEmailPage'
 import ContactsPage from './pages/contacts-page/ContactsPage'
 import MyProfilePage from './pages/my-profile-page/MyProfilePage'
 import VerifyEmailPage from './pages/authentication/VerifyEmailPage'
-import MembersDirectory from './pages/members-directory/MembersDirectoryPage'
+import MembersDirectoryPage from './pages/members-directory/MembersDirectoryPage'
+import usePrevious from './components/usePrevious'
+import { DISPLAY_NAME, EMAIL, UID } from './fields'
 
-class App extends Component {
-  componentDidMount () {
-    this.props.fetchCurrentUser()
-  }
+const pageWrapperClassNames = 'mb-4 mx-1 mx-sm-2 mx-md-3'
 
-  componentDidUpdate (prevProps) {
-    if (prevProps.currentUser !== this.props.currentUser) {
-      if (this.props.currentUser) {
+function App ({ fetchCurrentUser, isCurrentUserLoaded, currentUser }) {
+  useEffect(fetchCurrentUser, [])
+
+  const prevCurrentUser = usePrevious(currentUser)
+  useEffect(() => {
+    if (prevCurrentUser !== currentUser) {
+      console.log('currentUser is different:', currentUser)
+      if (currentUser) {
         Sentry.configureScope((scope) => {
           scope.setUser({
-            id: this.props.currentUser.uid,
-            email: this.props.currentUser.email,
-            displayName: this.props.currentUser.display
+            id: currentUser[UID],
+            email: currentUser[EMAIL],
+            displayName: currentUser[DISPLAY_NAME]
           })
         })
       } else {
@@ -59,187 +63,197 @@ class App extends Component {
         })
       }
     }
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser])
 
-  render () {
+  console.log('render called')
+  return (
+    <>
+      <Switch>
+        <Route
+          exact
+          path={SIGN_IN}
+          render={() => (
+            <div>
+              <HeaderArea />
+              <HomePage />
+              <Footer />
 
-    const { isCurrentUserLoaded, currentUser } = this.props
-    return (
-      <div>
-        <Switch>
-          <Route
-            exact
-            path={SIGN_IN}
-            render={() => (
-              <div>
-                <HeaderArea />
-                <HomePage />
-                <Footer />
-
-                <SignIn />
-              </div>
-            )}
-          />
-          <Route
-            exact
-            path={JOIN}
-            render={() => (
-              <div>
-                <HeaderArea />
+              <SignIn />
+            </div>
+          )}
+        />
+        <Route
+          exact
+          path={JOIN}
+          render={() => (
+            <div>
+              <HeaderArea />
+              <div className={pageWrapperClassNames}>
                 <SignUpPage />
-                <Footer />
               </div>
-            )}
-          />
-          <Route
-            exact
-            path={MY_PROFILE}
-            render={() => (
-              <div>
-                <HeaderArea />
+              <Footer />
+            </div>
+          )}
+        />
+        <Route
+          exact
+          path={MY_PROFILE}
+          render={() => (
+            <div>
+              <HeaderArea />
+              <div className={pageWrapperClassNames}>
                 <MyProfilePage />
-                <Footer />
               </div>
-            )}
-          />
-          <Route
-            path={MEMBERS_DIRECTORY}
-            render={() => (
-              <div>
-                <HeaderArea />
-                <MembersDirectory />
-                <Footer />
+              <Footer />
+            </div>
+          )}
+        />
+        <Route
+          path={MEMBERS_DIRECTORY}
+          render={() => (
+            <div>
+              <HeaderArea />
+              <div className={pageWrapperClassNames}>
+                <MembersDirectoryPage />
               </div>
-            )}
-          />
-          <Route
-            exact
-            path={USERS}
-            render={() => (
-              <div>
-                <HeaderArea />
+              <Footer />
+            </div>
+          )}
+        />
+        <Route
+          exact
+          path={USERS}
+          render={() => (
+            <div>
+              <HeaderArea />
+              <div className={pageWrapperClassNames}>
                 <UsersPage />
-                <Footer />
               </div>
-            )}
-          />
-          <Route
-            exact
-            path={CONTACTS}
-            render={() => (
-              <div>
-                <HeaderArea />
+              <Footer />
+            </div>
+          )}
+        />
+        <Route
+          exact
+          path={CONTACTS}
+          render={() => (
+            <div>
+              <HeaderArea />
+              <div className={pageWrapperClassNames}>
                 <ContactsPage />
-                <Footer />
               </div>
-            )}
-          />
-          <Route
-            exact
-            path={GALLERY}
-            render={() => (
-              <div>
-                <HeaderArea />
+              <Footer />
+            </div>
+          )}
+        />
+        <Route
+          exact
+          path={GALLERY}
+          render={() => (
+            <div>
+              <HeaderArea />
+              <div className={pageWrapperClassNames}>
                 <GalleryPage />
-                <Footer />
               </div>
-            )}
-          />
-          <Route
-            exact
-            path={FORGOT_PASSWORD}
-            render={() => (
-              <div>
-                <HeaderArea />
-                <HomePage />
-                <Footer />
+              <Footer />
+            </div>
+          )}
+        />
+        <Route
+          exact
+          path={FORGOT_PASSWORD}
+          render={() => (
+            <div>
+              <HeaderArea />
+              <HomePage />
+              <Footer />
 
-                <ForgotPasswordPage />
-              </div>
-            )}
-          />
-          <Route
-            exact
-            path={COMPLETE}
-            render={() => (
-              <div>
-                <HeaderArea />
-                <HomePage />
-                <Footer />
+              <ForgotPasswordPage />
+            </div>
+          )}
+        />
+        <Route
+          exact
+          path={COMPLETE}
+          render={() => (
+            <div>
+              <HeaderArea />
+              <HomePage />
+              <Footer />
 
-                <Complete />
-              </div>
-            )}
-          />
-          <Route
-            exact
-            path={RESET_PASSWORD}
-            render={() => (
-              <div>
-                <HeaderArea />
-                <HomePage />
-                <Footer />
+              <Complete />
+            </div>
+          )}
+        />
+        <Route
+          exact
+          path={RESET_PASSWORD}
+          render={() => (
+            <div>
+              <HeaderArea />
+              <HomePage />
+              <Footer />
 
-                <ResetPasswordPage />
-              </div>
-            )}
-          />
-          <Route
-            exact
-            path={RECOVER_EMAIL}
-            render={() => (
-              <div>
-                <HeaderArea />
-                <HomePage />
-                <Footer />
+              <ResetPasswordPage />
+            </div>
+          )}
+        />
+        <Route
+          exact
+          path={RECOVER_EMAIL}
+          render={() => (
+            <div>
+              <HeaderArea />
+              <HomePage />
+              <Footer />
 
-                <RecoverEmailPage />
-              </div>
-            )}
-          />
-          <Route
-            exact
-            path={VERIFY_EMAIL}
-            render={() => (
-              <div>
-                <HeaderArea />
-                <HomePage />
-                <Footer />
+              <RecoverEmailPage />
+            </div>
+          )}
+        />
+        <Route
+          exact
+          path={VERIFY_EMAIL}
+          render={() => (
+            <div>
+              <HeaderArea />
+              <HomePage />
+              <Footer />
 
-                <VerifyEmailPage />
-              </div>
-            )}
-          />
+              <VerifyEmailPage />
+            </div>
+          )}
+        />
 
-          <Route
-            path={ROOT}
-            render={() => (
-              <div>
-                <HeaderArea />
-                <HomePage />
-                <Footer />
-              </div>
-            )}
-          />
-        </Switch>
-        {
-          isCurrentUserLoaded &&
-          <Drift
-            appId='fxagpvvrufk4'
-            userId={currentUser && currentUser.uid}
-            attributes={{
-              email: currentUser && currentUser.email,
-              avatar_url: currentUser && currentUser.photoURL,
-              displayName: currentUser && currentUser.displayName
-            }}
-            config={{
-              enableCampaigns: window.innerHeight >= 770
-            }}
-          />
-        }
-      </div>
-    )
-  }
+        <Route
+          path={ROOT}
+          render={() => (
+            <div>
+              <HeaderArea />
+              <HomePage />
+              <Footer />
+            </div>
+          )}
+        />
+      </Switch>
+      {
+        isCurrentUserLoaded &&
+        <Drift
+          appId='fxagpvvrufk4'
+          userId={currentUser && currentUser.uid}
+          attributes={{
+            email: currentUser && currentUser.email,
+            avatar_url: currentUser && currentUser.photoURL,
+            displayName: currentUser && currentUser.displayName
+          }}
+          config={{
+            enableCampaigns: window.innerHeight >= 770
+          }}
+        />
+      }
+    </>
+  )
 }
 
 App.propTypes = {

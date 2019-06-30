@@ -7,7 +7,7 @@ import { CONTACTS, MEMBERS_DIRECTORY, MY_PROFILE, ROOT, USERS } from '../urls'
 import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import LoggedInState from './LoggedInState'
-import { MEMBERSHIP_EXPIRES_AT } from '../fields'
+import { MEMBERSHIP_EXPIRES_AT, UID } from '../fields'
 import moment from 'moment'
 
 class Profile extends Component {
@@ -17,8 +17,7 @@ class Profile extends Component {
   }
 
   render () {
-    const { currentUser, allowUsersPage, allowContactsPage, userData } = this.props
-    const isMember = userData && userData.get(MEMBERSHIP_EXPIRES_AT) && moment(userData.get(MEMBERSHIP_EXPIRES_AT)).isAfter(moment())
+    const { currentUser, allowUsersPage, allowContactsPage, isMember } = this.props
 
     return (
       <span className="dropdown signout-btn text-white-50">
@@ -68,20 +67,20 @@ Profile.propTypes = {
   allowUsersPage: PropTypes.bool.isRequired,
   allowContactsPage: PropTypes.bool.isRequired,
   currentUser: PropTypes.object.isRequired,
-  userData: PropTypes.object.isRequired
-
+  userData: PropTypes.object.isRequired,
+  isMember: PropTypes.bool.isRequired
 }
 
 const mapStateToProps = ({ currentUser: { permissions, currentUser, userData } }) => {
   return {
     allowUsersPage: !!currentUser && (
-      !!permissions.usersRead[currentUser.uid] ||
-      !!permissions.usersWrite[currentUser.uid]),
+      !!permissions.usersRead[currentUser[UID]] ||
+      !!permissions.usersWrite[currentUser[UID]]),
     allowContactsPage: !!currentUser && (
-      !!permissions.contactsRead[currentUser.uid] ||
-      !!permissions.contactsWrite[currentUser.uid]),
+      !!permissions.contactsRead[currentUser[UID]] ||
+      !!permissions.contactsWrite[currentUser[UID]]),
     currentUser: currentUser || {},
-    userData: userData || {}
+    isMember: !!(userData && userData.get(MEMBERSHIP_EXPIRES_AT) && moment(userData.get(MEMBERSHIP_EXPIRES_AT)).isAfter(moment()))
   }
 }
 

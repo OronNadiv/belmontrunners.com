@@ -35,6 +35,7 @@ function MembersDirectoryPage ({ currentUser, location: { pathname }, history })
     (async function () {
       const resp = await firebase.functions().httpsCallable('getMembers')()
       setUsers(resp.data)
+      // setUsers(require('./members.json'))
     })()
   }, [currentUser])
 
@@ -108,7 +109,7 @@ function MembersDirectoryPage ({ currentUser, location: { pathname }, history })
     return <></>
   }
   return (
-    <div className='mb-4'>
+    <>
       {
         !!selected &&
         <UserProfile
@@ -118,16 +119,12 @@ function MembersDirectoryPage ({ currentUser, location: { pathname }, history })
         />
       }
       <SearchBox onChange={setSearch} />
-      <div className='row'>
-        <div className='col-12'>
-          <Paper className='px-2 py-3'>
-            <div className='d-flex justify-content-between flex-wrap'>
-              {getChips()}
-            </div>
-          </Paper>
+      <Paper className='px-2 py-3'>
+        <div className='d-flex justify-content-between flex-wrap'>
+          {getChips()}
         </div>
-      </div>
-    </div>
+      </Paper>
+    </>
   )
 }
 

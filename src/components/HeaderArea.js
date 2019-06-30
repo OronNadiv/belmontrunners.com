@@ -6,12 +6,26 @@ import IconButton from '@material-ui/core/IconButton'
 import MenuIcon from '@material-ui/icons/Menu'
 import HomeIcon from '@material-ui/icons/Home'
 import MyProfileIcon from '@material-ui/icons/AccountCircle'
+import MembersDirectoryIcon from '@material-ui/icons/People'
+import UsersIcon from '@material-ui/icons/PeopleOutline'
+import ContactsIcon from '@material-ui/icons/Contacts'
 import SignOutIcon from '@material-ui/icons/PowerSettingsNew'
 import SignInIcon from '@material-ui/icons/ExitToApp'
 import JoinUsIcon from '@material-ui/icons/PersonAdd'
+import moment from 'moment'
 
 import Profile from './Profile'
-import { FORGOT_PASSWORD, JOIN, MY_PROFILE, RESET_PASSWORD, ROOT, SIGN_IN } from '../urls'
+import {
+  CONTACTS,
+  FORGOT_PASSWORD,
+  JOIN,
+  MEMBERS_DIRECTORY,
+  MY_PROFILE,
+  RESET_PASSWORD,
+  ROOT,
+  SIGN_IN,
+  USERS
+} from '../urls'
 import { Link, withRouter } from 'react-router-dom'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import { useTheme } from '@material-ui/core'
@@ -27,13 +41,14 @@ import ListItemIcon from '@material-ui/core/ListItemIcon'
 import Toolbar from '@material-ui/core/Toolbar'
 import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
+import { MEMBERSHIP_EXPIRES_AT, UID } from '../fields'
 
 const TOOLBAR_HEIGHT = 72
 const DRAWER_WIDTH = 240
 const BACKGROUND_IMAGE = 'linear-gradient(90deg,#141da2,#9b5cf6)'
 
 
-function HeaderArea ({ location: { pathname }, isCurrentUserLoaded, currentUser }) {
+function HeaderArea ({ location: { pathname }, isCurrentUserLoaded, currentUser, allowUsersPage, allowContactsPage, isMember }) {
   const [transparentBackground, setTransparentBackground] = useState(true)
   const [showDrawer, setShowDrawer] = useState(false)
 
@@ -126,7 +141,7 @@ function HeaderArea ({ location: { pathname }, isCurrentUserLoaded, currentUser 
     },
     drawerList: {
       paddingTop: 20,
-      paddingLeft: 20
+      paddingLeft: 10
     },
     drawerLink: {
       color: theme.palette.text.primary
@@ -188,6 +203,38 @@ function HeaderArea ({ location: { pathname }, isCurrentUserLoaded, currentUser 
                   </ListItem>
                 </Link>
               }
+
+              {
+                isMember &&
+                <Link to={MEMBERS_DIRECTORY} onClick={handleDrawerClose}>
+                  <ListItem button>
+                    <ListItemIcon><MembersDirectoryIcon color='primary' /></ListItemIcon>
+                    <ListItemText primary='Members Directory' className={classes.drawerLink} />
+                  </ListItem>
+                </Link>
+              }
+
+              {
+                allowUsersPage &&
+                <Link to={USERS} onClick={handleDrawerClose}>
+                  <ListItem button>
+                    <ListItemIcon><UsersIcon color='primary' /></ListItemIcon>
+                    <ListItemText primary='Users' className={classes.drawerLink} />
+                  </ListItem>
+                </Link>
+              }
+
+              {
+                allowContactsPage &&
+                <Link to={CONTACTS} onClick={handleDrawerClose}>
+                  <ListItem button>
+                    <ListItemIcon><ContactsIcon color='primary' /></ListItemIcon>
+                    <ListItemText primary='Contacts' className={classes.drawerLink} />
+                  </ListItem>
+                </Link>
+              }
+
+
               {
                 isSignedIn &&
                 <Link to={ROOT}
@@ -286,15 +333,25 @@ function HeaderArea ({ location: { pathname }, isCurrentUserLoaded, currentUser 
 }
 
 HeaderArea.propTypes = {
+  allowUsersPage: PropTypes.bool.isRequired,
+  allowContactsPage: PropTypes.bool.isRequired,
   isCurrentUserLoaded: PropTypes.bool.isRequired,
   currentUser: PropTypes.object,
   location: PropTypes.shape({
     pathname: PropTypes.string.isRequired
-  }).isRequired
+  }).isRequired,
+  isMember: PropTypes.bool.isRequired
 }
 
-const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, currentUser, permissions } }) => {
+const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, currentUser, permissions, userData } }) => {
   return {
+    allowUsersPage: !!currentUser && (
+      !!permissions.usersRead[currentUser[UID]] ||
+      !!permissions.usersWrite[currentUser[UID]]),
+    allowContactsPage: !!currentUser && (
+      !!permissions.contactsRead[currentUser[UID]] ||
+      !!permissions.contactsWrite[currentUser[UID]]),
+    isMember: !!(userData && userData.get(MEMBERSHIP_EXPIRES_AT) && moment(userData.get(MEMBERSHIP_EXPIRES_AT)).isAfter(moment())),
     isCurrentUserLoaded,
     currentUser
   }

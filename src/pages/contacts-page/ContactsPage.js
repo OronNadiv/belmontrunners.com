@@ -261,7 +261,7 @@ class ContactsPage extends Component {
     }
 
     return (
-      <div className='mb-4'>
+      <>
         {
           showAddDialog &&
           <AddDialog
@@ -303,82 +303,76 @@ class ContactsPage extends Component {
           }
         </SearchBox>
 
-        <div className='row mb-4'>
-          <div className='d-flex flex-row mx-auto'>
-            <div className='d-flex flex-row align-items-center'
-                 onClick={() => this.setState({ [SHOW_MEMBERS]: !this.state[SHOW_MEMBERS] })}
-            >
-              <Checkbox
-                checked={this.state[SHOW_MEMBERS]}
+        <div className='d-flex flex-row flex-wrap justify-content-center mb-4'>
+          <div className='d-flex flex-row align-items-center'
+               onClick={() => this.setState({ [SHOW_MEMBERS]: !this.state[SHOW_MEMBERS] })}
+          >
+            <Checkbox
+              checked={this.state[SHOW_MEMBERS]}
 
-              />
-              <Chip
-                label='Members'
-                color='primary'
-              />
-            </div>
-            <div className='d-flex flex-row align-items-center mx-4'
-                 onClick={() => this.setState({ [SHOW_USERS]: !this.state[SHOW_USERS] })}
-            >
-              <Checkbox
-                checked={this.state[SHOW_USERS]}
-              />
-              <Chip
-                label='Users'
-                color='secondary'
-              />
-            </div>
-            <div className='d-flex flex-row align-items-center'
-                 onClick={() => this.setState({ [SHOW_SUBSCRIBERS]: !this.state[SHOW_SUBSCRIBERS] })}
-            >
-              <Checkbox
-                checked={this.state[SHOW_SUBSCRIBERS]}
-              />
-              <Chip
-                label='Subscribers'
-                color='default'
-              />
-            </div>
+            />
+            <Chip
+              label='Members'
+              color='primary'
+            />
+          </div>
+          <div className='d-flex flex-row align-items-center mx-4'
+               onClick={() => this.setState({ [SHOW_USERS]: !this.state[SHOW_USERS] })}
+          >
+            <Checkbox
+              checked={this.state[SHOW_USERS]}
+            />
+            <Chip
+              label='Users'
+              color='secondary'
+            />
+          </div>
+          <div className='d-flex flex-row align-items-center'
+               onClick={() => this.setState({ [SHOW_SUBSCRIBERS]: !this.state[SHOW_SUBSCRIBERS] })}
+          >
+            <Checkbox
+              checked={this.state[SHOW_SUBSCRIBERS]}
+            />
+            <Chip
+              label='Subscribers'
+              color='default'
+            />
           </div>
         </div>
-        <div className='row'>
-          <div className='col-12'>
+        <Paper className='px-2 py-3'>
+          <Typography variant="h5" component="h3" className='ml-3'>
+            Contacts ({filteredActive.size})
+            <CopyToClipboard
+              text={this.state.copyToClipboard}
+              onCopy={() => {
+                this.setState({ copied: true })
+              }}>
+              <IconButton>
+                <CopyIcon />
+              </IconButton>
+            </CopyToClipboard>
+            <IconButton onClick={() => this.exportToCSV()}>
+              <SaveIcon />
+            </IconButton>
+
+          </Typography>
+          <div className='d-flex justify-content-between flex-wrap'>
+            {this.getChips(filteredActive, true)}
+          </div>
+        </Paper>
+        {
+          /*
+          <div className='col-6'>
             <Paper className='px-2 py-3'>
               <Typography variant="h5" component="h3" className='ml-3'>
-                Contacts ({filteredActive.size})
-                <CopyToClipboard
-                  text={this.state.copyToClipboard}
-                  onCopy={() => {
-                    this.setState({ copied: true })
-                  }}>
-                  <IconButton>
-                    <CopyIcon />
-                  </IconButton>
-                </CopyToClipboard>
-                <IconButton onClick={() => this.exportToCSV()}>
-                  <SaveIcon />
-                </IconButton>
-
+                Inactive ({filteredInactive.size})
               </Typography>
-              <div className='d-flex justify-content-between flex-wrap'>
-                {this.getChips(filteredActive, true)}
-              </div>
+              {this.getChips(filteredInactive, false)}
             </Paper>
           </div>
-          {
-            /*
-            <div className='col-6'>
-              <Paper className='px-2 py-3'>
-                <Typography variant="h5" component="h3" className='ml-3'>
-                  Inactive ({filteredInactive.size})
-                </Typography>
-                {this.getChips(filteredInactive, false)}
-              </Paper>
-            </div>
-            */
-          }
-        </div>
-      </div>
+          */
+        }
+      </>
     )
   }
 }

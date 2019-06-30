@@ -315,109 +315,107 @@ class EnhancedTable extends Component {
           />
         }
         <SearchBox placeholder="Fuzzy Search" onChange={(search) => this.setState({ search })} />
-        <div className='row mx-1'>
-          <Paper>
-            <EnhancedTableToolbar onExport={() => this.handleExport()} />
-            <div className={{ overflowX: 'auto' }}>
-              <Table
-                aria-labelledby="tableTitle"
-                size={dense ? 'small' : 'medium'}
-              >
-                <EnhancedTableHead
-                  order={order}
-                  orderBy={orderBy}
-                  onRequestSort={this.handleRequestSort}
-                  rowCount={rows.length}
-                />
-                <TableBody>
-                  {stableSort(rows, getSorting(order, orderBy))
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((row, index) => {
-                      return (
-                        <TableRow
-                          key={index}
-                          hover
-                        >
-                          <TableCell onClick={() => {
-                            console.log('uid:', row[UID])
-                          }}>{row[DISPLAY_NAME]}</TableCell>
-                          <TableCell>{row[EMAIL]}</TableCell>
-                          <TableCell>{row[PHONE]}</TableCell>
-                          <TableCell>{row[ADDRESS]}</TableCell>
-                          <TableCell>{row[DATE_OF_BIRTH]}</TableCell>
-                          <TableCell>{row[GENDER]}</TableCell>
-                          <TableCell>{row[SHIRT_GENDER]}</TableCell>
-                          <TableCell>{row[SHIRT_SIZE]}</TableCell>
-                          <TableCell style={{ color: getColor(row[MEMBERSHIP_EXPIRES_AT]) }}>
-                            {row[MEMBERSHIP_EXPIRES_AT]}
-                          </TableCell>
+        <Paper style={{ overflowX: 'scroll' }}>
+          <EnhancedTableToolbar onExport={() => this.handleExport()} />
+          <div className={{ overflowX: 'auto' }}>
+            <Table
+              aria-labelledby="tableTitle"
+              size={dense ? 'small' : 'medium'}
+            >
+              <EnhancedTableHead
+                order={order}
+                orderBy={orderBy}
+                onRequestSort={this.handleRequestSort}
+                rowCount={rows.length}
+              />
+              <TableBody>
+                {stableSort(rows, getSorting(order, orderBy))
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((row, index) => {
+                    return (
+                      <TableRow
+                        key={index}
+                        hover
+                      >
+                        <TableCell onClick={() => {
+                          console.log('uid:', row[UID])
+                        }}>{row[DISPLAY_NAME]}</TableCell>
+                        <TableCell>{row[EMAIL]}</TableCell>
+                        <TableCell>{row[PHONE]}</TableCell>
+                        <TableCell>{row[ADDRESS]}</TableCell>
+                        <TableCell>{row[DATE_OF_BIRTH]}</TableCell>
+                        <TableCell>{row[GENDER]}</TableCell>
+                        <TableCell>{row[SHIRT_GENDER]}</TableCell>
+                        <TableCell>{row[SHIRT_SIZE]}</TableCell>
+                        <TableCell style={{ color: getColor(row[MEMBERSHIP_EXPIRES_AT]) }}>
+                          {row[MEMBERSHIP_EXPIRES_AT]}
+                        </TableCell>
+                        <TableCell>
+                          <Checkbox
+                            checked={row[DID_RECEIVED_SHIRT]}
+                            disabled={!allowWrite}
+                            onChange={async (event, checked) => {
+                              const index = rows.indexOf(row)
+                              rows[index][DID_RECEIVED_SHIRT] = checked
+                              const userRef = firebase.firestore().doc(`users/${row[UID]}`)
+                              try {
+                                await userRef.set({ [DID_RECEIVED_SHIRT]: checked }, { merge: true })
+                                this.setState({ rows })
+                              } catch (error) {
+                                Sentry.captureException(error)
+                                console.log(error)
+                              }
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell>{row[CREATED_AT]}</TableCell>
+                        <TableCell>
+                          <Checkbox
+                            checked={row[EMAIL_VERIFIED]}
+                            disabled
+                          />
+                        </TableCell>
+                        {
+                          allowDelete &&
                           <TableCell>
-                            <Checkbox
-                              checked={row[DID_RECEIVED_SHIRT]}
-                              disabled={!allowWrite}
-                              onChange={async (event, checked) => {
-                                const index = rows.indexOf(row)
-                                rows[index][DID_RECEIVED_SHIRT] = checked
-                                const userRef = firebase.firestore().doc(`users/${row[UID]}`)
-                                try {
-                                  await userRef.set({ [DID_RECEIVED_SHIRT]: checked }, { merge: true })
-                                  this.setState({ rows })
-                                } catch (error) {
-                                  Sentry.captureException(error)
-                                  console.log(error)
-                                }
-                              }}
-                            />
+                            <IconButton aria-label="Delete" onClick={() => {
+                              this.setState({ rowToDelete: row })
+                            }}>
+                              <DeleteIcon />
+                            </IconButton>
                           </TableCell>
-                          <TableCell>{row[CREATED_AT]}</TableCell>
-                          <TableCell>
-                            <Checkbox
-                              checked={row[EMAIL_VERIFIED]}
-                              disabled
-                            />
-                          </TableCell>
-                          {
-                            allowDelete &&
-                            <TableCell>
-                              <IconButton aria-label="Delete" onClick={() => {
-                                this.setState({ rowToDelete: row })
-                              }}>
-                                <DeleteIcon />
-                              </IconButton>
-                            </TableCell>
-                          }
-                        </TableRow>
-                      )
-                    })}
-                  {emptyRows > 0 && (
-                    <TableRow style={{ height: 49 * emptyRows }}>
-                      <TableCell colSpan={10} />
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25]}
-              component="div"
-              count={rows.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              backIconButtonProps={{
-                'aria-label': 'Previous Page'
-              }}
-              nextIconButtonProps={{
-                'aria-label': 'Next Page'
-              }}
-              onChangePage={this.handleChangePage}
-              onChangeRowsPerPage={this.handleChangeRowsPerPage}
-            />
-          </Paper>
-          <FormControlLabel
-            control={<Switch checked={dense} onChange={this.handleChangeDense} />}
-            label="Dense padding"
+                        }
+                      </TableRow>
+                    )
+                  })}
+                {emptyRows > 0 && (
+                  <TableRow style={{ height: 49 * emptyRows }}>
+                    <TableCell colSpan={10} />
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={rows.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            backIconButtonProps={{
+              'aria-label': 'Previous Page'
+            }}
+            nextIconButtonProps={{
+              'aria-label': 'Next Page'
+            }}
+            onChangePage={this.handleChangePage}
+            onChangeRowsPerPage={this.handleChangeRowsPerPage}
           />
-        </div>
+        </Paper>
+        <FormControlLabel
+          control={<Switch checked={dense} onChange={this.handleChangeDense} />}
+          label="Dense padding"
+        />
       </>
     )
   }
