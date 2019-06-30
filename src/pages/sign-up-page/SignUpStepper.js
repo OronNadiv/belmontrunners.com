@@ -66,17 +66,17 @@ function SignUpStepper ({ steps }) {
   }
 
   return (
-    <div>
+    <>
       {
         steps.length > 1 &&
-        <Stepper alternativeLabel className="justify-content-center" activeStep={activeStep}>
+        <Stepper alternativeLabel activeStep={activeStep}>
           {getStepsHeaders()}
         </Stepper>
       }
       {
         getStep()
       }
-    </div>
+    </>
   )
 }
 

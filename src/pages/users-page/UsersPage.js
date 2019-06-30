@@ -31,8 +31,6 @@ import {
   LAST_SIGNED_IN_AT,
   MEMBERSHIP_EXPIRES_AT,
   PHONE,
-  SHIRT_GENDER,
-  SHIRT_SIZE,
   STATE,
   UID,
   ZIP
@@ -56,8 +54,6 @@ const phoneUtil = googleLibPhoneNumber.PhoneNumberUtil.getInstance()
 const DATE_OF_BIRTH_FORMAT = 'MM/DD'
 const MEMBERSHIP_EXPIRES_AT_FORMAT = 'YYYY-MM-DD HH:mm'
 
-const SHIRT_SIZES_ORDER = ['XXXS', 'XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL']
-
 function desc (rowA, rowB, columnName) {
   switch (columnName) {
     case CREATED_AT:
@@ -68,16 +64,6 @@ function desc (rowA, rowB, columnName) {
       return moment(rowB[columnName] || moment(0), MEMBERSHIP_EXPIRES_AT_FORMAT).diff(moment(rowA[columnName] || moment(0), MEMBERSHIP_EXPIRES_AT_FORMAT))
     case DATE_OF_BIRTH:
       return moment(rowB[columnName] || moment(0), DATE_OF_BIRTH_FORMAT).diff(moment(rowA[columnName] || moment(0), DATE_OF_BIRTH_FORMAT))
-    case SHIRT_SIZE:
-      let a = SHIRT_SIZES_ORDER.indexOf(rowA[columnName])
-      let b = SHIRT_SIZES_ORDER.indexOf(rowB[columnName])
-      if (b < a) {
-        return -1
-      } else if (b > a) {
-        return 1
-      } else {
-        return 0
-      }
     default:
       return s.naturalCmp(rowB[columnName], rowA[columnName])
   }
@@ -167,8 +153,6 @@ const headRows = [
   { id: ADDRESS, numeric: false, disablePadding: false, label: 'Address' },
   { id: DATE_OF_BIRTH, numeric: false, disablePadding: false, label: 'Birthday' },
   { id: GENDER, numeric: false, disablePadding: false, label: 'Gender' },
-  { id: SHIRT_GENDER, numeric: false, disablePadding: false, label: 'Shirt Gender' },
-  { id: SHIRT_SIZE, numeric: false, disablePadding: false, label: 'Shirt Size' },
   { id: MEMBERSHIP_EXPIRES_AT, numeric: false, disablePadding: false, label: 'Membership Expires' },
   { id: DID_RECEIVED_SHIRT, numeric: false, disablePadding: false, label: 'Received Shirt' },
   { id: CREATED_AT, numeric: false, disablePadding: false, label: 'Account Creation' },
@@ -345,8 +329,6 @@ class EnhancedTable extends Component {
                         <TableCell>{row[ADDRESS]}</TableCell>
                         <TableCell>{row[DATE_OF_BIRTH]}</TableCell>
                         <TableCell>{row[GENDER]}</TableCell>
-                        <TableCell>{row[SHIRT_GENDER]}</TableCell>
-                        <TableCell>{row[SHIRT_SIZE]}</TableCell>
                         <TableCell style={{ color: getColor(row[MEMBERSHIP_EXPIRES_AT]) }}>
                           {row[MEMBERSHIP_EXPIRES_AT]}
                         </TableCell>

@@ -23,7 +23,7 @@ function SignUpPage ({ isCurrentUserLoaded, currentUser }) {
   }
   console.log('steps:', steps)
   return (
-    <div className='d-flex justify-content-center'>
+    <div style={{ maxWidth: 350 }} className='mx-auto'>
       <SignUpStepper steps={steps} />
     </div>
   )

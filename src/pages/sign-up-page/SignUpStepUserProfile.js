@@ -11,8 +11,6 @@ import {
   DATE_OF_BIRTH,
   GENDER,
   PHONE,
-  SHIRT_GENDER,
-  SHIRT_SIZE,
   STATE,
   ZIP
 } from '../../fields'
@@ -50,7 +48,7 @@ class SignUpStepUserProfile extends Component {
     const { isLast, isCurrentUserLoaded, userDataUpdating } = this.props
     const userData = this.props.userData.toJS()
 
-    const initialValues = _.pick(userData, ADDRESS1, ADDRESS2, CITY, DATE_OF_BIRTH, GENDER, PHONE, SHIRT_GENDER, SHIRT_SIZE, STATE, ZIP)
+    const initialValues = _.pick(userData, ADDRESS1, ADDRESS2, CITY, DATE_OF_BIRTH, GENDER, PHONE, STATE, ZIP)
     return !isCurrentUserLoaded ?
       '' :
       <Form
