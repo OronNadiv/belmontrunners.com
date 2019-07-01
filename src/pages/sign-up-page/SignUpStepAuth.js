@@ -31,7 +31,7 @@ function SignUpStepAuth ({ onNextClicked, isLast }) {
 
   useEffect(() => {
     window.scrollTo(0, 0)
-  })
+  }, [])
 
   const signUp = async (providerName, fullName, email, password) => {
     const displayName = s(fullName).clean().words().map((w) => s.capitalize(w)).join(" ")
