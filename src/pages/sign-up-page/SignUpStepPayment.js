@@ -31,7 +31,7 @@ function SignUpStepPayment ({
   const [successMessage, setSuccessMessage] = useState()
   const [errorMessage, setErrorMessage] = useState()
   const [success, setSuccess] = useState()
-  const [submitting, setSubmitting] = useState()
+  const [isSubmitting, setIsSubmitting] = useState()
   const [confirmationNumber, setConfirmationNumber] = useState()
 
   const prevUserDataUpdating = usePrevious(userDataUpdating)
@@ -57,7 +57,7 @@ function SignUpStepPayment ({
   }
 
   const handleSubmitPayment = async () => {
-    setSubmitting(true)
+    setIsSubmitting(true)
 
     try {
       const stripeResponse = await stripe.createToken({ type: 'card' })
@@ -77,6 +77,8 @@ function SignUpStepPayment ({
       try {
         const response = await stripeFunction(body)
         console.log('response:', response)
+        setConfirmationNumber(response.data.id)
+
         const transactionsRef = firebase.firestore().doc(
           `users/${uid}/transactions/${moment().utc().format()}`)
         const transactionsLastRef = firebase.firestore().doc(
@@ -94,14 +96,13 @@ function SignUpStepPayment ({
         } else {
           newMembershipExpiresAt = yearFromNow
         }
-        setConfirmationNumber(response.data.id)
 
-        let values = {
+        const values = {
           // stripeResponse: JSON.stringify(stripeResponse),
-          stripeResponse: stripeResponse,
+          stripeResponse,
           paidAt: moment().utc().format(),
           paidAmount: totalAmount,
-          confirmationNumber: response.data.id
+          confirmationNumber
         }
         await Promise.all([
           transactionsRef.set(values),
@@ -131,7 +132,7 @@ function SignUpStepPayment ({
       // todo:handle case where charge failed by showing an error message
       console.error("stripeError:", error)
     } finally {
-      setSubmitting(false)
+      setIsSubmitting(false)
     }
   }
 
@@ -218,12 +219,12 @@ function SignUpStepPayment ({
           primaryText={success || needToPay === false ?
             (isLast ? 'Finish' : 'Next')
             : "Pay Now"}
-          primaryDisabled={!!submitting || userDataUpdating}
+          primaryDisabled={!!isSubmitting || userDataUpdating}
           showPrimary
 
           handleSecondaryClicked={handleClose}
           secondaryText={'Finish later'}
-          secondaryDisabled={!!submitting || userDataUpdating}
+          secondaryDisabled={!!isSubmitting || userDataUpdating}
           showSecondary={needToPay === true && !success}
         />
       }
@@ -252,7 +253,6 @@ SignUpStepPayment.propTypes = {
 
   // from router-dom
   history: PropTypes.object.isRequired
-
 }
 
 const mapDispatchToProps = {

@@ -10,7 +10,7 @@ module.exports = (admin) => {
     const listUsersResult = await auth.listUsers(1000, nextPageToken)
     await Promise.each(listUsersResult.users, async (userRecord) => {
       try {
-        const { uid, email, emailVerified, displayName, photoURL, metadata: { creationTime, lastSignInTime } } = userRecord.toJSON()
+        const { uid, email, emailVerified, displayName, metadata: { creationTime, lastSignInTime } } = userRecord.toJSON()
         let createdAt = moment(creationTime).utc().format()
         let lastSignedInAt = moment(lastSignInTime).utc().format()
         const userRef = firestore.doc(`users/${uid}`)
@@ -20,7 +20,6 @@ module.exports = (admin) => {
           emailVerified,
           displayName,
           lastSignedInAt,
-          photoURL: photoURL || null
         }, { merge: true })
         console.info(`Updated ${uid} ${createdAt} ${lastSignedInAt}`)
       } catch (err) {

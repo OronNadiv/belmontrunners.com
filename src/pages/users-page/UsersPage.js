@@ -323,7 +323,7 @@ class EnhancedTable extends Component {
                       <TableRow
                         key={index}
                         hover
-                      >0O 5S Z2 7Z
+                      >
                         <TableCell>
                           <Avatar name={row[DISPLAY_NAME]} round color='#6247ea' size={40}
                                   src={row[PHOTO_URL]} />
