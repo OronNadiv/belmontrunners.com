@@ -64,17 +64,18 @@ function MyProfile ({ updateUserData, sendEmailVerification, currentUser, userDa
       console.log('handleLinkToFacebook called.')
       await currentUser.linkWithPopup(new firebase.auth.FacebookAuthProvider())
 
-      if (!userData[PHOTO_URL]) {
+      let photoUrl = userData[PHOTO_URL]
+      if (!photoUrl) {
         const foundProviderData = currentUser.providerData.find(({ photoURL }) => {
           return Boolean(photoURL)
         })
         if (foundProviderData) {
-          const photoUrl = foundProviderData[PHOTO_URL]
-          setIsSubmitting(true)
-          await updateUserData({ [PHOTO_URL]: photoUrl }, { merge: true })
+          photoUrl = foundProviderData[PHOTO_URL]
         }
       }
-      // this.forceUpdate()
+      // doing this in order to trigger an update.
+      setIsSubmitting(true)
+      await updateUserData({ [PHOTO_URL]: photoUrl }, { merge: true })
     } catch (err) {
       console.log('err:', err)
       setLinkWithProviderErrorMessage('Connection failed')
@@ -91,9 +92,9 @@ function MyProfile ({ updateUserData, sendEmailVerification, currentUser, userDa
       const photoUrl = foundProviderData ? foundProviderData[PHOTO_URL] : null
       console.log('foundProviderData :', foundProviderData)
       console.log('photoUrl :', photoUrl)
+      // doing this in order to trigger an update.
       setIsSubmitting(true)
       await updateUserData({ [PHOTO_URL]: photoUrl }, { merge: true })
-      // this.forceUpdate()
     } catch (err) {
       console.log('err:', err)
       setLinkWithProviderErrorMessage('Disconnection failed')
