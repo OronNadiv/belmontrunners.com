@@ -1,6 +1,6 @@
 import 'firebase/auth'
 import firebase from 'firebase'
-import React, { Component } from 'react'
+import React, { useEffect, useState } from 'react'
 import { TextField } from 'final-form-material-ui'
 import isEmailComponent from 'isemail'
 import {
@@ -25,30 +25,20 @@ const isEmail = value => (!value || !isEmailComponent.validate(value) ? INVALID_
 const minPasswordLength = value => (value.length < 6 ? INVALID_PASSWORD_LENGTH(6) : undefined)
 const composeValidators = (...validators) => value => validators.reduce((error, validator) => error || validator(value), undefined)
 
-class SignUpStepAuth extends Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      fullName: '',
-      email: '',
-      password: '',
-      errorMessage: '',
-      success: false
-    }
-  }
+function SignUpStepAuth ({ onNextClicked, isLast }) {
+  const [errorMessage, setErrorMessage] = useState('')
+  const [isSigningUp, setIsSigningUp] = useState(false)
 
-  componentDidMount () {
+  useEffect(() => {
     window.scrollTo(0, 0)
-  }
+  })
 
-  async signUp (providerName, fullName, email, password) {
+  const signUp = async (providerName, fullName, email, password) => {
     const displayName = s(fullName).clean().words().map((w) => s.capitalize(w)).join(" ")
 
-    const { onNextClicked } = this.props
-    this.setState({
-      errorMessage: '',
-      isSigningUp: true
-    })
+    setErrorMessage('')
+    setIsSigningUp(true)
+
     const providerGoogle = new firebase.auth.GoogleAuthProvider()
     const providerFacebook = new firebase.auth.FacebookAuthProvider()
 
@@ -59,7 +49,7 @@ class SignUpStepAuth extends Component {
           .tap((user) => {
             console.log('calling updateProfile', user)
             return firebase.auth().currentUser.updateProfile({
-              displayName
+              [DISPLAY_NAME]: displayName
             })
           })
         break
@@ -76,8 +66,8 @@ class SignUpStepAuth extends Component {
     }
     try {
       await promise
-      const currentUserRef = firebase.firestore().doc(`users/${firebase.auth().currentUser.uid}`)
-      const doc = await currentUserRef.get()
+      const userRef = firebase.firestore().doc(`users/${firebase.auth().currentUser.uid}`)
+      const doc = await userRef.get()
       let values = {}
       if (!doc.exists) {
         values = {
@@ -97,18 +87,16 @@ class SignUpStepAuth extends Component {
         displayName,
         photoURL
       }
-      await currentUserRef.set(values, { merge: true })
+      await userRef.set(values, { merge: true })
       onNextClicked()
     } catch (error) {
-      this.handleSignUpError(error)
+      handleSignUpError(error)
     } finally {
-      this.setState({
-        isSigningUp: false
-      })
+      setIsSigningUp(false)
     }
   }
 
-  handleSignUpError (error) {
+  const handleSignUpError = (error) => {
     window.scrollTo(0, 0)
     const {
       code,
@@ -116,129 +104,118 @@ class SignUpStepAuth extends Component {
     } = error
     switch (code) {
       case 'auth/invalid-email':
-        this.setState({ errorMessage: INVALID_EMAIL })
+        setErrorMessage(INVALID_EMAIL)
         break
       case 'auth/email-already-in-use':
-        this.setState({ errorMessage: EMAIL_ALREADY_IN_USE })
+        setErrorMessage(EMAIL_ALREADY_IN_USE)
         break
       case 'auth/popup-closed-by-user':
-        this.setState({ errorMessage: POPUP_CLOSED_BEFORE_COMPLETION })
+        setErrorMessage(POPUP_CLOSED_BEFORE_COMPLETION)
         break
       default:
         Sentry.captureException(error)
         console.error('signUpError', error)
-        this.setState({ errorMessage: message })
+        setErrorMessage(message)
     }
   }
 
-  handleSignUpWithEmail (values) {
+  const handleSignUpWithEmail = async (values) => {
     console.log('handleSignUpWithEmail called.  Values:', values)
-    this.signUp('email', values[DISPLAY_NAME], values[EMAIL], values[PASSWORD])
+    await signUp('email', values[DISPLAY_NAME], values[EMAIL], values[PASSWORD])
   }
 
 
-  handleSignInWithProvider (providerName) {
-    this.signUp(providerName)
-  }
+  // const handleSignInWithProvider = (providerName) => {
+  //   signUp(providerName)
+  // }
 
-  render () {
-    const {
-      errorMessage,
-      isSigningUp
-    } = this.state
-
-    const {
-      isLast
-    } = this.props
-
-    return (
-      <div style={{ maxWidth: 400 }}>
-        {/*
+  return (
+    <div style={{ maxWidth: 400 }}>
+      {/*
         // TODO: enable providers.  Need to redirect to details and payment if seeing for the first time
         <div className='btn btn-block btn-social btn-twitter'
-             onClick={() => this.handleSignInWithProvider('facebook')}>
+             onClick={() => handleSignInWithProvider('facebook')}>
           <span className='fab fa-facebook' /> Connect with Facebook
         </div>
         <div className='btn btn-block btn-social btn-google'
-             onClick={() => this.handleSignInWithProvider('google')}>
+             onClick={() => handleSignInWithProvider('google')}>
           <span className='fab fa-google' /> Connect with Google
         </div>
 
         <div className='mt-4 text-center text-dark'>Or sign up with email</div>
 */}
 
-        {
-          errorMessage &&
-          <div className='mt-2 text-danger text-center'>{errorMessage}</div>
-        }
+      {
+        errorMessage &&
+        <div className='mt-2 text-danger text-center'>{errorMessage}</div>
+      }
 
-        <Form
-          onSubmit={(values) => this.handleSignUpWithEmail(values)}
-          render={({ handleSubmit, form }) => (
-            <form onSubmit={handleSubmit} className='container-fluid'>
+      <Form
+        onSubmit={handleSignUpWithEmail}
+        render={({ handleSubmit, form }) => (
+          <form onSubmit={handleSubmit} className='container-fluid'>
 
-              <div className='row'>
-                <Field
-                  style={{ minHeight: 68 }}
-                  label='Your email'
-                  type='email'
-                  fullWidth
-                  margin='normal'
-                  name={EMAIL}
-                  component={TextField}
-                  validate={composeValidators(required, isEmail)}
-                />
-              </div>
-
-              <div className='row'>
-                <Field
-                  style={{ minHeight: 68 }}
-                  label='Your full name'
-                  margin='normal'
-                  fullWidth
-                  name={DISPLAY_NAME}
-                  component={TextField}
-                  validate={required}
-                />
-              </div>
-
-              <div className='row'>
-                <Field
-                  style={{ minHeight: 68 }}
-                  label='Your password'
-                  type='password'
-                  margin='normal'
-                  fullWidth
-                  name={PASSWORD}
-                  component={TextField}
-                  validate={composeValidators(required, minPasswordLength)}
-                />
-              </div>
-
-              {
-                // todo: add 'confirm password' field
-              }
-              <div className='mt-2 mb-2 text-center'>
-                By clicking “NEXT”, you agree to our <a href={TOS}
-                                                        target='_blank' rel='noopener noreferrer'>terms of
-                service</a>, <a
-                href={PRIVACY_POLICY} target='_blank'
-                rel='noopener noreferrer'>privacy statement</a> and <a
-                href={WAVER} target='_blank'
-                rel='noopener noreferrer'>release of liability</a>. We’ll occasionally send you account related emails.
-              </div>
-              <SignUpStepperButton
-                handlePrimaryClicked={() => form.submit()}
-                primaryText={isLast ? 'Create Account' : 'Next'}
-                showPrimary
-                primaryDisabled={!!isSigningUp}
+            <div className='row'>
+              <Field
+                style={{ minHeight: 68 }}
+                label='Your email'
+                type='email'
+                fullWidth
+                margin='normal'
+                name={EMAIL}
+                component={TextField}
+                validate={composeValidators(required, isEmail)}
               />
-            </form>
-          )}
-        />
-      </div>
-    )
-  }
+            </div>
+
+            <div className='row'>
+              <Field
+                style={{ minHeight: 68 }}
+                label='Your full name'
+                margin='normal'
+                fullWidth
+                name={DISPLAY_NAME}
+                component={TextField}
+                validate={required}
+              />
+            </div>
+
+            <div className='row'>
+              <Field
+                style={{ minHeight: 68 }}
+                label='Your password'
+                type='password'
+                margin='normal'
+                fullWidth
+                name={PASSWORD}
+                component={TextField}
+                validate={composeValidators(required, minPasswordLength)}
+              />
+            </div>
+
+            {
+              // todo: add 'confirm password' field
+            }
+            <div className='mt-2 mb-2 text-center'>
+              By clicking “NEXT”, you agree to our <a href={TOS}
+                                                      target='_blank' rel='noopener noreferrer'>terms of
+              service</a>, <a
+              href={PRIVACY_POLICY} target='_blank'
+              rel='noopener noreferrer'>privacy statement</a> and <a
+              href={WAVER} target='_blank'
+              rel='noopener noreferrer'>release of liability</a>. We’ll occasionally send you account related emails.
+            </div>
+            <SignUpStepperButton
+              handlePrimaryClicked={() => form.submit()}
+              primaryText={isLast ? 'Create Account' : 'Next'}
+              showPrimary
+              primaryDisabled={!!isSigningUp}
+            />
+          </form>
+        )}
+      />
+    </div>
+  )
 }
 
 SignUpStepAuth.propTypes = {

@@ -16,6 +16,7 @@ import SaveIcon from '@material-ui/icons/SaveAlt'
 import Switch from '@material-ui/core/Switch'
 import { connect } from 'react-redux'
 import moment from 'moment'
+import Avatar from 'react-avatar'
 import googleLibPhoneNumber from 'google-libphonenumber'
 import {
   ADDRESS1,
@@ -31,6 +32,7 @@ import {
   LAST_SIGNED_IN_AT,
   MEMBERSHIP_EXPIRES_AT,
   PHONE,
+  PHOTO_URL,
   STATE,
   UID,
   ZIP
@@ -147,6 +149,7 @@ EnhancedTableToolbar.propTypes = {
 }
 
 const headRows = [
+  { id: PHOTO_URL, numeric: false, disablePadding: false, label: 'Photo' },
   { id: DISPLAY_NAME, numeric: false, disablePadding: false, label: 'Name' },
   { id: EMAIL, numeric: false, disablePadding: false, label: 'Email' },
   { id: PHONE, numeric: false, disablePadding: false, label: 'Phone' },
@@ -320,7 +323,11 @@ class EnhancedTable extends Component {
                       <TableRow
                         key={index}
                         hover
-                      >
+                      >0O 5S Z2 7Z
+                        <TableCell>
+                          <Avatar name={row[DISPLAY_NAME]} round color='#6247ea' size={40}
+                                  src={row[PHOTO_URL]} />
+                        </TableCell>
                         <TableCell onClick={() => {
                           console.log('uid:', row[UID])
                         }}>{row[DISPLAY_NAME]}</TableCell>

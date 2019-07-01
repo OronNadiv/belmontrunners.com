@@ -7,16 +7,18 @@ import { CONTACTS, MEMBERS_DIRECTORY, MY_PROFILE, ROOT, USERS } from '../urls'
 import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import LoggedInState from './LoggedInState'
-import { MEMBERSHIP_EXPIRES_AT, UID } from '../fields'
+import { DISPLAY_NAME, MEMBERSHIP_EXPIRES_AT, PHOTO_URL, UID } from '../fields'
 import moment from 'moment'
+import { Map as IMap } from 'immutable'
 
-function Profile ({ currentUser, allowUsersPage, allowContactsPage, isMember }) {
+function Profile ({ allowUsersPage, allowContactsPage, isMember, userData }) {
+  userData = userData.toJS()
   return (
     <span className="dropdown signout-btn text-white-50">
         <a className="dropdown-toggle" id="dropdownMenuLink" href='/'
            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <Avatar name={currentUser.displayName} round color='#6247ea' size={40}
-                  src={currentUser.photoURL} />
+          <Avatar name={userData[DISPLAY_NAME]} round color='#6247ea' size={40}
+                  src={userData[PHOTO_URL]} />
         </a>
 
         <div className="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
@@ -56,6 +58,7 @@ Profile.propTypes = {
   allowUsersPage: PropTypes.bool.isRequired,
   allowContactsPage: PropTypes.bool.isRequired,
   currentUser: PropTypes.object.isRequired,
+  userData: PropTypes.object.isRequired,
   isMember: PropTypes.bool.isRequired
 }
 
@@ -67,7 +70,7 @@ const mapStateToProps = ({ currentUser: { permissions, currentUser, userData } }
     allowContactsPage: !!currentUser && (
       !!permissions.contactsRead[currentUser[UID]] ||
       !!permissions.contactsWrite[currentUser[UID]]),
-    currentUser: currentUser || {},
+    userData: userData || new IMap(),
     isMember: !!(userData && userData.get(MEMBERSHIP_EXPIRES_AT) && moment(userData.get(MEMBERSHIP_EXPIRES_AT)).isAfter(moment()))
   }
 }
