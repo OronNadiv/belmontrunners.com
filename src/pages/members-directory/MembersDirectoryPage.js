@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react"
 import { DISPLAY_NAME, PHOTO_URL, UID } from '../../fields'
 import Chip from '@material-ui/core/Chip'
 import * as PropTypes from 'prop-types'
-import { updateUserData as updateUserDataAction } from '../../reducers/currentUser'
+import * as Sentry from '@sentry/browser'
 import { connect } from 'react-redux'
 import Paper from '@material-ui/core/Paper'
 import DirectionsRun from '@material-ui/icons/DirectionsRun'
@@ -15,8 +15,9 @@ import UserProfile from './UserProfile'
 import { makeStyles } from '@material-ui/core'
 import { withRouter } from 'react-router-dom'
 import _ from 'underscore'
-import { MEMBERS_DIRECTORY } from '../../urls'
+import { MEMBERS_DIRECTORY, ROOT } from '../../urls'
 import SearchBox from '../../components/SearchBox'
+import Snackbar from '@material-ui/core/Snackbar'
 
 function MembersDirectoryPage ({ currentUser, location: { pathname }, history }) {
   const useStyles = makeStyles(() => ({
@@ -27,16 +28,31 @@ function MembersDirectoryPage ({ currentUser, location: { pathname }, history })
   }))
   const classes = useStyles()
 
+  const [showError, setShowError] = useState(false)
   const [users, setUsers] = useState([])
   useEffect(() => {
     if (!currentUser) {
       return
     }
     (async function () {
-      const resp = await firebase.functions().httpsCallable('getMembers')()
-      setUsers(resp.data)
+      try {
+        const resp = await firebase.functions().httpsCallable('getMembers')()
+        setUsers(resp.data)
+      } catch (err) {
+        console.warn('error from getMembers:', err)
+        if (err && err.message) {
+          const error = JSON.parse(err.message)
+          if (error.status === 403) {
+            history.push(ROOT)
+            return
+          }
+        }
+        Sentry.captureException(err)
+        setShowError(true)
+      }
       // setUsers(require('./members.json'))
     })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser])
 
   const [selected, setSelected] = useState()
@@ -61,11 +77,12 @@ function MembersDirectoryPage ({ currentUser, location: { pathname }, history })
   const [search, setSearch] = useState('')
 
   const handleChipSelected = (user) => {
+    console.log('user:', user)
     history.push(`${MEMBERS_DIRECTORY}/${user[UID]}`)
   }
 
   const handleDrawerClosed = () => {
-    history.push(`${MEMBERS_DIRECTORY}`)
+    history.push(MEMBERS_DIRECTORY)
   }
 
   const getChips = () => {
@@ -111,6 +128,14 @@ function MembersDirectoryPage ({ currentUser, location: { pathname }, history })
   return (
     <>
       {
+        showError &&
+        <Snackbar
+          open
+          autoHideDuration={6000}
+          message={'Oops! Something went wrong.'}
+        />
+      }
+      {
         !!selected &&
         <UserProfile
           user={selected}
@@ -129,25 +154,18 @@ function MembersDirectoryPage ({ currentUser, location: { pathname }, history })
 }
 
 MembersDirectoryPage.propTypes = {
-  currentUser: PropTypes.object,
-  updateUserData: PropTypes.func.isRequired,
-  userData: PropTypes.object.isRequired,
+  currentUser: PropTypes.object.isRequired,
   location: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired
 }
 
-const mapDispatchToProps = {
-  updateUserData: updateUserDataAction
-}
-
-const mapStateToProps = ({ currentUser: { currentUser, userData } }) => {
+const mapStateToProps = ({ currentUser: { currentUser } }) => {
   return {
-    currentUser,
-    userData
+    currentUser
   }
 }
 
 export default LoggedInState({
   name: 'membersDirectory',
   isRequiredToBeLoggedIn: true
-})(connect(mapStateToProps, mapDispatchToProps)(withRouter(MembersDirectoryPage)))
+})(connect(mapStateToProps)(withRouter(MembersDirectoryPage)))

@@ -380,7 +380,7 @@ class ContactsPage extends Component {
 ContactsPage.propTypes = {
   allowRead: PropTypes.bool.isRequired,
   allowWrite: PropTypes.bool.isRequired,
-  currentUser: PropTypes.object
+  currentUser: PropTypes.object.isRequired
 }
 
 const mapStateToProps = ({ currentUser: { permissions, currentUser } }) => {

@@ -47,7 +47,10 @@ module.exports = (admin) => {
     const applyFilters = (user) => {
       if (context.auth.uid === user.uid) {
         if (!user.isMember) {
-          throw new functions.https.HttpsError('permission-denied', 'user is not a member.')
+          throw new functions.https.HttpsError('permission-denied', JSON.stringify({
+            status: 403,
+            message: 'user is not a member.'
+          }))
         }
         return user
       }

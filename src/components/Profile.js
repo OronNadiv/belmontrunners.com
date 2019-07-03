@@ -57,7 +57,7 @@ function Profile ({ allowUsersPage, allowContactsPage, isMember, userData }) {
 Profile.propTypes = {
   allowUsersPage: PropTypes.bool.isRequired,
   allowContactsPage: PropTypes.bool.isRequired,
-  currentUser: PropTypes.object.isRequired,
+  currentUser: PropTypes.object,
   userData: PropTypes.object.isRequired,
   isMember: PropTypes.bool.isRequired
 }

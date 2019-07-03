@@ -11,174 +11,176 @@ import Promise from 'bluebird'
 import { ROOT } from '../../urls'
 import { connect } from 'react-redux'
 import { DATE_OF_BIRTH, MEMBERSHIP_EXPIRES_AT } from '../../fields'
-import { updateUserData as updateUserDataAction } from '../../reducers/currentUser'
 import * as Sentry from '@sentry/browser'
 import { withRouter } from 'react-router-dom'
-import usePrevious from '../../components/usePrevious'
+import UpdateUserData from '../../components/UpdateUserData'
 
 const MEMBERSHIP_FEE_ADULT = 25
 const MEMBERSHIP_FEE_KID = 15
 
 function SignUpStepPayment ({
                               currentUser: { displayName, uid, email }, history,
-                              updateUserData, stripe, isLast, userDataUpdating, userDataUpdateError,
+                              updateUserData, stripe, isLast,
                               needToPay, totalAmount, membershipExpiresAt, onNextClicked
                             }) {
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
 
-  const [successMessage, setSuccessMessage] = useState()
   const [errorMessage, setErrorMessage] = useState()
-  const [success, setSuccess] = useState()
   const [isSubmitting, setIsSubmitting] = useState()
   const [confirmationNumber, setConfirmationNumber] = useState()
 
-  const prevUserDataUpdating = usePrevious(userDataUpdating)
-  useEffect(() => {
-    if (prevUserDataUpdating && !userDataUpdating) {
-      if (!userDataUpdateError && confirmationNumber) {
-        setMessage('',
-          <div>
-            <div>Complete successfully</div>
-            <div>Confirmation: {confirmationNumber.substring(3)}</div>
-          </div>)
-      } else {
-        // todo: show message if user data update failed.
-      }
-    }
-
-  }, [prevUserDataUpdating, userDataUpdating, userDataUpdateError, confirmationNumber])
-
-  const setMessage = (errorMessage = '', successMessage = '') => {
-    setSuccessMessage(successMessage)
-    setErrorMessage(errorMessage)
-    setSuccess(!!successMessage)
-  }
-
-  const handleSubmitPayment = async () => {
-    setIsSubmitting(true)
-
+  const createToken = async () => {
     try {
       const stripeResponse = await stripe.createToken({ type: 'card' })
-      console.log('stripeResponse:', JSON.stringify(stripeResponse, 0, 2))
+      console.log('stripeResponse1:', JSON.stringify(stripeResponse, 0, 2))
       if (stripeResponse.error) {
-        setMessage(stripeResponse.error.message)
-        throw stripeResponse.error
+        setErrorMessage(stripeResponse.error.message)
+        return
       }
-      const body = {
-        ...stripeResponse,
-        origin: window.origin,
-        description: `Annual membership for Belmont Runners. name: ${displayName} email: ${email}  uid: ${uid}`,
-        amountInCents: totalAmount * 100
-      }
-      const stripeFunction = firebase.functions().httpsCallable('stripe')
-
-      try {
-        const response = await stripeFunction(body)
-        console.log('response:', response)
-        setConfirmationNumber(response.data.id)
-
-        const transactionsRef = firebase.firestore().doc(
-          `users/${uid}/transactions/${moment().utc().format()}`)
-        const transactionsLastRef = firebase.firestore().doc(
-          `users/${uid}/transactions/latest`)
-
-        let newMembershipExpiresAt
-        const yearFromNow = moment().add(1, 'year')
-        if (membershipExpiresAt) {
-          const membershipExpiresAtPlusOneYear = moment(membershipExpiresAt).add(1, 'year')
-          if (membershipExpiresAtPlusOneYear.isBefore(yearFromNow)) {
-            newMembershipExpiresAt = yearFromNow
-          } else {
-            newMembershipExpiresAt = membershipExpiresAtPlusOneYear
-          }
-        } else {
-          newMembershipExpiresAt = yearFromNow
-        }
-
-        const values = {
-          // stripeResponse: JSON.stringify(stripeResponse),
-          stripeResponse,
-          paidAt: moment().utc().format(),
-          paidAmount: totalAmount,
-          confirmationNumber
-        }
-        await Promise.all([
-          transactionsRef.set(values),
-          transactionsLastRef.set(values)
-        ])
-        try {
-          updateUserData({
-            [MEMBERSHIP_EXPIRES_AT]: newMembershipExpiresAt.utc().format()
-          }, { merge: true })
-        } catch (error) {
-          Sentry.captureException(error)
-          console.error('failed to update user data.', error)
-        }
-      } catch (error) {
-        console.warn('Error from stripe.  error:', error)
-        if (error && error.message) {
-          const stripeError = JSON.parse(error.message)
-          console.warn('stripeError:', stripeError)
-          setMessage(stripeError.message)
-          return
-        }
-        // todo: handle case where it's not stripe error.
-        throw stripeResponse
-      }
+      return stripeResponse
     } catch (error) {
-      Sentry.captureException(error)
-      // todo:handle case where charge failed by showing an error message
-      console.error("stripeError:", error)
-    } finally {
-      setIsSubmitting(false)
+      throw new Error(`unknown stripe response.  response: ${JSON.stringify(error)}`)
     }
   }
 
-  const getBody = () => {
-    if (!success) {
-      if (needToPay === false) {
-        return (
-          <>
-            <div className='text-success text-center mt-4'>Your membership expires
-              on {moment(membershipExpiresAt).format("MMMM Do YYYY")}</div>
-            <div className='text-success text-center'>You can renew it
-              after {moment(membershipExpiresAt).subtract(1, 'month').format("MMMM Do YYYY")}
-            </div>
-          </>
-        )
-      } else if (needToPay === true) {
-        // need to pay.
-        return (<>
-            <h6 className='mt-3'>Membership fees</h6>
-            &bull; Adult (18 and over): $25<br />
-            &bull; Kids: $15.<br />
-
-            <h4 className='my-4'>Total amount:
-              ${totalAmount > 0 ? totalAmount : ''}
-            </h4>
-            {
-              membershipExpiresAt &&
-              <div className='text-warning mb-2 text-center'>
-                {
-                  moment(membershipExpiresAt).isAfter(moment()) ?
-                    `Membership will expire on ${moment(membershipExpiresAt).format("MMMM Do YYYY")}` :
-                    `Membership expired on ${moment(membershipExpiresAt).format("MMMM Do YYYY")}`
-                }
-              </div>
-            }
-            <h5 className='mb-2'>
-              Credit or debit card
-            </h5>
-            <CardElement onReady={(el) => el.focus()} />
-            {errorMessage && <div className='text-danger text-center'>{errorMessage}</div>}
-          </>
-        )
-      }
-    } else if (success) {
-      return <div className='text-success text-center mt-4'>{successMessage}</div>
+  useEffect(() => {
+    if (!isSubmitting) {
+      return
     }
+
+    const run = async () => {
+      try {
+        const stripeResponse = await createToken()
+        console.log('stripeResponse2:', !!stripeResponse)
+        if (!stripeResponse) {
+          return
+        }
+        const body = {
+          ...stripeResponse,
+          origin: window.origin,
+          description: `Annual membership for Belmont Runners. name: ${displayName} email: ${email}  uid: ${uid}`,
+          amountInCents: totalAmount * 100
+        }
+        const stripeFunction = firebase.functions().httpsCallable('stripe')
+
+        try {
+          const response = await stripeFunction(body)
+
+          const stripeConfirmationId = response.data.id
+          setConfirmationNumber(stripeConfirmationId)
+
+          const transactionsRef = firebase.firestore().doc(
+            `users/${uid}/transactions/${moment().utc().format()}`)
+          const transactionsLastRef = firebase.firestore().doc(
+            `users/${uid}/transactions/latest`)
+
+          let newMembershipExpiresAt
+          const yearFromNow = moment().add(1, 'year')
+          if (membershipExpiresAt) {
+            const membershipExpiresAtPlusOneYear = moment(membershipExpiresAt).add(1, 'year')
+            if (membershipExpiresAtPlusOneYear.isBefore(yearFromNow)) {
+              newMembershipExpiresAt = yearFromNow
+            } else {
+              newMembershipExpiresAt = membershipExpiresAtPlusOneYear
+            }
+          } else {
+            newMembershipExpiresAt = yearFromNow
+          }
+
+          const values = {
+            // stripeResponse: JSON.stringify(stripeResponse),
+            stripeResponse,
+            paidAt: moment().utc().format(),
+            paidAmount: totalAmount,
+            confirmationNumber: stripeConfirmationId
+          }
+          await Promise.all([
+            transactionsRef.set(values),
+            transactionsLastRef.set(values)
+          ])
+          try {
+            await updateUserData({
+              [MEMBERSHIP_EXPIRES_AT]: newMembershipExpiresAt.utc().format()
+            }, { merge: true })
+
+          } catch (error) {
+            Sentry.captureException(error)
+            console.error('failed to update user data.', error)
+            // note: update of userData failed, everything else complete successfully.
+          }
+        } catch (error) {
+          console.warn('Error from stripe.  error:', error)
+          if (error && error.message) {
+            const stripeError = JSON.parse(error.message)
+            console.warn('stripeError:', stripeError)
+            setErrorMessage(stripeError.message)
+            return
+          }
+          // todo: handle case where it's not stripe error.
+          throw stripeResponse
+        }
+      } catch (error) {
+        Sentry.captureException(error)
+        // todo:handle case where charge failed by showing an error message
+        console.error("stripeError:", error)
+      } finally {
+        setIsSubmitting(false)
+      }
+    }
+    run()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSubmitting])
+
+  const getBody = () => {
+    if (confirmationNumber) {
+      return <div className='text-success text-center mt-4'>
+        <div>
+          <div>Complete successfully</div>
+          <div>Confirmation: {confirmationNumber.substring(3)}</div>
+        </div>
+      </div>
+    }
+
+    if (needToPay === false) {
+      return (
+        <>
+          <div className='text-success text-center mt-4'>Your membership expires
+            on {moment(membershipExpiresAt).format("MMMM Do YYYY")}</div>
+          <div className='text-success text-center'>You can renew it
+            after {moment(membershipExpiresAt).subtract(1, 'month').format("MMMM Do YYYY")}
+          </div>
+        </>
+      )
+    }
+
+    // need to pay.
+    return (<>
+        <h6 className='mt-3'>Membership fees</h6>
+        &bull; Adult (18 and over): $25<br />
+        &bull; Kids: $15.<br />
+
+        <h4 className='my-4'>Total amount:
+          ${totalAmount > 0 ? totalAmount : ''}
+        </h4>
+        {
+          membershipExpiresAt &&
+          <div className='text-warning mb-2 text-center'>
+            {
+              moment(membershipExpiresAt).isAfter(moment()) ?
+                `Membership will expire on ${moment(membershipExpiresAt).format("MMMM Do YYYY")}` :
+                `Membership expired on ${moment(membershipExpiresAt).format("MMMM Do YYYY")}`
+            }
+          </div>
+        }
+        <h5 className='mb-2'>
+          Credit or debit card
+        </h5>
+        <CardElement onReady={(el) => el.focus()} />
+        {errorMessage && <div className='text-danger text-center'>{errorMessage}</div>}
+      </>
+    )
   }
 
   console.log('SignUpStepPayment.render() called.')
@@ -188,7 +190,7 @@ function SignUpStepPayment ({
   }
 
   function handleNextClicked () {
-    success || needToPay === false ? onNextClicked() : handleSubmitPayment()
+    confirmationNumber || needToPay === false ? onNextClicked() : setIsSubmitting(true)
   }
 
   return (
@@ -216,16 +218,16 @@ function SignUpStepPayment ({
         (needToPay === false || needToPay === true) &&
         <SignUpStepperButton
           handlePrimaryClicked={handleNextClicked}
-          primaryText={success || needToPay === false ?
+          primaryText={confirmationNumber || needToPay === false ?
             (isLast ? 'Finish' : 'Next')
             : "Pay Now"}
-          primaryDisabled={!!isSubmitting || userDataUpdating}
+          primaryDisabled={!!isSubmitting}
           showPrimary
 
           handleSecondaryClicked={handleClose}
           secondaryText={'Finish later'}
-          secondaryDisabled={!!isSubmitting || userDataUpdating}
-          showSecondary={needToPay === true && !success}
+          secondaryDisabled={!!isSubmitting}
+          showSecondary={needToPay === true && !confirmationNumber}
         />
       }
     </div>
@@ -234,9 +236,7 @@ function SignUpStepPayment ({
 
 SignUpStepPayment.propTypes = {
   // from redux
-  currentUser: PropTypes.object,
-  userDataUpdating: PropTypes.bool.isRequired,
-  userDataUpdateError: PropTypes.object,
+  currentUser: PropTypes.object.isRequired,
   updateUserData: PropTypes.func.isRequired,
   needToPay: PropTypes.bool,
   membershipExpiresAt: PropTypes.string,
@@ -255,18 +255,14 @@ SignUpStepPayment.propTypes = {
   history: PropTypes.object.isRequired
 }
 
-const mapDispatchToProps = {
-  updateUserData: updateUserDataAction
-}
-
-const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, currentUser, userData, userDataUpdating, userDataUpdateError } }) => {
+const mapStateToProps = ({ currentUser: { currentUser, userData } }) => {
 
   userData = userData ? userData.toJS() : userData
   let membershipExpiresAt = null
   let needToPay = false
   let totalAmount = -1
 
-  if (isCurrentUserLoaded && currentUser) {
+  if (currentUser) {
     const dateOfBirth = moment(userData[DATE_OF_BIRTH])
     const isAdult = moment().diff(dateOfBirth, 'years') >= 18
     if (isAdult) {
@@ -276,17 +272,13 @@ const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, currentUser, user
     }
 
     membershipExpiresAt = userData[MEMBERSHIP_EXPIRES_AT]
-    if (membershipExpiresAt && moment(membershipExpiresAt).isAfter(moment().add(1, 'month'))) {
-      needToPay = false
-    } else {
+    if (!(membershipExpiresAt && moment(membershipExpiresAt).isAfter(moment().add(1, 'month')))) {
       needToPay = true
     }
   }
 
   return {
     currentUser,
-    userDataUpdating,
-    userDataUpdateError,
 
     needToPay,
     membershipExpiresAt,
@@ -294,7 +286,10 @@ const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, currentUser, user
   }
 }
 
-export default withRouter(injectStripe(LoggedInState({
-  name: 'SignUpStepPayment',
-  isRequiredToBeLoggedIn: true
-})(connect(mapStateToProps, mapDispatchToProps)(SignUpStepPayment))))
+export default UpdateUserData(
+  withRouter(
+    injectStripe(
+      LoggedInState({
+        name: 'SignUpStepPayment',
+        isRequiredToBeLoggedIn: true
+      })(connect(mapStateToProps)(SignUpStepPayment)))))

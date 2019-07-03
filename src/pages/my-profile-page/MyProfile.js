@@ -1,13 +1,14 @@
+import 'firebase/auth'
+import firebase from 'firebase'
+import { Map as IMap } from 'immutable'
+import * as Sentry from '@sentry/browser'
 import React, { useEffect, useState } from 'react'
 import * as PropTypes from 'prop-types'
 import { Form } from 'react-final-form'
 import LoggedInState from '../../components/LoggedInState'
 import { connect } from 'react-redux'
 import { ADDRESS1, ADDRESS2, CITY, DATE_OF_BIRTH, GENDER, PHONE, PHOTO_URL, STATE, ZIP } from '../../fields'
-import {
-  sendEmailVerification as sendEmailVerificationAction,
-  updateUserData as updateUserDataAction
-} from '../../reducers/currentUser'
+import { sendEmailVerification as sendEmailVerificationAction } from '../../reducers/currentUser'
 import _ from 'underscore'
 import UserDetails from '../../components/UserDetails'
 import { ROOT } from '../../urls'
@@ -20,12 +21,12 @@ import ChangeEmailDialog from '../../components/ChangeEmailDialog'
 import Snackbar from '@material-ui/core/Snackbar'
 import IconButton from '@material-ui/core/IconButton'
 import CloseIcon from '@material-ui/icons/Close'
-import 'firebase/auth'
-import firebase from 'firebase'
 import { withRouter } from 'react-router-dom'
-import usePrevious from '../../components/usePrevious'
+import UpdateUserData from '../../components/UpdateUserData'
 
-function MyProfile ({ updateUserData, sendEmailVerification, currentUser, userData, history, userDataUpdating, userDataUpdateError }) {
+function MyProfile ({ updateUserData, sendEmailVerification, currentUser, userData, history }) {
+  userData = userData.toJS()
+
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showChangeEmailDialog, setShowChangeEmailDialog] = useState()
   const [showChangePasswordDialog, setShowChangePasswordDialog] = useState()
@@ -36,23 +37,19 @@ function MyProfile ({ updateUserData, sendEmailVerification, currentUser, userDa
     window.scrollTo(0, 0)
   }, [])
 
-  const handleSubmit = (values) => {
-    setIsSubmitting(true)
+  const handleSubmit = async (values) => {
     console.log('submitting values:', JSON.stringify(values, 0, 2))
-    return updateUserData(values, { merge: true })
-  }
-
-  const prevUserDataUpdating = usePrevious(userDataUpdating)
-  useEffect(() => {
-    if (prevUserDataUpdating && !userDataUpdating && isSubmitting) {
+    try {
+      setIsSubmitting(true)
+      await updateUserData(values, { merge: true })
+    } catch (error) {
+      Sentry.captureException(error)
+      console.error('error response:', error)
+// todo: show error message
+    } finally {
       setIsSubmitting(false)
-      if (userDataUpdateError) {
-        // todo: show error since update failed.
-      }
     }
-
-  }, [prevUserDataUpdating, userDataUpdating, userDataUpdateError, isSubmitting])
-
+  }
 
   const sendVerificationEmail = async () => {
     sendEmailVerification()
@@ -79,6 +76,8 @@ function MyProfile ({ updateUserData, sendEmailVerification, currentUser, userDa
     } catch (err) {
       console.log('err:', err)
       setLinkWithProviderErrorMessage('Connection failed')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -98,6 +97,8 @@ function MyProfile ({ updateUserData, sendEmailVerification, currentUser, userDa
     } catch (err) {
       console.log('err:', err)
       setLinkWithProviderErrorMessage('Disconnection failed')
+    } finally {
+      setIsSubmitting(false)
     }
   }
   const handleClose = () => {
@@ -105,8 +106,6 @@ function MyProfile ({ updateUserData, sendEmailVerification, currentUser, userDa
   }
 
 
-  userData = userData.toJS()
-  console.log('userData :', userData)
   const connectedToFacebook = Boolean(_.findWhere(currentUser.providerData, { providerId: 'facebook.com' }))
 
   const initialValues = _.pick(userData, ADDRESS1, ADDRESS2, CITY, DATE_OF_BIRTH, GENDER, PHONE, STATE, ZIP)
@@ -270,31 +269,30 @@ function MyProfile ({ updateUserData, sendEmailVerification, currentUser, userDa
 
 MyProfile.propTypes = {
   sendEmailVerification: PropTypes.func.isRequired,
-  updateUserData: PropTypes.func.isRequired,
-  currentUser: PropTypes.object,
+  currentUser: PropTypes.object.isRequired,
   userData: PropTypes.object.isRequired,
-  userDataUpdating: PropTypes.bool.isRequired,
-  userDataUpdateError: PropTypes.object,
+
+  // from HOC
+  updateUserData: PropTypes.func.isRequired,
 
   // from router-dom
   history: PropTypes.object.isRequired
 }
 
 const mapDispatchToProps = {
-  sendEmailVerification: sendEmailVerificationAction,
-  updateUserData: updateUserDataAction
+  sendEmailVerification: sendEmailVerificationAction
 }
 
-const mapStateToProps = ({ currentUser: { currentUser, userData, userDataUpdating, userDataUpdateError } }) => {
+const mapStateToProps = ({ currentUser: { currentUser, userData } }) => {
   return {
     currentUser,
-    userData,
-    userDataUpdating,
-    userDataUpdateError
+    userData: userData || new IMap()
   }
 }
 
-export default LoggedInState({
-  name: 'MyProfilePage',
-  isRequiredToBeLoggedIn: true
-})(connect(mapStateToProps, mapDispatchToProps)(withRouter(MyProfile)))
+export default withRouter(
+  UpdateUserData(
+    LoggedInState({
+      name: 'MyProfilePage',
+      isRequiredToBeLoggedIn: true
+    })(connect(mapStateToProps, mapDispatchToProps)(MyProfile))))

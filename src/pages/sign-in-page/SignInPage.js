@@ -89,7 +89,7 @@ class SignInPage extends Component {
     try {
       await promise
       this.setState({
-        isSignedIn: true
+        isSignedIn: false
       })
     } catch (error) {
       console.log('error while signing in', error)
@@ -97,10 +97,6 @@ class SignInPage extends Component {
         isSignedIn: false
       })
       this.handleSignInError(error)
-    } finally {
-      this.setState({
-        isSigningIn: false
-      })
     }
     // todo: when sign-in is done via provider, redirect to user details and then maybe to payments
   }

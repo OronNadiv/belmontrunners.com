@@ -1,15 +1,14 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Redirect } from 'react-router-dom'
 import { ROOT } from '../urls'
 import { connect } from 'react-redux'
 import * as PropTypes from 'prop-types'
-import usePrevious from './usePrevious'
 
 const outer = ({ name, isRequiredToBeLoggedIn, canSwitchToLogin }) => {
   const inner = (WrappedComponent) => {
     const HOC = (props) => {
       const { isCurrentUserLoaded, currentUser } = props
-      const [redirectToRoot, setRedirectToRoot] = useState(false)
+      const [redirectToRoot, setRedirectToRoot] = useState(null)
 
       const [initialIsLoggedIn, setInitialIsLoggedIn] = useState(null)
       useEffect(() => {
@@ -17,20 +16,16 @@ const outer = ({ name, isRequiredToBeLoggedIn, canSwitchToLogin }) => {
           console.log(`user hasn't been fetched yet.`)
           return
         }
-        if (redirectToRoot) {
-          console.log('initialed redirect.  skipping.')
-          return
-        }
         console.log('user has been fetched.')
-        const isLoggedIn = !!currentUser
 
-        // save state login for later
         if (initialIsLoggedIn === null) {
-          setInitialIsLoggedIn(isLoggedIn)
+          // save state login for later
+          console.log(2)
+          setInitialIsLoggedIn(!!currentUser)
         }
-      }, [currentUser, initialIsLoggedIn, isCurrentUserLoaded, redirectToRoot])
+      }, [currentUser, initialIsLoggedIn, isCurrentUserLoaded])
 
-      const checkLoginState = useCallback(() => {
+      useEffect(() => {
         console.log('checkLoginState called.  name:', name)
         if (!isCurrentUserLoaded) {
           console.log(`user hasn't been fetched yet.`)
@@ -50,6 +45,7 @@ const outer = ({ name, isRequiredToBeLoggedIn, canSwitchToLogin }) => {
             'initialIsLoggedIn', initialIsLoggedIn,
             'isLoggedIn:', isLoggedIn,
             'isRequiredToBeLoggedIn:', isRequiredToBeLoggedIn)
+          setRedirectToRoot(false)
           return
         }
 
@@ -64,6 +60,7 @@ const outer = ({ name, isRequiredToBeLoggedIn, canSwitchToLogin }) => {
         // ok, can switch but only to login state.  Let's see if the user was previously logged in')'
         if (!initialIsLoggedIn && isLoggedIn) {
           console.log('the user switched from not logged in to logged in.  We are all good.')
+          setRedirectToRoot(false)
           return
         }
 
@@ -71,21 +68,13 @@ const outer = ({ name, isRequiredToBeLoggedIn, canSwitchToLogin }) => {
         return setRedirectToRoot(true)
       }, [currentUser, initialIsLoggedIn, isCurrentUserLoaded, redirectToRoot])
 
-      useEffect(checkLoginState, [])
-
-      const prevIsCurrentUserLoaded = usePrevious(isCurrentUserLoaded)
-      useEffect(() => {
-        if (prevIsCurrentUserLoaded !== isCurrentUserLoaded) {
-          checkLoginState()
-        }
-      }, [prevIsCurrentUserLoaded, isCurrentUserLoaded, checkLoginState])
-
-      if (!isCurrentUserLoaded) {
-        return null // todo: better to show loading spinner
+      if (!isCurrentUserLoaded || redirectToRoot === null) {
+        return '' // todo: better to show loading spinner
       }
       const filteredProps = { ...props }
       delete filteredProps.currentUser
       delete filteredProps.isCurrentUserLoaded
+      
       return redirectToRoot ?
         <Redirect to={ROOT} /> :
         <WrappedComponent {...filteredProps} />

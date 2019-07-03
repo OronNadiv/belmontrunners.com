@@ -29,11 +29,11 @@ import IconButton from '@material-ui/core/IconButton'
 import SwipeableDrawer from '@material-ui/core/SwipeableDrawer'
 import { connect } from 'react-redux'
 import { Map as IMap } from 'immutable'
-import { updateUserData as updateUserDataAction } from '../../reducers/currentUser'
 import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
 import ListItemText from '@material-ui/core/ListItemText'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
+import UpdateUserData from '../../components/UpdateUserData'
 
 const defaultVisibility = {
   [EMAIL]: ONLY_ME,
@@ -46,6 +46,8 @@ const PNF = googleLibPhoneNumber.PhoneNumberFormat
 const phoneUtil = googleLibPhoneNumber.PhoneNumberUtil.getInstance()
 
 function UserProfile ({ onClose, user, visibility, updateUserData, currentUser }) {
+  console.log('user:', user)
+
   const [refs, setRefs] = useState({})
   const [openMenus, setOpenMenus] = useState({})
 
@@ -136,11 +138,11 @@ function UserProfile ({ onClose, user, visibility, updateUserData, currentUser }
   }
 
   function handleVisibilityChanged (keys) {
-    return (val) => {
+    return async (val) => {
       keys.forEach(key => {
         visibility = visibility.set(key, val)
       })
-      updateUserData({ visibility: visibility.toJS() }, { merge: true })
+      await updateUserData({ visibility: visibility.toJS() }, { merge: true })
     }
   }
 
@@ -218,19 +220,15 @@ UserProfile.propTypes = {
   user: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
   updateUserData: PropTypes.func.isRequired,
-  currentUser: PropTypes.object,
+  currentUser: PropTypes.object.isRequired,
   visibility: PropTypes.object.isRequired
-}
-
-const mapDispatchToProps = {
-  updateUserData: updateUserDataAction
 }
 
 const mapStateToProps = ({ currentUser: { currentUser, userData } }) => {
   return {
     currentUser,
-    visibility: userData.get('visibility') || new IMap()
+    visibility: userData ? userData.get('visibility') : new IMap()
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UserProfile)
+export default connect(mapStateToProps)(UpdateUserData(UserProfile))

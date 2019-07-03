@@ -121,13 +121,14 @@ export const sendEmailVerification = () => {
   }
 }
 
-export const updateUserData = (values, options = { merge: true }) => {
+export const updateUserData = (values, options = { merge: true }, context) => {
   return async (dispatch, getState) => {
     if (getState().currentUser.isCurrentUserLoading) {
       return
     }
     dispatch({
-      type: USER_DATA_UPDATE_REQUEST
+      type: USER_DATA_UPDATE_REQUEST,
+      context
     })
     const userRef = firebase.firestore().doc(`users/${firebase.auth().currentUser.uid}`)
     try {
@@ -135,14 +136,16 @@ export const updateUserData = (values, options = { merge: true }) => {
       const userData = await fetchUserData()
       dispatch({
         type: USER_DATA_UPDATE_SUCCESS,
-        data: userData
+        data: userData,
+        context
       })
     } catch (error) {
       Sentry.captureException(error)
       console.error(error)
       dispatch({
         type: USER_DATA_UPDATE_FAILURE,
-        error
+        error,
+        context
       })
     }
   }
@@ -185,28 +188,31 @@ const ACTION_HANDLERS = {
   },
 
 
-  [USER_DATA_UPDATE_REQUEST]: (state = initialState) => {
+  [USER_DATA_UPDATE_REQUEST]: (state = initialState, {context}) => {
     state = {
       ...state,
       userDataUpdating: true,
-      userDataUpdateError: null
+      userDataUpdateError: null,
+      userDataUpdateContext: context
     }
     return state
   },
-  [USER_DATA_UPDATE_SUCCESS]: (state = initialState, { data }) => {
+  [USER_DATA_UPDATE_SUCCESS]: (state = initialState, { data, context }) => {
     state = {
       ...state,
       userData: fromJS(data),
       userDataUpdating: false,
-      userDataUpdateError: null
+      userDataUpdateError: null,
+      userDataUpdateContext: context
     }
     return state
   },
-  [USER_DATA_UPDATE_FAILURE]: (state = initialState, { error }) => {
+  [USER_DATA_UPDATE_FAILURE]: (state = initialState, { error, context }) => {
     state = {
       ...state,
       userDataUpdating: false,
-      userDataUpdateError: error
+      userDataUpdateError: error,
+      userDataUpdateContext: context
     }
     return state
   }

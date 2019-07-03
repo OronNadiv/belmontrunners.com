@@ -8,8 +8,9 @@ import moment from 'moment/moment'
 import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import SnackbarContent from '@material-ui/core/SnackbarContent/index'
-import { updateUserData as updateUserDataAction } from '../../reducers/currentUser'
 import * as Sentry from '@sentry/browser'
+import UpdateUserData from '../../components/UpdateUserData'
+import { Map as IMap } from 'immutable'
 
 const POPUP_PAY_MEMBERSHIP_SNOOZED_AT = 'popupPayMembershipSnoozedAt'
 const POPUP_RECEIVED_SHIRT_AT = 'popupReceivedShirtSnoozedAt'
@@ -42,10 +43,10 @@ class Notifications extends Component {
     return false
   }
 
-  dismissNotification ({ notificationKey }) {
+  async dismissNotification ({ notificationKey }) {
     const { updateUserData } = this.props
     this.setState({ notification: null })
-    updateUserData({ notifications: { [notificationKey]: moment().utc().format() } }, { merge: true })
+    await updateUserData({ notifications: { [notificationKey]: moment().utc().format() } }, { merge: true })
   }
 
 
@@ -150,9 +151,9 @@ class Notifications extends Component {
           <Button
             color='secondary'
             size="small"
-            onClick={() => {
+            onClick={async () => {
               try {
-                updateUserData({ [DID_RECEIVED_SHIRT]: true }, { merge: true })
+                await updateUserData({ [DID_RECEIVED_SHIRT]: true }, { merge: true })
               } catch (error) {
                 Sentry.captureException(error)
                 console.error('error while updating [DID_RECEIVED_SHIRT] to true.  error:', error)
@@ -204,15 +205,11 @@ Notifications.propTypes = {
   userData: PropTypes.object.isRequired
 }
 
-const mapDispatchToProps = {
-  updateUserData: updateUserDataAction
-}
-
 const mapStateToProps = ({ currentUser: { currentUser, userData } }) => {
   return {
     currentUser,
-    userData
+    userData: userData || new IMap()
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Notifications)
+export default UpdateUserData(connect(mapStateToProps)(Notifications))

@@ -1,74 +1,58 @@
-import React, { Component } from 'react'
+import { Map as IMap } from 'immutable'
+import React, { useEffect, useState } from 'react'
 import * as PropTypes from 'prop-types'
 import { Form } from 'react-final-form'
 import SignUpStepperButton from './SignUpStepperButton'
 import LoggedInState from '../../components/LoggedInState'
 import { connect } from 'react-redux'
-import {
-  ADDRESS1,
-  ADDRESS2,
-  CITY,
-  DATE_OF_BIRTH,
-  GENDER,
-  PHONE,
-  STATE,
-  ZIP
-} from '../../fields'
-import { updateUserData as updateUserDataAction } from '../../reducers/currentUser'
+import { ADDRESS1, ADDRESS2, CITY, DATE_OF_BIRTH, GENDER, PHONE, STATE, ZIP } from '../../fields'
 import { DatePicker, MuiPickersUtilsProvider } from "material-ui-pickers"
 import MomentUtils from '@date-io/moment'
 import _ from 'underscore'
 import UserDetails from '../../components/UserDetails'
+import UpdateUserData from '../../components/UpdateUserData'
 
-class SignUpStepUserProfile extends Component {
-  handleSubmit (values) {
-    this.submitting = true
-    const { updateUserData } = this.props
+const SignUpStepUserProfile = ({ onNextClicked, userData, isLast, isCurrentUserLoaded, updateUserData }) => {
+  userData = userData.toJS()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const handleSubmit = async (values) => {
     console.log('submitting values:', JSON.stringify(values, 0, 2))
-    return updateUserData(values, { merge: true })
-  }
 
-  componentDidMount () {
-    window.scrollTo(0, 0)
-  }
-
-  componentDidUpdate (prevProps, prevState, snapshot) {
-    if (prevProps.userDataUpdating && !this.props.userDataUpdating && this.submitting) {
-      this.submitting = false
-      if (!this.props.userDataUpdateError) {
-        const { onNextClicked } = this.props
-        onNextClicked()
-      } else {
-        // todo: show error since update failed.
-      }
+    setIsSubmitting(true)
+    try {
+      await updateUserData(values, { merge: true })
+      onNextClicked()
+    } catch (error) {
+      setIsSubmitting(false)
+      // todo: show error since update failed.
     }
   }
 
-  render () {
-    const { isLast, isCurrentUserLoaded, userDataUpdating } = this.props
-    const userData = this.props.userData.toJS()
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  })
 
-    const initialValues = _.pick(userData, ADDRESS1, ADDRESS2, CITY, DATE_OF_BIRTH, GENDER, PHONE, STATE, ZIP)
-    return !isCurrentUserLoaded ?
-      '' :
-      <Form
-        onSubmit={(values) => this.handleSubmit(values)}
-        initialValues={initialValues}
-        render={({ handleSubmit, form, values }) => (
-          <form onSubmit={handleSubmit}>
+  const initialValues = _.pick(userData, ADDRESS1, ADDRESS2, CITY, DATE_OF_BIRTH, GENDER, PHONE, STATE, ZIP)
+  return !isCurrentUserLoaded ?
+    '' :
+    <Form
+      onSubmit={(values) => handleSubmit(values)}
+      initialValues={initialValues}
+      render={({ handleSubmit, form, values }) => (
+        <form onSubmit={handleSubmit}>
 
-            <UserDetails values={values} />
+          <UserDetails values={values} />
 
-            <SignUpStepperButton
-              handlePrimaryClicked={() => form.submit()}
-              primaryText={isLast ? 'Save' : 'Next'}
-              primaryDisabled={!!userDataUpdating}
-              showPrimary
-            />
-          </form>
-        )}
-      />
-  }
+          <SignUpStepperButton
+            handlePrimaryClicked={() => form.submit()}
+            primaryText={isLast ? 'Save' : 'Next'}
+            primaryDisabled={isSubmitting}
+            showPrimary
+          />
+        </form>
+      )}
+    />
 }
 
 function DatePickerWrapper (props) {
@@ -105,28 +89,20 @@ DatePickerWrapper.propTypes = {
 SignUpStepUserProfile.propTypes = {
   updateUserData: PropTypes.func.isRequired,
   userData: PropTypes.object.isRequired,
-  userDataUpdating: PropTypes.bool.isRequired,
-  userDataUpdateError: PropTypes.object,
   isCurrentUserLoaded: PropTypes.bool.isRequired,
 
   isLast: PropTypes.bool,
   onNextClicked: PropTypes.func.isRequired
 }
 
-const mapDispatchToProps = {
-  updateUserData: updateUserDataAction
-}
-
-const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, userData, userDataUpdating, userDataUpdateError } }) => {
+const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, userData } }) => {
   return {
     isCurrentUserLoaded,
-    userData,
-    userDataUpdating,
-    userDataUpdateError
+    userData: userData || new IMap()
   }
 }
 
-export default LoggedInState({
+export default UpdateUserData(LoggedInState({
   name: 'SignUpStepUserProfile',
   isRequiredToBeLoggedIn: true
-})(connect(mapStateToProps, mapDispatchToProps)(SignUpStepUserProfile))
+})(connect(mapStateToProps)(SignUpStepUserProfile)))

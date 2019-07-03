@@ -90,9 +90,8 @@ function SignUpStepAuth ({ onNextClicked, isLast }) {
       await userRef.set(values, { merge: true })
       onNextClicked()
     } catch (error) {
-      handleSignUpError(error)
-    } finally {
       setIsSigningUp(false)
+      handleSignUpError(error)
     }
   }
 
