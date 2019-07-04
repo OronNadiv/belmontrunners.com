@@ -1,8 +1,9 @@
 import 'firebase/auth'
 import firebase from 'firebase'
-import React, { Component } from 'react'
+import * as PropTypes from 'prop-types'
+import React, { useEffect, useState } from 'react'
 import isEmailComponent from 'isemail'
-import { Link, Redirect } from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
 import { TextField } from 'final-form-material-ui'
 import {
   INVALID_EMAIL,
@@ -21,6 +22,7 @@ import LoggedInState from '../../components/LoggedInState'
 import * as Sentry from '@sentry/browser'
 import { Field, Form } from 'react-final-form'
 import { EMAIL, PASSWORD } from '../../fields'
+import { goToTop } from 'react-scrollable-anchor'
 
 const providerGoogle = new firebase.auth.GoogleAuthProvider()
 const providerFacebook = new firebase.auth.FacebookAuthProvider()
@@ -30,44 +32,45 @@ const isEmail = value => (!value || !isEmailComponent.validate(value) ? INVALID_
 const minPasswordLength = value => (value.length < 6 ? INVALID_PASSWORD_LENGTH(6) : undefined)
 const composeValidators = (...validators) => value => validators.reduce((error, validator) => error || validator(value), undefined)
 
-class SignInPage extends Component {
+function SignInPage ({ history }) {
+  const [errorMessage, setErrorMessage] = useState('')
+  const [isSigningIn, setIsSigningIn] = useState(false)
+  const [isSignedIn, setIsSignedIn] = useState(false)
 
-  constructor (props) {
-    super(props)
-    this.state = {
-      errorMessage: '',
-      isSigningIn: false,
-      isSignedIn: false
-    }
-  }
+  useEffect(() => {
+    goToTop()
+  }, [])
+  
+  useEffect(() => {
+    errorMessage && goToTop()
+  }, [errorMessage])
 
-  handleSignInError (error) {
-    window.scrollTo(0, 0)
+  const handleSignInError = (error) => {
 
     const { code, message } = error
     switch (code) {
       case 'auth/invalid-email':
-        this.setState({ errorMessage: INVALID_EMAIL })
+        setErrorMessage(INVALID_EMAIL)
         break
       case 'auth/user-not-found':
-        this.setState({ errorMessage: USER_NOT_FOUND_INVALID_EMAIL_OR_PASSWORD })
+        setErrorMessage(USER_NOT_FOUND_INVALID_EMAIL_OR_PASSWORD)
         break
       case 'auth/wrong-password':
-        this.setState({ errorMessage: WRONG_PASSWORD_INVALID_EMAIL_OR_PASSWORD })
+        setErrorMessage(WRONG_PASSWORD_INVALID_EMAIL_OR_PASSWORD)
         break
       case 'auth/popup-closed-by-user':
-        this.setState({ errorMessage: POPUP_CLOSED_BEFORE_COMPLETION })
+        setErrorMessage(POPUP_CLOSED_BEFORE_COMPLETION)
         break
       default:
         Sentry.captureException(error)
         console.error('SignInPage',
           'code:', code,
           'message:', message)
-        this.setState({ errorMessage: message })
+        setErrorMessage(message)
     }
   }
 
-  async signIn (providerName, params) {
+  const signIn = async (providerName, params) => {
     let promise
     switch (providerName.toLowerCase()) {
       case 'facebook':
@@ -82,126 +85,125 @@ class SignInPage extends Component {
         break
     }
 
-    this.setState({
-      isSigningIn: true
-    })
+    setIsSigningIn(true)
 
     try {
       await promise
-      this.setState({
-        isSignedIn: false
-      })
+      setIsSignedIn(false)
     } catch (error) {
       console.log('error while signing in', error)
-      this.setState({
-        isSignedIn: false
-      })
-      this.handleSignInError(error)
+      setIsSignedIn(false)
+      handleSignInError(error)
     }
     // todo: when sign-in is done via provider, redirect to user details and then maybe to payments
   }
 
-  handleSignInWithEmail (values) {
-    this.setState({ errorMessage: '' })
+  const handleSignInWithEmail = (values) => {
+    setErrorMessage('')
 
-    this.signIn('email', values)
+    signIn('email', values)
   }
 
-  handleSignInWithProvider (providerName) {
-    this.signIn(providerName)
+  // const handleSignInWithProvider = (providerName) => {
+  //   signIn(providerName)
+  // }
+
+
+  const handleClose = () => {
+    history.push(ROOT)
   }
 
-  render () {
-    console.log('Signin render called')
+  useEffect(() => {
+    isSignedIn && history.push(ROOT)
+  })
 
-    const { close, isSigningIn, isSignedIn, errorMessage } = this.state
+  console.log('Signin render called')
 
-    if (close || isSignedIn) {
-      return <Redirect to={ROOT} />
-    }
+  return (
+    <Form
+      onSubmit={handleSignInWithEmail}
+      render={({ handleSubmit, form }) => (
+        <form onSubmit={handleSubmit}>
+          <Dialog
+            open
+            fullWidth
+            maxWidth='xs'
+            onClose={handleClose}
+            aria-labelledby="form-dialog-title"
+          >
+            <DialogTitle>
+              Sign In
+            </DialogTitle>
 
-    return (
-      <Form
-        onSubmit={(values) => this.handleSignInWithEmail(values)}
-        render={({ handleSubmit, form }) => (
-          <form onSubmit={handleSubmit}>
-            <Dialog
-              open
-              fullWidth
-              maxWidth='xs'
-              onClose={() => this.setState({ close: true })}
-              aria-labelledby="form-dialog-title"
-            >
-              <DialogTitle>
-                Sign In
-              </DialogTitle>
-
-              <DialogContent>
-                {/*
+            <DialogContent>
+              {/*
           // TODO: enable providers
           <div className="btn btn-block btn-social btn-twitter"
-               onClick={() => this.handleSignInWithProvider('facebook')}>
+               onClick={() => handleSignInWithProvider('facebook')}>
             <span className="fab fa-facebook" /> Sign in with Facebook
           </div>
           <div className="btn btn-block btn-social btn-google"
-               onClick={() => this.handleSignInWithProvider('google')}>
+               onClick={() => handleSignInWithProvider('google')}>
             <span className="fab fa-google" /> Sign in with Google
           </div>
 
           <div className="mt-4 text-center text-dark">Or sign in with email</div>
 */}
 
-                {
-                  errorMessage &&
-                  <div className="mt-2 text-danger text-center">{errorMessage}</div>
-                }
+              {
+                errorMessage &&
+                <div className="mt-2 text-danger text-center">{errorMessage}</div>
+              }
 
-                <Field
-                  label='Your email'
-                  margin='normal'
-                  type='email'
-                  fullWidth
-                  name={EMAIL}
-                  component={TextField}
-                  validate={composeValidators(required, isEmail)}
-                />
-                <Field
-                  label='Your password'
-                  type='password'
-                  margin='normal'
-                  fullWidth
-                  name={PASSWORD}
-                  component={TextField}
-                  validate={composeValidators(required, minPasswordLength)}
-                />
+              <Field
+                label='Your email'
+                margin='normal'
+                type='email'
+                fullWidth
+                name={EMAIL}
+                component={TextField}
+                validate={composeValidators(required, isEmail)}
+              />
+              <Field
+                label='Your password'
+                type='password'
+                margin='normal'
+                fullWidth
+                name={PASSWORD}
+                component={TextField}
+                validate={composeValidators(required, minPasswordLength)}
+              />
 
-                <p className="float-right">
-                  Forgot<Link to={FORGOT_PASSWORD} className="ml-2">Password?</Link>
-                </p>
+              <p className="float-right">
+                Forgot<Link to={FORGOT_PASSWORD} className="ml-2">Password?</Link>
+              </p>
 
-              </DialogContent>
+            </DialogContent>
 
-              <DialogActions>
-                <Button
-                  onClick={() => this.setState({ close: true })}
-                  disabled={isSigningIn}
-                >
-                  Cancel
-                </Button>
-                <Button type="button" color="primary"
-                        onClick={() => form.submit()}
-                        disabled={isSigningIn}
-                >
-                  Sign in
-                </Button>
+            <DialogActions>
+              <Button
+                onClick={handleClose}
+                disabled={isSigningIn}
+              >
+                Cancel
+              </Button>
+              <Button type="button" color="primary"
+                      onClick={() => form.submit()}
+                      disabled={isSigningIn}
+              >
+                Sign in
+              </Button>
 
-              </DialogActions>
-            </Dialog>
-          </form>
-        )}
-      />
-    )
-  }
+            </DialogActions>
+          </Dialog>
+        </form>
+      )}
+    />
+  )
 }
 
-export default LoggedInState({ name: 'SignIn', isRequiredToBeLoggedIn: false })(SignInPage)
+SignInPage.propTypes = {
+  history: PropTypes.object.isRequired
+}
+
+export default withRouter(LoggedInState({ name: 'SignIn', isRequiredToBeLoggedIn: false })(SignInPage))

@@ -1,7 +1,7 @@
-// import 'firebase/auth'
+import 'firebase/auth'
 import firebase from 'firebase'
-import React, { Component } from 'react'
-import { Redirect, withRouter } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { withRouter } from 'react-router-dom'
 import Dialog from '@material-ui/core/Dialog'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogContentText from '@material-ui/core/DialogContentText'
@@ -15,6 +15,7 @@ import { INVALID_PASSWORD_LENGTH, RESET_PASSWORD_SUCCESS } from '../../messages'
 import * as Sentry from '@sentry/browser'
 import { PASSWORD } from '../../fields'
 import { Field, Form } from 'react-final-form'
+import { goToTop } from 'react-scrollable-anchor'
 
 const WEAK_PASSWORD = 'Password is too weak.'
 
@@ -26,150 +27,130 @@ const minPasswordLength = value => {
   return res
 }
 
-const STATE_CLOSE = 'close'
-const STATE_ERROR_MESSAGE = 'errorMessage'
-const STATE_IS_SUBMITTING = 'isSubmitting'
-const STATE_IS_SUCCESS = 'isSuccess'
+function ResetPasswordPage ({ history, location }) {
+  const [errorMessage, setErrorMessage] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
 
-class ResetPasswordPage extends Component {
-  constructor (props) {
-    super(props)
-    console.log('ResetPassword constructor called')
-    this.state = {
-      [STATE_CLOSE]: false,
-      [STATE_ERROR_MESSAGE]: '',
-      [STATE_IS_SUBMITTING]: false,
-      [STATE_IS_SUCCESS]: false
-    }
-  }
+  useEffect(() => {
+    goToTop()
+  }, [])
 
-  handleError (error) {
-    window.scrollTo(0, 0)
+  useEffect(() => {
+    errorMessage && goToTop()
+  }, [errorMessage])
+
+
+  const handleError = (error) => {
     const { code, message } = error
     if (code === 'auth/weak-password') {
-      this.setState({
-        [STATE_ERROR_MESSAGE]: WEAK_PASSWORD
-      })
+      setErrorMessage(WEAK_PASSWORD)
     } else {
       Sentry.captureException(error)
       console.error('ResetPasswordPage',
         'code:', code,
         'message:', message)
-      this.setState({
-        [STATE_ERROR_MESSAGE]: message
-      })
+      setErrorMessage(message)
     }
   }
 
-  async handleSubmit (values) {
+  const handleSubmit = async (values) => {
     const newPassword = values[PASSWORD]
 
-    const oobCode = this.props.location.state.query.oobCode
+    const oobCode = location.state.query.oobCode
 
-    this.setState({
-      [STATE_ERROR_MESSAGE]: '',
-      [STATE_IS_SUBMITTING]: true
-    })
+    setErrorMessage('')
+    setIsSubmitting(true)
+
     try {
       await firebase.auth().confirmPasswordReset(oobCode, newPassword)
-      this.setState({
-        [STATE_IS_SUCCESS]: true
-      })
+      setIsSuccess(true)
     } catch (error) {
-      this.handleError(error)
+      handleError(error)
     } finally {
-      this.setState({
-        [STATE_IS_SUBMITTING]: false
-      })
+      setIsSubmitting(false)
     }
   }
 
-  render () {
-    const close = this.state[STATE_CLOSE]
-    const errorMessage = this.state[STATE_ERROR_MESSAGE]
-    const isSubmitting = this.state[STATE_IS_SUBMITTING]
-    const isSuccess = this.state[STATE_IS_SUCCESS]
+  const handleClose = () => {
+    history.push(ROOT)
+  }
 
-    if (close) {
-      console.log('redirecting to root', close)
-      return <Redirect to={ROOT} />
-    }
+  return (
+    <Form
+      onSubmit={(values) => handleSubmit(values)}
+      render={({ handleSubmit, form }) => (
+        <form onSubmit={handleSubmit}>
 
-    return (
-      <Form
-        onSubmit={(values) => this.handleSubmit(values)}
-        render={({ handleSubmit, form }) => (
-          <form onSubmit={handleSubmit}>
+          <Dialog
+            open
+            fullWidth
+            maxWidth='xs'
+            onClose={handleClose}
+            aria-labelledby="form-dialog-title"
+          >
+            <DialogTitle>
+              Reset Password
+            </DialogTitle>
 
-            <Dialog
-              open
-              fullWidth
-              maxWidth='xs'
-              onClose={() => this.setState({ [STATE_CLOSE]: true })}
-              aria-labelledby="form-dialog-title"
-            >
-              <DialogTitle>
-                Reset Password
-              </DialogTitle>
-
-              <DialogContent>
-                {
-                  errorMessage &&
-                  <DialogContentText>
-                    <div className='text-danger text-center'>
-                      {errorMessage}
-                    </div>
-                  </DialogContentText>
-                }
-                {
-                  isSuccess
-                    ?
-                    <DialogContentText>
-                      <div className='text-success text-center'>
-                        {RESET_PASSWORD_SUCCESS}
-                      </div>
-                    </DialogContentText>
-                    :
-                    <Field
-                      label='New password'
-                      type='password'
-                      margin='normal'
-                      fullWidth
-                      name={PASSWORD}
-                      component={TextField}
-                      validate={composeValidators(required, minPasswordLength)}
-                    />
-                }
-              </DialogContent>
+            <DialogContent>
+              {
+                errorMessage &&
+                <DialogContentText>
+                  <div className='text-danger text-center'>
+                    {errorMessage}
+                  </div>
+                </DialogContentText>
+              }
               {
                 isSuccess
                   ?
-                  <DialogActions>
-                    <Button onClick={() => this.setState({ [STATE_CLOSE]: true })} color="primary">
-                      Close
-                    </Button>
-                  </DialogActions>
+                  <DialogContentText>
+                    <div className='text-success text-center'>
+                      {RESET_PASSWORD_SUCCESS}
+                    </div>
+                  </DialogContentText>
                   :
-                  <DialogActions>
-                    <Button onClick={() => this.setState({ [STATE_CLOSE]: true })}>
-                      Cancel
-                    </Button>
-                    <Button type="button" color="primary"
-                            onClick={() => form.submit()}
-                            disabled={isSubmitting}>
-                      Set new password
-                    </Button>
-                  </DialogActions>
+                  <Field
+                    label='New password'
+                    type='password'
+                    margin='normal'
+                    fullWidth
+                    name={PASSWORD}
+                    component={TextField}
+                    validate={composeValidators(required, minPasswordLength)}
+                  />
               }
-            </Dialog>
-          </form>
-        )}
-      />
-    )
-  }
+            </DialogContent>
+            {
+              isSuccess
+                ?
+                <DialogActions>
+                  <Button onClick={handleClose} color="primary">
+                    Close
+                  </Button>
+                </DialogActions>
+                :
+                <DialogActions>
+                  <Button onClick={handleClose}>
+                    Cancel
+                  </Button>
+                  <Button type="button" color="primary"
+                          onClick={() => form.submit()}
+                          disabled={isSubmitting}>
+                    Set new password
+                  </Button>
+                </DialogActions>
+            }
+          </Dialog>
+        </form>
+      )}
+    />
+  )
 }
 
 ResetPasswordPage.propTypes = {
+  history: PropTypes.object.isRequired,
   location: PropTypes.shape({
     state: PropTypes.shape({
       info: PropTypes.shape({
