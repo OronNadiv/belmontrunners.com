@@ -1,6 +1,6 @@
 import * as PropTypes from 'prop-types'
 import React, { useState } from 'react'
-import Avatar from 'react-avatar'
+import initials from 'initials'
 import moment from 'moment'
 import {
   ADDRESS1,
@@ -34,6 +34,8 @@ import MenuItem from '@material-ui/core/MenuItem'
 import ListItemText from '@material-ui/core/ListItemText'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 import UpdateUserData from '../../components/UpdateUserData'
+import { Avatar } from '@material-ui/core'
+import { makeStyles, useTheme } from '@material-ui/core/styles'
 
 const defaultVisibility = {
   [EMAIL]: ONLY_ME,
@@ -46,6 +48,17 @@ const PNF = googleLibPhoneNumber.PhoneNumberFormat
 const phoneUtil = googleLibPhoneNumber.PhoneNumberUtil.getInstance()
 
 function UserProfile ({ onClose, user, visibility, updateUserData, currentUser }) {
+  const theme = useTheme()
+
+  const useStyles = makeStyles({
+    avatar: {
+      width: 60,
+      height: 60,
+      backgroundColor: theme.palette.primary.main
+    }
+  })
+  const classes = useStyles()
+
   console.log('user:', user)
 
   const [refs, setRefs] = useState({})
@@ -167,7 +180,7 @@ function UserProfile ({ onClose, user, visibility, updateUserData, currentUser }
       </div>
       <div className='mx-5'>
         <div className='d-flex justify-content-center mb-4 align-items-center'>
-          <Avatar name={user[DISPLAY_NAME]} round color='#6247ea' size={60} src={user[PHOTO_URL]} />
+          <Avatar className={classes.avatar} src={user[PHOTO_URL]}>{initials(user[DISPLAY_NAME])}</Avatar>
         </div>
         <div className='d-flex justify-content-center mb-5 align-items-center'>
           {user[DISPLAY_NAME]}
