@@ -19,6 +19,7 @@ import moment from 'moment'
 import * as Sentry from '@sentry/browser'
 import { Field, Form } from 'react-final-form'
 import { DISPLAY_NAME, EMAIL, PASSWORD } from '../../fields'
+import { goToTop } from 'react-scrollable-anchor'
 
 const required = value => (value ? undefined : 'Required')
 const isEmail = value => (!value || !isEmailComponent.validate(value) ? INVALID_EMAIL : undefined)
@@ -30,8 +31,12 @@ function SignUpStepAuth ({ onNextClicked, isLast }) {
   const [isSigningUp, setIsSigningUp] = useState(false)
 
   useEffect(() => {
-    window.scrollTo(0, 0)
+    goToTop()
   }, [])
+
+  useEffect(() => {
+    errorMessage && goToTop()
+  }, [errorMessage])
 
   const signUp = async (providerName, fullName, email, password) => {
     const displayName = s(fullName).clean().words().map((w) => s.capitalize(w)).join(" ")
@@ -96,7 +101,6 @@ function SignUpStepAuth ({ onNextClicked, isLast }) {
   }
 
   const handleSignUpError = (error) => {
-    window.scrollTo(0, 0)
     const {
       code,
       message

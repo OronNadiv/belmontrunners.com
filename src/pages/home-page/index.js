@@ -6,9 +6,13 @@ import Subscribe from './Subscribe'
 import Team from './team/Team'
 import Map from './Map'
 import Notifications from './Notifications'
+import { goToTop } from 'react-scrollable-anchor'
 
 function Home () {
-  useEffect(() => window.scrollTo(0, 0), [])
+  useEffect(() => {
+    goToTop()
+  }, [])
+
 
   return (
     <div>

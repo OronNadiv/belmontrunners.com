@@ -18,6 +18,7 @@ import _ from 'underscore'
 import { MEMBERS_DIRECTORY, ROOT } from '../../urls'
 import SearchBox from '../../components/SearchBox'
 import Snackbar from '@material-ui/core/Snackbar'
+import CircularProgress from '@material-ui/core/CircularProgress'
 
 function MembersDirectoryPage ({ currentUser, location: { pathname }, history }) {
   const useStyles = makeStyles(() => ({
@@ -28,6 +29,7 @@ function MembersDirectoryPage ({ currentUser, location: { pathname }, history })
   }))
   const classes = useStyles()
 
+  const [isLoading, setIsLoading] = useState(true)
   const [showError, setShowError] = useState(false)
   const [users, setUsers] = useState([])
   useEffect(() => {
@@ -36,6 +38,7 @@ function MembersDirectoryPage ({ currentUser, location: { pathname }, history })
     }
     (async function () {
       try {
+        // return setUsers(require('./members.json'))
         const resp = await firebase.functions().httpsCallable('getMembers')()
         setUsers(resp.data)
       } catch (err) {
@@ -49,8 +52,9 @@ function MembersDirectoryPage ({ currentUser, location: { pathname }, history })
         }
         Sentry.captureException(err)
         setShowError(true)
+      } finally {
+        setIsLoading(false)
       }
-      // setUsers(require('./members.json'))
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser])
@@ -146,7 +150,11 @@ function MembersDirectoryPage ({ currentUser, location: { pathname }, history })
       <SearchBox onChange={setSearch} />
       <Paper className='px-2 py-3'>
         <div className='d-flex justify-content-between flex-wrap'>
-          {getChips()}
+          {
+            isLoading ?
+              <CircularProgress className='mx-auto' /> :
+              getChips()
+          }
         </div>
       </Paper>
     </>

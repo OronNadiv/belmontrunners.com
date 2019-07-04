@@ -11,6 +11,7 @@ import MomentUtils from '@date-io/moment'
 import _ from 'underscore'
 import UserDetails from '../../components/UserDetails'
 import UpdateUserData from '../../components/UpdateUserData'
+import { goToTop } from 'react-scrollable-anchor'
 
 const SignUpStepUserProfile = ({ onNextClicked, userData, isLast, isCurrentUserLoaded, updateUserData }) => {
   userData = userData.toJS()
@@ -30,7 +31,7 @@ const SignUpStepUserProfile = ({ onNextClicked, userData, isLast, isCurrentUserL
   }
 
   useEffect(() => {
-    window.scrollTo(0, 0)
+    goToTop()
   })
 
   const initialValues = _.pick(userData, ADDRESS1, ADDRESS2, CITY, DATE_OF_BIRTH, GENDER, PHONE, STATE, ZIP)

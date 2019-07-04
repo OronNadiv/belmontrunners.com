@@ -28,7 +28,7 @@ function Profile ({ allowUsersPage, allowContactsPage, isMember, userData }) {
           {
             isMember &&
             <Link to={MEMBERS_DIRECTORY} className="dropdown-item">
-              Members Directory
+              Members
             </Link>
           }
           {

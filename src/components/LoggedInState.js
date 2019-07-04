@@ -20,7 +20,6 @@ const outer = ({ name, isRequiredToBeLoggedIn, canSwitchToLogin }) => {
 
         if (initialIsLoggedIn === null) {
           // save state login for later
-          console.log(2)
           setInitialIsLoggedIn(!!currentUser)
         }
       }, [currentUser, initialIsLoggedIn, isCurrentUserLoaded])
@@ -74,7 +73,7 @@ const outer = ({ name, isRequiredToBeLoggedIn, canSwitchToLogin }) => {
       const filteredProps = { ...props }
       delete filteredProps.currentUser
       delete filteredProps.isCurrentUserLoaded
-      
+
       return redirectToRoot ?
         <Redirect to={ROOT} /> :
         <WrappedComponent {...filteredProps} />

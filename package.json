@@ -43,6 +43,7 @@
     "react-redux": "^7.1.0",
     "react-router-dom": "^5.0.1",
     "react-scripts": "^3.0.1",
+    "react-scrollable-anchor": "^0.6.1",
     "react-sortable-hoc": "^1.9.1",
     "react-stripe-elements": "^3.0.0",
     "reactjs-file-uploader": "^1.0.8",

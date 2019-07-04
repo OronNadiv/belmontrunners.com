@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import * as PropTypes from 'prop-types'
 import LoggedInState from '../../components/LoggedInState'
 import { connect } from 'react-redux'
@@ -6,9 +6,14 @@ import { sendEmailVerification as sendEmailVerificationAction } from '../../redu
 import MyProfileForm from './MyProfileForm'
 import MyProfileChangePassword from './MyProfileChangePassword'
 import MyProfileFacebook from './MyProfileFacebook'
+import { goToTop } from 'react-scrollable-anchor'
 
 function MyProfilePage ({ currentUser }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  useEffect(() => {
+    goToTop()
+  }, [currentUser])
 
   const handleSubmissionChanged = ((value) => {
     setIsSubmitting(value)

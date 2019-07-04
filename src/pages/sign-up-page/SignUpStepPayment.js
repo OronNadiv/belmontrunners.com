@@ -14,6 +14,7 @@ import { DATE_OF_BIRTH, MEMBERSHIP_EXPIRES_AT } from '../../fields'
 import * as Sentry from '@sentry/browser'
 import { withRouter } from 'react-router-dom'
 import UpdateUserData from '../../components/UpdateUserData'
+import { goToTop } from 'react-scrollable-anchor'
 
 const MEMBERSHIP_FEE_ADULT = 25
 const MEMBERSHIP_FEE_KID = 15
@@ -24,7 +25,7 @@ function SignUpStepPayment ({
                               needToPay, totalAmount, membershipExpiresAt, onNextClicked
                             }) {
   useEffect(() => {
-    window.scrollTo(0, 0)
+    goToTop()
   }, [])
 
   const [errorMessage, setErrorMessage] = useState()
