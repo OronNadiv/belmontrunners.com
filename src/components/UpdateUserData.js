@@ -6,8 +6,8 @@ import * as PropTypes from 'prop-types'
 import uuid from 'uuid/v4'
 import _ from 'underscore'
 
-const Outer = (WrappedComponent) => {
-  const Inner = (props) => {
+function Outer (WrappedComponent) {
+  function Inner (props) {
     const { currentUser, userDataUpdating, userDataUpdateError, updateUserData, userDataUpdateContext } = props
     const [deferreds, setDeferreds] = useState([])
     const prevUserDataUpdating = usePrevious(userDataUpdating)

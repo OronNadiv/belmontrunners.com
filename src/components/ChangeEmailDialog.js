@@ -1,6 +1,6 @@
 import 'firebase/auth'
 import firebase from 'firebase'
-import React, { Component } from 'react'
+import React, { useState } from 'react'
 import Dialog from '@material-ui/core/Dialog'
 import DialogContent from '@material-ui/core/DialogContent'
 import { TextField } from 'final-form-material-ui'
@@ -27,49 +27,36 @@ const isEmail = value => (!value || !isEmailComponent.validate(value) ? INVALID_
 const composeValidators = (...validators) => value => validators.reduce((error, validator) => error || validator(value), undefined)
 const minPasswordLength = value => (value.length < 6 ? INVALID_PASSWORD_LENGTH(6) : undefined)
 
-const STATE_ERROR_MESSAGE = 'errorMessage'
-const STATE_IS_SUBMITTING = 'isSubmitting'
-const STATE_IS_SUCCESS = 'isSuccess'
-
 const EMAIL1 = 'email1'
 const EMAIL2 = 'email2'
 
-class ChangeEmailDialog extends Component {
+function ChangeEmailDialog ({ currentUser, sendEmailVerification, onClose }) {
 
-  constructor (props) {
-    super(props)
-    this.state = {
-      [STATE_ERROR_MESSAGE]: '',
-      [STATE_IS_SUBMITTING]: false,
-      [STATE_IS_SUCCESS]: false
-    }
-  }
+  const [errorMessage, setErrorMessage] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
 
-  async handleSubmit (values) {
+  const handleSubmit = async (values) => {
     const email1 = values[EMAIL1]
     const email2 = values[EMAIL2]
     const password = values[PASSWORD]
-    const { currentUser, sendEmailVerification } = this.props
 
     if (email1 !== email2) {
       return { [EMAIL2]: EMAILS_DONT_MATCH }
     }
 
-    this.setState({
-      [STATE_ERROR_MESSAGE]: '',
-      [STATE_IS_SUBMITTING]: true
-    })
+    setErrorMessage('')
+    setIsSubmitting(true)
 
     const credentials = firebase.auth.EmailAuthProvider.credential(currentUser.email, password)
     try {
       await currentUser.reauthenticateWithCredential(credentials)
       try {
         await currentUser.updateEmail(email1)
+        // todo: use same mechanism as in UpdateUserData
         await sendEmailVerification()
 
-        this.setState({
-          [STATE_IS_SUCCESS]: true
-        })
+        setIsSuccess(true)
       } catch (error) {
         Sentry.captureException(error)
         console.error(error)
@@ -77,151 +64,132 @@ class ChangeEmailDialog extends Component {
         const { code, message } = error
         switch (code) {
           case 'auth/invalid-email':
-            this.setState({
-              [STATE_ERROR_MESSAGE]: INVALID_EMAIL
-            })
+            setErrorMessage(INVALID_EMAIL)
             return
           case 'auth/email-already-in-use':
-            this.setState({
-              [STATE_ERROR_MESSAGE]: EMAIL_ALREADY_IN_USE
-            })
+            setErrorMessage(EMAIL_ALREADY_IN_USE)
             return
           default:
             Sentry.captureException(error)
             console.error('ChangeEmail.',
               'code:', code,
               'message:', message)
-            this.setState({
-              [STATE_ERROR_MESSAGE]: message
-            })
+            setErrorMessage(message)
         }
       }
     } catch (error) {
       const { code, message } = error
       if (code === 'auth/wrong-password') {
-        this.setState({
-          [STATE_ERROR_MESSAGE]: WRONG_PASSWORD
-        })
+        setErrorMessage(WRONG_PASSWORD)
       } else {
         Sentry.captureException(error)
-        this.setState({
-          [STATE_ERROR_MESSAGE]: message
-        })
+        setErrorMessage(message)
       }
     } finally {
-      this.setState({
-        [STATE_IS_SUBMITTING]: false
-      })
+      setIsSubmitting(false)
     }
   }
 
-  handleClose () {
-    this.props.onClose()
+  const handleClose = () => {
+    onClose()
   }
 
-  render () {
-    console.log('ChangeEmail render called')
+  console.log('ChangeEmail render called')
 
-    const { currentUser } = this.props
-    const errorMessage = this.state[STATE_ERROR_MESSAGE]
-    const isSubmitting = this.state[STATE_IS_SUBMITTING]
-    const isSuccess = this.state[STATE_IS_SUCCESS]
+  return (
+    <Form
+      onSubmit={handleSubmit}
+      render={({ handleSubmit, form }) => (
+        <form onSubmit={handleSubmit}>
 
-    return (
-      <Form
-        onSubmit={(values) => this.handleSubmit(values)}
-        render={({ handleSubmit, form }) => (
-          <form onSubmit={handleSubmit}>
+          <Dialog
+            open
+            fullWidth
+            maxWidth='xs'
+            onClose={handleClose}
+            aria-labelledby="form-dialog-title"
+          >
+            <DialogTitle>
+              Change Email
+            </DialogTitle>
 
-            <Dialog
-              open
-              fullWidth
-              maxWidth='xs'
-              onClose={() => this.handleClose()}
-              aria-labelledby="form-dialog-title"
-            >
-              <DialogTitle>
-                Change Email
-              </DialogTitle>
+            <DialogContent>
+              Current email address: <span className='font-weight-bold'>{currentUser.email}</span>
+              {
+                errorMessage &&
+                <div className="mt-2 text-danger text-center">{errorMessage}</div>
+              }
 
-              <DialogContent>
-                Current email address: <span className='font-weight-bold'>{currentUser.email}</span>
-                {
-                  errorMessage &&
-                  <div className="mt-2 text-danger text-center">{errorMessage}</div>
-                }
+              {
+                isSuccess ?
+                  <div className='text-success text-center mt-4'>Email changed successfully.</div> :
+                  <div>
+                    <Field
+                      label='New email'
+                      margin='normal'
+                      type='email'
+                      fullWidth
+                      name={EMAIL1}
+                      component={TextField}
+                      validate={composeValidators(required, isEmail)}
+                    />
+                    <Field
+                      label='Confirm email'
+                      margin='normal'
+                      type='email'
+                      fullWidth
+                      name={EMAIL2}
+                      component={TextField}
+                      validate={composeValidators(required, isEmail)}
+                    />
 
-                {
-                  isSuccess ?
-                    <div className='text-success text-center mt-4'>Email changed successfully.</div> :
-                    <div>
-                      <Field
-                        label='New email'
-                        margin='normal'
-                        type='email'
-                        fullWidth
-                        name={EMAIL1}
-                        component={TextField}
-                        validate={composeValidators(required, isEmail)}
-                      />
-                      <Field
-                        label='Confirm email'
-                        margin='normal'
-                        type='email'
-                        fullWidth
-                        name={EMAIL2}
-                        component={TextField}
-                        validate={composeValidators(required, isEmail)}
-                      />
+                    <Field
+                      label='Enter password'
+                      type='password'
+                      margin='normal'
+                      fullWidth
+                      name={PASSWORD}
+                      component={TextField}
+                      validate={composeValidators(required, minPasswordLength)}
+                    />
+                  </div>
+              }
+            </DialogContent>
 
-                      <Field
-                        label='Enter password'
-                        type='password'
-                        margin='normal'
-                        fullWidth
-                        name={PASSWORD}
-                        component={TextField}
-                        validate={composeValidators(required, minPasswordLength)}
-                      />
-                    </div>
-                }
-              </DialogContent>
-
-              <DialogActions>
-                {
-                  isSuccess ?
+            <DialogActions>
+              {
+                isSuccess ?
+                  <Button
+                    type="button"
+                    color="primary"
+                    onClick={handleClose}
+                  >
+                    Close
+                  </Button> :
+                  <div>
+                    <Button
+                      type="button"
+                      onClick={handleClose}
+                      disabled={isSubmitting}
+                    >
+                      Cancel
+                    </Button>
                     <Button
                       type="button"
                       color="primary"
-                      onClick={() => this.handleClose()}
+                      disabled={isSubmitting}
+                      onClick={() => form.submit()}
                     >
-                      Close
-                    </Button> :
-                    <div>
-                      <Button
-                        type="button"
-                        onClick={() => this.handleClose()}
-                        disabled={isSubmitting}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        type="button"
-                        color="primary"
-                        disabled={isSubmitting}
-                        onClick={() => form.submit()}
-                      >
-                        Submit
-                      </Button>
-                    </div>
-                }
-              </DialogActions>
-            </Dialog>
-          </form>
-        )}
-      />
-    )
-  }
+                      Submit
+                    </Button>
+                  </div>
+              }
+            </DialogActions>
+          </Dialog>
+        </form>
+      )}
+    />
+  )
 }
 
 
