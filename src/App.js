@@ -66,6 +66,8 @@ function App ({ fetchCurrentUser, isCurrentUserLoaded, currentUser }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser])
 
+  const enableCampaigns = window.innerHeight >= 600
+  console.log('enableCampaigns:', enableCampaigns, 'window.innerHeight:', window.innerHeight)
   return (
     <>
       <Switch>
@@ -247,7 +249,7 @@ function App ({ fetchCurrentUser, isCurrentUserLoaded, currentUser }) {
             displayName: currentUser && currentUser[DISPLAY_NAME]
           }}
           config={{
-            enableCampaigns: window.innerHeight >= 770
+            enableCampaigns
           }}
         />
       }
