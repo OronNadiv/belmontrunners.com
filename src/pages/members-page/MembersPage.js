@@ -15,12 +15,12 @@ import UserProfile from './UserProfile'
 import { makeStyles } from '@material-ui/core'
 import { withRouter } from 'react-router-dom'
 import _ from 'underscore'
-import { MEMBERS_DIRECTORY, ROOT } from '../../urls'
+import { MEMBERS, ROOT } from '../../urls'
 import SearchBox from '../../components/SearchBox'
 import Snackbar from '@material-ui/core/Snackbar'
 import CircularProgress from '@material-ui/core/CircularProgress'
 
-function MembersDirectoryPage ({ currentUser, location: { pathname }, history }) {
+function MembersPage ({ currentUser, location: { pathname }, history }) {
   const useStyles = makeStyles(() => ({
     chipAvatar: {
       width: 32,
@@ -73,7 +73,7 @@ function MembersDirectoryPage ({ currentUser, location: { pathname }, history })
     if (selected) {
       setSelected(selected)
     } else {
-      history.push(MEMBERS_DIRECTORY)
+      history.push(MEMBERS)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [users, pathname])
@@ -82,11 +82,11 @@ function MembersDirectoryPage ({ currentUser, location: { pathname }, history })
 
   const handleChipSelected = (user) => {
     console.log('user:', user)
-    history.push(`${MEMBERS_DIRECTORY}/${user[UID]}`)
+    history.push(`${MEMBERS}/${user[UID]}`)
   }
 
   const handleDrawerClosed = () => {
-    history.push(MEMBERS_DIRECTORY)
+    history.push(MEMBERS)
   }
 
   const getChips = () => {
@@ -161,7 +161,7 @@ function MembersDirectoryPage ({ currentUser, location: { pathname }, history })
   )
 }
 
-MembersDirectoryPage.propTypes = {
+MembersPage.propTypes = {
   currentUser: PropTypes.object.isRequired,
   location: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired
@@ -174,6 +174,6 @@ const mapStateToProps = ({ currentUser: { currentUser } }) => {
 }
 
 export default LoggedInState({
-  name: 'membersDirectory',
+  name: 'membersPage',
   isRequiredToBeLoggedIn: true
-})(connect(mapStateToProps)(withRouter(MembersDirectoryPage)))
+})(connect(mapStateToProps)(withRouter(MembersPage)))

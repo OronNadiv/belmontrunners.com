@@ -2,8 +2,8 @@ import 'firebase/auth'
 import firebase from 'firebase'
 import Avatar from '@material-ui/core/avatar'
 import React from 'react'
-import { Link } from 'react-router-dom'
-import { CONTACTS, MEMBERS_DIRECTORY, MY_PROFILE, ROOT, USERS } from '../urls'
+import Divider from '@material-ui/core/Divider'
+import { CONTACTS, MEMBERS, MY_PROFILE, ROOT, USERS } from '../urls'
 import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import LoggedInState from './LoggedInState'
@@ -20,8 +20,9 @@ import MenuList from '@material-ui/core/MenuList'
 import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp'
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown'
 import initials from 'initials'
+import { withRouter } from 'react-router-dom'
 
-function Profile ({ allowUsersPage, allowContactsPage, isMember, userData }) {
+function Profile ({ allowUsersPage, allowContactsPage, isMember, userData, history }) {
 
   const useStyles = makeStyles({
     avatarWrapper: {
@@ -43,6 +44,9 @@ function Profile ({ allowUsersPage, allowContactsPage, isMember, userData }) {
     },
     popper: {
       zIndex: 10000
+    },
+    menuItem: {
+      padding: '10px 40px'
     }
   })
   const classes = useStyles()
@@ -53,10 +57,11 @@ function Profile ({ allowUsersPage, allowContactsPage, isMember, userData }) {
     setOpen(prevOpen => !prevOpen)
   }
 
-  function handleClose (event) {
+  const handleClose = (url) => (event) => {
     if (anchorRef.current && anchorRef.current.contains(event.target)) {
       return
     }
+    history.push(url)
 
     setOpen(false)
   }
@@ -85,44 +90,34 @@ function Profile ({ allowUsersPage, allowContactsPage, isMember, userData }) {
             {...TransitionProps}
             style={{ transformOrigin: 'center top' }}
           >
-            <Paper id="menu-list-grow">
-              <ClickAwayListener onClickAway={handleClose}>
+            <Paper id='menu-list-grow'>
+              <ClickAwayListener onClickAway={handleClose()}>
                 <MenuList>
-                  <MenuItem onClick={handleClose}>
-                    <Link to={MY_PROFILE} className="dropdown-item">
-                      My profile
-                    </Link>
+                  <MenuItem onClick={handleClose(MY_PROFILE)} className={classes.menuItem}>
+                    My profile
                   </MenuItem>
-                  <MenuItem onClick={handleClose}>
-                    {
-                      isMember &&
-                      <Link to={MEMBERS_DIRECTORY} className="dropdown-item">
-                        Members
-                      </Link>
-                    }
-                  </MenuItem>
-                  <MenuItem onClick={handleClose}>
-                    {
-                      allowUsersPage &&
-                      <Link to={USERS} className='dropdown-item'>
-                        Users
-                      </Link>
-                    }
-                  </MenuItem>
-                  <MenuItem onClick={handleClose}>
-                    {
-                      allowContactsPage &&
-                      <Link to={CONTACTS} className='dropdown-item'>
-                        Contacts
-                      </Link>
-                    }
-                  </MenuItem>
-                  <div className="dropdown-divider" />
-                  <MenuItem onClick={handleClose}>
-                    <Link className='dropdown-item' to={ROOT}
-                          onClick={() => firebase.auth().signOut()}>
-                      Sign out
-                    </Link>
+                  {
+                    isMember &&
+                    <MenuItem onClick={handleClose(MEMBERS)} className={classes.menuItem}>
+                      Members
+                    </MenuItem>
+                  }
+                  {
+                    allowUsersPage &&
+                    <MenuItem onClick={handleClose(USERS)} className={classes.menuItem}>
+                      Users
+                    </MenuItem>
+                  }
+                  {
+                    allowContactsPage &&
+                    <MenuItem onClick={handleClose(CONTACTS)} className={classes.menuItem}>
+                      Contacts
+                    </MenuItem>
+                  }
+                  <Divider />
+                  <MenuItem onClick={() => firebase.auth().signOut() && handleClose(ROOT)()}
+                            className={classes.menuItem}>
+                    Sign out
                   </MenuItem>
                 </MenuList>
               </ClickAwayListener>
@@ -139,6 +134,7 @@ Profile.propTypes = {
   allowContactsPage: PropTypes.bool.isRequired,
   currentUser: PropTypes.object,
   userData: PropTypes.object.isRequired,
+  history: PropTypes.object.isRequired,
   isMember: PropTypes.bool.isRequired
 }
 
@@ -155,4 +151,7 @@ const mapStateToProps = ({ currentUser: { permissions, currentUser, userData } }
   }
 }
 
-export default LoggedInState({ name: 'profile', isRequiredToBeLoggedIn: true })(connect(mapStateToProps)(Profile))
+export default withRouter(LoggedInState({
+  name: 'profile',
+  isRequiredToBeLoggedIn: true
+})(connect(mapStateToProps)(Profile)))

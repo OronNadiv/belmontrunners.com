@@ -6,26 +6,15 @@ import IconButton from '@material-ui/core/IconButton'
 import MenuIcon from '@material-ui/icons/Menu'
 import HomeIcon from '@material-ui/icons/Home'
 import MyProfileIcon from '@material-ui/icons/AccountCircle'
-import MembersDirectoryIcon from '@material-ui/icons/People'
+import MembersIcon from '@material-ui/icons/People'
 import UsersIcon from '@material-ui/icons/PeopleOutline'
 import ContactsIcon from '@material-ui/icons/Contacts'
 import SignOutIcon from '@material-ui/icons/PowerSettingsNew'
 import SignInIcon from '@material-ui/icons/ExitToApp'
 import JoinUsIcon from '@material-ui/icons/PersonAdd'
 import moment from 'moment'
-
 import Profile from './Profile'
-import {
-  CONTACTS,
-  FORGOT_PASSWORD,
-  JOIN,
-  MEMBERS_DIRECTORY,
-  MY_PROFILE,
-  RESET_PASSWORD,
-  ROOT,
-  SIGN_IN,
-  USERS
-} from '../urls'
+import { CONTACTS, FORGOT_PASSWORD, JOIN, MEMBERS, MY_PROFILE, RESET_PASSWORD, ROOT, SIGN_IN, USERS } from '../urls'
 import { Link, withRouter } from 'react-router-dom'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import { useTheme } from '@material-ui/core'
@@ -115,7 +104,7 @@ function HeaderArea ({ location: { pathname }, isCurrentUserLoaded, currentUser,
       flexGrow: 1
     },
     growRight: {},
-    membersDirectory: {
+    members: {
       font: '500 12px/80px "Roboto", sans-serif',
       textTransform: 'uppercase',
       color: 'white'
@@ -206,9 +195,9 @@ function HeaderArea ({ location: { pathname }, isCurrentUserLoaded, currentUser,
 
               {
                 isMember &&
-                <Link to={MEMBERS_DIRECTORY} onClick={handleDrawerClose}>
+                <Link to={MEMBERS} onClick={handleDrawerClose}>
                   <ListItem button>
-                    <ListItemIcon><MembersDirectoryIcon color='primary' /></ListItemIcon>
+                    <ListItemIcon><MembersIcon color='primary' /></ListItemIcon>
                     <ListItemText primary='Members' className={classes.drawerLink} />
                   </ListItem>
                 </Link>
@@ -285,7 +274,7 @@ function HeaderArea ({ location: { pathname }, isCurrentUserLoaded, currentUser,
             Disabling for now until we have multiple menu item.  Only one item does not look good.
 
             !isSmallDevice &&
-            <Link to={MEMBERS_DIRECTORY} className={classes.membersDirectory}>
+            <Link to={MEMBERS} className={classes.members}>
               <div className='text-white' style={{ marginLeft: 250 }}>
                 Members
               </div>

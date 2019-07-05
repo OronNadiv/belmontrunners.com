@@ -11,7 +11,7 @@ export const USERS = '/users'
 export const CONTACTS = '/contacts'
 export const GALLERY = '/gallery'
 export const MY_PROFILE = '/myProfile'
-export const MEMBERS_DIRECTORY = '/membersDirectory'
+export const MEMBERS = '/members'
 
 // documents
 export const TOS_FILE_NAME = '2019-04-01_tos.pdf'

@@ -17,7 +17,7 @@ import {
   FORGOT_PASSWORD,
   GALLERY,
   JOIN,
-  MEMBERS_DIRECTORY,
+  MEMBERS,
   MY_PROFILE,
   RECOVER_EMAIL,
   RESET_PASSWORD,
@@ -36,7 +36,7 @@ import RecoverEmailPage from './pages/authentication/RecoverEmailPage'
 import ContactsPage from './pages/contacts-page/ContactsPage'
 import MyProfilePage from './pages/my-profile-page/MyProfilePage'
 import VerifyEmailPage from './pages/authentication/VerifyEmailPage'
-import MembersDirectoryPage from './pages/members-directory/MembersDirectoryPage'
+import MembersPage from './pages/members-page/MembersPage'
 import usePrevious from './components/usePrevious'
 import { DISPLAY_NAME, EMAIL, PHOTO_URL, UID } from './fields'
 
@@ -109,12 +109,12 @@ function App ({ fetchCurrentUser, isCurrentUserLoaded, currentUser }) {
           )}
         />
         <Route
-          path={MEMBERS_DIRECTORY}
+          path={MEMBERS}
           render={() => (
             <div>
               <HeaderArea />
               <div className={pageWrapperClassNames}>
-                <MembersDirectoryPage />
+                <MembersPage />
               </div>
               <Footer />
             </div>
