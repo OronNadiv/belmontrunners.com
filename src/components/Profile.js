@@ -1,6 +1,6 @@
 import 'firebase/auth'
 import firebase from 'firebase'
-import Avatar from '@material-ui/core/avatar'
+import Avatar from '@material-ui/core/Avatar'
 import React from 'react'
 import Divider from '@material-ui/core/Divider'
 import { CONTACTS, MEMBERS, MY_PROFILE, ROOT, USERS } from '../urls'

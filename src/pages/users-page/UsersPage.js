@@ -16,7 +16,7 @@ import SaveIcon from '@material-ui/icons/SaveAlt'
 import Switch from '@material-ui/core/Switch'
 import { connect } from 'react-redux'
 import moment from 'moment'
-import Avatar from 'react-avatar'
+import Avatar from '@material-ui/core/Avatar'
 import googleLibPhoneNumber from 'google-libphonenumber'
 import {
   ADDRESS1,
@@ -49,6 +49,7 @@ import FuzzySearch from 'fuzzy-search'
 import * as Sentry from '@sentry/browser'
 import { ExportToCsv } from 'export-to-csv'
 import SearchBox from '../../components/SearchBox'
+import initials from 'initials'
 
 const ADDRESS = 'address'
 const PNF = googleLibPhoneNumber.PhoneNumberFormat
@@ -325,8 +326,16 @@ class EnhancedTable extends Component {
                         hover
                       >
                         <TableCell>
-                          <Avatar name={row[DISPLAY_NAME]} round color='#6247ea' size={40}
-                                  src={row[PHOTO_URL]} />
+                          <Avatar style={{
+                            width: 40,
+                            height: 40,
+                            backgroundColor: 'rgb(98, 71, 234)',
+                            fontSize: 13.33333
+                          }} src={row[PHOTO_URL]}>
+                            {
+                              initials(row[DISPLAY_NAME])
+                            }
+                          </Avatar>
                         </TableCell>
                         <TableCell onClick={() => {
                           console.log('uid:', row[UID])
