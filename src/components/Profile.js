@@ -58,7 +58,7 @@ function Profile ({ allowUsersPage, allowContactsPage, isMember, userData, histo
   }
 
   const handleClose = (url) => (event) => {
-    if (anchorRef.current && anchorRef.current.contains(event.target)) {
+    if (anchorRef.current && event && anchorRef.current.contains(event.target)) {
       return
     }
     history.push(url)
@@ -115,7 +115,7 @@ function Profile ({ allowUsersPage, allowContactsPage, isMember, userData, histo
                     </MenuItem>
                   }
                   <Divider />
-                  <MenuItem onClick={() => firebase.auth().signOut() && handleClose(ROOT)()}
+                  <MenuItem onClick={(event) => firebase.auth().signOut() && handleClose(ROOT)(event)}
                             className={classes.menuItem}>
                     Sign out
                   </MenuItem>
