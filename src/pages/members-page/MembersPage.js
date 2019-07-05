@@ -19,8 +19,9 @@ import { MEMBERS, ROOT } from '../../urls'
 import SearchBox from '../../components/SearchBox'
 import Snackbar from '@material-ui/core/Snackbar'
 import CircularProgress from '@material-ui/core/CircularProgress'
+import { Map as IMap } from 'immutable'
 
-function MembersPage ({ currentUser, location: { pathname }, history }) {
+function MembersPage ({ currentUser, location: { pathname }, history, userData }) {
   const useStyles = makeStyles(() => ({
     chipAvatar: {
       width: 32,
@@ -103,10 +104,14 @@ function MembersPage ({ currentUser, location: { pathname }, history }) {
         let label = user[DISPLAY_NAME]
 
         function getColor () {
-          if (user.uid === currentUser.uid) {
+          if (user[UID] === currentUser[UID]) {
             return 'primary'
           }
           return 'default'
+        }
+
+        if (user[UID] === currentUser[UID]) {
+          user[PHOTO_URL] = userData.get(PHOTO_URL)
         }
 
         return <Chip
@@ -163,13 +168,15 @@ function MembersPage ({ currentUser, location: { pathname }, history }) {
 
 MembersPage.propTypes = {
   currentUser: PropTypes.object.isRequired,
+  userData: PropTypes.object.isRequired,
   location: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired
 }
 
-const mapStateToProps = ({ currentUser: { currentUser } }) => {
+const mapStateToProps = ({ currentUser: { currentUser, userData } }) => {
   return {
-    currentUser
+    currentUser,
+    userData: userData || new IMap()
   }
 }
 

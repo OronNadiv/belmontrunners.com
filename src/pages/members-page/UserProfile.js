@@ -36,6 +36,10 @@ import ListItemIcon from '@material-ui/core/ListItemIcon'
 import UpdateUserData from '../../components/UpdateUserData'
 import Avatar from '@material-ui/core/Avatar'
 import { makeStyles, useTheme } from '@material-ui/core/styles'
+import { linkToFacebook } from '../../utilities/linkToFacebook'
+import _ from 'underscore'
+import Snackbar from '@material-ui/core/Snackbar'
+import SnackbarContent from '@material-ui/core/SnackbarContent'
 
 const defaultVisibility = {
   [EMAIL]: ONLY_ME,
@@ -47,7 +51,7 @@ const defaultVisibility = {
 const PNF = googleLibPhoneNumber.PhoneNumberFormat
 const phoneUtil = googleLibPhoneNumber.PhoneNumberUtil.getInstance()
 
-function UserProfile ({ onClose, user, visibility, updateUserData, currentUser }) {
+function UserProfile ({ onClose, user, visibility, userData, updateUserData, currentUser }) {
   const theme = useTheme()
 
   const useStyles = makeStyles({
@@ -63,6 +67,7 @@ function UserProfile ({ onClose, user, visibility, updateUserData, currentUser }
 
   const [refs, setRefs] = useState({})
   const [openMenus, setOpenMenus] = useState({})
+  const [errorMessage, setErrorMessage] = useState('')
 
   function getPhone () {
     if (!user[PHONE]) {
@@ -159,6 +164,16 @@ function UserProfile ({ onClose, user, visibility, updateUserData, currentUser }
     }
   }
 
+  const handleLinkToFacebook = async () => {
+    try {
+      await linkToFacebook(currentUser, userData, updateUserData)
+    } catch (error) {
+      setErrorMessage('Failed to link to your Facebook account')
+    }
+  }
+
+  const connectedToFacebook = Boolean(_.findWhere(currentUser.providerData, { providerId: 'facebook.com' }))
+
   return (
     <SwipeableDrawer
       open
@@ -167,6 +182,28 @@ function UserProfile ({ onClose, user, visibility, updateUserData, currentUser }
       }}
       onClose={() => onClose()}
     >
+      {
+        errorMessage && (
+          <Snackbar
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'center'
+            }}
+            open
+            autoHideDuration={10000}
+            onClose={() => {
+              setErrorMessage('')
+            }}
+          >
+            <SnackbarContent
+              aria-describedby="client-snackbar"
+              style={{ backgroundColor: '#673ab7' }}
+              message={errorMessage}
+            />
+          </Snackbar>
+        )
+      }
+
       <div className='clearfix' style={{ minWidth: 270 }}>
         <IconButton
           className='float-left'
@@ -179,11 +216,23 @@ function UserProfile ({ onClose, user, visibility, updateUserData, currentUser }
         </IconButton>
       </div>
       <div className='mx-5'>
-        <div className='d-flex justify-content-center mb-4 align-items-center'>
-          <Avatar className={classes.avatar} src={user[PHOTO_URL]}>{initials(user[DISPLAY_NAME])}</Avatar>
-        </div>
-        <div className='d-flex justify-content-center mb-5 align-items-center'>
-          {user[DISPLAY_NAME]}
+        <div className='mb-5'>
+          <div className='d-flex justify-content-center mb-4 align-items-center'>
+            <Avatar className={classes.avatar} src={user[PHOTO_URL]}>{initials(user[DISPLAY_NAME])}</Avatar>
+          </div>
+          <div className='d-flex justify-content-center mb-4 align-items-center'>
+            {user[DISPLAY_NAME]}
+          </div>
+          {
+            currentUser[UID] === user[UID] &&
+            !connectedToFacebook &&
+            <div>
+              <small>
+                <span className='text-muted'>Missing photo? </span>
+                <span className='text-primary' style={{ cursor: 'pointer' }} onClick={handleLinkToFacebook}>Link to Facebook</span>
+              </small>
+            </div>
+          }
         </div>
         {
           getKeyVal(
@@ -232,12 +281,14 @@ UserProfile.propTypes = {
   onClose: PropTypes.func.isRequired,
   updateUserData: PropTypes.func.isRequired,
   currentUser: PropTypes.object.isRequired,
+  userData: PropTypes.object.isRequired,
   visibility: PropTypes.object.isRequired
 }
 
 const mapStateToProps = ({ currentUser: { currentUser, userData } }) => {
   return {
     currentUser,
+    userData: userData || new IMap(),
     visibility: userData ? userData.get('visibility') : new IMap()
   }
 }
