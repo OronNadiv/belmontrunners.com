@@ -209,7 +209,7 @@ function HeaderArea ({ location: { pathname }, isCurrentUserLoaded, currentUser,
                 <Link to={MEMBERS_DIRECTORY} onClick={handleDrawerClose}>
                   <ListItem button>
                     <ListItemIcon><MembersDirectoryIcon color='primary' /></ListItemIcon>
-                    <ListItemText primary='Members Directory' className={classes.drawerLink} />
+                    <ListItemText primary='Members' className={classes.drawerLink} />
                   </ListItem>
                 </Link>
               }

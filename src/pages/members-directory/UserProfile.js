@@ -34,7 +34,7 @@ import MenuItem from '@material-ui/core/MenuItem'
 import ListItemText from '@material-ui/core/ListItemText'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 import UpdateUserData from '../../components/UpdateUserData'
-import { Avatar } from '@material-ui/core'
+import Avatar from '@material-ui/core/avatar'
 import { makeStyles, useTheme } from '@material-ui/core/styles'
 
 const defaultVisibility = {

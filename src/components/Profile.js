@@ -1,6 +1,6 @@
 import 'firebase/auth'
 import firebase from 'firebase'
-import Avatar from 'react-avatar'
+import Avatar from '@material-ui/core/avatar'
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { CONTACTS, MEMBERS_DIRECTORY, MY_PROFILE, ROOT, USERS } from '../urls'
@@ -10,47 +10,127 @@ import LoggedInState from './LoggedInState'
 import { DISPLAY_NAME, MEMBERSHIP_EXPIRES_AT, PHOTO_URL, UID } from '../fields'
 import moment from 'moment'
 import { Map as IMap } from 'immutable'
+import { makeStyles } from '@material-ui/core/styles'
+import ClickAwayListener from '@material-ui/core/ClickAwayListener'
+import Grow from '@material-ui/core/Grow'
+import Paper from '@material-ui/core/Paper'
+import Popper from '@material-ui/core/Popper'
+import MenuItem from '@material-ui/core/MenuItem'
+import MenuList from '@material-ui/core/MenuList'
+import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp'
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown'
+import initials from 'initials'
 
 function Profile ({ allowUsersPage, allowContactsPage, isMember, userData }) {
+
+  const useStyles = makeStyles({
+    avatarWrapper: {
+      display: 'flex',
+      alignItems: 'center'
+    },
+    avatar: {
+      cursor: 'pointer',
+      width: 40,
+      height: 40,
+      backgroundColor: 'rgb(98, 71, 234)',
+      fontSize: 13.33333
+    },
+    carrot: {
+      cursor: 'pointer',
+      width: 18,
+      height: 18,
+      color: 'rgb(98, 71, 234)'
+    },
+    popper: {
+      zIndex: 10000
+    }
+  })
+  const classes = useStyles()
+  const anchorRef = React.useRef(null)
+  const [open, setOpen] = React.useState(false)
+
+  function handleToggle () {
+    setOpen(prevOpen => !prevOpen)
+  }
+
+  function handleClose (event) {
+    if (anchorRef.current && anchorRef.current.contains(event.target)) {
+      return
+    }
+
+    setOpen(false)
+  }
+
   userData = userData.toJS()
+
   return (
-    <span className="dropdown signout-btn text-white-50">
-        <a className="dropdown-toggle" id="dropdownMenuLink" href='/'
-           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <Avatar name={userData[DISPLAY_NAME]} round color='#6247ea' size={40}
-                  src={userData[PHOTO_URL]} />
-        </a>
-
-        <div className="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
-          <Link to={MY_PROFILE} className="dropdown-item">
-            My profile
-          </Link>
+    <>
+      <div className={classes.avatarWrapper} ref={anchorRef} onClick={handleToggle}>
+        <Avatar className={classes.avatar} src={userData[PHOTO_URL]}>
           {
-            isMember &&
-            <Link to={MEMBERS_DIRECTORY} className="dropdown-item">
-              Members
-            </Link>
+            initials(userData[DISPLAY_NAME])
           }
+        </Avatar>
+        <div>
           {
-            allowUsersPage &&
-            <Link to={USERS} className='dropdown-item'>
-              Users
-            </Link>
+            open ?
+              <ArrowDropUpIcon className={classes.carrot} /> :
+              <ArrowDropDownIcon className={classes.carrot} />
           }
-          {
-            allowContactsPage &&
-            <Link to={CONTACTS} className='dropdown-item'>
-              Contacts
-            </Link>
-          }
-          <div className="dropdown-divider" />
-
-          <Link className='dropdown-item' to={ROOT}
-                onClick={() => firebase.auth().signOut()}>
-            Sign out
-          </Link>
         </div>
-      </span>
+      </div>
+      <Popper open={open} anchorEl={anchorRef.current} transition placement='bottom-end' className={classes.popper}>
+        {({ TransitionProps }) => (
+          <Grow
+            {...TransitionProps}
+            style={{ transformOrigin: 'center top' }}
+          >
+            <Paper id="menu-list-grow">
+              <ClickAwayListener onClickAway={handleClose}>
+                <MenuList>
+                  <MenuItem onClick={handleClose}>
+                    <Link to={MY_PROFILE} className="dropdown-item">
+                      My profile
+                    </Link>
+                  </MenuItem>
+                  <MenuItem onClick={handleClose}>
+                    {
+                      isMember &&
+                      <Link to={MEMBERS_DIRECTORY} className="dropdown-item">
+                        Members
+                      </Link>
+                    }
+                  </MenuItem>
+                  <MenuItem onClick={handleClose}>
+                    {
+                      allowUsersPage &&
+                      <Link to={USERS} className='dropdown-item'>
+                        Users
+                      </Link>
+                    }
+                  </MenuItem>
+                  <MenuItem onClick={handleClose}>
+                    {
+                      allowContactsPage &&
+                      <Link to={CONTACTS} className='dropdown-item'>
+                        Contacts
+                      </Link>
+                    }
+                  </MenuItem>
+                  <div className="dropdown-divider" />
+                  <MenuItem onClick={handleClose}>
+                    <Link className='dropdown-item' to={ROOT}
+                          onClick={() => firebase.auth().signOut()}>
+                      Sign out
+                    </Link>
+                  </MenuItem>
+                </MenuList>
+              </ClickAwayListener>
+            </Paper>
+          </Grow>
+        )}
+      </Popper>
+    </>
   )
 }
 
