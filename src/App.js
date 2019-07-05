@@ -242,7 +242,7 @@ function App ({ fetchCurrentUser, isCurrentUserLoaded, currentUser }) {
         isCurrentUserLoaded &&
         <Drift
           appId='fxagpvvrufk4'
-          userId={currentUser ? currentUser[UID] : undefined}
+          userId={currentUser ? currentUser[UID] : ''}
           attributes={{
             email: currentUser && currentUser[EMAIL],
             avatar_url: currentUser && currentUser[PHOTO_URL],
