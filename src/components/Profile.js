@@ -17,8 +17,8 @@ import Paper from '@material-ui/core/Paper'
 import Popper from '@material-ui/core/Popper'
 import MenuItem from '@material-ui/core/MenuItem'
 import MenuList from '@material-ui/core/MenuList'
-import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp'
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown'
+import ArrowDropUpIcon from '@material-ui/icons/KeyboardArrowUp'
+import ArrowDropDownIcon from '@material-ui/icons/KeyboardArrowDown'
 import initials from 'initials'
 import { withRouter } from 'react-router-dom'
 
@@ -26,8 +26,9 @@ function Profile ({ allowUsersPage, allowContactsPage, isMember, userData, histo
 
   const useStyles = makeStyles({
     avatarWrapper: {
-      display: 'flex',
-      alignItems: 'center'
+      alignItems: 'center',
+      cursor: 'pointer',
+      display: 'flex'
     },
     avatar: {
       cursor: 'pointer',
@@ -37,10 +38,9 @@ function Profile ({ allowUsersPage, allowContactsPage, isMember, userData, histo
       fontSize: 13.33333
     },
     carrot: {
-      cursor: 'pointer',
-      width: 18,
-      height: 18,
-      color: 'rgb(98, 71, 234)'
+      color: '#fff',
+      height: 24,
+      width: 24
     },
     popper: {
       zIndex: 10000
