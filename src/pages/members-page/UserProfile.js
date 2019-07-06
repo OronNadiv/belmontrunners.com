@@ -51,7 +51,9 @@ const defaultVisibility = {
 const PNF = googleLibPhoneNumber.PhoneNumberFormat
 const phoneUtil = googleLibPhoneNumber.PhoneNumberUtil.getInstance()
 
-function UserProfile ({ onClose, user, visibility, userData, updateUserData, currentUser }) {
+function UserProfile ({ onClose, user, userData, updateUserData, currentUser }) {
+  userData = userData.toJS()
+  const visibility = userData.visibility || {}
   const theme = useTheme()
 
   const useStyles = makeStyles({
@@ -158,9 +160,9 @@ function UserProfile ({ onClose, user, visibility, userData, updateUserData, cur
   function handleVisibilityChanged (keys) {
     return async (val) => {
       keys.forEach(key => {
-        visibility = visibility.set(key, val)
+        visibility[key] = val
       })
-      await updateUserData({ visibility: visibility.toJS() }, { merge: true })
+      await updateUserData({ visibility }, { merge: true })
     }
   }
 
@@ -239,7 +241,7 @@ function UserProfile ({ onClose, user, visibility, userData, updateUserData, cur
             'Phone',
             getPhone(),
             <SmartPhoneIcon className='mr-2' style={{ fill: '#D2D6DB' }} />,
-            visibility.get(PHONE) || defaultVisibility[PHONE],
+            visibility[PHONE] || defaultVisibility[PHONE],
             (val) => handleVisibilityChanged([PHONE])(val)
           )
         }
@@ -248,7 +250,7 @@ function UserProfile ({ onClose, user, visibility, userData, updateUserData, cur
             'Address',
             getAddress(),
             <HomeIcon className='mr-2' style={{ fill: '#D2D6DB' }} />,
-            visibility.get(ADDRESS1) || defaultVisibility[ADDRESS1],
+            visibility[ADDRESS1] || defaultVisibility[ADDRESS1],
             (val) => handleVisibilityChanged([ADDRESS1, ADDRESS2, CITY, STATE, ZIP])(val)
           )
         }
@@ -257,7 +259,7 @@ function UserProfile ({ onClose, user, visibility, userData, updateUserData, cur
             'Email',
             user[EMAIL], // getEmail(),
             <EmailIcon className='mr-2' style={{ fill: '#D2D6DB' }} />,
-            visibility.get(EMAIL) || defaultVisibility[EMAIL],
+            visibility[EMAIL] || defaultVisibility[EMAIL],
             (val) => handleVisibilityChanged([EMAIL])(val)
           )
         }
@@ -266,7 +268,7 @@ function UserProfile ({ onClose, user, visibility, userData, updateUserData, cur
             'Birthday',
             user[DATE_OF_BIRTH] && moment(user[DATE_OF_BIRTH]).format('MMMM D'),
             <CakeIcon className='mr-2' style={{ fill: '#D2D6DB' }} />,
-            visibility.get(DATE_OF_BIRTH) || defaultVisibility[DATE_OF_BIRTH],
+            visibility[DATE_OF_BIRTH] || defaultVisibility[DATE_OF_BIRTH],
             (val) => handleVisibilityChanged([DATE_OF_BIRTH])(val)
           )
         }
@@ -281,18 +283,13 @@ UserProfile.propTypes = {
   onClose: PropTypes.func.isRequired,
   updateUserData: PropTypes.func.isRequired,
   currentUser: PropTypes.object.isRequired,
-  userData: PropTypes.object.isRequired,
-  visibility: PropTypes.object.isRequired
+  userData: PropTypes.object.isRequired
 }
 
-const mapStateToProps = ({ currentUser: { currentUser, userData } }) => {
-  userData = userData || new IMap()
-  const visibility = userData.get('visibility') || new IMap()
-
+const mapStateToProps = ({ currentUser: { currentUser, userData = new IMap() } }) => {
   return {
     currentUser,
-    userData,
-    visibility
+    userData
   }
 }
 
