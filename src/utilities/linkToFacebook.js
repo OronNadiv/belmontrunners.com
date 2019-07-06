@@ -24,7 +24,7 @@ export const linkToFacebook = async (currentUser, userData, updateUserData) => {
   }
 }
 
-export const unlinkFromFacebook = async ({ currentUser, updateUserData }) => {
+export const unlinkFromFacebook = async (currentUser, updateUserData) => {
   try {
     console.log('UnlinkFromFacebook called.')
     await currentUser.unlink('facebook.com')

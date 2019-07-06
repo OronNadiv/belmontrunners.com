@@ -65,8 +65,6 @@ function UserProfile ({ onClose, user, userData, updateUserData, currentUser }) 
   })
   const classes = useStyles()
 
-  console.log('user:', user)
-
   const [refs, setRefs] = useState({})
   const [openMenus, setOpenMenus] = useState({})
   const [errorMessage, setErrorMessage] = useState('')

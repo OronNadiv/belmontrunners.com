@@ -1,5 +1,4 @@
 import 'firebase/auth'
-import firebase from 'firebase'
 import { Map as IMap } from 'immutable'
 import React, { useState } from 'react'
 import * as PropTypes from 'prop-types'
@@ -12,8 +11,9 @@ import Button from '@material-ui/core/Button'
 import Snackbar from '@material-ui/core/Snackbar'
 import IconButton from '@material-ui/core/IconButton'
 import CloseIcon from '@material-ui/icons/Close'
-import { PHOTO_URL } from '../../fields'
 import UpdateUserData from '../../components/HOC/UpdateUserData'
+import { linkToFacebook, unlinkFromFacebook } from '../../utilities/linkToFacebook'
+import * as Sentry from '@sentry/browser'
 
 function MyProfileFacebook ({ updateUserData, currentUser, userData, onSubmitting }) {
   userData = userData.toJS()
@@ -22,24 +22,11 @@ function MyProfileFacebook ({ updateUserData, currentUser, userData, onSubmittin
 
   const handleLinkToFacebook = async () => {
     try {
-      console.log('handleLinkToFacebook called.')
-      await currentUser.linkWithPopup(new firebase.auth.FacebookAuthProvider())
-
-      let photoUrl = userData[PHOTO_URL]
-      if (!photoUrl) {
-        const foundProviderData = currentUser.providerData.find(({ photoURL }) => {
-          return Boolean(photoURL)
-        })
-        if (foundProviderData) {
-          photoUrl = foundProviderData[PHOTO_URL]
-        }
-      }
-      // doing this in order to trigger an update.
       onSubmitting(true)
-      await updateUserData({ [PHOTO_URL]: photoUrl }, { merge: true })
-    } catch (err) {
-      console.log('err:', err)
-      setLinkWithProviderErrorMessage('Connection failed')
+      await linkToFacebook(currentUser, userData, updateUserData)
+    } catch (error) {
+      Sentry.captureException(error)
+      setLinkWithProviderErrorMessage('Failed to link to your Facebook account')
     } finally {
       onSubmitting(false)
     }
@@ -47,20 +34,11 @@ function MyProfileFacebook ({ updateUserData, currentUser, userData, onSubmittin
 
   const handleUnlinkToFacebook = async () => {
     try {
-      console.log('handleUnlinkToFacebook called.')
-      await currentUser.unlink('facebook.com')
-      const foundProviderData = currentUser.providerData.find(({ photoURL }) => {
-        return Boolean(photoURL)
-      })
-      const photoUrl = foundProviderData ? foundProviderData[PHOTO_URL] : null
-      console.log('foundProviderData :', foundProviderData)
-      console.log('photoUrl :', photoUrl)
-      // doing this in order to trigger an update.
       onSubmitting(true)
-      await updateUserData({ [PHOTO_URL]: photoUrl }, { merge: true })
-    } catch (err) {
-      console.log('err:', err)
-      setLinkWithProviderErrorMessage('Disconnection failed')
+      await unlinkFromFacebook(currentUser, updateUserData)
+    } catch (error) {
+      Sentry.captureException(error)
+      setLinkWithProviderErrorMessage('Failed to unlink from your Facebook account')
     } finally {
       onSubmitting(false)
     }
