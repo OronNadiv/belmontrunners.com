@@ -114,7 +114,7 @@ function EventSchedule () {
         </div>
         {
           loadMoreClicked <= 2 && filteredEvents.length < events.length &&
-          <div className='d-flex justify-content-center'>
+          <div className='d-flex justify-content-center bounce'>
             <IconButton
               onClick={() => {
                 setLoadMoreClicked(loadMoreClicked + 1)
