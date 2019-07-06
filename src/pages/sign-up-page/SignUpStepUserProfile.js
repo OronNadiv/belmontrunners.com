@@ -3,14 +3,14 @@ import React, { useEffect, useState } from 'react'
 import * as PropTypes from 'prop-types'
 import { Form } from 'react-final-form'
 import SignUpStepperButton from './SignUpStepperButton'
-import LoggedInState from '../../components/LoggedInState'
+import LoggedInState from '../../components/HOC/LoggedInState'
 import { connect } from 'react-redux'
 import { ADDRESS1, ADDRESS2, CITY, DATE_OF_BIRTH, GENDER, PHONE, STATE, ZIP } from '../../fields'
 import { DatePicker, MuiPickersUtilsProvider } from "material-ui-pickers"
 import MomentUtils from '@date-io/moment'
-import _ from 'underscore'
+import { compose, pick } from 'underscore'
 import UserDetails from '../../components/UserDetails'
-import UpdateUserData from '../../components/UpdateUserData'
+import UpdateUserData from '../../components/HOC/UpdateUserData'
 import { goToTop } from 'react-scrollable-anchor'
 
 const SignUpStepUserProfile = ({ onNextClicked, userData, isLast, isCurrentUserLoaded, updateUserData }) => {
@@ -34,7 +34,7 @@ const SignUpStepUserProfile = ({ onNextClicked, userData, isLast, isCurrentUserL
     goToTop()
   })
 
-  const initialValues = _.pick(userData, ADDRESS1, ADDRESS2, CITY, DATE_OF_BIRTH, GENDER, PHONE, STATE, ZIP)
+  const initialValues = pick(userData, ADDRESS1, ADDRESS2, CITY, DATE_OF_BIRTH, GENDER, PHONE, STATE, ZIP)
   return !isCurrentUserLoaded ?
     '' :
     <Form
@@ -103,7 +103,8 @@ const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, userData } }) => 
   }
 }
 
-export default UpdateUserData(LoggedInState({
-  name: 'SignUpStepUserProfile',
-  isRequiredToBeLoggedIn: true
-})(connect(mapStateToProps)(SignUpStepUserProfile)))
+export default compose(
+  UpdateUserData,
+  LoggedInState(),
+  connect(mapStateToProps)
+)(SignUpStepUserProfile)

@@ -40,7 +40,24 @@ import MembersPage from './pages/members-page/MembersPage'
 import usePrevious from './components/usePrevious'
 import { DISPLAY_NAME, EMAIL, PHOTO_URL, UID } from './fields'
 
-const pageWrapperClassNames = 'mb-4 mx-1 mx-sm-2 mx-md-3'
+function Wrapper (props = {}) {
+
+  return (
+    <>
+      <HeaderArea />
+      {props.inHomePage && <HomePage />}
+      {props.inHomePage && props.children}
+
+      {!props.inHomePage && <div className='mb-4 mx-1 mx-sm-2 mx-md-3'> {props.children} </div>}
+      <Footer />
+    </>
+  )
+}
+
+Wrapper.propTypes = {
+  inHomePage: PropTypes.bool,
+  children: PropTypes.element
+}
 
 function App ({ fetchCurrentUser, isCurrentUserLoaded, currentUser }) {
   useEffect(fetchCurrentUser, [])
@@ -73,169 +90,115 @@ function App ({ fetchCurrentUser, isCurrentUserLoaded, currentUser }) {
       <Switch>
         <Route
           exact
-          path={SIGN_IN}
-          render={() => (
-            <div>
-              <HeaderArea />
-              <HomePage />
-              <Footer />
-
-              <SignIn />
-            </div>
-          )}
-        />
-        <Route
-          exact
           path={JOIN}
           render={() => (
-            <div>
-              <HeaderArea />
-              <div className={pageWrapperClassNames}>
-                <SignUpPage />
-              </div>
-              <Footer />
-            </div>
+            <Wrapper>
+              <SignUpPage />
+            </Wrapper>
           )}
         />
         <Route
           exact
           path={MY_PROFILE}
           render={() => (
-            <div>
-              <HeaderArea />
-              <div className={pageWrapperClassNames}>
-                <MyProfilePage />
-              </div>
-              <Footer />
-            </div>
+            <Wrapper>
+              <MyProfilePage />
+            </Wrapper>
           )}
         />
         <Route
           path={MEMBERS}
           render={() => (
-            <div>
-              <HeaderArea />
-              <div className={pageWrapperClassNames}>
-                <MembersPage />
-              </div>
-              <Footer />
-            </div>
+            <Wrapper>
+              <MembersPage />
+            </Wrapper>
           )}
         />
         <Route
           exact
           path={USERS}
           render={() => (
-            <div>
-              <HeaderArea />
-              <div className={pageWrapperClassNames}>
-                <UsersPage />
-              </div>
-              <Footer />
-            </div>
+            <Wrapper>
+              <UsersPage />
+            </Wrapper>
           )}
         />
         <Route
           exact
           path={CONTACTS}
           render={() => (
-            <div>
-              <HeaderArea />
-              <div className={pageWrapperClassNames}>
-                <ContactsPage />
-              </div>
-              <Footer />
-            </div>
+            <Wrapper>
+              <ContactsPage />
+            </Wrapper>
           )}
         />
         <Route
           exact
           path={GALLERY}
           render={() => (
-            <div>
-              <HeaderArea />
-              <div className={pageWrapperClassNames}>
-                <GalleryPage />
-              </div>
-              <Footer />
-            </div>
+            <Wrapper>
+              <GalleryPage />
+            </Wrapper>
+          )}
+        />
+        <Route
+          exact
+          path={SIGN_IN}
+          render={() => (
+            <Wrapper inHomePage>
+              <SignIn />
+            </Wrapper>
           )}
         />
         <Route
           exact
           path={FORGOT_PASSWORD}
           render={() => (
-            <div>
-              <HeaderArea />
-              <HomePage />
-              <Footer />
-
+            <Wrapper inHomePage>
               <ForgotPasswordPage />
-            </div>
+            </Wrapper>
           )}
         />
         <Route
           exact
           path={COMPLETE}
           render={() => (
-            <div>
-              <HeaderArea />
-              <HomePage />
-              <Footer />
-
+            <Wrapper inHomePage>
               <Complete />
-            </div>
+            </Wrapper>
           )}
         />
         <Route
           exact
           path={RESET_PASSWORD}
           render={() => (
-            <div>
-              <HeaderArea />
-              <HomePage />
-              <Footer />
-
+            <Wrapper inHomePage>
               <ResetPasswordPage />
-            </div>
+            </Wrapper>
           )}
         />
         <Route
           exact
           path={RECOVER_EMAIL}
           render={() => (
-            <div>
-              <HeaderArea />
-              <HomePage />
-              <Footer />
-
+            <Wrapper inHomePage>
               <RecoverEmailPage />
-            </div>
+            </Wrapper>
           )}
         />
         <Route
           exact
           path={VERIFY_EMAIL}
           render={() => (
-            <div>
-              <HeaderArea />
-              <HomePage />
-              <Footer />
-
+            <Wrapper inHomePage>
               <VerifyEmailPage />
-            </div>
+            </Wrapper>
           )}
         />
 
         <Route
           path={ROOT}
-          render={() => (
-            <div>
-              <HeaderArea />
-              <HomePage />
-              <Footer />
-            </div>
-          )}
+          render={() => <Wrapper inHomePage />}
         />
       </Switch>
       {

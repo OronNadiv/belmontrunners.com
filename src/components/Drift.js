@@ -4,6 +4,7 @@ import * as PropTypes from "prop-types"
 import { Map as IMap } from 'immutable'
 
 const Drift = ({ appId, config, userId, attributes }) => {
+  userId = userId || ''
   config = new IMap(config)
   attributes = new IMap(attributes)
   const insertScript = (scriptText) => {

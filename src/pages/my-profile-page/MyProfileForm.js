@@ -6,12 +6,12 @@ import { Form } from 'react-final-form'
 import { connect } from 'react-redux'
 import { ADDRESS1, ADDRESS2, CITY, DATE_OF_BIRTH, GENDER, PHONE, STATE, ZIP } from '../../fields'
 import { sendEmailVerification as sendEmailVerificationAction } from '../../reducers/currentUser'
-import _ from 'underscore'
+import { compose, pick } from 'underscore'
 import UserDetails from '../../components/UserDetails'
 import { ROOT } from '../../urls'
 import Button from '@material-ui/core/Button'
 import { withRouter } from 'react-router-dom'
-import UpdateUserData from '../../components/UpdateUserData'
+import UpdateUserData from '../../components/HOC/UpdateUserData'
 
 function MyProfileForm ({ updateUserData, currentUser, userData, history, isSubmitting, onSubmitting }) {
   userData = userData.toJS()
@@ -34,7 +34,7 @@ function MyProfileForm ({ updateUserData, currentUser, userData, history, isSubm
     history.push(ROOT)
   }
 
-  const initialValues = _.pick(userData, ADDRESS1, ADDRESS2, CITY, DATE_OF_BIRTH, GENDER, PHONE, STATE, ZIP)
+  const initialValues = pick(userData, ADDRESS1, ADDRESS2, CITY, DATE_OF_BIRTH, GENDER, PHONE, STATE, ZIP)
 
   return currentUser &&
     <>
@@ -97,6 +97,8 @@ const mapStateToProps = ({ currentUser: { currentUser, userData } }) => {
   }
 }
 
-export default withRouter(
-  UpdateUserData(
-    connect(mapStateToProps, mapDispatchToProps)(MyProfileForm)))
+export default compose(
+  UpdateUserData,
+  withRouter,
+  connect(mapStateToProps, mapDispatchToProps)
+)(MyProfileForm)

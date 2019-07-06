@@ -9,7 +9,7 @@ import IconButton from '@material-ui/core/IconButton'
 import AddIcon from '@material-ui/icons/AddCircle'
 import CopyIcon from '@material-ui/icons/FileCopy'
 import * as PropTypes from 'prop-types'
-import LoggedInState from '../../components/LoggedInState'
+import LoggedInState from '../../components/HOC/LoggedInState'
 import { connect } from 'react-redux'
 import Typography from '@material-ui/core/Typography'
 import normalizeEmail from 'normalize-email'
@@ -27,6 +27,7 @@ import { ExportToCsv } from 'export-to-csv'
 import { parseFullName } from 'parse-full-name'
 import SaveIcon from '@material-ui/icons/SaveAlt'
 import SearchBox from '../../components/SearchBox'
+import { compose } from 'underscore'
 
 const IS_MEMBER = 'isMember'
 
@@ -391,7 +392,7 @@ const mapStateToProps = ({ currentUser: { permissions, currentUser } }) => {
   }
 }
 
-export default LoggedInState({
-  name: 'ContactsPage',
-  isRequiredToBeLoggedIn: true
-})(connect(mapStateToProps)(ContactsPage))
+export default compose(
+  LoggedInState(),
+  connect(mapStateToProps)
+)(ContactsPage)

@@ -4,7 +4,7 @@ import { Map as IMap } from 'immutable'
 import React, { useState } from 'react'
 import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import _ from 'underscore'
+import { compose, findWhere } from 'underscore'
 import Card from '@material-ui/core/Card'
 import CardContent from '@material-ui/core/CardContent'
 import Typography from '@material-ui/core/Typography'
@@ -13,7 +13,7 @@ import Snackbar from '@material-ui/core/Snackbar'
 import IconButton from '@material-ui/core/IconButton'
 import CloseIcon from '@material-ui/icons/Close'
 import { PHOTO_URL } from '../../fields'
-import UpdateUserData from '../../components/UpdateUserData'
+import UpdateUserData from '../../components/HOC/UpdateUserData'
 
 function MyProfileFacebook ({ updateUserData, currentUser, userData, onSubmitting }) {
   userData = userData.toJS()
@@ -66,7 +66,7 @@ function MyProfileFacebook ({ updateUserData, currentUser, userData, onSubmittin
     }
   }
 
-  const connectedToFacebook = Boolean(_.findWhere(currentUser.providerData, { providerId: 'facebook.com' }))
+  const connectedToFacebook = Boolean(findWhere(currentUser.providerData, { providerId: 'facebook.com' }))
 
   return currentUser &&
     <div id='my-profile-facebook'>
@@ -143,4 +143,7 @@ const mapStateToProps = ({ currentUser: { currentUser, userData } }) => {
   }
 }
 
-export default UpdateUserData(connect(mapStateToProps)(MyProfileFacebook))
+export default compose(
+  UpdateUserData,
+  connect(mapStateToProps)
+)(MyProfileFacebook)

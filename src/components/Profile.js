@@ -6,7 +6,7 @@ import Divider from '@material-ui/core/Divider'
 import { CONTACTS, MEMBERS, MY_PROFILE, ROOT, USERS } from '../urls'
 import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import LoggedInState from './LoggedInState'
+import LoggedInState from './HOC/LoggedInState'
 import { DISPLAY_NAME, MEMBERSHIP_EXPIRES_AT, PHOTO_URL, UID } from '../fields'
 import moment from 'moment'
 import { Map as IMap } from 'immutable'
@@ -21,6 +21,7 @@ import ArrowDropUpIcon from '@material-ui/icons/KeyboardArrowUp'
 import ArrowDropDownIcon from '@material-ui/icons/KeyboardArrowDown'
 import initials from 'initials'
 import { withRouter } from 'react-router-dom'
+import { compose } from 'underscore'
 
 function Profile ({ allowUsersPage, allowContactsPage, isMember, userData, history }) {
 
@@ -151,7 +152,9 @@ const mapStateToProps = ({ currentUser: { permissions, currentUser, userData } }
   }
 }
 
-export default withRouter(LoggedInState({
-  name: 'profile',
-  isRequiredToBeLoggedIn: true
-})(connect(mapStateToProps)(Profile)))
+export default compose(
+  withRouter,
+  LoggedInState({ name: 'Profile' }),
+  connect(mapStateToProps)
+)(Profile)
+

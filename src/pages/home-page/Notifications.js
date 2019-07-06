@@ -9,8 +9,9 @@ import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import SnackbarContent from '@material-ui/core/SnackbarContent'
 import * as Sentry from '@sentry/browser'
-import UpdateUserData from '../../components/UpdateUserData'
+import UpdateUserData from '../../components/HOC/UpdateUserData'
 import { Map as IMap } from 'immutable'
+import { compose } from 'underscore'
 
 const POPUP_PAY_MEMBERSHIP_SNOOZED_AT = 'popupPayMembershipSnoozedAt'
 const POPUP_RECEIVED_SHIRT_AT = 'popupReceivedShirtSnoozedAt'
@@ -212,4 +213,7 @@ const mapStateToProps = ({ currentUser: { currentUser, userData } }) => {
   }
 }
 
-export default UpdateUserData(connect(mapStateToProps)(Notifications))
+export default compose(
+  UpdateUserData,
+  connect(mapStateToProps)
+)(Notifications)

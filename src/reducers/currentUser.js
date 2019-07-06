@@ -3,6 +3,7 @@ import Promise from 'bluebird'
 import * as Sentry from '@sentry/browser'
 import moment from 'moment'
 import { fromJS } from 'immutable'
+import { UID } from '../fields'
 
 const PREFIX = 'CURRENT_USER'
 
@@ -16,7 +17,7 @@ export const USER_DATA_UPDATE_FAILURE = `${PREFIX}USER_DATA_UPDATE_FAILURE`
 let isRegistered
 
 const fetchUserData = async () => {
-  const userRef = firebase.firestore().doc(`users/${firebase.auth().currentUser.uid}`)
+  const userRef = firebase.firestore().doc(`users/${firebase.auth().currentUser[UID]}`)
   const userDoc = await userRef.get()
   const userData = userDoc.data() || {}
   return userData
@@ -130,7 +131,7 @@ export const updateUserData = (values, options = { merge: true }, context) => {
       type: USER_DATA_UPDATE_REQUEST,
       context
     })
-    const userRef = firebase.firestore().doc(`users/${firebase.auth().currentUser.uid}`)
+    const userRef = firebase.firestore().doc(`users/${firebase.auth().currentUser[UID]}`)
     try {
       await userRef.set(values, options)
       const userData = await fetchUserData()
@@ -188,7 +189,7 @@ const ACTION_HANDLERS = {
   },
 
 
-  [USER_DATA_UPDATE_REQUEST]: (state = initialState, {context}) => {
+  [USER_DATA_UPDATE_REQUEST]: (state = initialState, { context }) => {
     state = {
       ...state,
       userDataUpdating: true,

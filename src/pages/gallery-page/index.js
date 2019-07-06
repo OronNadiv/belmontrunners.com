@@ -4,7 +4,7 @@ import firebase from 'firebase'
 import React, { useEffect, useState } from "react"
 import SelectFileButton from './SelectFileButton'
 import Button from '@material-ui/core/Button'
-import _ from 'underscore'
+import { filter, groupBy, map } from 'underscore'
 import Promise from 'bluebird'
 import moment from 'moment'
 import DailyGallery from './DailyGallery'
@@ -54,8 +54,8 @@ function App () {
         }
       })
       console.log('photos', photos)
-      photos = _.filter(photos, x => !!x.src)
-      const groupedPhotos = _.groupBy(photos, (item) => {
+      photos = filter(photos, x => !!x.src)
+      const groupedPhotos = groupBy(photos, (item) => {
         const res = moment(item.createdAt).local().format('YYYY-MM-DD')
         // console.log('createdAt:', item.createdAt, 'res:', res)
         delete item.createdAt
@@ -170,7 +170,7 @@ function App () {
         )}
       />
       {
-        _.map(items, (innerItems, date, index) => (
+        map(items, (innerItems, date) => (
           <DailyGallery key={date} date={moment(date, 'YYYY-MM-DD').format('LL')} items={innerItems} />
         ))
       }

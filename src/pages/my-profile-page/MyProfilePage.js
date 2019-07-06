@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import * as PropTypes from 'prop-types'
-import LoggedInState from '../../components/LoggedInState'
+import LoggedInState from '../../components/HOC/LoggedInState'
 import { connect } from 'react-redux'
 import { sendEmailVerification as sendEmailVerificationAction } from '../../reducers/currentUser'
 import MyProfileForm from './MyProfileForm'
 import MyProfileChangePassword from './MyProfileChangePassword'
 import MyProfileFacebook from './MyProfileFacebook'
 import { goToTop } from 'react-scrollable-anchor'
+import { compose } from 'underscore'
 
 function MyProfilePage ({ currentUser }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -41,7 +42,7 @@ const mapStateToProps = ({ currentUser: { currentUser } }) => {
   }
 }
 
-export default LoggedInState({
-  name: 'MyProfilePage',
-  isRequiredToBeLoggedIn: true
-})(connect(mapStateToProps, mapDispatchToProps)(MyProfilePage))
+export default compose(
+  LoggedInState(),
+  connect(mapStateToProps, mapDispatchToProps)
+)(MyProfilePage)

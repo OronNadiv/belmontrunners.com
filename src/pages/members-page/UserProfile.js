@@ -33,11 +33,11 @@ import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
 import ListItemText from '@material-ui/core/ListItemText'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
-import UpdateUserData from '../../components/UpdateUserData'
+import UpdateUserData from '../../components/HOC/UpdateUserData'
 import Avatar from '@material-ui/core/Avatar'
 import { makeStyles, useTheme } from '@material-ui/core/styles'
 import { linkToFacebook } from '../../utilities/linkToFacebook'
-import _ from 'underscore'
+import { findWhere } from 'underscore'
 import Snackbar from '@material-ui/core/Snackbar'
 import SnackbarContent from '@material-ui/core/SnackbarContent'
 
@@ -172,7 +172,7 @@ function UserProfile ({ onClose, user, visibility, userData, updateUserData, cur
     }
   }
 
-  const connectedToFacebook = Boolean(_.findWhere(currentUser.providerData, { providerId: 'facebook.com' }))
+  const connectedToFacebook = Boolean(findWhere(currentUser.providerData, { providerId: 'facebook.com' }))
 
   return (
     <SwipeableDrawer

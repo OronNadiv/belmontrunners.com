@@ -5,7 +5,7 @@ import { CardElement, injectStripe } from 'react-stripe-elements'
 import SignUpStepperButton from './SignUpStepperButton'
 import './Stripe.scss'
 import * as PropTypes from 'prop-types'
-import LoggedInState from '../../components/LoggedInState'
+import LoggedInState from '../../components/HOC/LoggedInState'
 import moment from 'moment'
 import Promise from 'bluebird'
 import { ROOT } from '../../urls'
@@ -13,8 +13,9 @@ import { connect } from 'react-redux'
 import { DATE_OF_BIRTH, MEMBERSHIP_EXPIRES_AT } from '../../fields'
 import * as Sentry from '@sentry/browser'
 import { withRouter } from 'react-router-dom'
-import UpdateUserData from '../../components/UpdateUserData'
+import UpdateUserData from '../../components/HOC/UpdateUserData'
 import { goToTop } from 'react-scrollable-anchor'
+import { compose } from 'underscore'
 
 const MEMBERSHIP_FEE_ADULT = 25
 const MEMBERSHIP_FEE_KID = 15
@@ -287,10 +288,10 @@ const mapStateToProps = ({ currentUser: { currentUser, userData } }) => {
   }
 }
 
-export default UpdateUserData(
-  withRouter(
-    injectStripe(
-      LoggedInState({
-        name: 'SignUpStepPayment',
-        isRequiredToBeLoggedIn: true
-      })(connect(mapStateToProps)(SignUpStepPayment)))))
+export default compose(
+  UpdateUserData,
+  withRouter,
+  injectStripe,
+  LoggedInState(),
+  connect(mapStateToProps)
+)(SignUpStepPayment)

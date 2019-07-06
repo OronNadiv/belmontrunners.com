@@ -13,13 +13,14 @@ import * as PropTypes from 'prop-types'
 import SignUpStepperButton from './SignUpStepperButton'
 import Promise from 'bluebird'
 import s from 'underscore.string'
-import LoggedInState from '../../components/LoggedInState'
+import LoggedInState from '../../components/HOC/LoggedInState'
 import { PRIVACY_POLICY, PRIVACY_POLICY_FILE_NAME, TOS, TOS_FILE_NAME, WAVER, WAVER_FILE_NAME } from '../../urls'
 import moment from 'moment'
 import * as Sentry from '@sentry/browser'
 import { Field, Form } from 'react-final-form'
-import { DISPLAY_NAME, EMAIL, PASSWORD } from '../../fields'
+import { DISPLAY_NAME, EMAIL, PASSWORD, UID } from '../../fields'
 import { goToTop } from 'react-scrollable-anchor'
+import { compose } from 'underscore'
 
 const required = value => (value ? undefined : 'Required')
 const isEmail = value => (!value || !isEmailComponent.validate(value) ? INVALID_EMAIL : undefined)
@@ -71,7 +72,7 @@ function SignUpStepAuth ({ onNextClicked, isLast }) {
     }
     try {
       await promise
-      const userRef = firebase.firestore().doc(`users/${firebase.auth().currentUser.uid}`)
+      const userRef = firebase.firestore().doc(`users/${firebase.auth().currentUser[UID]}`)
       const doc = await userRef.get()
       let values = {}
       if (!doc.exists) {
@@ -226,8 +227,6 @@ SignUpStepAuth.propTypes = {
   onNextClicked: PropTypes.func.isRequired
 }
 
-export default LoggedInState({
-  name: 'SignUpStepAuth',
-  isRequiredToBeLoggedIn: false,
-  canSwitchToLogin: true
-})(SignUpStepAuth)
+export default compose(
+  LoggedInState({ isRequiredToBeLoggedIn: false })
+)(SignUpStepAuth)

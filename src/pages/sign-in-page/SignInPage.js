@@ -18,11 +18,12 @@ import DialogContent from '@material-ui/core/DialogContent'
 import DialogActions from '@material-ui/core/DialogActions'
 import Button from '@material-ui/core/Button'
 import { FORGOT_PASSWORD, ROOT } from '../../urls'
-import LoggedInState from '../../components/LoggedInState'
+import LoggedInState from '../../components/HOC/LoggedInState'
 import * as Sentry from '@sentry/browser'
 import { Field, Form } from 'react-final-form'
 import { EMAIL, PASSWORD } from '../../fields'
 import { goToTop } from 'react-scrollable-anchor'
+import { compose } from 'underscore'
 
 const providerGoogle = new firebase.auth.GoogleAuthProvider()
 const providerFacebook = new firebase.auth.FacebookAuthProvider()
@@ -40,7 +41,7 @@ function SignInPage ({ history }) {
   useEffect(() => {
     goToTop()
   }, [])
-  
+
   useEffect(() => {
     errorMessage && goToTop()
   }, [errorMessage])
@@ -89,7 +90,7 @@ function SignInPage ({ history }) {
 
     try {
       await promise
-      setIsSignedIn(false)
+      setIsSignedIn(true)
     } catch (error) {
       console.log('error while signing in', error)
       setIsSignedIn(false)
@@ -206,4 +207,7 @@ SignInPage.propTypes = {
   history: PropTypes.object.isRequired
 }
 
-export default withRouter(LoggedInState({ name: 'SignIn', isRequiredToBeLoggedIn: false })(SignInPage))
+export default compose(
+  withRouter,
+  LoggedInState({ isRequiredToBeLoggedIn: false})
+)(SignInPage)

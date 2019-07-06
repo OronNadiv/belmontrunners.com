@@ -38,7 +38,7 @@ import {
   ZIP
 } from '../../fields'
 import { Checkbox } from '@material-ui/core'
-import LoggedInState from '../../components/LoggedInState'
+import LoggedInState from '../../components/HOC/LoggedInState'
 import { ROOT } from '../../urls'
 import { Redirect } from 'react-router-dom'
 import s from 'underscore.string'
@@ -50,6 +50,7 @@ import * as Sentry from '@sentry/browser'
 import { ExportToCsv } from 'export-to-csv'
 import SearchBox from '../../components/SearchBox'
 import initials from 'initials'
+import { compose } from 'underscore'
 
 const ADDRESS = 'address'
 const PNF = googleLibPhoneNumber.PhoneNumberFormat
@@ -428,14 +429,14 @@ EnhancedTable.propTypes = {
 
 const mapStateToProps = ({ currentUser: { permissions, currentUser } }) => {
   return {
-    allowRead: !!currentUser && !!permissions.usersRead[currentUser.uid],
-    allowWrite: !!currentUser && !!permissions.usersWrite[currentUser.uid],
-    allowDelete: !!currentUser && !!permissions.usersDelete[currentUser.uid],
+    allowRead: !!currentUser && !!permissions.usersRead[currentUser[UID]],
+    allowWrite: !!currentUser && !!permissions.usersWrite[currentUser[UID]],
+    allowDelete: !!currentUser && !!permissions.usersDelete[currentUser[UID]],
     currentUser: currentUser || {}
   }
 }
 
-export default LoggedInState({
-  name: 'usersPage',
-  isRequiredToBeLoggedIn: true
-})(connect(mapStateToProps)(EnhancedTable))
+export default compose(
+  LoggedInState(),
+  connect(mapStateToProps)
+)(EnhancedTable)

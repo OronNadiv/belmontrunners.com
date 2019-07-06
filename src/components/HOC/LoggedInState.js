@@ -1,18 +1,23 @@
 import React, { useEffect, useState } from 'react'
 import { Redirect } from 'react-router-dom'
-import { ROOT } from '../urls'
+import { ROOT } from '../../urls'
 import { connect } from 'react-redux'
 import * as PropTypes from 'prop-types'
 
-const outer = ({ name, isRequiredToBeLoggedIn, canSwitchToLogin }) => {
-  const inner = (WrappedComponent) => {
-    const HOC = (props) => {
-      const { isCurrentUserLoaded, currentUser } = props
+const LoggedInState = (params = {}) => {
+  let { name, isRequiredToBeLoggedIn = true, canSwitchToLogin = true } = params
+  isRequiredToBeLoggedIn = !!isRequiredToBeLoggedIn
+  canSwitchToLogin = !!canSwitchToLogin
+
+  return (WrappedComponent) => {
+    const Inner = (props) => {
+      // name = name || WrappedComponent.name
+      const { ___isCurrentUserLoaded___, ___currentUser___ } = props
       const [redirectToRoot, setRedirectToRoot] = useState(null)
 
       const [initialIsLoggedIn, setInitialIsLoggedIn] = useState(null)
       useEffect(() => {
-        if (!isCurrentUserLoaded) {
+        if (!___isCurrentUserLoaded___) {
           console.log(`user hasn't been fetched yet.`)
           return
         }
@@ -20,13 +25,13 @@ const outer = ({ name, isRequiredToBeLoggedIn, canSwitchToLogin }) => {
 
         if (initialIsLoggedIn === null) {
           // save state login for later
-          setInitialIsLoggedIn(!!currentUser)
+          setInitialIsLoggedIn(!!___currentUser___)
         }
-      }, [currentUser, initialIsLoggedIn, isCurrentUserLoaded])
+      }, [___currentUser___, initialIsLoggedIn, ___isCurrentUserLoaded___])
 
       useEffect(() => {
         console.log('checkLoginState called.  name:', name)
-        if (!isCurrentUserLoaded) {
+        if (!___isCurrentUserLoaded___) {
           console.log(`user hasn't been fetched yet.`)
           return
         }
@@ -36,9 +41,8 @@ const outer = ({ name, isRequiredToBeLoggedIn, canSwitchToLogin }) => {
         }
 
         console.log('user has been fetched.')
-        const isLoggedIn = !!currentUser
+        const isLoggedIn = !!___currentUser___
 
-        isRequiredToBeLoggedIn = !!isRequiredToBeLoggedIn
         if (isLoggedIn === isRequiredToBeLoggedIn) {
           console.log('state is as expected',
             'initialIsLoggedIn', initialIsLoggedIn,
@@ -49,7 +53,6 @@ const outer = ({ name, isRequiredToBeLoggedIn, canSwitchToLogin }) => {
         }
 
         // state is not as expected
-        canSwitchToLogin = !!canSwitchToLogin
         if (!canSwitchToLogin) {
           console.log('cannot switch to a valid state.  that means redirect to root.')
           setRedirectToRoot(true)
@@ -65,14 +68,14 @@ const outer = ({ name, isRequiredToBeLoggedIn, canSwitchToLogin }) => {
 
         console.log('user switched state to not logged in and it\'s not allowed.')
         return setRedirectToRoot(true)
-      }, [currentUser, initialIsLoggedIn, isCurrentUserLoaded, redirectToRoot])
+      }, [___currentUser___, initialIsLoggedIn, ___isCurrentUserLoaded___, redirectToRoot])
 
-      if (!isCurrentUserLoaded || redirectToRoot === null) {
+      if (!___isCurrentUserLoaded___ || redirectToRoot === null) {
         return '' // todo: better to show loading spinner
       }
       const filteredProps = { ...props }
-      delete filteredProps.currentUser
-      delete filteredProps.isCurrentUserLoaded
+      delete filteredProps.___currentUser___
+      delete filteredProps.___isCurrentUserLoaded___
 
       return redirectToRoot ?
         <Redirect to={ROOT} /> :
@@ -81,23 +84,22 @@ const outer = ({ name, isRequiredToBeLoggedIn, canSwitchToLogin }) => {
 
     const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, currentUser } }) => {
       return {
-        isCurrentUserLoaded,
-        currentUser
+        ___isCurrentUserLoaded___: isCurrentUserLoaded,
+        ___currentUser___: currentUser
       }
     }
-    HOC.propTypes = {
-      isCurrentUserLoaded: PropTypes.bool.isRequired,
-      currentUser: PropTypes.object
+    Inner.propTypes = {
+      ___isCurrentUserLoaded___: PropTypes.bool.isRequired,
+      ___currentUser___: PropTypes.object
     }
-    return connect(mapStateToProps)(HOC)
+    return connect(mapStateToProps)(Inner)
   }
-  return inner
 }
 
-outer.propTypes = {
+LoggedInState.propTypes = {
   name: PropTypes.string.isRequired,
   isRequiredToBeLoggedIn: PropTypes.bool.isRequired,
   canSwitchToLogin: PropTypes.bool
 }
 
-export default outer
+export default LoggedInState

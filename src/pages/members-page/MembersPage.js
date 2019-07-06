@@ -10,11 +10,11 @@ import Paper from '@material-ui/core/Paper'
 import DirectionsRun from '@material-ui/icons/DirectionsRun'
 import Avatar from '@material-ui/core/Avatar'
 import FuzzySearch from 'fuzzy-search'
-import LoggedInState from '../../components/LoggedInState'
+import LoggedInState from '../../components/HOC/LoggedInState'
 import UserProfile from './UserProfile'
 import { makeStyles } from '@material-ui/core'
 import { withRouter } from 'react-router-dom'
-import _ from 'underscore'
+import { compose, findWhere } from 'underscore'
 import { MEMBERS, ROOT } from '../../urls'
 import SearchBox from '../../components/SearchBox'
 import Snackbar from '@material-ui/core/Snackbar'
@@ -70,7 +70,7 @@ function MembersPage ({ currentUser, location: { pathname }, history, userData }
       setSelected()
       return
     }
-    const selected = _.findWhere(users, { [UID]: pathnames[1] })
+    const selected = findWhere(users, { [UID]: pathnames[1] })
     if (selected) {
       setSelected(selected)
     } else {
@@ -180,7 +180,8 @@ const mapStateToProps = ({ currentUser: { currentUser, userData } }) => {
   }
 }
 
-export default LoggedInState({
-  name: 'membersPage',
-  isRequiredToBeLoggedIn: true
-})(connect(mapStateToProps)(withRouter(MembersPage)))
+export default compose(
+  withRouter,
+  LoggedInState(),
+  connect(mapStateToProps)
+)(MembersPage)

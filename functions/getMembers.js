@@ -40,12 +40,12 @@ const defaultVisibility = {
 module.exports = (admin) => {
   const firestore = admin.firestore()
   return async (data, context) => {
-    if (!context || !context.auth || !context.auth.uid) {
+    if (!context || !context.auth || !context.auth[UID]) {
       throw new functions.https.HttpsError('unauthenticated', 'unauthenticated.')
     }
 
     const applyFilters = (user) => {
-      if (context.auth.uid === user.uid) {
+      if (context.auth[UID] === user[UID]) {
         if (!user.isMember) {
           throw new functions.https.HttpsError('permission-denied', JSON.stringify({
             status: 403,

@@ -12,7 +12,7 @@ import { TextField } from 'final-form-material-ui'
 import DialogActions from '@material-ui/core/DialogActions'
 import Button from '@material-ui/core/Button'
 import { ROOT } from '../../urls'
-import LoggedInState from '../../components/LoggedInState'
+import LoggedInState from '../../components/HOC/LoggedInState'
 import { Field, Form } from 'react-final-form'
 import { EMAIL } from '../../fields'
 import * as Sentry from '@sentry/browser'
@@ -164,4 +164,4 @@ class ForgotPasswordPage extends Component {
   }
 }
 
-export default LoggedInState({ name: 'ForgotPassword', isRequiredToBeLoggedIn: false })(ForgotPasswordPage)
+export default LoggedInState({ isRequiredToBeLoggedIn: false })(ForgotPasswordPage)
