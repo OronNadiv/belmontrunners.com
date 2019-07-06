@@ -8,7 +8,7 @@ class HomeBanner extends Component {
           <div className="container">
             <div className="banner_content">
               <h2>Belmont Runners</h2>
-              <p>Running & walking club for Belmont, San Carlos, San Mateo,<br />Redwood City and the surrounding area
+              <p>Running club for Belmont, San Carlos, San Mateo,<br />Redwood City and the surrounding area
               </p>
             </div>
           </div>

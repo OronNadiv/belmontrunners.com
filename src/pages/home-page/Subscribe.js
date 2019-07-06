@@ -133,7 +133,7 @@ My email address is: ${email}`
         <div className='row'>
           <div className='col-lg-5 col-md-6 col-sm-6 mx-auto'>
             <div className='single-footer-widget'>
-              <p className='text-center'>Get updates about runs, walks and other events.</p>
+              <p className='text-center'>Get updates about runs and other events.</p>
               <div id='mc_embed_signup'>
                 <div className='subscribe_form relative'>
                   <div className='input-group d-flex flex-row'>
