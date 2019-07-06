@@ -286,10 +286,13 @@ UserProfile.propTypes = {
 }
 
 const mapStateToProps = ({ currentUser: { currentUser, userData } }) => {
+  userData = userData || new IMap()
+  const visibility = userData.get('visibility') || new IMap()
+
   return {
     currentUser,
-    userData: userData || new IMap(),
-    visibility: userData ? userData.get('visibility') : new IMap()
+    userData,
+    visibility
   }
 }
 
