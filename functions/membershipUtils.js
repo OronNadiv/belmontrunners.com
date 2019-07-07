@@ -1,4 +1,4 @@
-const { MEMBERSHIP_EXPIRES_AT } = require('../fields')
+const { MEMBERSHIP_EXPIRES_AT } = require('./fields')
 const moment = require('moment')
 
 const IS_A_MEMBER = 'isAMember'
