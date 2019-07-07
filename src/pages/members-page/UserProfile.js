@@ -18,28 +18,33 @@ import {
   ZIP
 } from '../../fields'
 import googleLibPhoneNumber from 'google-libphonenumber'
-import CloseIcon from '@material-ui/icons/Close'
-import SmartPhoneIcon from '@material-ui/icons/Smartphone'
-import HomeIcon from '@material-ui/icons/Home'
-import EmailIcon from '@material-ui/icons/Email'
-import PersonIcon from '@material-ui/icons/Person'
-import GroupIcon from '@material-ui/icons/Group'
-import CakeIcon from '@material-ui/icons/Cake'
-import IconButton from '@material-ui/core/IconButton'
-import SwipeableDrawer from '@material-ui/core/SwipeableDrawer'
+import {
+  Cake as CakeIcon,
+  Close as CloseIcon,
+  Email as EmailIcon,
+  Group as GroupIcon,
+  Home as HomeIcon,
+  Person as PersonIcon,
+  Smartphone as SmartPhoneIcon
+} from '@material-ui/icons'
+import {
+  Avatar,
+  IconButton,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Snackbar,
+  SnackbarContent,
+  SwipeableDrawer,
+  useMediaQuery
+} from '@material-ui/core'
+import { makeStyles, useTheme } from '@material-ui/core/styles'
 import { connect } from 'react-redux'
 import { Map as IMap } from 'immutable'
-import Menu from '@material-ui/core/Menu'
-import MenuItem from '@material-ui/core/MenuItem'
-import ListItemText from '@material-ui/core/ListItemText'
-import ListItemIcon from '@material-ui/core/ListItemIcon'
 import UpdateUserData from '../../components/HOC/UpdateUserData'
-import Avatar from '@material-ui/core/Avatar'
-import { makeStyles, useTheme } from '@material-ui/core/styles'
 import { linkToFacebook } from '../../utilities/linkToFacebook'
 import { findWhere } from 'underscore'
-import Snackbar from '@material-ui/core/Snackbar'
-import SnackbarContent from '@material-ui/core/SnackbarContent'
 
 const defaultVisibility = {
   [EMAIL]: ONLY_ME,
@@ -50,17 +55,33 @@ const defaultVisibility = {
 
 const PNF = googleLibPhoneNumber.PhoneNumberFormat
 const phoneUtil = googleLibPhoneNumber.PhoneNumberUtil.getInstance()
+const DRAWER_WIDTH = 270
 
 function UserProfile ({ onClose, user, userData, updateUserData, currentUser }) {
   userData = userData.toJS()
   const visibility = userData.visibility || {}
   const theme = useTheme()
+  const isSmallDevice = useMediaQuery(theme.breakpoints.down('sm'))
+
+  const AVATAR_WIDTH = 100
+  const AVATAR_HEIGHT = 100
+
+  const drawerPaper = {}
+  isSmallDevice && (drawerPaper.width = '100%')
+  !isSmallDevice && (drawerPaper.minWidth = DRAWER_WIDTH)
 
   const useStyles = makeStyles({
     avatar: {
-      width: 60,
-      height: 60,
+      width: AVATAR_WIDTH,
+      height: AVATAR_HEIGHT,
       backgroundColor: theme.palette.primary.main
+    },
+    drawer: {
+      flexShrink: 0
+    },
+    drawerPaper,
+    root: {
+      fontSize: 18
     }
   })
   const classes = useStyles()
@@ -106,24 +127,26 @@ function UserProfile ({ onClose, user, userData, updateUserData, currentUser }) 
       setRefs(refs)
     }
 
-    return !value ? null : (
-      <div className='mb-4'>
+    return (
+      <div className='mt-4' style={{ order: value ? 1 : 10000 }}>
         <div className='d-flex align-items-top'>
           {icon}
           {/*<div className='mr-1 text-secondary' style={{ width: 90 }}>{label}:</div>*/}
-          <div>{value}</div>
+          <div>{value || 'Not sharing'}</div>
         </div>
         {
           currentUser[UID] === user[UID] &&
-          <small
-            onClick={handleOpen}
-            ref={handleRef}
-          >
-            <span className='text-muted'>Visible to: </span>
-            {currVisibility === ONLY_ME && 'Only me'}
-            {currVisibility === MEMBERS && 'Club members'}
-            <span className='text-primary' style={{ cursor: 'pointer' }}> (change)</span>
-          </small>
+          <div className='mt-2'>
+            <small
+              onClick={handleOpen}
+              ref={handleRef}
+            >
+              <span className='text-muted'>Visible to: </span>
+              {currVisibility === ONLY_ME && 'Only me'}
+              {currVisibility === MEMBERS && 'Club members'}
+              <span className='text-primary' style={{ cursor: 'pointer' }}> (change)</span>
+            </small>
+          </div>
         }
         <Menu
           id="customized-menu"
@@ -168,7 +191,7 @@ function UserProfile ({ onClose, user, userData, updateUserData, currentUser }) 
     try {
       await linkToFacebook(currentUser, userData, updateUserData)
     } catch (error) {
-      setErrorMessage('Failed to link to your Facebook account')
+      setErrorMessage('Operation failed')
     }
   }
 
@@ -180,7 +203,11 @@ function UserProfile ({ onClose, user, userData, updateUserData, currentUser }) 
       anchor="right"
       onOpen={() => {
       }}
-      onClose={() => onClose()}
+      onClose={onClose}
+      className={classes.drawer}
+      classes={{
+        paper: classes.drawerPaper
+      }}
     >
       {
         errorMessage && (
@@ -204,7 +231,7 @@ function UserProfile ({ onClose, user, userData, updateUserData, currentUser }) 
         )
       }
 
-      <div className='clearfix' style={{ minWidth: 270 }}>
+      <div className='clearfix'>
         <IconButton
           className='float-left'
           key="close"
@@ -215,61 +242,62 @@ function UserProfile ({ onClose, user, userData, updateUserData, currentUser }) 
           <CloseIcon />
         </IconButton>
       </div>
-      <div className='mx-5'>
-        <div className='mb-5'>
-          <div className='d-flex justify-content-center mb-4 align-items-center'>
-            <Avatar className={classes.avatar} src={user[PHOTO_URL]}>{initials(user[DISPLAY_NAME])}</Avatar>
-          </div>
-          <div className='d-flex justify-content-center mb-4 align-items-center'>
+      <div className={`mx-5 ${classes.root}`}>
+        <div className='d-flex flex-column align-items-center'>
+          <Avatar className={` ${classes.avatar}`}
+                  src={user[PHOTO_URL] && `${user[PHOTO_URL]}?width=${AVATAR_WIDTH}&&height=${AVATAR_HEIGHT}`}>{initials(user[DISPLAY_NAME])}</Avatar>
+          <div className='mt-3'>
             {user[DISPLAY_NAME]}
           </div>
           {
             currentUser[UID] === user[UID] &&
             !connectedToFacebook &&
-            <div>
+            <div className='mt-2'>
               <small>
-                <span className='text-muted'>Missing photo? </span>
+                <span className='text-muted font-weight-bold'>Missing photo? </span>
                 <span className='text-primary' style={{ cursor: 'pointer' }} onClick={handleLinkToFacebook}>Link to Facebook</span>
               </small>
             </div>
           }
         </div>
-        {
-          getKeyVal(
-            'Phone',
-            getPhone(),
-            <SmartPhoneIcon className='mr-2' style={{ fill: '#D2D6DB' }} />,
-            visibility[PHONE] || defaultVisibility[PHONE],
-            (val) => handleVisibilityChanged([PHONE])(val)
-          )
-        }
-        {
-          getKeyVal(
-            'Address',
-            getAddress(),
-            <HomeIcon className='mr-2' style={{ fill: '#D2D6DB' }} />,
-            visibility[ADDRESS1] || defaultVisibility[ADDRESS1],
-            (val) => handleVisibilityChanged([ADDRESS1, ADDRESS2, CITY, STATE, ZIP])(val)
-          )
-        }
-        {
-          getKeyVal(
-            'Email',
-            user[EMAIL], // getEmail(),
-            <EmailIcon className='mr-2' style={{ fill: '#D2D6DB' }} />,
-            visibility[EMAIL] || defaultVisibility[EMAIL],
-            (val) => handleVisibilityChanged([EMAIL])(val)
-          )
-        }
-        {
-          getKeyVal(
-            'Birthday',
-            user[DATE_OF_BIRTH] && moment(user[DATE_OF_BIRTH]).format('MMMM D'),
-            <CakeIcon className='mr-2' style={{ fill: '#D2D6DB' }} />,
-            visibility[DATE_OF_BIRTH] || defaultVisibility[DATE_OF_BIRTH],
-            (val) => handleVisibilityChanged([DATE_OF_BIRTH])(val)
-          )
-        }
+        <div className='d-flex flex-column align-items-center my-4'>
+          {
+            getKeyVal(
+              'Email',
+              user[EMAIL], // getEmail(),
+              <EmailIcon className='mr-2' style={{ fill: '#D2D6DB' }} />,
+              visibility[EMAIL] || defaultVisibility[EMAIL],
+              (val) => handleVisibilityChanged([EMAIL])(val)
+            )
+          }
+          {
+            getKeyVal(
+              'Phone',
+              getPhone(),
+              <SmartPhoneIcon className='mr-2' style={{ fill: '#D2D6DB' }} />,
+              visibility[PHONE] || defaultVisibility[PHONE],
+              (val) => handleVisibilityChanged([PHONE])(val)
+            )
+          }
+          {
+            getKeyVal(
+              'Address',
+              getAddress(),
+              <HomeIcon className='mr-2' style={{ fill: '#D2D6DB' }} />,
+              visibility[ADDRESS1] || defaultVisibility[ADDRESS1],
+              (val) => handleVisibilityChanged([ADDRESS1, ADDRESS2, CITY, STATE, ZIP])(val)
+            )
+          }
+          {
+            getKeyVal(
+              'Birthday',
+              user[DATE_OF_BIRTH] && moment(user[DATE_OF_BIRTH]).format('MMMM D'),
+              <CakeIcon className='mr-2' style={{ fill: '#D2D6DB' }} />,
+              visibility[DATE_OF_BIRTH] || defaultVisibility[DATE_OF_BIRTH],
+              (val) => handleVisibilityChanged([DATE_OF_BIRTH])(val)
+            )
+          }
+        </div>
       </div>
     </SwipeableDrawer>
   )

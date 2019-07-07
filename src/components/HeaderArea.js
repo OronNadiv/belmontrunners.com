@@ -1,33 +1,37 @@
 import React, { useEffect, useState } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
-import AppBar from '@material-ui/core/AppBar'
-import Button from '@material-ui/core/Button'
-import IconButton from '@material-ui/core/IconButton'
-import MenuIcon from '@material-ui/icons/Menu'
-import HomeIcon from '@material-ui/icons/Home'
-import MyProfileIcon from '@material-ui/icons/AccountCircle'
-import MembersIcon from '@material-ui/icons/People'
-import UsersIcon from '@material-ui/icons/PeopleOutline'
-import ContactsIcon from '@material-ui/icons/Contacts'
-import SignOutIcon from '@material-ui/icons/PowerSettingsNew'
-import SignInIcon from '@material-ui/icons/ExitToApp'
-import JoinUsIcon from '@material-ui/icons/PersonAdd'
+import {
+  AppBar,
+  Button,
+  Divider,
+  IconButton,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  SwipeableDrawer,
+  Toolbar,
+  useMediaQuery,
+  useTheme
+} from '@material-ui/core'
+import {
+  AccountCircle as MyProfileIcon,
+  Close as CloseIcon,
+  Contacts as ContactsIcon,
+  ExitToApp as SignInIcon,
+  Home as HomeIcon,
+  Menu as MenuIcon,
+  People as MembersIcon,
+  PeopleOutline as UsersIcon,
+  PersonAdd as JoinUsIcon,
+  PowerSettingsNew as SignOutIcon
+} from '@material-ui/icons'
 import moment from 'moment'
 import Profile from './Profile'
 import { CONTACTS, FORGOT_PASSWORD, JOIN, MEMBERS, MY_PROFILE, RESET_PASSWORD, ROOT, SIGN_IN, USERS } from '../urls'
 import { Link, withRouter } from 'react-router-dom'
-import useMediaQuery from '@material-ui/core/useMediaQuery'
-import { useTheme } from '@material-ui/core'
 import $ from 'jquery'
-import SwipeableDrawer from '@material-ui/core/SwipeableDrawer'
-import CloseIcon from '@material-ui/icons/Close'
-import Divider from '@material-ui/core/Divider'
 import firebase from 'firebase'
-import ListItem from '@material-ui/core/ListItem'
-import List from '@material-ui/core/List'
-import ListItemText from '@material-ui/core/ListItemText'
-import ListItemIcon from '@material-ui/core/ListItemIcon'
-import Toolbar from '@material-ui/core/Toolbar'
 import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { MEMBERSHIP_EXPIRES_AT, UID } from '../fields'
