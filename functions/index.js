@@ -87,4 +87,5 @@ exports.addContact = functions
   .https.onCall(addContact)
 
 exports.getMembers = functions
+  .runWith({ timeoutSeconds: 30, memory: '512MB' })
   .https.onCall(getMembers)

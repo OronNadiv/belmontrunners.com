@@ -83,7 +83,6 @@ module.exports = (admin) => {
     users = _.chain(users)
       .map(applyFilters)
       .filter((user) => user[IS_MEMBER])
-      .sortBy((user) => user[DISPLAY_NAME].toLowerCase())
       .value()
     return users
   }

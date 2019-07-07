@@ -14,7 +14,7 @@ import LoggedInState from '../../components/HOC/LoggedInState'
 import UserProfile from './UserProfile'
 import { makeStyles } from '@material-ui/core'
 import { withRouter } from 'react-router-dom'
-import { compose, findWhere } from 'underscore'
+import { compose, findWhere, sortBy } from 'underscore'
 import { MEMBERS, ROOT } from '../../urls'
 import SearchBox from '../../components/SearchBox'
 import Snackbar from '@material-ui/core/Snackbar'
@@ -41,7 +41,11 @@ function MembersPage ({ currentUser, location: { pathname }, history, userData }
       try {
         // return setUsers(require('./members.json'))
         const resp = await firebase.functions().httpsCallable('getMembers')()
-        setUsers(resp.data)
+        const data = sortBy(
+          resp.data,
+          (user) => user[UID] === currentUser[UID] ? '_' : user[DISPLAY_NAME].toLowerCase()
+        )
+        setUsers(data)
       } catch (err) {
         console.warn('error from getMembers:', err)
         if (err && err.message) {
