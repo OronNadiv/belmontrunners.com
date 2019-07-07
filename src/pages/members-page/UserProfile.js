@@ -101,11 +101,13 @@ function UserProfile ({ onClose, user, userData, updateUserData, currentUser }) 
   function getAddress () {
     if (user[ADDRESS1] || user[ADDRESS2] || user[CITY] || user[STATE] || user[ZIP]) {
       return <div>
-        {user[ADDRESS1] && <div>{user[ADDRESS1]}<br /></div>}
-        {user[ADDRESS2] && <div>{user[ADDRESS2]}<br /></div>}
-        {user[CITY] && <span>{user[CITY]}, </span>}
-        {user[STATE] && <span>{user[STATE]} </span>}
-        {user[ZIP] && <span>{user[ZIP]}</span>}
+        {user[ADDRESS1] && user[ADDRESS1]}
+        {user[ADDRESS1] && <br />}
+        {user[ADDRESS2] && user[ADDRESS2]}
+        {user[ADDRESS2] && <br />}
+        {user[CITY] && `${user[CITY]}, `}
+        {user[STATE] && `${user[STATE]} `}
+        {user[ZIP] && user[ZIP]}
       </div>
     }
     return null
