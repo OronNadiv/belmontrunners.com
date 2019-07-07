@@ -1,31 +1,28 @@
-import React, { Component } from 'react'
+import React, { useEffect, useState } from 'react'
 import Button from '@material-ui/core/Button'
-import Snackbar from '@material-ui/core/Snackbar'
-import { Link } from 'react-router-dom'
-import { JOIN } from '../../urls'
-import { DID_RECEIVED_SHIRT, MEMBERSHIP_EXPIRES_AT } from '../../fields'
+import { ACTION_COLOR, LINK_COLOR, Snackbar } from '../../components/Snackbar'
+import { DID_RECEIVED_SHIRT } from '../../fields'
 import moment from 'moment/moment'
 import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import SnackbarContent from '@material-ui/core/SnackbarContent'
 import * as Sentry from '@sentry/browser'
 import UpdateUserData from '../../components/HOC/UpdateUserData'
 import { Map as IMap } from 'immutable'
 import { compose } from 'underscore'
+import { calc, IS_MEMBERSHIP_EXPIRED, IS_MEMBERSHIP_EXPIRES_SOON } from '../../utilities/membershipUtils'
+import { JOIN } from '../../urls'
+import { Link } from 'react-router-dom'
+import { IS_A_MEMBER } from '../../../functions/membershipUtils'
 
 const POPUP_PAY_MEMBERSHIP_SNOOZED_AT = 'popupPayMembershipSnoozedAt'
 const POPUP_RECEIVED_SHIRT_AT = 'popupReceivedShirtSnoozedAt'
-const ACTION_COLOR = '#b39ddb'
-const LINK_COLOR = 'crimson'
 
-class Notifications extends Component {
+function Notifications ({ currentUser, userData, updateUserData }) {
+  userData = userData.toJS()
 
-  constructor (props) {
-    super(props)
-    this.state = {}
-  }
+  const [notification, setNotification] = useState()
 
-  wasPopupDismissed ({ userData, notificationKey, days = 7 }) {
+  const wasPopupDismissed = ({ notificationKey, days = 7 }) => {
     const snoozedAt = userData.notifications && userData.notifications[notificationKey]
 
     if (!!snoozedAt && moment(snoozedAt).add(days, 'days').isAfter(moment())) {
@@ -44,81 +41,64 @@ class Notifications extends Component {
     return false
   }
 
-  async dismissNotification ({ notificationKey }) {
-    const { updateUserData } = this.props
-    this.setState({ notification: null })
-    await updateUserData({ notifications: { [notificationKey]: moment().utc().format() } }, { merge: true })
+  const dismissNotification = async ({ notificationKey }) => {
+    try {
+      setNotification()
+      await updateUserData({ notifications: { [notificationKey]: moment().utc().format() } }, { merge: true })
+    } catch (error) {
+      Sentry.captureException(error)
+      console.error('error while dismissNotification.  error:', error)
+    }
   }
 
-
-  showNotification ({ message, action }) {
-    const notification =
-      <Snackbar
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'center'
-        }}
-        open
-        key={0}
-      >
-        <SnackbarContent
-          aria-describedby="client-snackbar"
-          style={{ backgroundColor: '#673ab7' }}
-          message={message}
-          action={action}
-        />
-      </Snackbar>
-
-    this.setState({
-      notification
-    })
+  const showNotification = ({ message, action }) => {
+    setNotification(<Snackbar message={message} action={action} />)
   }
 
-  didPayMembership ({ userData }) {
-    const membershipExpiresAt = userData[MEMBERSHIP_EXPIRES_AT]
-    return membershipExpiresAt && moment(membershipExpiresAt).isAfter(moment().add(1, 'month'))
-  }
-
-  processPayMembershipNotification ({ userData }) {
-    if (this.wasPopupDismissed({ userData, notificationKey: POPUP_PAY_MEMBERSHIP_SNOOZED_AT })) {
+  const processPayMembershipNotification = () => {
+    if (wasPopupDismissed({ notificationKey: POPUP_PAY_MEMBERSHIP_SNOOZED_AT })) {
       return false
     }
 
-    // ok, we can show the popup.
+    const membershipStatus = calc(userData)
 
-    if (this.didPayMembership({ userData })) {
+    let message
+    if (!membershipStatus[IS_MEMBERSHIP_EXPIRED] && !membershipStatus[IS_A_MEMBER]) {
+      message = 'become a member'
+    } else if (membershipStatus[IS_MEMBERSHIP_EXPIRES_SOON] || membershipStatus[IS_MEMBERSHIP_EXPIRED]) {
+      message = 'renew your membership'
+    } else {
+      // is a member
       return false
     }
 
-    const isExistingMember = !!userData[MEMBERSHIP_EXPIRES_AT]
-
-    this.showNotification({
+    showNotification({
       message:
-        <div>
+        <>
           Click <Link
           style={{ color: LINK_COLOR }}
           to={{
             pathname: JOIN
-          }}>HERE</Link> to {!isExistingMember ? 'become a member' : 'renew your membership'}
-        </div>,
+          }}>HERE</Link> to {message}
+        </>,
       action:
         <Button
           style={{ color: ACTION_COLOR }}
           size="small"
-          onClick={() => this.dismissNotification({ notificationKey: POPUP_PAY_MEMBERSHIP_SNOOZED_AT })}>
+          onClick={async () => await dismissNotification({ notificationKey: POPUP_PAY_MEMBERSHIP_SNOOZED_AT })}>
           Remind me later
         </Button>
     })
     return true
   }
 
-  processReceivedShirt ({ userData }) {
+  const processReceivedShirt = () => {
     console.log('processReceivedShirt called.', userData)
-    const { updateUserData } = this.props
-    if (this.wasPopupDismissed({
-      userData,
-      notificationKey: POPUP_RECEIVED_SHIRT_AT
-    }) || !this.didPayMembership({ userData })) {
+    const membershipStatus = calc(userData)
+
+    if (wasPopupDismissed({ notificationKey: POPUP_RECEIVED_SHIRT_AT }) ||
+      membershipStatus[IS_A_MEMBER] ||
+      membershipStatus[IS_MEMBERSHIP_EXPIRED]) {
       return false
     }
 
@@ -129,26 +109,23 @@ class Notifications extends Component {
     // ok, we can show the popup.
 
     const showDougShelly = () => {
-      this.showNotification({
+      showNotification({
         message:
           'No problem. Please reach out to Doug or Shelly on the next Saturday run.',
         action:
           <Button
             style={{ color: ACTION_COLOR }}
             size="small"
-            onClick={() => {
-              console.log('dismissing POPUP_RECEIVED_SHIRT_AT, after Doug & Shelly message.')
-              this.dismissNotification({ notificationKey: POPUP_RECEIVED_SHIRT_AT })
-            }}>
+            onClick={async () => await dismissNotification({ notificationKey: POPUP_RECEIVED_SHIRT_AT })}>
             Remind me later
           </Button>
       })
     }
-    this.showNotification({
+    showNotification({
       message:
         'Did you receive a running shirt',
       action:
-        <div>
+        <>
           <Button
             color='secondary'
             size="small"
@@ -167,37 +144,20 @@ class Notifications extends Component {
           onClick={() => showDougShelly()}>
           NO
         </Button>
-        </div>
+        </>
     })
     return true
   }
 
-  processNotifications () {
-    const { currentUser } = this.props
-    const userData = this.props.userData.toJS()
+  useEffect(() => {
     if (!currentUser) {
-      this.setState({ notification: null })
+      setNotification()
       return
     }
-    this.processPayMembershipNotification({ userData }) || this.processReceivedShirt({ userData }) || this.setState({ notification: null })
-  }
+    processPayMembershipNotification() || processReceivedShirt() || setNotification()
+  }, [currentUser])
 
-  componentDidMount () {
-    this.processNotifications()
-  }
-
-  componentDidUpdate (prevProps) {
-    (prevProps.currentUser !== this.props.currentUser ||
-      prevProps.userData !== this.props.userData) && this.processNotifications()
-  }
-
-  render () {
-    return (
-      <div>
-        {this.state.notification}
-      </div>
-    )
-  }
+  return <>{notification}</>
 }
 
 Notifications.propTypes = {

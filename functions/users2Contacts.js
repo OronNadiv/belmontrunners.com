@@ -1,3 +1,5 @@
+import { calc, IS_A_MEMBER } from './membershipUtils'
+
 const { ARRAY_KEY, DISPLAY_NAME, EMAIL, SUBSCRIBER_IS_ACTIVE, IS_MEMBER, MEMBERSHIP_EXPIRES_AT, UID } = require('./fields')
 
 const moment = require('moment')
@@ -78,9 +80,7 @@ module.exports = (admin) => {
     })
     // set isMember
     contacts.forEach((contact) => {
-      const membershipExpiresAt = contact[MEMBERSHIP_EXPIRES_AT]
-      const isMember = membershipExpiresAt && moment(membershipExpiresAt).isAfter(moment())
-      contact[IS_MEMBER] = Boolean(isMember)
+      contact[IS_MEMBER] = calc(contact)[IS_A_MEMBER]
     })
 
     await firestore.doc('subscribers/items').set({ [ARRAY_KEY]: contacts })

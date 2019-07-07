@@ -7,8 +7,7 @@ import { CONTACTS, MEMBERS, MY_PROFILE, ROOT, USERS } from '../urls'
 import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import LoggedInState from './HOC/LoggedInState'
-import { DISPLAY_NAME, MEMBERSHIP_EXPIRES_AT, PHOTO_URL, UID } from '../fields'
-import moment from 'moment'
+import { DISPLAY_NAME, PHOTO_URL, UID } from '../fields'
 import { Map as IMap } from 'immutable'
 import { makeStyles } from '@material-ui/core/styles'
 import ClickAwayListener from '@material-ui/core/ClickAwayListener'
@@ -22,6 +21,7 @@ import ArrowDropDownIcon from '@material-ui/icons/KeyboardArrowDown'
 import initials from 'initials'
 import { withRouter } from 'react-router-dom'
 import { compose } from 'underscore'
+import { calc, IS_A_MEMBER } from '../utilities/membershipUtils'
 
 function Profile ({ allowUsersPage, allowContactsPage, isMember, userData, history }) {
 
@@ -148,7 +148,7 @@ const mapStateToProps = ({ currentUser: { permissions, currentUser, userData } }
       !!permissions.contactsRead[currentUser[UID]] ||
       !!permissions.contactsWrite[currentUser[UID]]),
     userData: userData || new IMap(),
-    isMember: !!(userData && userData.get(MEMBERSHIP_EXPIRES_AT) && moment(userData.get(MEMBERSHIP_EXPIRES_AT)).isAfter(moment()))
+    isMember: userData && calc(userData.toJS())[IS_A_MEMBER]
   }
 }
 

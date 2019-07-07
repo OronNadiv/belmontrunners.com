@@ -1,3 +1,5 @@
+import { calc, IS_A_MEMBER } from './membershipUtils'
+
 const {
   ADDRESS1,
   ADDRESS2,
@@ -7,7 +9,6 @@ const {
   EMAIL,
   GENDER,
   MEMBERS,
-  MEMBERSHIP_EXPIRES_AT,
   PHONE,
   PHOTO_URL,
   ONLY_ME,
@@ -16,11 +17,10 @@ const {
   ZIP
 } = require('./fields')
 
-const moment = require('moment')
 const _ = require('underscore')
 const functions = require('firebase-functions')
 const IS_MEMBER = 'isMember'
-const isMember = (user) => user[MEMBERSHIP_EXPIRES_AT] && moment(user[MEMBERSHIP_EXPIRES_AT]).isAfter(moment())
+const isMember = (user) => calc(user)[IS_A_MEMBER]
 
 const defaultVisibility = {
   [UID]: MEMBERS,

@@ -26,7 +26,6 @@ import {
   PersonAdd as JoinUsIcon,
   PowerSettingsNew as SignOutIcon
 } from '@material-ui/icons'
-import moment from 'moment'
 import Profile from './Profile'
 import { CONTACTS, FORGOT_PASSWORD, JOIN, MEMBERS, MY_PROFILE, RESET_PASSWORD, ROOT, SIGN_IN, USERS } from '../urls'
 import { Link, withRouter } from 'react-router-dom'
@@ -34,7 +33,8 @@ import $ from 'jquery'
 import firebase from 'firebase'
 import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { MEMBERSHIP_EXPIRES_AT, UID } from '../fields'
+import { calc, IS_A_MEMBER } from '../utilities/membershipUtils'
+import { UID } from '../fields'
 
 const TOOLBAR_HEIGHT = 72
 const DRAWER_WIDTH = 240
@@ -344,7 +344,7 @@ const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, currentUser, perm
     allowContactsPage: !!currentUser && (
       !!permissions.contactsRead[currentUser[UID]] ||
       !!permissions.contactsWrite[currentUser[UID]]),
-    isMember: !!(userData && userData.get(MEMBERSHIP_EXPIRES_AT) && moment(userData.get(MEMBERSHIP_EXPIRES_AT)).isAfter(moment())),
+    isMember: userData && calc(userData.toJS())[IS_A_MEMBER],
     isCurrentUserLoaded,
     currentUser
   }

@@ -16,6 +16,7 @@ import { withRouter } from 'react-router-dom'
 import UpdateUserData from '../../components/HOC/UpdateUserData'
 import { goToTop } from 'react-scrollable-anchor'
 import { compose } from 'underscore'
+import { calc, IS_A_MEMBER, IS_MEMBERSHIP_EXPIRES_SOON } from '../../utilities/membershipUtils'
 
 const MEMBERSHIP_FEE_ADULT = 25
 const MEMBERSHIP_FEE_KID = 15
@@ -259,7 +260,7 @@ SignUpStepPayment.propTypes = {
 
 const mapStateToProps = ({ currentUser: { currentUser, userData } }) => {
 
-  userData = userData ? userData.toJS() : userData
+  userData = userData ? userData.toJS() : {}
   let membershipExpiresAt = null
   let needToPay = false
   let totalAmount = -1
@@ -273,8 +274,9 @@ const mapStateToProps = ({ currentUser: { currentUser, userData } }) => {
       totalAmount = MEMBERSHIP_FEE_KID
     }
 
+    const membershipData = calc(userData)
     membershipExpiresAt = userData[MEMBERSHIP_EXPIRES_AT]
-    if (!(membershipExpiresAt && moment(membershipExpiresAt).isAfter(moment().add(1, 'month')))) {
+    if (!membershipData[IS_A_MEMBER] || membershipData[IS_MEMBERSHIP_EXPIRES_SOON]) {
       needToPay = true
     }
   }
