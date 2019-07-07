@@ -11,7 +11,6 @@ import { Map as IMap } from 'immutable'
 import { compose } from 'underscore'
 import {
   calc,
-  IS_A_MEMBER,
   IS_MEMBERSHIP_EXPIRED,
   IS_MEMBERSHIP_EXPIRES_SOON,
   WAS_NEVER_A_MEMBER
@@ -27,10 +26,10 @@ function Notifications ({ currentUser, userData, updateUserData }) {
 
   const [notification, setNotification] = useState()
 
-  const wasPopupDismissed = ({ notificationKey, days = 7 }) => {
+  const wasPopupDismissed = ({ notificationKey, duration = moment.duration(7, 'days') }) => {
     const snoozedAt = userData.notifications && userData.notifications[notificationKey]
 
-    if (!!snoozedAt && moment(snoozedAt).add(days, 'days').isAfter(moment())) {
+    if (!!snoozedAt && moment().isBefore(moment(snoozedAt).add(duration))) {
       console.log(notificationKey + ' dismissed.  snoozedAt:', snoozedAt)
       return true
     }
@@ -103,7 +102,6 @@ function Notifications ({ currentUser, userData, updateUserData }) {
 
     if (wasPopupDismissed({ notificationKey: POPUP_RECEIVED_SHIRT_AT }) ||
       membershipStatus[WAS_NEVER_A_MEMBER] ||
-      membershipStatus[IS_A_MEMBER] ||
       membershipStatus[IS_MEMBERSHIP_EXPIRED]
     ) {
       return false
@@ -139,6 +137,7 @@ function Notifications ({ currentUser, userData, updateUserData }) {
             onClick={async () => {
               try {
                 await updateUserData({ [DID_RECEIVED_SHIRT]: true }, { merge: true })
+                setNotification()
               } catch (error) {
                 Sentry.captureException(error)
                 console.error('error while updating [DID_RECEIVED_SHIRT] to true.  error:', error)

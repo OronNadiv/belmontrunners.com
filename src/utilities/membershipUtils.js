@@ -1,20 +1,20 @@
 import { MEMBERSHIP_EXPIRES_AT } from '../fields'
 import moment from 'moment'
 
-const IS_A_MEMBER = 'isAMember'
-const WAS_NEVER_A_MEMBER = 'isAMember'
-const IS_MEMBERSHIP_EXPIRED = 'isMembershipExpired'
-const IS_MEMBERSHIP_EXPIRES_SOON = 'isMembershipExpiresSoon'
+const IS_A_MEMBER = 'IS_A_MEMBER'
+const WAS_NEVER_A_MEMBER = 'WAS_NEVER_A_MEMBER'
+const IS_MEMBERSHIP_EXPIRED = 'IS_MEMBERSHIP_EXPIRED'
+const IS_MEMBERSHIP_EXPIRES_SOON = 'IS_MEMBERSHIP_EXPIRES_SOON'
 
 const calc = (userData, duration = moment.duration(1, 'month')) => {
   const membershipExpiresAt = userData[MEMBERSHIP_EXPIRES_AT]
 
-  let isAMember = membershipExpiresAt && moment(membershipExpiresAt).isAfter(moment())
-  let isMembershipExpired = membershipExpiresAt && moment(membershipExpiresAt).isBefore(moment())
+  const isAMember = membershipExpiresAt && moment().isBefore(moment(membershipExpiresAt))
+  const isMembershipExpired = membershipExpiresAt && moment(membershipExpiresAt).isBefore(moment())
   return {
-    [IS_A_MEMBER]: isAMember,
+    [IS_A_MEMBER]: !!isAMember,
     [IS_MEMBERSHIP_EXPIRES_SOON]: isAMember && moment(membershipExpiresAt).isBefore(moment().add(duration)),
-    [IS_MEMBERSHIP_EXPIRED]: isMembershipExpired,
+    [IS_MEMBERSHIP_EXPIRED]: !!isMembershipExpired,
     [WAS_NEVER_A_MEMBER]: !isAMember && !isMembershipExpired
   }
 }
