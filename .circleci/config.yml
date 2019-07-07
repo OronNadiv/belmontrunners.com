@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  build:
+  buildHosting:
     branches:
       only:
         - master
@@ -12,8 +12,7 @@ jobs:
           name: Install Dependencies
           command: |
             npm install
-            cd functions
-            npm install
+            npm test
       - run:
           name: Build Application
           command: npm run build
@@ -21,5 +20,28 @@ jobs:
           name: Install Firebase Tools
           command: npm install --prefix=./firebase-deploy firebase-tools
       - run:
-          name: Deploy to Firebase
-          command: ./firebase-deploy/node_modules/.bin/firebase deploy --token=$FIREBASE_DEPLOY_TOKEN --force
+          name: Deploy to Firebase - hosting
+          command: ./firebase-deploy/node_modules/.bin/firebase deploy --only hosting --token=$FIREBASE_DEPLOY_TOKEN --force
+  buildFunctions:
+    branches:
+      only:
+        - master
+    docker:
+      - image: circleci/node:8
+    steps:
+      - checkout
+      - run:
+          name: Install Dependencies
+          command: |
+            cd functions
+            npm install
+            npm test
+      - run:
+          name: Build Application
+          command: npm run build
+      - run:
+          name: Install Firebase Tools
+          command: npm install --prefix=./firebase-deploy firebase-tools
+      - run:
+          name: Deploy to Firebase - functions
+          command: ./firebase-deploy/node_modules/.bin/firebase deploy --only functions --token=$FIREBASE_DEPLOY_TOKEN --force

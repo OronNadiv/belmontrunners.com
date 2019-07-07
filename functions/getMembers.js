@@ -1,4 +1,4 @@
-import { calc, IS_A_MEMBER } from './membershipUtils'
+const { calc, IS_A_MEMBER } = require('./membershipUtils')
 
 const {
   ADDRESS1,

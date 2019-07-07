@@ -9,10 +9,15 @@ import * as Sentry from '@sentry/browser'
 import UpdateUserData from '../../components/HOC/UpdateUserData'
 import { Map as IMap } from 'immutable'
 import { compose } from 'underscore'
-import { calc, IS_MEMBERSHIP_EXPIRED, IS_MEMBERSHIP_EXPIRES_SOON } from '../../utilities/membershipUtils'
+import {
+  calc,
+  IS_A_MEMBER,
+  IS_MEMBERSHIP_EXPIRED,
+  IS_MEMBERSHIP_EXPIRES_SOON,
+  WAS_NEVER_A_MEMBER
+} from '../../utilities/membershipUtils'
 import { JOIN } from '../../urls'
 import { Link } from 'react-router-dom'
-import { IS_A_MEMBER } from '../../../functions/membershipUtils'
 
 const POPUP_PAY_MEMBERSHIP_SNOOZED_AT = 'popupPayMembershipSnoozedAt'
 const POPUP_RECEIVED_SHIRT_AT = 'popupReceivedShirtSnoozedAt'
@@ -63,7 +68,7 @@ function Notifications ({ currentUser, userData, updateUserData }) {
     const membershipStatus = calc(userData)
 
     let message
-    if (!membershipStatus[IS_MEMBERSHIP_EXPIRED] && !membershipStatus[IS_A_MEMBER]) {
+    if (membershipStatus[WAS_NEVER_A_MEMBER]) {
       message = 'become a member'
     } else if (membershipStatus[IS_MEMBERSHIP_EXPIRES_SOON] || membershipStatus[IS_MEMBERSHIP_EXPIRED]) {
       message = 'renew your membership'
@@ -97,8 +102,10 @@ function Notifications ({ currentUser, userData, updateUserData }) {
     const membershipStatus = calc(userData)
 
     if (wasPopupDismissed({ notificationKey: POPUP_RECEIVED_SHIRT_AT }) ||
+      membershipStatus[WAS_NEVER_A_MEMBER] ||
       membershipStatus[IS_A_MEMBER] ||
-      membershipStatus[IS_MEMBERSHIP_EXPIRED]) {
+      membershipStatus[IS_MEMBERSHIP_EXPIRED]
+    ) {
       return false
     }
 
@@ -155,6 +162,7 @@ function Notifications ({ currentUser, userData, updateUserData }) {
       return
     }
     processPayMembershipNotification() || processReceivedShirt() || setNotification()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser])
 
   return <>{notification}</>

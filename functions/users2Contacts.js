@@ -1,8 +1,6 @@
-import { calc, IS_A_MEMBER } from './membershipUtils'
-
+const { calc, IS_A_MEMBER } = require('./membershipUtils')
 const { ARRAY_KEY, DISPLAY_NAME, EMAIL, SUBSCRIBER_IS_ACTIVE, IS_MEMBER, MEMBERSHIP_EXPIRES_AT, UID } = require('./fields')
 
-const moment = require('moment')
 const Promise = require('bluebird')
 const normalizeEmail = require("normalize-email")
 const _ = require('underscore')
