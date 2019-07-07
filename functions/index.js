@@ -81,9 +81,11 @@ exports.ical = functions
   })
 
 exports.stripe = functions
+  .runWith({ memory: '512MB' })
   .https.onCall(stripe)
 
 exports.addContact = functions
+  .runWith({ memory: '512MB' })
   .https.onCall(addContact)
 
 exports.getMembers = functions
