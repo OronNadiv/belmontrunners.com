@@ -20,7 +20,7 @@ const calc = (userData, duration = moment.duration(1, 'month')) => {
   }
 }
 
-export {
+module.exports = {
   calc,
   WAS_NEVER_A_MEMBER,
   IS_A_MEMBER,
