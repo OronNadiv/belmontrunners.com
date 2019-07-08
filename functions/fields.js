@@ -18,5 +18,5 @@ module.exports = {
   GENDER: 'gender',
 
   ONLY_ME: 'ONLY_ME',
-  MEMBERS: 'MEMBERS'
+  MEMBERS: 'MEMBERS',
 }

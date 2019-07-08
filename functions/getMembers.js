@@ -8,6 +8,7 @@ const {
   DISPLAY_NAME,
   EMAIL,
   GENDER,
+  IS_MEMBER,
   MEMBERS,
   PHONE,
   PHOTO_URL,
@@ -19,7 +20,6 @@ const {
 
 const _ = require('underscore')
 const functions = require('firebase-functions')
-const IS_MEMBER = 'isMember'
 const isMember = (user) => calc(user)[IS_A_MEMBER]
 
 const defaultVisibility = {

@@ -18,7 +18,7 @@ export const MEMBERSHIP_EXPIRES_AT = 'membershipExpiresAt'
 export const DID_RECEIVED_SHIRT = 'didReceivedShirt'
 
 export const SUBSCRIBERS_ARRAY_KEY = 'values'
-export const SUBSCRIBER_IS_ACTIVE = 'isActive'
+export const IS_MEMBER = 'isMember'
 
 export const ONLY_ME = 'ONLY_ME'
 export const MEMBERS = 'MEMBERS'
