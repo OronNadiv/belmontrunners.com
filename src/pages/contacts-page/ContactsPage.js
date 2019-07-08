@@ -210,11 +210,11 @@ function ContactsPage ({ currentUser, allowRead }) {
             onCopy={() => {
               setCopied(true)
             }}>
-            <IconButton>
+            <IconButton disabled={!filteredContacts.size}>
               <CopyIcon />
             </IconButton>
           </CopyToClipboard>
-          <IconButton onClick={exportToCSV}>
+          <IconButton onClick={exportToCSV} disabled={!filteredContacts.size}>
             <SaveIcon />
           </IconButton>
 

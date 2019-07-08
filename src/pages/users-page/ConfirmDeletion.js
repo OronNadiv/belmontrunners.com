@@ -1,17 +1,17 @@
 import firebase from 'firebase'
 import React from 'react'
-import Button from '@material-ui/core/Button'
-import Snackbar from '@material-ui/core/Snackbar'
+import { Button, Snackbar } from '@material-ui/core'
 import * as PropTypes from 'prop-types'
 import { DISPLAY_NAME, EMAIL, UID } from '../../fields'
 import * as Sentry from '@sentry/browser'
 
 const confirmDeletion = ({ row, onClose }) => {
-  const deleteUser = async () => {
-    let uid = row[UID]
-    console.log(`Deleting: users/${uid}, row:`, row)
-    const userRef = firebase.firestore().doc(`users/${uid}`)
+
+  const handleDelete = async () => {
     try {
+      const uid = row[UID]
+      console.log(`Deleting: users/${uid}, row:`, row)
+      const userRef = firebase.firestore().doc(`users/${uid}`)
       await userRef.delete()
       console.log('Deleted successfully')
     } catch (error) {
@@ -37,12 +37,10 @@ const confirmDeletion = ({ row, onClose }) => {
       message={<span
         id="message-id">Are you sure you want to delete <b>{row[DISPLAY_NAME]} &lt;{row[EMAIL]}&gt;</b></span>}
       action={[
-        <Button key="0" color="secondary" onClick={() => {
-          onClose()
-        }}>
+        <Button key="0" color="secondary" onClick={onClose}>
           no
         </Button>,
-        <Button key="1" size="small" onClick={() => deleteUser()}>
+        <Button key="1" size="small" onClick={handleDelete}>
           yes
         </Button>
       ]}

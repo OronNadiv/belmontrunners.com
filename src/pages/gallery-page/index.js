@@ -3,7 +3,7 @@ import 'firebase/storage'
 import firebase from 'firebase'
 import React, { useEffect, useState } from "react"
 import SelectFileButton from './SelectFileButton'
-import Button from '@material-ui/core/Button'
+import { Button } from '@material-ui/core'
 import { filter, groupBy, map } from 'underscore'
 import Promise from 'bluebird'
 import moment from 'moment'

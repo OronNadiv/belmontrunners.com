@@ -1,12 +1,8 @@
 import 'firebase/auth'
 import firebase from 'firebase'
 import React, { useState } from 'react'
-import Dialog from '@material-ui/core/Dialog'
-import DialogContent from '@material-ui/core/DialogContent'
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core'
 import { TextField } from 'final-form-material-ui'
-import DialogActions from '@material-ui/core/DialogActions'
-import Button from '@material-ui/core/Button'
-import DialogTitle from '@material-ui/core/DialogTitle'
 import isEmailComponent from 'isemail'
 import {
   EMAIL_ALREADY_IN_USE,

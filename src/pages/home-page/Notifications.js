@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import Button from '@material-ui/core/Button'
+import { Button } from '@material-ui/core'
 import { ACTION_COLOR, LINK_COLOR, Snackbar } from '../../components/Snackbar'
 import { DID_RECEIVED_SHIRT } from '../../fields'
 import moment from 'moment/moment'

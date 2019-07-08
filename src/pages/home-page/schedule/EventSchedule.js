@@ -4,7 +4,7 @@ import csv from 'csvtojson'
 import moment from 'moment'
 import CalendarSelector from './CalendarSelector'
 import ExpendMoreIcon from '@material-ui/icons/ExpandMore'
-import IconButton from '@material-ui/core/IconButton'
+import { IconButton } from '@material-ui/core'
 
 const SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/1FZOB291KWLoutpr0s6VeK5EtvuiQ8uhe497nOmWoqPA/export?format=csv&usp=sharing"
 

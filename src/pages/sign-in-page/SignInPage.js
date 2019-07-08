@@ -12,11 +12,7 @@ import {
   USER_NOT_FOUND_INVALID_EMAIL_OR_PASSWORD,
   WRONG_PASSWORD_INVALID_EMAIL_OR_PASSWORD
 } from '../../messages'
-import Dialog from '@material-ui/core/Dialog'
-import DialogTitle from '@material-ui/core/DialogTitle'
-import DialogContent from '@material-ui/core/DialogContent'
-import DialogActions from '@material-ui/core/DialogActions'
-import Button from '@material-ui/core/Button'
+import {Button, Dialog,DialogTitle, DialogContent, DialogActions} from '@material-ui/core'
 import { FORGOT_PASSWORD, ROOT } from '../../urls'
 import LoggedInState from '../../components/HOC/LoggedInState'
 import * as Sentry from '@sentry/browser'

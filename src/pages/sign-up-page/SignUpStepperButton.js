@@ -1,4 +1,4 @@
-import Button from '@material-ui/core/Button/index'
+import {Button} from '@material-ui/core'
 import React from 'react'
 import * as PropTypes from 'prop-types'
 

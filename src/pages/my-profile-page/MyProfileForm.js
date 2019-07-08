@@ -9,7 +9,7 @@ import { sendEmailVerification as sendEmailVerificationAction } from '../../redu
 import { compose, pick } from 'underscore'
 import UserDetails from '../../components/UserDetails'
 import { ROOT } from '../../urls'
-import Button from '@material-ui/core/Button'
+import {Button} from '@material-ui/core'
 import { withRouter } from 'react-router-dom'
 import UpdateUserData from '../../components/HOC/UpdateUserData'
 

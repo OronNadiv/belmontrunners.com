@@ -3,10 +3,7 @@ import React, { useState } from 'react'
 import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { sendEmailVerification as sendEmailVerificationAction } from '../../reducers/currentUser'
-import Card from '@material-ui/core/Card'
-import CardContent from '@material-ui/core/CardContent'
-import Typography from '@material-ui/core/Typography'
-import Button from '@material-ui/core/Button'
+import { Button, Card, CardContent, Typography } from '@material-ui/core'
 import ChangeEmailDialog from '../../components/ChangeEmailDialog'
 
 function MyProfileChangePassword ({ sendEmailVerification, currentUser }) {

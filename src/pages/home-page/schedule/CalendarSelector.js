@@ -1,24 +1,26 @@
 import React, { useState } from 'react'
-import Button from '@material-ui/core/Button'
-import Menu from '@material-ui/core/Menu'
-import ListItemIcon from '@material-ui/core/ListItemIcon'
-import ListItemText from '@material-ui/core/ListItemText'
-import MenuItem from '@material-ui/core/MenuItem'
+import {
+  Button,
+  Dialog,
+  IconButton,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Paper,
+  Snackbar,
+  Toolbar,
+  withMobileDialog
+} from '@material-ui/core'
 import GoogleCalendarIcon from './GoogleCalendarIcon'
 import IosIcon from './IosIcon'
 import MicrosoftOutlookIcon from './MicrosoftOutlookIcon'
 import YahooIcon from './YahooIcon'
-import Paper from '@material-ui/core/Paper'
-import Dialog from '@material-ui/core/Dialog'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
-import Snackbar from '@material-ui/core/Snackbar'
 import LinkIcon from './LinkIcon'
 import MacOSIcon from './MacOSIcon'
 import './schedule.scss'
-import Toolbar from '@material-ui/core/Toolbar'
-import IconButton from '@material-ui/core/IconButton'
-import CloseIcon from '@material-ui/icons/Close'
-import withMobileDialog from '@material-ui/core/withMobileDialog'
+import { Close as CloseIcon } from '@material-ui/icons'
 import * as PropTypes from 'prop-types'
 
 const GOOGLE = 'GOOGLE'

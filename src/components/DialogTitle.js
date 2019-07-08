@@ -1,8 +1,6 @@
 import React from 'react'
-import MuiDialogTitle from '@material-ui/core/DialogTitle'
-import IconButton from '@material-ui/core/IconButton'
+import { DialogTitle as MuiDialogTitle, IconButton, Typography } from '@material-ui/core'
 import CloseIcon from '@material-ui/icons/Close'
-import Typography from '@material-ui/core/Typography'
 import * as PropTypes from 'prop-types'
 
 const DialogTitle = ({ children, onClose }) => {

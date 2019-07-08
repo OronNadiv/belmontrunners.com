@@ -2,7 +2,7 @@ import React from 'react'
 import { Select, TextField } from 'final-form-material-ui'
 import moment from 'moment'
 import { Field } from 'react-final-form'
-import MenuItem from '@material-ui/core/MenuItem'
+import { MenuItem } from '@material-ui/core'
 import { ADDRESS1, ADDRESS2, CITY, DATE_OF_BIRTH, GENDER, PHONE, STATE, ZIP } from '../fields'
 import DatePickerWrapper from './DatePickerWrapper'
 
