@@ -3,11 +3,11 @@ import firebase from 'firebase'
 import React, { useState } from 'react'
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core'
 import { TextField } from 'final-form-material-ui'
-import { INVALID_PASSWORD_LENGTH, PASSWORDS_MISMATCH, WRONG_PASSWORD } from '../messages'
+import { INVALID_PASSWORD_LENGTH, PASSWORDS_MISMATCH, WRONG_PASSWORD } from '../../messages'
 import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import * as Sentry from '@sentry/browser'
-import { PASSWORD } from '../fields'
+import { PASSWORD } from '../../fields'
 import { Field, Form } from 'react-final-form'
 
 const required = value => (value ? undefined : 'Required')

@@ -7,6 +7,7 @@ import { compose } from 'underscore'
 import DownloadAccountInfo from './DownloadAccountInfo'
 import ChangeEmail from './ChangeEmail'
 import DeleteAccount from './DeleteAccount'
+import ChangePassword from './ChangePassword'
 
 function AccountPage ({ currentUser }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -20,6 +21,7 @@ function AccountPage ({ currentUser }) {
   return !currentUser ? null :
     <div className='mx-auto py-5 px-3' style={{ maxWidth: 600 }}>
       <ChangeEmail onSubmitting={handleSubmissionChanged} isSubmitting={isSubmitting} />
+      <ChangePassword onSubmitting={handleSubmissionChanged} isSubmitting={isSubmitting} />
       <DownloadAccountInfo onSubmitting={handleSubmissionChanged} isSubmitting={isSubmitting} />
       <DeleteAccount onSubmitting={handleSubmissionChanged} isSubmitting={isSubmitting} />
     </div>
