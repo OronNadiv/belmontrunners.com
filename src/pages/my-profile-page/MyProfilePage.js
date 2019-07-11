@@ -4,7 +4,6 @@ import LoggedInState from '../../components/HOC/LoggedInState'
 import { connect } from 'react-redux'
 import { sendEmailVerification as sendEmailVerificationAction } from '../../reducers/currentUser'
 import MyProfileForm from './MyProfileForm'
-import MyProfileChangePassword from './MyProfileChangePassword'
 import MyProfileFacebook from './MyProfileFacebook'
 import { goToTop } from 'react-scrollable-anchor'
 import { compose } from 'underscore'
@@ -12,9 +11,7 @@ import { compose } from 'underscore'
 function MyProfilePage ({ currentUser }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  useEffect(() => {
-    goToTop()
-  }, [currentUser])
+  useEffect(goToTop, [currentUser])
 
   const handleSubmissionChanged = ((value) => {
     setIsSubmitting(value)
@@ -22,7 +19,6 @@ function MyProfilePage ({ currentUser }) {
 
   return currentUser &&
     <div className='mx-auto py-5 px-3' style={{ maxWidth: 500 }}>
-      <MyProfileChangePassword onSubmitting={handleSubmissionChanged} isSubmitting={isSubmitting} />
       <MyProfileFacebook onSubmitting={handleSubmissionChanged} isSubmitting={isSubmitting} />
       <MyProfileForm onSubmitting={handleSubmissionChanged} isSubmitting={isSubmitting} />
     </div>

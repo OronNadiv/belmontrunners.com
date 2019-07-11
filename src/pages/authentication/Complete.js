@@ -39,7 +39,7 @@ class Complete extends Component {
         break
       default:
         Sentry.captureException(error)
-        console.error('confirmPasswordReset',
+        console.error('in Complete',
           'code:', code,
           'message:', message)
         this.setState({ errorMessage: message })

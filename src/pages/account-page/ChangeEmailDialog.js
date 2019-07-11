@@ -10,13 +10,13 @@ import {
   INVALID_EMAIL,
   INVALID_PASSWORD_LENGTH,
   WRONG_PASSWORD
-} from '../messages'
+} from '../../messages'
 import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import * as Sentry from '@sentry/browser'
 import { Field, Form } from 'react-final-form'
-import { PASSWORD } from '../fields'
-import { sendEmailVerification as sendEmailVerificationAction } from '../reducers/currentUser'
+import { PASSWORD } from '../../fields'
+import { sendEmailVerification as sendEmailVerificationAction } from '../../reducers/currentUser'
 
 const required = value => (value ? undefined : 'Required')
 const isEmail = value => (!value || !isEmailComponent.validate(value) ? INVALID_EMAIL : undefined)

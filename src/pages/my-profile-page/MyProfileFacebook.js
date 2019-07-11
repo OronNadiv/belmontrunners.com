@@ -49,7 +49,7 @@ function MyProfileFacebook ({ updateUserData, currentUser, userData, onSubmittin
             <Typography component="h6" variant="h6">
               Facebook
             </Typography>
-            <Typography variant="subtitle1" color="textSecondary">
+            <Typography color="textSecondary">
                 <span className={connectedToFacebook ? 'text-success' : 'text-danger'}>
                   {connectedToFacebook ? 'Connected' : 'Disconnected'}
                 </span>

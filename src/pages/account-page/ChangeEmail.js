@@ -4,9 +4,9 @@ import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { sendEmailVerification as sendEmailVerificationAction } from '../../reducers/currentUser'
 import { Button, Card, CardContent, Typography } from '@material-ui/core'
-import ChangeEmailDialog from '../../components/ChangeEmailDialog'
+import ChangeEmailDialog from './ChangeEmailDialog'
 
-function MyProfileChangePassword ({ sendEmailVerification, currentUser }) {
+function ChangeEmail ({ sendEmailVerification, currentUser, onSubmitting, isSubmitting }) {
 
   const [showChangeEmailDialog, setShowChangeEmailDialog] = useState()
   const [emailVerificationSent, setEmailVerificationSent] = useState()
@@ -25,7 +25,7 @@ function MyProfileChangePassword ({ sendEmailVerification, currentUser }) {
             <Typography component="h6" variant="h6">
               Email Address
             </Typography>
-            <Typography variant="subtitle1" color="textSecondary">
+            <Typography color="textSecondary">
               {currentUser.email} (
               {
                 currentUser.emailVerified === false ?
@@ -55,7 +55,7 @@ function MyProfileChangePassword ({ sendEmailVerification, currentUser }) {
         </div>
         <span className='px-3 d-flex'>
             <Button variant="contained" color="primary" className='align-self-center'
-                    onClick={() => setShowChangeEmailDialog(true)}>
+                    onClick={() => setShowChangeEmailDialog(true)} disabled={isSubmitting}>
               Change Email
             </Button>
           </span>
@@ -67,9 +67,11 @@ function MyProfileChangePassword ({ sendEmailVerification, currentUser }) {
     </>
 }
 
-MyProfileChangePassword.propTypes = {
+ChangeEmail.propTypes = {
   sendEmailVerification: PropTypes.func.isRequired,
-  currentUser: PropTypes.object.isRequired
+  currentUser: PropTypes.object.isRequired,
+  onSubmitting: PropTypes.func.isRequired,
+  isSubmitting: PropTypes.bool.isRequired
 }
 
 const mapDispatchToProps = {
@@ -82,4 +84,4 @@ const mapStateToProps = ({ currentUser: { currentUser } }) => {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(MyProfileChangePassword)
+export default connect(mapStateToProps, mapDispatchToProps)(ChangeEmail)

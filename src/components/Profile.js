@@ -2,7 +2,7 @@ import 'firebase/auth'
 import firebase from 'firebase'
 import { Avatar, ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popper,Divider } from '@material-ui/core'
 import React from 'react'
-import { CONTACTS, MEMBERS, MY_PROFILE, ROOT, USERS } from '../urls'
+import { ACCOUNT, CONTACTS, MEMBERS, PROFILE, ROOT, USERS } from '../urls'
 import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import LoggedInState from './HOC/LoggedInState'
@@ -86,8 +86,11 @@ function Profile ({ allowUsersPage, allowContactsPage, isMember, userData, histo
             <Paper id='menu-list-grow'>
               <ClickAwayListener onClickAway={handleClose()}>
                 <MenuList>
-                  <MenuItem onClick={handleClose(MY_PROFILE)} className={classes.menuItem}>
-                    My profile
+                  <MenuItem onClick={handleClose(PROFILE)} className={classes.menuItem}>
+                    Profile
+                  </MenuItem>
+                  <MenuItem onClick={handleClose(ACCOUNT)} className={classes.menuItem}>
+                    Account
                   </MenuItem>
                   {
                     isMember &&

@@ -5,7 +5,7 @@ import * as PropTypes from 'prop-types'
 const ACTION_COLOR = '#b39ddb'
 const LINK_COLOR = 'crimson'
 
-function Snackbar ({ action, message }) {
+function Snackbar ({ action, message, onClose }) {
   const useStyles = makeStyles(() => ({
     root: {},
     content: { backgroundColor: '#673ab7' }
@@ -19,6 +19,7 @@ function Snackbar ({ action, message }) {
       horizontal: 'center'
     }}
     open
+    onClose={onClose}
   >
     <SnackbarContent
       aria-describedby="client-snackbar"
@@ -31,7 +32,8 @@ function Snackbar ({ action, message }) {
 
 Snackbar.propTypes = {
   action: PropTypes.any,
-  message: PropTypes.any
+  message: PropTypes.any,
+  onClose: PropTypes.func
 }
 
 export {

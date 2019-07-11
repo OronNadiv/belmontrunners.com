@@ -27,7 +27,18 @@ import {
   PowerSettingsNew as SignOutIcon
 } from '@material-ui/icons'
 import Profile from './Profile'
-import { CONTACTS, FORGOT_PASSWORD, JOIN, MEMBERS, MY_PROFILE, RESET_PASSWORD, ROOT, SIGN_IN, USERS } from '../urls'
+import {
+  ACCOUNT,
+  CONTACTS,
+  FORGOT_PASSWORD,
+  JOIN,
+  MEMBERS,
+  PROFILE,
+  RESET_PASSWORD,
+  ROOT,
+  SIGN_IN,
+  USERS
+} from '../urls'
 import { Link, withRouter } from 'react-router-dom'
 import $ from 'jquery'
 import firebase from 'firebase'
@@ -189,12 +200,20 @@ function HeaderArea ({ location: { pathname }, isCurrentUserLoaded, currentUser,
               }
               {
                 isSignedIn &&
-                <Link to={MY_PROFILE} onClick={handleDrawerClose}>
+                  <>
+                <Link to={PROFILE} onClick={handleDrawerClose}>
                   <ListItem button>
                     <ListItemIcon><MyProfileIcon color='primary' /></ListItemIcon>
-                    <ListItemText primary='My profile' className={classes.drawerLink} />
+                    <ListItemText primary='Profile' className={classes.drawerLink} />
                   </ListItem>
                 </Link>
+                <Link to={ACCOUNT} onClick={handleDrawerClose}>
+                  <ListItem button>
+                    <ListItemIcon><MyProfileIcon color='primary' /></ListItemIcon>
+                    <ListItemText primary='Account' className={classes.drawerLink} />
+                  </ListItem>
+                </Link>
+                </>
               }
 
               {

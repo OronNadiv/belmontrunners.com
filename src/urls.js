@@ -10,7 +10,8 @@ export const ROOT = '/'
 export const USERS = '/users'
 export const CONTACTS = '/contacts'
 export const GALLERY = '/gallery'
-export const MY_PROFILE = '/myProfile'
+export const PROFILE = '/profile'
+export const ACCOUNT = '/account'
 export const MEMBERS = '/members'
 
 // documents

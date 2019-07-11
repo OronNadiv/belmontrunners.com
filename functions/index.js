@@ -9,6 +9,7 @@ const generateICal = require('./generateICal')(admin)
 const stripe = require('./stripe')
 const addContact = require('./addContact')(admin)
 const getMembers = require('./getMembers')(admin)
+const deleteUser = require('./deleteUser')(admin)
 
 // exports.generateThumbnailHTTP = functions
 //   .runWith({ timeoutSeconds: 120, memory: '1GB' })
@@ -91,3 +92,7 @@ exports.addContact = functions
 exports.getMembers = functions
   .runWith({ timeoutSeconds: 30, memory: '512MB' })
   .https.onCall(getMembers)
+
+exports.deleteUser = functions
+  .runWith({ timeoutSeconds: 30, memory: '512MB' })
+  .https.onCall(deleteUser)

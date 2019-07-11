@@ -12,13 +12,14 @@ import HomePage from './pages/home-page'
 import HeaderArea from './components/HeaderArea'
 import SignUpPage from './pages/sign-up-page/SignUpPage'
 import {
+  ACCOUNT,
   COMPLETE,
   CONTACTS,
   FORGOT_PASSWORD,
   GALLERY,
   JOIN,
   MEMBERS,
-  MY_PROFILE,
+  PROFILE,
   RECOVER_EMAIL,
   RESET_PASSWORD,
   ROOT,
@@ -39,6 +40,7 @@ import VerifyEmailPage from './pages/authentication/VerifyEmailPage'
 import MembersPage from './pages/members-page/MembersPage'
 import usePrevious from './components/usePrevious'
 import { DISPLAY_NAME, EMAIL, PHOTO_URL, UID } from './fields'
+import AccountPage from './pages/account-page/AccountPage'
 
 function Wrapper (props = {}) {
 
@@ -99,10 +101,19 @@ function App ({ fetchCurrentUser, isCurrentUserLoaded, currentUser }) {
         />
         <Route
           exact
-          path={MY_PROFILE}
+          path={PROFILE}
           render={() => (
             <Wrapper>
               <MyProfilePage />
+            </Wrapper>
+          )}
+        />
+        <Route
+          exact
+          path={ACCOUNT}
+          render={() => (
+            <Wrapper>
+              <AccountPage />
             </Wrapper>
           )}
         />

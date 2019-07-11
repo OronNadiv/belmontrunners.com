@@ -9,7 +9,7 @@ import { sendEmailVerification as sendEmailVerificationAction } from '../../redu
 import { compose, pick } from 'underscore'
 import UserDetails from '../../components/UserDetails'
 import { ROOT } from '../../urls'
-import {Button} from '@material-ui/core'
+import { Button } from '@material-ui/core'
 import { withRouter } from 'react-router-dom'
 import UpdateUserData from '../../components/HOC/UpdateUserData'
 
@@ -21,12 +21,13 @@ function MyProfileForm ({ updateUserData, currentUser, userData, history, isSubm
     try {
       onSubmitting(true)
       await updateUserData(values, { merge: true })
+      onSubmitting(false)
+      history.push(ROOT)
     } catch (error) {
+      onSubmitting(false)
       Sentry.captureException(error)
       console.error('error response:', error)
 // todo: show an error message
-    } finally {
-      onSubmitting(false)
     }
   }
 
