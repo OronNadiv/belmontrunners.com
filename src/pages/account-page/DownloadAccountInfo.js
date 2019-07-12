@@ -9,7 +9,7 @@ import UpdateUserData from '../../components/HOC/UpdateUserData'
 import DownloadButton from 'react-dfb'
 import moment from 'moment'
 
-function DownloadAccountInfo ({ currentUser, userData, onSubmitting }) {
+function DownloadAccountInfo ({ currentUser, userData, isSubmitting }) {
   userData = userData.toJS()
 
   const [downloadData, setDownloadData] = useState()
@@ -37,7 +37,7 @@ function DownloadAccountInfo ({ currentUser, userData, onSubmitting }) {
       <span className='px-3 d-flex'>
           <div className='align-self-center'>
             <DownloadButton downloadData={downloadData} onClick={handleDownloadPI}>
-              <Button variant="contained" color="primary">
+              <Button variant="contained" color="primary" disabled={isSubmitting}>
                 Download
               </Button>
             </DownloadButton>

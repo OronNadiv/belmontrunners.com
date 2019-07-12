@@ -4,7 +4,7 @@ import React from 'react'
 import * as PropTypes from 'prop-types'
 import { Form } from 'react-final-form'
 import { connect } from 'react-redux'
-import { ADDRESS1, ADDRESS2, CITY, DATE_OF_BIRTH, GENDER, PHONE, STATE, ZIP } from '../../fields'
+import { ADDRESS1, ADDRESS2, CITY, DATE_OF_BIRTH, DISPLAY_NAME, GENDER, PHONE, STATE, ZIP } from '../../fields'
 import { sendEmailVerification as sendEmailVerificationAction } from '../../reducers/currentUser'
 import { compose, pick } from 'underscore'
 import UserDetails from '../../components/UserDetails'
@@ -20,7 +20,11 @@ function MyProfileForm ({ updateUserData, currentUser, userData, history, isSubm
     console.log('submitting values:', JSON.stringify(values, 0, 2))
     try {
       onSubmitting(true)
-      await updateUserData(values, { merge: true })
+      await Promise.all([
+        currentUser.updateProfile({ [DISPLAY_NAME]: values[DISPLAY_NAME] }),
+        updateUserData(values, { merge: true })
+      ])
+
       onSubmitting(false)
       history.push(ROOT)
     } catch (error) {
@@ -35,7 +39,7 @@ function MyProfileForm ({ updateUserData, currentUser, userData, history, isSubm
     history.push(ROOT)
   }
 
-  const initialValues = pick(userData, ADDRESS1, ADDRESS2, CITY, DATE_OF_BIRTH, GENDER, PHONE, STATE, ZIP)
+  const initialValues = pick(userData, ADDRESS1, ADDRESS2, CITY, DATE_OF_BIRTH, DISPLAY_NAME, GENDER, PHONE, STATE, ZIP)
 
   return currentUser &&
     <>
@@ -43,7 +47,7 @@ function MyProfileForm ({ updateUserData, currentUser, userData, history, isSubm
             initialValues={initialValues}
             render={({ handleSubmit, form, values }) => (
               <form onSubmit={handleSubmit}>
-                <UserDetails values={values} />
+                <UserDetails values={values} showDisplayName />
                 <div className='d-flex justify-content-between my-5'>
                   <Button
                     className='mr-4'

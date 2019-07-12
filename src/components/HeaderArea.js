@@ -15,7 +15,7 @@ import {
   useTheme
 } from '@material-ui/core'
 import {
-  AccountCircle as MyProfileIcon,
+  AccountCircle as ProfileIcon,
   Close as CloseIcon,
   Contacts as ContactsIcon,
   ExitToApp as SignInIcon,
@@ -24,7 +24,8 @@ import {
   People as MembersIcon,
   PeopleOutline as UsersIcon,
   PersonAdd as JoinUsIcon,
-  PowerSettingsNew as SignOutIcon
+  PowerSettingsNew as SignOutIcon,
+  Settings as AccountIcon
 } from '@material-ui/icons'
 import Profile from './Profile'
 import {
@@ -200,19 +201,19 @@ function HeaderArea ({ location: { pathname }, isCurrentUserLoaded, currentUser,
               }
               {
                 isSignedIn &&
-                  <>
-                <Link to={PROFILE} onClick={handleDrawerClose}>
-                  <ListItem button>
-                    <ListItemIcon><MyProfileIcon color='primary' /></ListItemIcon>
-                    <ListItemText primary='Profile' className={classes.drawerLink} />
-                  </ListItem>
-                </Link>
-                <Link to={ACCOUNT} onClick={handleDrawerClose}>
-                  <ListItem button>
-                    <ListItemIcon><MyProfileIcon color='primary' /></ListItemIcon>
-                    <ListItemText primary='Account' className={classes.drawerLink} />
-                  </ListItem>
-                </Link>
+                <>
+                  <Link to={PROFILE} onClick={handleDrawerClose}>
+                    <ListItem button>
+                      <ListItemIcon><ProfileIcon color='primary' /></ListItemIcon>
+                      <ListItemText primary='Profile' className={classes.drawerLink} />
+                    </ListItem>
+                  </Link>
+                  <Link to={ACCOUNT} onClick={handleDrawerClose}>
+                    <ListItem button>
+                      <ListItemIcon><AccountIcon color='primary' /></ListItemIcon>
+                      <ListItemText primary='Account' className={classes.drawerLink} />
+                    </ListItem>
+                  </Link>
                 </>
               }
 

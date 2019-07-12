@@ -3,8 +3,9 @@ import { Select, TextField } from 'final-form-material-ui'
 import moment from 'moment'
 import { Field } from 'react-final-form'
 import { MenuItem } from '@material-ui/core'
-import { ADDRESS1, ADDRESS2, CITY, DATE_OF_BIRTH, GENDER, PHONE, STATE, ZIP } from '../fields'
+import { ADDRESS1, ADDRESS2, CITY, DATE_OF_BIRTH, DISPLAY_NAME, GENDER, PHONE, STATE, ZIP } from '../fields'
 import DatePickerWrapper from './DatePickerWrapper'
+import * as PropTypes from 'prop-types'
 
 const states = require('./states_titlecase.json')
 const required = value => (value ? undefined : 'Required')
@@ -18,12 +19,25 @@ const birthday = value => {
 const composeValidators = (...validators) => value =>
   validators.reduce((error, validator) => error || validator(value), undefined)
 
-function UserDetails () {
+function UserDetails ({ showDisplayName = false }) {
 
   const spacer = <div style={{ flexGrow: 0, flexShrink: 0, width: 20 }} />
 
   return (
     <div className='container-fluid'>
+      {
+        showDisplayName &&
+        <div className='row'>
+          <Field
+            label='Full name'
+            fullWidth
+            margin='normal'
+            name={DISPLAY_NAME}
+            component={TextField}
+            validate={required}
+          />
+        </div>
+      }
       <div className='row'>
         <Field
           label='Address 1'
@@ -148,6 +162,10 @@ function UserDetails () {
       </div>
     </div>
   )
+}
+
+UserDetails.propTypes = {
+  showDisplayName: PropTypes.bool
 }
 
 export default UserDetails
