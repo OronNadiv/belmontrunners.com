@@ -1,6 +1,7 @@
 const functions = require('firebase-functions')
 const admin = require('firebase-admin')
 admin.initializeApp()
+const firestore = admin.firestore()
 // const generateThumbnail = require('./generateThumbnail')(admin)
 const auth2Users = require('./auth2Users')(admin)
 const users2Contacts = require('./users2Contacts')(admin)
@@ -10,6 +11,9 @@ const stripe = require('./stripe')
 const addContact = require('./addContact')(admin)
 const getMembers = require('./getMembers')(admin)
 const deleteUser = require('./deleteUser')(admin)
+const purgeUsersUnder13 = require('./purgeUsersUnder13')(admin)
+const Promise = require('bluebird')
+const { EMAIL, UID } = require('./fields')
 
 // exports.generateThumbnailHTTP = functions
 //   .runWith({ timeoutSeconds: 120, memory: '1GB' })
@@ -27,19 +31,21 @@ const auth2UsersExec = async () => {
     process.exit(1)
   }
 }
-exports.auth2UsersCronJob = functions.pubsub.schedule('0 */6 * * *').onRun(auth2UsersExec)
+
+exports.purgeUsersUnder13CronJob = functions.pubsub.schedule('10 */6 * * *').onRun(async () => await purgeUsersUnder13())
+exports.auth2UsersCronJob = functions.pubsub.schedule('20 */6 * * *').onRun(async () => await auth2UsersExec)
 exports.auth2UsersOnCreate = functions.auth.user().onCreate(auth2UsersExec)
 
-exports.users2ContactsCronJab = functions.pubsub.schedule('20 */6 * * *').onRun(async () => {
+exports.users2ContactsCronJob = functions.pubsub.schedule('30 */6 * * *').onRun(async () => {
   try {
     await users2Contacts()
-    console.info('users2ContactsCronJab: done')
+    console.info('users2ContactsCronJob: done')
   } catch (err) {
-    console.error('users2ContactsCronJab: error:', err)
+    console.error('users2ContactsCronJob: error:', err)
   }
 })
 
-exports.contacts2MailChimpCronJab = functions
+exports.contacts2MailChimpCronJob = functions
   .runWith({ timeoutSeconds: 180 })
   .pubsub
   .schedule('40 */6 * * *')
@@ -95,4 +101,29 @@ exports.getMembers = functions
 
 exports.deleteUser = functions
   .runWith({ timeoutSeconds: 30, memory: '512MB' })
-  .https.onCall(deleteUser)
+  .https.onCall(async (data, context) => {
+    if (!context || !context.auth || !context.auth[UID]) {
+      throw new functions.https.HttpsError('unauthenticated', 'unauthenticated.')
+    }
+    const currentUID = context.auth[UID]
+    const targetUID = data.uid
+    let targetEmail
+    if (targetUID !== currentUID) {
+      const { docUsersDelete, docUser } = await Promise.props({
+        docUsersDelete: firestore.doc('permissions/usersDelete').get(),
+        docUser: firestore.doc(`users/${targetUID}`).get()
+      })
+      const usersDelete = docUsersDelete.data()
+      const allowDelete = usersDelete && usersDelete[currentUID]
+      if (!allowDelete) {
+        throw new functions.https.HttpsError('permission-denied', 'permission-denied.')
+      }
+      targetEmail = docUser.data() && docUser.data()[EMAIL]
+      if (!targetEmail) {
+        throw new functions.https.HttpsError('not-found', 'not-found.')
+      }
+    } else {
+      targetEmail = context.auth.token[EMAIL]
+    }
+    await deleteUser({ [UID]: targetUID, [EMAIL]: targetEmail })
+  })

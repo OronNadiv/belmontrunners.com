@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+import { EMAIL, UID } from './fields'
+
 const admin = require('firebase-admin')
 const serviceAccount = require("./serviceAccountKey.json")
 
@@ -9,8 +11,11 @@ admin.initializeApp({
 
 const process = require('./deleteUser')(admin)
 
-const data = {
-  uid: 'TpcFxzs0lnVgwzkozrB7g1xGjS13'
+const uid = '<ENTER UID>'
+const email = '<ENTER EMAIL>'
+const run = async () => {
+  await process({ [UID]: uid, [EMAIL]: email })
+  console.info('done')
 }
-const context = { auth: { uid: 'jL4tNueYfwYlVo32j2ydXCtepXJ3' } }
-process(data, context)
+
+run()

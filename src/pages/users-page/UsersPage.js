@@ -101,6 +101,7 @@ function EnhancedTable ({ currentUser, allowRead, allowWrite, allowDelete }) {
   const [dense, setDense] = useState(true)
   const [rowsPerPage, setRowsPerPage] = useState(25)
   const [rowToDelete, setRowToDelete] = useState()
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [search, setSearch] = useState('')
   const [filteredRows, setFilteredRows] = useState([])
 
@@ -215,9 +216,26 @@ function EnhancedTable ({ currentUser, allowRead, allowWrite, allowDelete }) {
         rowToDelete &&
         <ConfirmDeletion
           row={rowToDelete}
-          onClose={async () => {
+          onClose={async (shouldDelete) => {
+            const row = rowToDelete
             setRowToDelete()
-            await loadMembers()
+            try {
+              if (!shouldDelete) {
+                return
+              }
+              console.log(`Deleting: ${JSON.stringify(row)}`)
+              setIsSubmitting(true)
+              await firebase.functions().httpsCallable('deleteUser')({ [UID]: row[UID] })
+              console.log('Deleted successfully')
+              setSearch()
+              await loadMembers()
+            } catch (error) {
+              Sentry.captureException(error)
+              console.log('Deletion failed.',
+                'error:', error)
+            } finally {
+              setIsSubmitting(false)
+            }
           }}
         />
       }
@@ -283,7 +301,7 @@ function EnhancedTable ({ currentUser, allowRead, allowWrite, allowDelete }) {
                       {
                         allowDelete &&
                         <TableCell>
-                          <IconButton aria-label="Delete" onClick={() => {
+                          <IconButton aria-label="Delete" disabled={isSubmitting} onClick={() => {
                             setRowToDelete(row)
                           }}>
                             <DeleteIcon />

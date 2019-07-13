@@ -24,7 +24,8 @@ const MEMBERSHIP_FEE_KID = 15
 function SignUpStepPayment ({
                               currentUser: { displayName, uid, email }, history,
                               updateUserData, stripe, isLast,
-                              needToPay, totalAmount, membershipExpiresAt, onNextClicked
+                              needToPay, totalAmount, membershipExpiresAt, onNextClicked,
+                              youngerThan13
                             }) {
   useEffect(() => {
     goToTop()
@@ -147,6 +148,20 @@ function SignUpStepPayment ({
     }
 
     if (needToPay === false) {
+      if (youngerThan13) {
+        return (
+          <>
+            <div className='text-warning text-justify mt-4'>
+              Kids under the age of 13 are welcome to join the club but cannot complete the registration online.
+              For more information, please talk to one of the board members on your next run.
+            </div>
+            <div className='text-justify mt-4'>
+              Due to the California Consumer Privacy Act (CCPA), this account will be automatically within 24 hours.
+            </div>
+          </>
+        )
+      }
+
       return (
         <>
           <div className='text-success text-center mt-4'>Your membership expires
@@ -244,6 +259,7 @@ SignUpStepPayment.propTypes = {
   needToPay: PropTypes.bool,
   membershipExpiresAt: PropTypes.string,
   totalAmount: PropTypes.number.isRequired,
+  youngerThan13: PropTypes.bool.isRequired,
 
   // from HOC
   stripe: PropTypes.shape({
@@ -264,6 +280,7 @@ const mapStateToProps = ({ currentUser: { currentUser, userData } }) => {
   let membershipExpiresAt = null
   let needToPay = false
   let totalAmount = -1
+  let youngerThan13 = false
 
   if (currentUser) {
     const dateOfBirth = moment(userData[DATE_OF_BIRTH])
@@ -279,6 +296,10 @@ const mapStateToProps = ({ currentUser: { currentUser, userData } }) => {
     if (!membershipData[IS_A_MEMBER] || membershipData[IS_MEMBERSHIP_EXPIRES_SOON]) {
       needToPay = true
     }
+    youngerThan13 = (userData[DATE_OF_BIRTH] && moment().diff(moment(userData[DATE_OF_BIRTH]), 'years') < 13) || false
+    if (youngerThan13) {
+      needToPay = false
+    }
   }
 
   return {
@@ -286,7 +307,9 @@ const mapStateToProps = ({ currentUser: { currentUser, userData } }) => {
 
     needToPay,
     membershipExpiresAt,
-    totalAmount
+    totalAmount,
+
+    youngerThan13
   }
 }
 
