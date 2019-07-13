@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { Redirect } from 'react-router-dom'
-import { ROOT } from '../../urls'
+import { Redirect, withRouter } from 'react-router-dom'
+import { SIGN_IN } from '../../urls'
 import { connect } from 'react-redux'
 import * as PropTypes from 'prop-types'
+import { compose } from 'underscore'
 
 const LoggedInState = (params = {}) => {
   let { name, isRequiredToBeLoggedIn = true, canSwitchToLogin = true } = params
@@ -78,7 +79,10 @@ const LoggedInState = (params = {}) => {
       delete filteredProps.___isCurrentUserLoaded___
 
       return redirectToRoot ?
-        <Redirect to={ROOT} /> :
+        <Redirect to={{
+          pathname: SIGN_IN,
+          state: { redirectUrl: props.location.pathname }
+        }} /> :
         <WrappedComponent {...filteredProps} />
     }
 
@@ -90,9 +94,15 @@ const LoggedInState = (params = {}) => {
     }
     Inner.propTypes = {
       ___isCurrentUserLoaded___: PropTypes.bool.isRequired,
-      ___currentUser___: PropTypes.object
+      ___currentUser___: PropTypes.object,
+      location: PropTypes.shape({
+        pathname: PropTypes.string.isRequired
+      }).isRequired
     }
-    return connect(mapStateToProps)(Inner)
+    return compose(
+      withRouter,
+      connect(mapStateToProps)
+    )(Inner)
   }
 }
 

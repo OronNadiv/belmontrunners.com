@@ -12,7 +12,7 @@ import {
   USER_NOT_FOUND_INVALID_EMAIL_OR_PASSWORD,
   WRONG_PASSWORD_INVALID_EMAIL_OR_PASSWORD
 } from '../../messages'
-import {Button, Dialog,DialogTitle, DialogContent, DialogActions} from '@material-ui/core'
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core'
 import { FORGOT_PASSWORD, ROOT } from '../../urls'
 import LoggedInState from '../../components/HOC/LoggedInState'
 import * as Sentry from '@sentry/browser'
@@ -20,6 +20,7 @@ import { Field, Form } from 'react-final-form'
 import { EMAIL, PASSWORD } from '../../fields'
 import { goToTop } from 'react-scrollable-anchor'
 import { compose } from 'underscore'
+import { connect } from 'react-redux'
 
 const providerGoogle = new firebase.auth.GoogleAuthProvider()
 const providerFacebook = new firebase.auth.FacebookAuthProvider()
@@ -29,14 +30,11 @@ const isEmail = value => (!value || !isEmailComponent.validate(value) ? INVALID_
 const minPasswordLength = value => (value.length < 6 ? INVALID_PASSWORD_LENGTH(6) : undefined)
 const composeValidators = (...validators) => value => validators.reduce((error, validator) => error || validator(value), undefined)
 
-function SignInPage ({ history }) {
+function SignInPage ({ history, location, currentUser }) {
   const [errorMessage, setErrorMessage] = useState('')
   const [isSigningIn, setIsSigningIn] = useState(false)
-  const [isSignedIn, setIsSignedIn] = useState(false)
 
-  useEffect(() => {
-    goToTop()
-  }, [])
+  useEffect(goToTop, [])
 
   useEffect(() => {
     errorMessage && goToTop()
@@ -82,23 +80,22 @@ function SignInPage ({ history }) {
         break
     }
 
-    setIsSigningIn(true)
 
     try {
+      setIsSigningIn(true)
       await promise
-      setIsSignedIn(true)
     } catch (error) {
+      setIsSigningIn(false)
       console.log('error while signing in', error)
-      setIsSignedIn(false)
       handleSignInError(error)
     }
     // todo: when sign-in is done via provider, redirect to user details and then maybe to payments
   }
 
-  const handleSignInWithEmail = (values) => {
+  const handleSignInWithEmail = async (values) => {
     setErrorMessage('')
 
-    signIn('email', values)
+    await signIn('email', values)
   }
 
   // const handleSignInWithProvider = (providerName) => {
@@ -111,10 +108,17 @@ function SignInPage ({ history }) {
   }
 
   useEffect(() => {
-    isSignedIn && history.push(ROOT)
-  })
+    if (!currentUser) {
+      return
+    }
+    let targetUrl = ROOT
+    if (location && location.state && location.state.redirectUrl) {
+      targetUrl = location.state.redirectUrl
+    }
+    currentUser && history.push(targetUrl)
+  }, [currentUser, history, location])
 
-  console.log('Signin render called')
+  console.log('SignIn render called')
 
   return (
     <Form
@@ -200,10 +204,23 @@ function SignInPage ({ history }) {
 }
 
 SignInPage.propTypes = {
-  history: PropTypes.object.isRequired
+  currentUser: PropTypes.object,
+  history: PropTypes.object.isRequired,
+  location: PropTypes.shape({
+    state: PropTypes.shape({
+      redirectUrl: PropTypes.string
+    })
+  }).isRequired
+}
+
+const mapStateToProps = ({ currentUser: { currentUser } }) => {
+  return {
+    currentUser
+  }
 }
 
 export default compose(
+  connect(mapStateToProps),
   withRouter,
-  LoggedInState({ isRequiredToBeLoggedIn: false})
+  LoggedInState({ isRequiredToBeLoggedIn: false })
 )(SignInPage)
