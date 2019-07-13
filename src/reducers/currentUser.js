@@ -1,4 +1,6 @@
 import firebase from 'firebase'
+import 'firebase/auth'
+import 'firebase/firestore'
 import Promise from 'bluebird'
 import * as Sentry from '@sentry/browser'
 import moment from 'moment'

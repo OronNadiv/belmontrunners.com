@@ -22,8 +22,8 @@ import { goToTop } from 'react-scrollable-anchor'
 import { compose } from 'underscore'
 import { connect } from 'react-redux'
 
-const providerGoogle = new firebase.auth.GoogleAuthProvider()
-const providerFacebook = new firebase.auth.FacebookAuthProvider()
+// const providerGoogle = new firebase.auth.GoogleAuthProvider()
+// const providerFacebook = new firebase.auth.FacebookAuthProvider()
 
 const required = value => (value ? undefined : 'Required')
 const isEmail = value => (!value || !isEmailComponent.validate(value) ? INVALID_EMAIL : undefined)
@@ -68,12 +68,12 @@ function SignInPage ({ history, location, currentUser }) {
   const signIn = async (providerName, params) => {
     let promise
     switch (providerName.toLowerCase()) {
-      case 'facebook':
-        promise = firebase.auth().signInWithPopup(providerFacebook)
-        break
-      case 'google':
-        promise = firebase.auth().signInWithPopup(providerGoogle)
-        break
+      // case 'facebook':
+      //   promise = firebase.auth().signInWithPopup(providerFacebook)
+      //   break
+      // case 'google':
+      //   promise = firebase.auth().signInWithPopup(providerGoogle)
+      //   break
       case 'email':
       default:
         promise = firebase.auth().signInWithEmailAndPassword(params[EMAIL], params[PASSWORD])
