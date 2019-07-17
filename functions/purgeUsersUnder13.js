@@ -18,6 +18,7 @@ module.exports = (admin) => {
 
     usersToDelete.forEach(async (user) => {
       console.error('would have deleted:', JSON.stringify(user))
+      // see which one were about to be deleted.  you may need to communicate it with their parents.
       // await deleteUser(user)
     })
   }

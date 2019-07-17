@@ -152,11 +152,11 @@ function SignUpStepPayment ({
         return (
           <>
             <div className='text-warning text-justify mt-4'>
-              Kids under the age of 13 are welcome to join the club but cannot complete the registration online.
-              For more information, please talk to one of the board members on your next run.
+              Kids 12 and under are welcome to join the club, but cannot register online. For more information, please
+              talk to one of the board members during your next run
             </div>
             <div className='text-justify mt-4'>
-              Due to the California Consumer Privacy Act (CCPA), this account will be automatically within 24 hours.
+              Due to the California Consumer Privacy Act (CCPA) and the Children&#39;s Online Privacy Protection Act (COPPA), this account will be automatically disabled within 24 hours.
             </div>
           </>
         )
