@@ -27,7 +27,7 @@ import {
   USERS,
   VERIFY_EMAIL
 } from './urls'
-import UsersPage from './pages/users-page/UsersPage'
+import UsersPage2 from './pages/users-page2/UsersPage'
 import GalleryPage from './pages/gallery-page/'
 import Drift from './components/Drift'
 import * as Sentry from '@sentry/browser'
@@ -130,7 +130,7 @@ function App ({ fetchCurrentUser, isCurrentUserLoaded, currentUser }) {
           path={USERS}
           render={() => (
             <Wrapper>
-              <UsersPage />
+              <UsersPage2 />
             </Wrapper>
           )}
         />
