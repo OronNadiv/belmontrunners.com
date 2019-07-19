@@ -15,6 +15,7 @@ import {
   EMAIL_VERIFIED,
   GENDER,
   MEMBERSHIP_EXPIRES_AT,
+  NOT_INTERESTED_IN_BECOMING_A_MEMBER,
   PHONE,
   PHOTO_URL,
   STATE,
@@ -33,6 +34,8 @@ import * as Sentry from '@sentry/browser'
 import { IUserData } from "../../reducers/IUserData";
 import { ROOT } from "../../urls";
 import { Redirect } from 'react-router-dom'
+import ConfirmDeletion from "./ConfirmDeletion";
+import { calc, IS_A_MEMBER } from "../../utilities/membershipUtils";
 
 const PNF = googleLibPhoneNumber.PhoneNumberFormat
 const phoneUtil = googleLibPhoneNumber.PhoneNumberUtil.getInstance()
@@ -49,7 +52,11 @@ interface UsersPageProps {
 
 
 function UsersPage (props: UsersPageProps) {
+  const { currentUser, allowDelete, allowRead, allowWrite } = props
+
   const [rows, setRows] = useState<IUserData[]>([])
+  const [rowToDelete, setRowToDelete] = useState<IUserData | undefined>(undefined)
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
 
   const loadMembers = useCallback(async () => {
     const usersRef = firebase.firestore().collection('users')
@@ -85,6 +92,7 @@ function UsersPage (props: UsersPageProps) {
           [CREATED_AT]: moment(data[CREATED_AT]).format(MEMBERSHIP_EXPIRES_AT_FORMAT),
           [MEMBERSHIP_EXPIRES_AT]: data[MEMBERSHIP_EXPIRES_AT] ? moment(data[MEMBERSHIP_EXPIRES_AT]).format(MEMBERSHIP_EXPIRES_AT_FORMAT) : '',
           [EMAIL_VERIFIED]: !!data[EMAIL_VERIFIED],
+          [NOT_INTERESTED_IN_BECOMING_A_MEMBER]: Boolean(data[NOT_INTERESTED_IN_BECOMING_A_MEMBER]),
         }
 
         rows.push(userData)
@@ -96,16 +104,20 @@ function UsersPage (props: UsersPageProps) {
     setRows(rows)
   }, [])
 
-  useEffect(goToTop, [props.currentUser])
+  useEffect(goToTop, [currentUser])
 
   useEffect(() => {
-    props.allowRead && loadMembers()
-  }, [props.allowRead, loadMembers])
+    allowRead && loadMembers()
+  }, [allowRead, loadMembers])
 
   const handleToggleReceivedShirt = async (userData: IUserData, isChecked: boolean) => {
-    console.log('userData[UID]:', userData[UID])
     const userRef = firebase.firestore().doc(`users/${userData[UID]}`)
     await userRef.set({ [DID_RECEIVED_SHIRT]: isChecked }, { merge: true })
+  }
+
+  const handleNotInterested = async (userData: IUserData, isChecked: boolean) => {
+    const userRef = firebase.firestore().doc(`users/${userData[UID]}`)
+    await userRef.set({ [NOT_INTERESTED_IN_BECOMING_A_MEMBER]: isChecked }, { merge: true })
   }
 
   const columns = [
@@ -191,6 +203,39 @@ function UsersPage (props: UsersPageProps) {
       }
     },
     {
+      name: NOT_INTERESTED_IN_BECOMING_A_MEMBER,
+      label: 'Not interested in becoming a member',
+      options: {
+        searchable: false,
+
+        customBodyRender:
+        // eslint-disable-next-line react/display-name
+          (value: any, tableMeta: any, updateValue: (isChecked: boolean) => never) => {
+            console.log('tableMeta.rowData:', tableMeta.rowData)
+            if (!tableMeta.rowData) {
+              return ''
+            }
+            const userData = _.findWhere(rows, { [UID]: tableMeta.rowData[0] }) as IUserData
+
+            return (
+              <Checkbox
+                checked={!!value}
+                disabled={!allowWrite || calc(userData)[IS_A_MEMBER]}
+                onChange={async (event, isChecked) => {
+                  try {
+                    await handleNotInterested(userData, isChecked)
+                    updateValue(isChecked)
+                  } catch (error) {
+                    Sentry.captureException(error)
+                    console.error(error)
+                  }
+                }}
+              />
+            )
+          }
+      }
+    },
+    {
       name: MEMBERSHIP_EXPIRES_AT,
       label: 'Membership Expires',
       options: {
@@ -209,13 +254,11 @@ function UsersPage (props: UsersPageProps) {
           (value: any, tableMeta: any, updateValue: (isChecked: boolean) => never) => {
             return (
               <Checkbox
-                checked={value}
-                disabled={!props.allowWrite}
+                checked={!!value}
+                disabled={!allowWrite}
                 onChange={async (event, isChecked) => {
                   try {
-                    // console.log('tableMeta:', tableMeta)
                     const userData = _.findWhere(rows, { [UID]: tableMeta.rowData[0] }) as IUserData
-                    console.log('isChecked:', isChecked)
                     await handleToggleReceivedShirt(userData, isChecked)
                     updateValue(isChecked)
                   } catch (error) {
@@ -265,41 +308,66 @@ function UsersPage (props: UsersPageProps) {
     }
   })
 
-  if (props.currentUser && !props.allowRead) {
+  if (currentUser && !allowRead) {
     return <Redirect to={ROOT} />
   }
 
   return (
-    !rows.length ? '' :
-      <MUIDataTable
-        title={"Users List"}
-        data={rows}
-        // @ts-ignore
-        columns={columns}
-        options={{
-          selectableRows: 'none',
-          print: false,
-          responsive: "scroll",
-          rowsPerPage: 100,
-          // onCellClick: (colData: any, cellMeta: { colIndex: number, rowIndex: number, dataIndex: number }) => {
-          // console.log('colData:', colData)
-          // console.log('cellMeta:', cellMeta)
-          // console.log('rows[:', rows[cellMeta.dataIndex])
-          // if (columns[cellMeta.colIndex].name === DID_RECEIVED_SHIRT) {
-          //   handleToggleReceivedShirt(rows[cellMeta.dataIndex])
-          //
-          // },
-          customToolbar: () => {
-            return props.allowDelete &&
-              <IconButton aria-label="Delete" onClick={() => {
-                // setRowToDelete(row)
-              }}>
-                <DeleteIcon />
-              </IconButton>
-          }
+    <>
+      {
+        rowToDelete &&
+        <ConfirmDeletion
+          row={rowToDelete}
+          onClose={async (shouldDelete: boolean) => {
+            const row = rowToDelete
+            try {
+              if (!shouldDelete) {
+                setRowToDelete(undefined)
+                return
+              }
+              console.log(`Deleting: ${JSON.stringify(row)}`)
+              setIsSubmitting(true)
+              await firebase.functions().httpsCallable('deleteUser')({ [UID]: row[UID] })
+              console.log('Deleted successfully')
+              setRowToDelete(undefined)
+              await loadMembers()
+            } catch (error) {
+              Sentry.captureException(error)
+              console.log('Deletion failed.',
+                'error:', error)
+            } finally {
+              setIsSubmitting(false)
+            }
+          }}
+        />
+      }
 
-        }}
-      />
+      {
+        !rows.length ? '' :
+          <MUIDataTable
+            title={"Users List"}
+            data={rows}
+            // @ts-ignore
+            columns={columns}
+            options={{
+              selectableRows: allowDelete ? 'single' : 'none',
+              print: false,
+              responsive: "scroll",
+              rowsPerPage: 15,
+              customToolbarSelect: (selectedRows) => {
+                return allowDelete &&
+                  <IconButton aria-label="Delete" disabled={isSubmitting} onClick={() => {
+                    const { dataIndex } = selectedRows.data[0]
+                    const row = rows[dataIndex]
+                    row && setRowToDelete(row)
+                  }}>
+                    <DeleteIcon />
+                  </IconButton>
+              }
+            }}
+          />
+      }
+    </>
   )
 }
 

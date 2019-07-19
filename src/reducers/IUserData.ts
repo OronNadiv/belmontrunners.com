@@ -10,6 +10,7 @@ import {
   EMAIL_VERIFIED,
   GENDER,
   MEMBERSHIP_EXPIRES_AT,
+  NOT_INTERESTED_IN_BECOMING_A_MEMBER,
   PHONE,
   PHOTO_URL,
   STATE,
@@ -34,4 +35,5 @@ export interface IUserData {
   [MEMBERSHIP_EXPIRES_AT]?: string
   [CREATED_AT]?: string
   [EMAIL_VERIFIED]: boolean
+  [NOT_INTERESTED_IN_BECOMING_A_MEMBER]?: boolean
 }

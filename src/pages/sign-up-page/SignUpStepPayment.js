@@ -10,7 +10,7 @@ import moment from 'moment'
 import Promise from 'bluebird'
 import { ROOT } from '../../urls'
 import { connect } from 'react-redux'
-import { DATE_OF_BIRTH, MEMBERSHIP_EXPIRES_AT } from '../../fields'
+import { DATE_OF_BIRTH, MEMBERSHIP_EXPIRES_AT, NOT_INTERESTED_IN_BECOMING_A_MEMBER } from '../../fields'
 import * as Sentry from '@sentry/browser'
 import { withRouter } from 'react-router-dom'
 import UpdateUserData from '../../components/HOC/UpdateUserData'
@@ -106,6 +106,7 @@ function SignUpStepPayment ({
           ])
           try {
             await updateUserData({
+              [NOT_INTERESTED_IN_BECOMING_A_MEMBER]: false,
               [MEMBERSHIP_EXPIRES_AT]: newMembershipExpiresAt.utc().format()
             }, { merge: true })
 
