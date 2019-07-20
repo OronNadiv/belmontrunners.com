@@ -104,7 +104,7 @@ function UsersPage (props: UsersPageProps) {
           [MEMBERSHIP_EXPIRES_AT]: data[MEMBERSHIP_EXPIRES_AT] ? moment(data[MEMBERSHIP_EXPIRES_AT]).format(MEMBERSHIP_EXPIRES_AT_FORMAT) : '',
           [MEMBERSHIP_STATUS]: '',
           [EMAIL_VERIFIED]: !!data[EMAIL_VERIFIED],
-          [NOT_INTERESTED_IN_BECOMING_A_MEMBER]: Boolean(data[NOT_INTERESTED_IN_BECOMING_A_MEMBER]),
+          [NOT_INTERESTED_IN_BECOMING_A_MEMBER]: !!data[NOT_INTERESTED_IN_BECOMING_A_MEMBER]
         }
 
         try {
@@ -242,7 +242,7 @@ function UsersPage (props: UsersPageProps) {
         // eslint-disable-next-line react/display-name
           (value: any, tableMeta: any, updateValue: (isChecked: boolean) => never) => {
             if (!tableMeta.rowData) {
-              return ''
+              return value
             }
             const userData = _.findWhere(rows, { [UID]: tableMeta.rowData[0] }) as IUserDataExtended
 
