@@ -241,26 +241,35 @@ function UsersPage (props: UsersPageProps) {
         customBodyRender:
         // eslint-disable-next-line react/display-name
           (value: any, tableMeta: any, updateValue: (isChecked: boolean) => never) => {
-            if (!tableMeta.rowData) {
+            try {
+              if (!tableMeta.rowData) {
+                return value
+              }
+              const userData = _.findWhere(rows, { [UID]: tableMeta.rowData[0] }) as IUserDataExtended
+              if (!userData) {
+                throw new Error(`userData is null. tableMeta.rowData: ${JSON.stringify(tableMeta.rowData)}`)
+              }
+
+              return (
+                <Checkbox
+                  checked={!!value}
+                  disabled={!allowWrite || calc(userData)[IS_A_MEMBER]}
+                  onChange={async (event, isChecked) => {
+                    try {
+                      await handleNotInterested(userData, isChecked)
+                      updateValue(isChecked)
+                    } catch (error) {
+                      Sentry.captureException(error)
+                      console.error(error)
+                    }
+                  }}
+                />
+              )
+            } catch (error) {
+              Sentry.captureException(error)
+              console.error(error)
               return value
             }
-            const userData = _.findWhere(rows, { [UID]: tableMeta.rowData[0] }) as IUserDataExtended
-
-            return (
-              <Checkbox
-                checked={!!value}
-                disabled={!allowWrite || calc(userData)[IS_A_MEMBER]}
-                onChange={async (event, isChecked) => {
-                  try {
-                    await handleNotInterested(userData, isChecked)
-                    updateValue(isChecked)
-                  } catch (error) {
-                    Sentry.captureException(error)
-                    console.error(error)
-                  }
-                }}
-              />
-            )
           }
       }
     },
