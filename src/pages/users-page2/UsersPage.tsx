@@ -35,13 +35,20 @@ import { IUserData } from "../../reducers/IUserData";
 import { ROOT } from "../../urls";
 import { Redirect } from 'react-router-dom'
 import ConfirmDeletion from "./ConfirmDeletion";
-import { calc, IS_A_MEMBER } from "../../utilities/membershipUtils";
+import {
+  calc,
+  IS_A_MEMBER,
+  IS_MEMBERSHIP_EXPIRED,
+  IS_MEMBERSHIP_EXPIRES_SOON,
+  WAS_NEVER_A_MEMBER
+} from "../../utilities/membershipUtils";
 
 const PNF = googleLibPhoneNumber.PhoneNumberFormat
 const phoneUtil = googleLibPhoneNumber.PhoneNumberUtil.getInstance()
 
 const DATE_OF_BIRTH_FORMAT = 'MM/DD'
 const MEMBERSHIP_EXPIRES_AT_FORMAT = 'YYYY-MM-DD HH:mm'
+const MEMBERSHIP_STATUS = 'MEMBERSHIP_STATUS'
 
 interface UsersPageProps {
   currentUser: any,
@@ -50,12 +57,16 @@ interface UsersPageProps {
   allowDelete: boolean
 }
 
+interface IUserDataExtended extends IUserData {
+  MEMBERSHIP_STATUS: string
+}
+
 
 function UsersPage (props: UsersPageProps) {
   const { currentUser, allowDelete, allowRead, allowWrite } = props
 
-  const [rows, setRows] = useState<IUserData[]>([])
-  const [rowToDelete, setRowToDelete] = useState<IUserData | undefined>(undefined)
+  const [rows, setRows] = useState<IUserDataExtended[]>([])
+  const [rowToDelete, setRowToDelete] = useState<IUserDataExtended | undefined>(undefined)
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
 
   const loadMembers = useCallback(async () => {
@@ -73,7 +84,7 @@ function UsersPage (props: UsersPageProps) {
           data[PHONE] = ''
         }
 
-        let userData: IUserData = {
+        let userData: IUserDataExtended = {
           [UID]: doc.id,
           [PHOTO_URL]: data[PHOTO_URL] || '',
           [DISPLAY_NAME]: data[DISPLAY_NAME],
@@ -91,8 +102,27 @@ function UsersPage (props: UsersPageProps) {
           [DATE_OF_BIRTH]: data[DATE_OF_BIRTH] ? moment(data[DATE_OF_BIRTH]).format(DATE_OF_BIRTH_FORMAT) : '',
           [CREATED_AT]: moment(data[CREATED_AT]).format(MEMBERSHIP_EXPIRES_AT_FORMAT),
           [MEMBERSHIP_EXPIRES_AT]: data[MEMBERSHIP_EXPIRES_AT] ? moment(data[MEMBERSHIP_EXPIRES_AT]).format(MEMBERSHIP_EXPIRES_AT_FORMAT) : '',
+          [MEMBERSHIP_STATUS]: '',
           [EMAIL_VERIFIED]: !!data[EMAIL_VERIFIED],
           [NOT_INTERESTED_IN_BECOMING_A_MEMBER]: Boolean(data[NOT_INTERESTED_IN_BECOMING_A_MEMBER]),
+        }
+
+        try {
+          let calc1 = calc(userData);
+          if (calc1[IS_A_MEMBER]) {
+            userData[MEMBERSHIP_STATUS] = 'Is a member'
+          } else if (calc1[IS_MEMBERSHIP_EXPIRED]) {
+            userData[MEMBERSHIP_STATUS] = 'Was a member'
+          } else if (calc1[WAS_NEVER_A_MEMBER]) {
+            userData[MEMBERSHIP_STATUS] = 'Not a member'
+          } else if (calc1[IS_MEMBERSHIP_EXPIRES_SOON]) {
+            userData[MEMBERSHIP_STATUS] = 'Membership expires soon'
+          } else {
+            throw new Error(`Unknown membership status.  calc: ${JSON.stringify(calc1)}`)
+          }
+        } catch (error) {
+          Sentry.captureException(error)
+          console.error(error)
         }
 
         rows.push(userData)
@@ -110,12 +140,12 @@ function UsersPage (props: UsersPageProps) {
     allowRead && loadMembers()
   }, [allowRead, loadMembers])
 
-  const handleToggleReceivedShirt = async (userData: IUserData, isChecked: boolean) => {
+  const handleToggleReceivedShirt = async (userData: IUserDataExtended, isChecked: boolean) => {
     const userRef = firebase.firestore().doc(`users/${userData[UID]}`)
     await userRef.set({ [DID_RECEIVED_SHIRT]: isChecked }, { merge: true })
   }
 
-  const handleNotInterested = async (userData: IUserData, isChecked: boolean) => {
+  const handleNotInterested = async (userData: IUserDataExtended, isChecked: boolean) => {
     const userRef = firebase.firestore().doc(`users/${userData[UID]}`)
     await userRef.set({ [NOT_INTERESTED_IN_BECOMING_A_MEMBER]: isChecked }, { merge: true })
   }
@@ -211,11 +241,10 @@ function UsersPage (props: UsersPageProps) {
         customBodyRender:
         // eslint-disable-next-line react/display-name
           (value: any, tableMeta: any, updateValue: (isChecked: boolean) => never) => {
-            console.log('tableMeta.rowData:', tableMeta.rowData)
             if (!tableMeta.rowData) {
               return ''
             }
-            const userData = _.findWhere(rows, { [UID]: tableMeta.rowData[0] }) as IUserData
+            const userData = _.findWhere(rows, { [UID]: tableMeta.rowData[0] }) as IUserDataExtended
 
             return (
               <Checkbox
@@ -244,6 +273,11 @@ function UsersPage (props: UsersPageProps) {
       }
     },
     {
+      name: MEMBERSHIP_STATUS,
+      label: 'Membership Status',
+      options: {},
+    },
+    {
       name: DID_RECEIVED_SHIRT,
       label: 'Received Shirt',
       options: {
@@ -258,7 +292,7 @@ function UsersPage (props: UsersPageProps) {
                 disabled={!allowWrite}
                 onChange={async (event, isChecked) => {
                   try {
-                    const userData = _.findWhere(rows, { [UID]: tableMeta.rowData[0] }) as IUserData
+                    const userData = _.findWhere(rows, { [UID]: tableMeta.rowData[0] }) as IUserDataExtended
                     await handleToggleReceivedShirt(userData, isChecked)
                     updateValue(isChecked)
                   } catch (error) {
