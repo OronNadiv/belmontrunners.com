@@ -393,7 +393,7 @@ function UsersPage (props: UsersPageProps) {
               selectableRows: allowDelete ? 'single' : 'none',
               print: false,
               responsive: "scroll",
-              rowsPerPage: 15,
+              rowsPerPage: 100,
               customToolbarSelect: (selectedRows) => {
                 return allowDelete &&
                   <IconButton aria-label="Delete" disabled={isSubmitting} onClick={() => {
