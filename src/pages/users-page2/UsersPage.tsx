@@ -28,7 +28,7 @@ import { goToTop } from 'react-scrollable-anchor'
 import googleLibPhoneNumber from 'google-libphonenumber'
 import _, { compose } from 'underscore'
 import { connect } from 'react-redux'
-import { CurrentUserStore } from "../../reducers/CurrentUserStore";
+import { ICurrentUserStore } from "../../reducers/ICurrentUserStore";
 import { Avatar, Checkbox, IconButton } from '@material-ui/core'
 import * as Sentry from '@sentry/browser'
 import { IUserData } from "../../reducers/IUserData";
@@ -158,7 +158,8 @@ function UsersPage (props: UsersPageProps) {
         filter: false,
         searchable: false,
         // eslint-disable-next-line react/display-name
-        customBodyRender: (value: any) => {
+        customBodyRender: (value: any, tableMeta: any, updateValue: (s: any, c: any, p: any) => any) => {
+          // console.log(tableMeta)
           return value ?
             <Avatar style={{ width: 40, height: 40, backgroundColor: 'rgb(98, 71, 234)', fontSize: 13.33333 }}
                     src={value} />
@@ -188,10 +189,6 @@ function UsersPage (props: UsersPageProps) {
         searchable: false
       }
     },
-    // {
-    //   name: ADDRESS,
-    //   label: 'Address'
-    // },
     {
       name: ADDRESS1,
       label: 'Address1',
@@ -238,39 +235,40 @@ function UsersPage (props: UsersPageProps) {
       options: {
         searchable: false,
 
-        customBodyRender:
         // eslint-disable-next-line react/display-name
-          (value: any, tableMeta: any, updateValue: (isChecked: boolean) => never) => {
-            try {
-              if (!tableMeta.rowData) {
-                return value
-              }
-              const userData = _.findWhere(rows, { [UID]: tableMeta.rowData[0] }) as IUserDataExtended
-              if (!userData) {
-                throw new Error(`userData is null. tableMeta: ${JSON.stringify(tableMeta)}`)
-              }
+        customBodyRender: (value: any, tableMeta: any, updateValue: (s: any, c: any, p: any) => any) => {
+          console.log(tableMeta)
 
-              return (
-                <Checkbox
-                  checked={!!value}
-                  disabled={!allowWrite || calc(userData)[IS_A_MEMBER]}
-                  onChange={async (event, isChecked) => {
-                    try {
-                      await handleNotInterested(userData, isChecked)
-                      updateValue(isChecked)
-                    } catch (error) {
-                      Sentry.captureException(error)
-                      console.error(error)
-                    }
-                  }}
-                />
-              )
-            } catch (error) {
-              Sentry.captureException(error)
-              console.error(error)
+          try {
+            if (!tableMeta.rowData) {
               return value
             }
+            const userData = _.findWhere(rows, { [UID]: tableMeta.rowData[0] }) as IUserDataExtended
+            if (!userData) {
+              throw new Error(`userData is null. tableMeta: ${JSON.stringify(tableMeta)}`)
+            }
+
+            return (
+              <Checkbox
+                checked={!!value}
+                disabled={!allowWrite || !!calc(userData)[IS_A_MEMBER]}
+                onChange={async (event, isChecked) => {
+                  try {
+                    await handleNotInterested(userData, isChecked)
+                    updateValue(isChecked, undefined, undefined)
+                  } catch (error) {
+                    Sentry.captureException(error)
+                    console.error(error)
+                  }
+                }}
+              />
+            )
+          } catch (error) {
+            Sentry.captureException(error)
+            console.error(error)
+            return value
           }
+        }
       }
     },
     {
@@ -292,26 +290,27 @@ function UsersPage (props: UsersPageProps) {
       options: {
         searchable: false,
 
-        customBodyRender:
         // eslint-disable-next-line react/display-name
-          (value: any, tableMeta: any, updateValue: (isChecked: boolean) => never) => {
-            return (
-              <Checkbox
-                checked={!!value}
-                disabled={!allowWrite}
-                onChange={async (event, isChecked) => {
-                  try {
-                    const userData = _.findWhere(rows, { [UID]: tableMeta.rowData[0] }) as IUserDataExtended
-                    await handleToggleReceivedShirt(userData, isChecked)
-                    updateValue(isChecked)
-                  } catch (error) {
-                    Sentry.captureException(error)
-                    console.error(error)
-                  }
-                }}
-              />
-            )
-          }
+        customBodyRender: (value: any, tableMeta: any, updateValue: (s: any, c: any, p: any) => any) => {
+          // console.log(tableMeta)
+
+          return (
+            <Checkbox
+              checked={!!value}
+              disabled={!allowWrite}
+              onChange={async (event, isChecked) => {
+                try {
+                  const userData = _.findWhere(rows, { [UID]: tableMeta.rowData[0] }) as IUserDataExtended
+                  await handleToggleReceivedShirt(userData, isChecked)
+                  updateValue(isChecked, undefined, undefined)
+                } catch (error) {
+                  Sentry.captureException(error)
+                  console.error(error)
+                }
+              }}
+            />
+          )
+        }
       }
     },
     {
@@ -327,16 +326,15 @@ function UsersPage (props: UsersPageProps) {
       label: 'Email Verified',
       options: {
         searchable: false,
-        customBodyRender:
         // eslint-disable-next-line react/display-name
-          (value: any) => {
-            return (
-              <Checkbox
-                checked={value}
-                disabled
-              />
-            )
-          }
+        customBodyRender: (value: any) => {
+          return (
+            <Checkbox
+              checked={value}
+              disabled
+            />
+          )
+        }
 
       }
     }
@@ -390,7 +388,6 @@ function UsersPage (props: UsersPageProps) {
           <MUIDataTable
             title={"Users List"}
             data={rows}
-            // @ts-ignore
             columns={columns}
             options={{
               selectableRows: allowDelete ? 'single' : 'none',
@@ -421,7 +418,7 @@ UsersPage.propTypes = {
   currentUser: PropTypes.object.isRequired
 }
 
-const mapStateToProps = (state: CurrentUserStore) => {
+const mapStateToProps = (state: ICurrentUserStore) => {
   let currentUserElement = state.currentUser.currentUser[UID];
   return {
     allowRead: !!state.currentUser.currentUser && state.currentUser.permissions.usersRead[currentUserElement],

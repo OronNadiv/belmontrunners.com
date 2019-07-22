@@ -40,20 +40,31 @@ import {
   SIGN_IN,
   USERS
 } from '../urls'
+import { RouteComponentProps } from 'react-router'
 import { Link, withRouter } from 'react-router-dom'
 import $ from 'jquery'
-import firebase from 'firebase'
 import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { calc, IS_A_MEMBER } from '../utilities/membershipUtils'
 import { UID } from '../fields'
+import firebase from 'firebase'
+import { ICurrentUserStore } from "../reducers/ICurrentUserStore";
+import { compose } from 'underscore'
 
 const TOOLBAR_HEIGHT = 72
 const DRAWER_WIDTH = 240
 const BACKGROUND_IMAGE = 'linear-gradient(90deg,#141da2,#9b5cf6)'
 
+interface IHeaderAreaProps extends RouteComponentProps<{}> {
+  isCurrentUserLoaded: boolean,
+  currentUser: firebase.User,
+  allowUsersPage: boolean,
+  allowContactsPage: boolean,
+  isMember: boolean
+}
 
-function HeaderArea ({ location: { pathname }, isCurrentUserLoaded, currentUser, allowUsersPage, allowContactsPage, isMember }) {
+function HeaderArea (props: IHeaderAreaProps) {
+  const { location: { pathname }, isCurrentUserLoaded, currentUser, allowUsersPage, allowContactsPage, isMember } = props
   const [transparentBackground, setTransparentBackground] = useState(true)
   const [showDrawer, setShowDrawer] = useState(false)
 
@@ -68,10 +79,10 @@ function HeaderArea ({ location: { pathname }, isCurrentUserLoaded, currentUser,
         setTransparentBackground(false)
         return
       }
-      const nav_offset_top = TOOLBAR_HEIGHT + 50
+      const nav_offset_top: number = TOOLBAR_HEIGHT + 50
 
-      const scroll = $(window).scrollTop()
-      if (scroll >= nav_offset_top) {
+      const scroll = $(window).scrollTop
+      if (scroll && Number(scroll) >= nav_offset_top) {
         setTransparentBackground(false)
       } else {
         setTransparentBackground(true)
@@ -87,12 +98,19 @@ function HeaderArea ({ location: { pathname }, isCurrentUserLoaded, currentUser,
   const theme = useTheme()
   const isSmallDevice = useMediaQuery(theme.breakpoints.down('sm'))
 
-  const rootStyle = {}
-  const appBarStyle = {}
+  const rootStyle: { height?: number } = {}
+  const appBarStyle: {
+    background?: string,
+    position?: 'fixed',
+    transform?: string,
+    transition?: string,
+    backgroundImage?: string,
+    top?: number,
+  } = {}
   if (transparentBackground && !isSmallDevice) {
     appBarStyle.background = 'transparent'
   } else {
-    appBarStyle.position = `fixed`
+    appBarStyle.position = 'fixed'
     appBarStyle.transform = `translateY(${TOOLBAR_HEIGHT}px)`
     if (!isSmallDevice) {
       appBarStyle.transition = 'transform 500ms ease, background 500ms ease'
@@ -158,15 +176,15 @@ function HeaderArea ({ location: { pathname }, isCurrentUserLoaded, currentUser,
     setShowDrawer(true)
   }
 
-  const handleDrawerClose = (event = {}) => {
+  const handleDrawerClose = (event: { type?: string, key?: string } = {}) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return
     }
     setShowDrawer(false)
   }
 
-  const isSignedOut = isCurrentUserLoaded && !currentUser
-  const isSignedIn = isCurrentUserLoaded && currentUser
+  const isSignedOut: boolean = isCurrentUserLoaded && !currentUser
+  const isSignedIn: boolean = isCurrentUserLoaded && !!currentUser
 
   return (
     <div className={classes.root}>
@@ -356,18 +374,17 @@ HeaderArea.propTypes = {
   isMember: PropTypes.bool.isRequired
 }
 
-const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, currentUser, permissions, userData } }) => {
+const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, currentUser, permissions, userData } }: ICurrentUserStore) => {
   return {
-    allowUsersPage: !!currentUser && (
-      !!permissions.usersRead[currentUser[UID]] ||
-      !!permissions.usersWrite[currentUser[UID]]),
-    allowContactsPage: !!currentUser && (
-      !!permissions.contactsRead[currentUser[UID]] ||
-      !!permissions.contactsWrite[currentUser[UID]]),
-    isMember: userData && calc(userData.toJS())[IS_A_MEMBER],
+    allowUsersPage: !!currentUser && (permissions.usersRead[currentUser[UID]] || permissions.usersWrite[currentUser[UID]]),
+    allowContactsPage: !!currentUser && (permissions.contactsRead[currentUser[UID]] || permissions.contactsWrite[currentUser[UID]]),
+    isMember: userData && calc(userData)[IS_A_MEMBER],
     isCurrentUserLoaded,
     currentUser
   }
 }
 
-export default connect(mapStateToProps)(withRouter(HeaderArea))
+export default compose(
+  withRouter,
+  connect(mapStateToProps)
+)(HeaderArea)

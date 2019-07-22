@@ -1,6 +1,6 @@
 import 'firebase/auth'
 import firebase from 'firebase'
-import { Avatar, ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popper,Divider } from '@material-ui/core'
+import { Avatar, ClickAwayListener, Divider, Grow, MenuItem, MenuList, Paper, Popper } from '@material-ui/core'
 import React from 'react'
 import { ACCOUNT, CONTACTS, MEMBERS, PROFILE, ROOT, USERS } from '../urls'
 import * as PropTypes from 'prop-types'
