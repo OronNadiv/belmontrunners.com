@@ -245,7 +245,7 @@ function UsersPage (props: UsersPageProps) {
             }
             const userData = _.findWhere(rows, { [UID]: tableMeta.rowData[0] }) as IUserDataExtended
             if (!userData) {
-              throw new Error(`userData is null. tableMeta: ${JSON.stringify(tableMeta)}`)
+              return value
             }
 
             return (
