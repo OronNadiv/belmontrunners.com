@@ -38,6 +38,8 @@
     "initials": "^3.0.1",
     "isemail": "^3.2.0",
     "jquery": "^3.4.1",
+    "logrocket": "^1.0.3",
+    "logrocket-react": "^3.0.0",
     "material-ui-pickers": "^2.2.4",
     "moment": "^2.24.0",
     "mui-datatables": "^2.6.4",

@@ -41,6 +41,8 @@ import MembersPage from './pages/members-page/MembersPage'
 import usePrevious from './components/usePrevious'
 import { DISPLAY_NAME, EMAIL, PHOTO_URL, UID } from './fields'
 import AccountPage from './pages/account-page/AccountPage'
+import LogRocket from 'logrocket'
+import setupLogRocketReact from 'logrocket-react'
 
 function Wrapper (props = {}) {
 
@@ -62,23 +64,39 @@ Wrapper.propTypes = {
 }
 
 function App ({ fetchCurrentUser, isCurrentUserLoaded, currentUser }) {
-  useEffect(fetchCurrentUser, [])
+  useEffect(() => {
+    LogRocket.init('qv4xmc/belmont-runners')
+    setupLogRocketReact(LogRocket)
+    fetchCurrentUser()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const prevCurrentUser = usePrevious(currentUser)
   useEffect(() => {
     if (prevCurrentUser !== currentUser) {
       console.log('currentUser is different:', currentUser)
       if (currentUser) {
-        Sentry.configureScope((scope) => {
-          scope.setUser({
-            id: currentUser[UID],
-            email: currentUser[EMAIL],
-            displayName: currentUser[DISPLAY_NAME]
+        LogRocket.identify(currentUser[UID], {
+          name: currentUser[DISPLAY_NAME],
+          email: currentUser[EMAIL]
+        })
+
+        LogRocket.getSessionURL(sessionURL => {
+          Sentry.configureScope((scope) => {
+            scope.setUser({
+              id: currentUser[UID],
+              email: currentUser[EMAIL],
+              displayName: currentUser[DISPLAY_NAME]
+            })
+            scope.setExtra("sessionURL", sessionURL)
           })
         })
       } else {
-        Sentry.configureScope((scope) => {
-          scope.setUser({ email: undefined, displayName: undefined, uid: undefined })
+        LogRocket.getSessionURL(sessionURL => {
+          Sentry.configureScope((scope) => {
+            scope.setUser({ email: undefined, displayName: undefined, uid: undefined })
+            scope.setExtra("sessionURL", sessionURL)
+          })
         })
       }
     }

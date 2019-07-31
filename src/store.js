@@ -3,6 +3,7 @@ import thunk from 'redux-thunk'
 import createRootReducer from './reducers/rootReducer'
 import { createBrowserHistory } from 'history'
 import { routerMiddleware } from 'connected-react-router'
+import LogRocket from 'logrocket';
 
 export const history = createBrowserHistory()
 
@@ -15,7 +16,8 @@ export default function configureStore (initialState = {}) {
     composeEnhancers(
       applyMiddleware(
         routerMiddleware(history), // for dispatching history actions
-        thunk
+        thunk,
+        LogRocket.reduxMiddleware()
       )
     )
   )
