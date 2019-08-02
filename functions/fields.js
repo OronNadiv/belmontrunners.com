@@ -16,6 +16,7 @@ module.exports = {
   PHONE: 'phone',
   DATE_OF_BIRTH: 'dateOfBirth',
   GENDER: 'gender',
+  GRAVATAR_URL: 'gravatarUrl',
 
   ONLY_ME: 'ONLY_ME',
   MEMBERS: 'MEMBERS',

@@ -1,3 +1,5 @@
+const gravatar = require('gravatar')
+
 const { calc, IS_A_MEMBER } = require('./membershipUtils')
 
 const {
@@ -8,6 +10,7 @@ const {
   DISPLAY_NAME,
   EMAIL,
   GENDER,
+  GRAVATAR_URL,
   IS_MEMBER,
   MEMBERS,
   PHONE,
@@ -35,7 +38,8 @@ const defaultVisibility = {
   [ZIP]: ONLY_ME,
   [GENDER]: ONLY_ME,
   [DATE_OF_BIRTH]: ONLY_ME,
-  [IS_MEMBER]: MEMBERS
+  [IS_MEMBER]: MEMBERS,
+  [GRAVATAR_URL]: MEMBERS
 }
 module.exports = (admin) => {
   const firestore = admin.firestore()
@@ -77,6 +81,7 @@ module.exports = (admin) => {
       const user = userDoc.data()
       user[UID] = userDoc.id
       user[IS_MEMBER] = isMember(user)
+      user[GRAVATAR_URL] = gravatar.url(userDoc[EMAIL], { protocol: 'https', default: '404' })
       users.push(user)
     })
 
