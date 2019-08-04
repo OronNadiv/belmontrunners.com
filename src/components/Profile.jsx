@@ -1,12 +1,12 @@
 import 'firebase/auth'
 import firebase from 'firebase'
 import { Avatar, ClickAwayListener, Divider, Grow, MenuItem, MenuList, Paper, Popper } from '@material-ui/core'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { ACCOUNT, CONTACTS, MEMBERS, PROFILE, ROOT, USERS } from '../urls'
 import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import LoggedInState from './HOC/LoggedInState'
-import { DISPLAY_NAME, PHOTO_URL, UID } from '../fields'
+import { DISPLAY_NAME, EMAIL, PHOTO_URL, UID } from '../fields'
 import { Map as IMap } from 'immutable'
 import { makeStyles } from '@material-ui/core/styles'
 import { KeyboardArrowDown as ArrowDropDownIcon, KeyboardArrowUp as ArrowDropUpIcon } from '@material-ui/icons'
@@ -14,6 +14,8 @@ import initials from 'initials'
 import { withRouter } from 'react-router-dom'
 import { compose } from 'underscore'
 import { calc, IS_A_MEMBER } from '../utilities/membershipUtils'
+import gravatar from 'gravatar'
+import rp from 'request-promise'
 
 function Profile ({ allowUsersPage, allowContactsPage, isMember, userData, history }) {
 
@@ -45,6 +47,32 @@ function Profile ({ allowUsersPage, allowContactsPage, isMember, userData, histo
   const classes = useStyles()
   const anchorRef = React.useRef(null)
   const [open, setOpen] = React.useState(false)
+  const [isGravatarFetched, setIsGravatarFetched] = useState(false)
+  const [gravatarUrl, setGravatarUrl] = useState()
+
+  useEffect(() => {
+    if (!userData || isGravatarFetched) {
+      return
+    }
+    const func = async () => {
+      if (!userData[PHOTO_URL] && !isGravatarFetched) {
+        console.log('userData[EMAIL]:', userData[EMAIL])
+        const uri = gravatar.url(userData[EMAIL], { protocol: 'https', default: '404' })
+        try {
+          console.log('before RP')
+          await rp(uri)
+          console.log('after RP')
+          setGravatarUrl(uri)
+        } catch (error) {
+          console.log('after RP-EXCEPTION', error)
+        } finally {
+          setIsGravatarFetched(true)
+        }
+      }
+    }
+
+    func()
+  }, [userData, isGravatarFetched])
 
   function handleToggle () {
     setOpen(prevOpen => !prevOpen)
@@ -61,10 +89,13 @@ function Profile ({ allowUsersPage, allowContactsPage, isMember, userData, histo
 
   userData = userData.toJS()
 
+  if (!userData[PHOTO_URL] && !isGravatarFetched) {
+    return null
+  }
   return (
     <>
       <div className={classes.avatarWrapper} ref={anchorRef} onClick={handleToggle}>
-        <Avatar className={classes.avatar} src={userData[PHOTO_URL]}>
+        <Avatar className={classes.avatar} src={userData[PHOTO_URL] || gravatarUrl}>
           {
             initials(userData[DISPLAY_NAME])
           }

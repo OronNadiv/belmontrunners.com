@@ -1,7 +1,7 @@
 import 'firebase/functions'
 import firebase from 'firebase'
 import React, { useEffect, useState } from "react"
-import { DISPLAY_NAME, PHOTO_URL, UID } from '../../fields'
+import { DISPLAY_NAME, GRAVATAR_URL, PHOTO_URL, UID } from '../../fields'
 import * as PropTypes from 'prop-types'
 import * as Sentry from '@sentry/browser'
 import { connect } from 'react-redux'
@@ -28,6 +28,7 @@ function MembersPage ({ currentUser, location: { pathname }, history, userData }
   const [isLoading, setIsLoading] = useState(true)
   const [showError, setShowError] = useState(false)
   const [users, setUsers] = useState([])
+
   useEffect(() => {
     if (!currentUser) {
       return
@@ -118,7 +119,9 @@ function MembersPage ({ currentUser, location: { pathname }, history, userData }
           avatar={
             user[PHOTO_URL] ?
               <Avatar className={classes.chipAvatar} src={user[PHOTO_URL]} /> :
-              <Avatar className={classes.chipAvatar}><DirectionsRun /></Avatar>
+              user[GRAVATAR_URL] ?
+                <Avatar className={classes.chipAvatar} src={user[GRAVATAR_URL]} /> :
+                <Avatar className={classes.chipAvatar}><DirectionsRun /></Avatar>
           }
           onClick={() => handleChipSelected(user)}
           key={user[UID]}

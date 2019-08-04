@@ -1,5 +1,3 @@
-const gravatar = require('gravatar')
-
 const { calc, IS_A_MEMBER } = require('./membershipUtils')
 
 const {
@@ -81,7 +79,6 @@ module.exports = (admin) => {
       const user = userDoc.data()
       user[UID] = userDoc.id
       user[IS_MEMBER] = isMember(user)
-      user[GRAVATAR_URL] = gravatar.url(userDoc[EMAIL], { protocol: 'https', default: '404' })
       users.push(user)
     })
 

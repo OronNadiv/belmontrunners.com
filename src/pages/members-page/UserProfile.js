@@ -9,6 +9,7 @@ import {
   DATE_OF_BIRTH,
   DISPLAY_NAME,
   EMAIL,
+  GRAVATAR_URL,
   MEMBERS,
   ONLY_ME,
   PHONE,
@@ -199,6 +200,13 @@ function UserProfile ({ onClose, user, userData, updateUserData, currentUser }) 
 
   const connectedToFacebook = Boolean(findWhere(currentUser.providerData, { providerId: 'facebook.com' }))
 
+  const avatarUrl = (
+    (user[PHOTO_URL] &&
+      `${user[PHOTO_URL]}?width=${AVATAR_WIDTH}&&height=${AVATAR_HEIGHT}`) ||
+    (user[GRAVATAR_URL] &&
+      `${user[GRAVATAR_URL]}?s=${AVATAR_WIDTH}`) || null
+  )
+
   return (
     <SwipeableDrawer
       open
@@ -247,7 +255,7 @@ function UserProfile ({ onClose, user, userData, updateUserData, currentUser }) 
       <div className={`mx-5 ${classes.root}`}>
         <div className='d-flex flex-column align-items-center'>
           <Avatar className={` ${classes.avatar}`}
-                  src={user[PHOTO_URL] && `${user[PHOTO_URL]}?width=${AVATAR_WIDTH}&&height=${AVATAR_HEIGHT}`}>{initials(user[DISPLAY_NAME])}</Avatar>
+                  src={avatarUrl}>{initials(user[DISPLAY_NAME])}</Avatar>
           <div className='mt-3'>
             {user[DISPLAY_NAME]}
           </div>
