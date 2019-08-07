@@ -237,7 +237,7 @@ function UsersPage (props: UsersPageProps) {
 
         // eslint-disable-next-line react/display-name
         customBodyRender: (value: any, tableMeta: any, updateValue: (s: any, c: any, p: any) => any) => {
-          console.log(tableMeta)
+          // console.log(tableMeta)
 
           try {
             if (!tableMeta.rowData) {

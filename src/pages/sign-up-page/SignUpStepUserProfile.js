@@ -41,7 +41,7 @@ const SignUpStepUserProfile = ({ onNextClicked, userData, isLast, isCurrentUserL
       onSubmit={(values) => handleSubmit(values)}
       initialValues={initialValues}
       render={({ handleSubmit, form, values }) => (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} method='POST'>
 
           <UserDetails values={values} />
 

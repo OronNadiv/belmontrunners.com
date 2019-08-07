@@ -124,7 +124,7 @@ function SignInPage ({ history, location, currentUser }) {
     <Form
       onSubmit={handleSignInWithEmail}
       render={({ handleSubmit, form }) => (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} method='POST'>
           <Dialog
             open
             fullWidth

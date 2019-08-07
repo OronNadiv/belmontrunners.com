@@ -46,7 +46,7 @@ function MyProfileForm ({ updateUserData, currentUser, userData, history, isSubm
       <Form onSubmit={(values) => handleSubmit(values)}
             initialValues={initialValues}
             render={({ handleSubmit, form, values }) => (
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={handleSubmit} method='POST'>
                 <UserDetails values={values} showDisplayName />
                 <div className='d-flex justify-content-between my-5'>
                   <Button

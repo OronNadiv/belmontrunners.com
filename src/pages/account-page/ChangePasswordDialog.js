@@ -75,7 +75,7 @@ function ChangePasswordDialog ({ onClose, currentUser }) {
     <Form
       onSubmit={handleSubmit}
       render={({ handleSubmit, form }) => (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} method='POST'>
 
           <Dialog
             open

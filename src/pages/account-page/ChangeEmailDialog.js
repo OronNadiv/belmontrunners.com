@@ -96,7 +96,7 @@ function ChangeEmailDialog ({ currentUser, sendEmailVerification, onClose }) {
     <Form
       onSubmit={handleSubmit}
       render={({ handleSubmit, form }) => (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} method='POST'>
 
           <Dialog
             open

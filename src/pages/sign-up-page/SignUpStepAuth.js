@@ -157,7 +157,7 @@ function SignUpStepAuth ({ onNextClicked, isLast }) {
       <Form
         onSubmit={handleSignUpWithEmail}
         render={({ handleSubmit, form }) => (
-          <form onSubmit={handleSubmit} className='container-fluid'>
+          <form onSubmit={handleSubmit} method='POST' className='container-fluid'>
 
             <div className='row'>
               <Field
