@@ -1,10 +1,10 @@
 import firebase from 'firebase'
-import {ICurrentUserPermissions} from './ICurrentUserPermissions'
-import { IUserData } from "./IUserData";
+import { ICurrentUserPermissions } from './ICurrentUserPermissions'
+import { Map } from 'immutable'
 
 export interface ICurrentUserData {
-  isCurrentUserLoaded : boolean,
+  isCurrentUserLoaded: boolean,
   permissions: ICurrentUserPermissions,
   currentUser: firebase.User,
-  userData: IUserData
+  userData: Map<string, any>
 }

@@ -50,6 +50,7 @@ import { UID } from '../fields'
 import firebase from 'firebase'
 import { ICurrentUserStore } from "../reducers/ICurrentUserStore";
 import { compose } from 'underscore'
+import { IUserData } from "../reducers/IUserData";
 
 const TOOLBAR_HEIGHT = 72
 const DRAWER_WIDTH = 240
@@ -378,7 +379,7 @@ const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, currentUser, perm
   return {
     allowUsersPage: !!currentUser && (permissions.usersRead[currentUser[UID]] || permissions.usersWrite[currentUser[UID]]),
     allowContactsPage: !!currentUser && (permissions.contactsRead[currentUser[UID]] || permissions.contactsWrite[currentUser[UID]]),
-    isMember: userData && calc(userData)[IS_A_MEMBER],
+    isMember: userData && calc(userData.toJS() as IUserData)[IS_A_MEMBER],
     isCurrentUserLoaded,
     currentUser
   }
