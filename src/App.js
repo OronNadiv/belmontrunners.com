@@ -15,8 +15,8 @@ import {
   ACCOUNT,
   COMPLETE,
   CONTACTS,
+  FAQ,
   FORGOT_PASSWORD,
-  GALLERY,
   JOIN,
   MEMBERS,
   PROFILE,
@@ -28,7 +28,6 @@ import {
   VERIFY_EMAIL
 } from './urls'
 import UsersPage from './pages/users-page/UsersPage'
-import GalleryPage from './pages/gallery-page/'
 import Drift from './components/Drift'
 import * as Sentry from '@sentry/browser'
 import ResetPasswordPage from './pages/authentication/ResetPasswordPage'
@@ -43,6 +42,7 @@ import { DISPLAY_NAME, EMAIL, PHOTO_URL, UID } from './fields'
 import AccountPage from './pages/account-page/AccountPage'
 import LogRocket from 'logrocket'
 import setupLogRocketReact from 'logrocket-react'
+import FaqPage from './pages/faq-page/FaqPage'
 
 function Wrapper (props = {}) {
 
@@ -161,12 +161,21 @@ function App ({ fetchCurrentUser, isCurrentUserLoaded, currentUser }) {
             </Wrapper>
           )}
         />
+        {/*<Route*/}
+        {/*  exact*/}
+        {/*  path={GALLERY}*/}
+        {/*  render={() => (*/}
+        {/*    <Wrapper>*/}
+        {/*      <GalleryPage />*/}
+        {/*    </Wrapper>*/}
+        {/*  )}*/}
+        {/*/>*/}
         <Route
           exact
-          path={GALLERY}
+          path={FAQ}
           render={() => (
             <Wrapper>
-              <GalleryPage />
+              <FaqPage />
             </Wrapper>
           )}
         />

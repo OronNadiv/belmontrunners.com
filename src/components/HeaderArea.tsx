@@ -20,6 +20,7 @@ import {
   Close as CloseIcon,
   Contacts as ContactsIcon,
   ExitToApp as SignInIcon,
+  QuestionAnswer as FAQIcon,
   Home as HomeIcon,
   Menu as MenuIcon,
   People as MembersIcon,
@@ -33,6 +34,7 @@ import {
   ACCOUNT,
   BLOG,
   CONTACTS,
+  FAQ,
   FORGOT_PASSWORD,
   JOIN,
   MEMBERS,
@@ -260,6 +262,13 @@ function HeaderArea (props: IHeaderAreaProps) {
                 </>
               }
 
+              <Link to={FAQ} onClick={handleDrawerClose}>
+                <ListItem button>
+                  <ListItemIcon><FAQIcon color='primary' /></ListItemIcon>
+                  <ListItemText primary='FAQ' className={classes.drawerLink} />
+                </ListItem>
+              </Link>
+
               <a href={BLOG} onClick={handleDrawerClose}>
                 <ListItem button>
                   <ListItemIcon><BlogIcon color='primary' /></ListItemIcon>
@@ -324,8 +333,17 @@ function HeaderArea (props: IHeaderAreaProps) {
           </Link>
           {
             !isSmallDevice &&
+            <Link to={FAQ} className={classes.menuItem}>
+              <div className='text-white' style={{ marginLeft: '12em' }}>
+                FAQ
+              </div>
+            </Link>
+          }
+
+          {
+            !isSmallDevice &&
             <a href={BLOG} className={classes.menuItem}>
-              <div className='text-white' style={{ marginLeft: 250 }}>
+              <div className='text-white' style={{ marginLeft: '7em' }}>
                 Blog
               </div>
             </a>
@@ -333,7 +351,7 @@ function HeaderArea (props: IHeaderAreaProps) {
           {
             !isSmallDevice && isMember &&
             <Link to={MEMBERS} className={classes.menuItem}>
-              <div className='text-white' style={{ marginLeft: 60 }}>
+              <div className='text-white' style={{ marginLeft: '7em' }}>
                 Members
               </div>
             </Link>
