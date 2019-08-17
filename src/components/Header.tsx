@@ -60,7 +60,7 @@ const TOOLBAR_HEIGHT = 72
 const DRAWER_WIDTH = 240
 const BACKGROUND_IMAGE = 'linear-gradient(90deg,#141da2,#9b5cf6)'
 
-interface IHeaderAreaProps extends RouteComponentProps<{}> {
+interface IHeaderProps extends RouteComponentProps<{}> {
   isCurrentUserLoaded: boolean,
   currentUser: firebase.User,
   allowUsersPage: boolean,
@@ -68,7 +68,7 @@ interface IHeaderAreaProps extends RouteComponentProps<{}> {
   isMember: boolean
 }
 
-function HeaderArea (props: IHeaderAreaProps) {
+function Header (props: IHeaderProps) {
   const { location: { pathname }, isCurrentUserLoaded, currentUser, allowUsersPage, allowContactsPage, isMember } = props
   const [transparentBackground, setTransparentBackground] = useState(true)
   const [showDrawer, setShowDrawer] = useState(false)
@@ -334,7 +334,7 @@ function HeaderArea (props: IHeaderAreaProps) {
           {
             !isSmallDevice &&
             <Link to={FAQ} className={classes.menuItem}>
-              <div className='text-white' style={{ marginLeft: '12em' }}>
+              <div className='text-white' style={{ marginLeft: '13em' }}>
                 FAQ
               </div>
             </Link>
@@ -396,7 +396,7 @@ function HeaderArea (props: IHeaderAreaProps) {
   )
 }
 
-HeaderArea.propTypes = {
+Header.propTypes = {
   allowUsersPage: PropTypes.bool.isRequired,
   allowContactsPage: PropTypes.bool.isRequired,
   isCurrentUserLoaded: PropTypes.bool.isRequired,
@@ -420,4 +420,4 @@ const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, currentUser, perm
 export default compose(
   withRouter,
   connect(mapStateToProps)
-)(HeaderArea)
+)(Header)

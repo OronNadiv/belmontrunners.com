@@ -9,7 +9,7 @@ import { Route, Switch } from 'react-router-dom'
 import SignIn from './pages/sign-in-page/SignInPage'
 import ForgotPasswordPage from './pages/authentication/ForgotPasswordPage'
 import HomePage from './pages/home-page'
-import HeaderArea from './components/HeaderArea'
+import Header from './components/Header'
 import SignUpPage from './pages/sign-up-page/SignUpPage'
 import {
   ACCOUNT,
@@ -48,7 +48,7 @@ function Wrapper (props = {}) {
 
   return (
     <>
-      <HeaderArea />
+      <Header />
       {props.inHomePage && <HomePage />}
       {props.inHomePage && props.children}
 
