@@ -238,6 +238,15 @@ function HeaderArea (props: IHeaderAreaProps) {
               }
 
               {
+                <a href={BLOG} onClick={handleDrawerClose}>
+                  <ListItem button>
+                    <ListItemIcon><MembersIcon color='primary' /></ListItemIcon>
+                    <ListItemText primary='Blog' className={classes.drawerLink} />
+                  </ListItem>
+                </a>
+              }
+
+              {
                 isMember &&
                 <Link to={MEMBERS} onClick={handleDrawerClose}>
                   <ListItem button>
@@ -315,9 +324,17 @@ function HeaderArea (props: IHeaderAreaProps) {
           </Link>
           {
             !isSmallDevice &&
-            <Link to={BLOG} className={classes.menuItem}>
+            <a href={BLOG} className={classes.menuItem}>
               <div className='text-white' style={{ marginLeft: 250 }}>
                 Blog
+              </div>
+            </a>
+          }
+          {
+            !isSmallDevice && isMember &&
+            <Link to={MEMBERS} className={classes.menuItem}>
+              <div className='text-white' style={{ marginLeft: 250 }}>
+                Members
               </div>
             </Link>
           }
