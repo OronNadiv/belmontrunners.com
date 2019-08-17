@@ -21,6 +21,7 @@ import {
   ExitToApp as SignInIcon,
   Home as HomeIcon,
   Menu as MenuIcon,
+  Chat as BlogIcon,
   People as MembersIcon,
   PeopleOutline as UsersIcon,
   PersonAdd as JoinUsIcon,
@@ -240,7 +241,7 @@ function HeaderArea (props: IHeaderAreaProps) {
               {
                 <a href={BLOG} onClick={handleDrawerClose}>
                   <ListItem button>
-                    <ListItemIcon><MembersIcon color='primary' /></ListItemIcon>
+                    <ListItemIcon><BlogIcon color='primary' /></ListItemIcon>
                     <ListItemText primary='Blog' className={classes.drawerLink} />
                   </ListItem>
                 </a>
@@ -333,7 +334,7 @@ function HeaderArea (props: IHeaderAreaProps) {
           {
             !isSmallDevice && isMember &&
             <Link to={MEMBERS} className={classes.menuItem}>
-              <div className='text-white' style={{ marginLeft: 250 }}>
+              <div className='text-white' style={{ marginLeft: 60 }}>
                 Members
               </div>
             </Link>

@@ -124,12 +124,6 @@ function Profile ({ allowUsersPage, allowContactsPage, isMember, userData, histo
                     Account
                   </MenuItem>
                   {
-                    isMember &&
-                    <MenuItem onClick={handleClose(MEMBERS)} className={classes.menuItem}>
-                      Members
-                    </MenuItem>
-                  }
-                  {
                     allowUsersPage &&
                     <MenuItem onClick={handleClose(USERS)} className={classes.menuItem}>
                       Users
