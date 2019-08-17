@@ -30,6 +30,7 @@ import {
 import Profile from './Profile'
 import {
   ACCOUNT,
+  BLOG,
   CONTACTS,
   FORGOT_PASSWORD,
   JOIN,
@@ -139,7 +140,7 @@ function HeaderArea (props: IHeaderAreaProps) {
       flexGrow: 1
     },
     growRight: {},
-    members: {
+    menuItem: {
       font: '500 12px/80px "Roboto", sans-serif',
       textTransform: 'uppercase',
       color: 'white'
@@ -313,16 +314,12 @@ function HeaderArea (props: IHeaderAreaProps) {
             <img src="img/logo.png" alt='' />
           </Link>
           {
-            /*
-            Disabling for now until we have multiple menu item.  Only one item does not look good.
-
             !isSmallDevice &&
-            <Link to={MEMBERS} className={classes.members}>
+            <Link to={BLOG} className={classes.menuItem}>
               <div className='text-white' style={{ marginLeft: 250 }}>
-                Members
+                Blog
               </div>
             </Link>
-            */
           }
           <div className={classes.growMiddle} />
 
