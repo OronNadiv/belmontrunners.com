@@ -16,12 +16,12 @@ import {
 } from '@material-ui/core'
 import {
   AccountCircle as ProfileIcon,
+  Chat as BlogIcon,
   Close as CloseIcon,
   Contacts as ContactsIcon,
   ExitToApp as SignInIcon,
   Home as HomeIcon,
   Menu as MenuIcon,
-  Chat as BlogIcon,
   People as MembersIcon,
   PeopleOutline as UsersIcon,
   PersonAdd as JoinUsIcon,
@@ -212,6 +212,28 @@ function HeaderArea (props: IHeaderAreaProps) {
             <Divider />
             <List className={classes.drawerList}>
               {
+                isSignedOut &&
+                <Link to={SIGN_IN} onClick={handleDrawerClose}>
+                  <ListItem button>
+                    <ListItemIcon><SignInIcon color='primary' /></ListItemIcon>
+                    <ListItemText primary='Sign in' className={classes.drawerLink} />
+                  </ListItem>
+
+                </Link>
+              }
+              {
+                isSignedOut &&
+                <Link to={{
+                  pathname: JOIN
+                }} onClick={handleDrawerClose}>
+                  <ListItem button>
+                    <ListItemIcon><JoinUsIcon color='primary' /></ListItemIcon>
+                    <ListItemText primary='Join us' className={classes.drawerLink} />
+                  </ListItem>
+                </Link>
+              }
+
+              {
                 isSignedIn &&
                 <Link to={ROOT} onClick={handleDrawerClose}>
                   <ListItem button>
@@ -238,14 +260,12 @@ function HeaderArea (props: IHeaderAreaProps) {
                 </>
               }
 
-              {
-                <a href={BLOG} onClick={handleDrawerClose}>
-                  <ListItem button>
-                    <ListItemIcon><BlogIcon color='primary' /></ListItemIcon>
-                    <ListItemText primary='Blog' className={classes.drawerLink} />
-                  </ListItem>
-                </a>
-              }
+              <a href={BLOG} onClick={handleDrawerClose}>
+                <ListItem button>
+                  <ListItemIcon><BlogIcon color='primary' /></ListItemIcon>
+                  <ListItemText primary='Blog' className={classes.drawerLink} />
+                </ListItem>
+              </a>
 
               {
                 isMember &&
@@ -288,27 +308,6 @@ function HeaderArea (props: IHeaderAreaProps) {
                   <ListItem button>
                     <ListItemIcon><SignOutIcon color='primary' /></ListItemIcon>
                     <ListItemText primary='Sign out' className={classes.drawerLink} />
-                  </ListItem>
-                </Link>
-              }
-              {
-                isSignedOut &&
-                <Link to={SIGN_IN} onClick={handleDrawerClose}>
-                  <ListItem button>
-                    <ListItemIcon><SignInIcon color='primary' /></ListItemIcon>
-                    <ListItemText primary='Sign in' className={classes.drawerLink} />
-                  </ListItem>
-
-                </Link>
-              }
-              {
-                isSignedOut &&
-                <Link to={{
-                  pathname: JOIN
-                }} onClick={handleDrawerClose}>
-                  <ListItem button>
-                    <ListItemIcon><JoinUsIcon color='primary' /></ListItemIcon>
-                    <ListItemText primary='Join us' className={classes.drawerLink} />
                   </ListItem>
                 </Link>
               }
