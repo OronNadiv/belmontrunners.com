@@ -217,8 +217,7 @@ export default function FaqPage () {
         </ExpansionPanelSummary>
         <ExpansionPanelDetails classes={classesExpansionPanelDetails}>
           <Typography>
-            We have a chat function on the club website (<a
-            href='https://www.belmontrunners.com'>www.belmontrunners.com</a>) if you have general questions. You can
+            If you have general questions, we have a chat on the bottom right of your screen. You can
             also call us <a href='tel:650-239-6300' target='_blank' rel='noreferrer noopener'>(650) 239-6300</a> or
             email us (<a href='mailto://belmontrunners@gmail.com' target='_blank'
                          rel='noreferrer noopener'>belmontrunners@gmail.com</a>) and we can answer your questions.
