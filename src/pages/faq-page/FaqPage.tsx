@@ -109,7 +109,7 @@ export default function FaqPage () {
         </ExpansionPanelSummary>
         <ExpansionPanelDetails classes={classesExpansionPanelDetails}>
           <Typography>
-            Belmont Runners does hilly trail runs at local parks and flt road runs in Belmont, Redwood Shores, and other
+            Belmont Runners do hilly trail runs at local parks and flat road runs in Belmont, Redwood Shores, and other
             local running spots. We are always open to suggestions on great places to run and enjoy the mid-Peninsula.
           </Typography>
         </ExpansionPanelDetails>
