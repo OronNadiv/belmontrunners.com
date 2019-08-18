@@ -20,13 +20,13 @@ import {
   Close as CloseIcon,
   Contacts as ContactsIcon,
   ExitToApp as SignInIcon,
-  QuestionAnswer as FAQIcon,
   Home as HomeIcon,
   Menu as MenuIcon,
   People as MembersIcon,
   PeopleOutline as UsersIcon,
   PersonAdd as JoinUsIcon,
   PowerSettingsNew as SignOutIcon,
+  QuestionAnswer as FAQIcon,
   Settings as AccountIcon
 } from '@material-ui/icons'
 import Profile from './Profile'
@@ -335,7 +335,8 @@ function Header (props: IHeaderProps) {
             !isSmallDevice &&
             <Link to={FAQ} className={classes.menuItem}>
               <div className='text-white' style={{ marginLeft: '13em' }}>
-                FAQ
+                <FAQIcon />
+                <span className='mx-2'>FAQ</span>
               </div>
             </Link>
           }
@@ -344,7 +345,8 @@ function Header (props: IHeaderProps) {
             !isSmallDevice &&
             <a href={BLOG} className={classes.menuItem}>
               <div className='text-white' style={{ marginLeft: '7em' }}>
-                Blog
+                <BlogIcon />
+                <span className='mx-2'>Blog</span>
               </div>
             </a>
           }
@@ -352,7 +354,8 @@ function Header (props: IHeaderProps) {
             !isSmallDevice && isMember &&
             <Link to={MEMBERS} className={classes.menuItem}>
               <div className='text-white' style={{ marginLeft: '7em' }}>
-                Members
+                <MembersIcon />
+                <span className='mx-2'>Members</span>
               </div>
             </Link>
           }
