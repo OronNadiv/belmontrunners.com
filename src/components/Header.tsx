@@ -86,7 +86,7 @@ function Header (props: IHeaderProps) {
       }
       const nav_offset_top: number = TOOLBAR_HEIGHT + 50
 
-      const scroll = $(window).scrollTop
+      const scroll = $(window).scrollTop()
       if (scroll && Number(scroll) >= nav_offset_top) {
         setTransparentBackground(false)
       } else {
