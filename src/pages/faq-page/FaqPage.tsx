@@ -71,6 +71,10 @@ export default function FaqPage () {
 
   return (
     <div className='mx-lg-5 mx-3 my-3'>
+      <div className='text-center mb-3'>
+        <img src="/img/blog/faq.png" alt='' className='img-fluid'/>
+      </div>
+
       <ExpansionPanel classes={classesExpansionPanel} expanded={expanded === 'panel1'}
                       onChange={handleChange('panel1')}>
         <ExpansionPanelSummary classes={classesExpansionPanelSummary} aria-controls="panel1d-content"
