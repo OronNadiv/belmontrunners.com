@@ -198,7 +198,8 @@ export default function FaqPage () {
             page</a> includes general information and breaking news. Third, we have a <a
             href='https://www.facebook.com/groups/402959680279126' target='_blank' rel='noreferrer noopener'>Facebook
             members-only group</a> that provides pictures, more detailed information, and opportunities to
-            communicate with other club members. Fourth, we have an <a href='https://www.instagram.com/belmontrunners/'>Instagram
+            communicate with other club members. Fourth, we have an <a href='https://www.instagram.com/belmontrunners/'
+                                                                       target='_blank' rel='noreferrer noopener'>Instagram
             page</a> with more content. Finally, we have a monthly newsletter that provides updates on our club.
           </Typography>
         </ExpansionPanelDetails>
