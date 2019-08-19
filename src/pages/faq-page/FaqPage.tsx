@@ -72,7 +72,7 @@ export default function FaqPage () {
   return (
     <div className='mx-lg-5 mx-3 my-3'>
       <div className='text-center mb-3'>
-        <img src="/img/faq/faq.png" alt='' className='img-fluid'/>
+        <img src="/img/faq/faq.png" alt='' className='img-fluid' />
       </div>
 
       <ExpansionPanel classes={classesExpansionPanel} expanded={expanded === 'panel1'}
@@ -190,11 +190,16 @@ export default function FaqPage () {
         </ExpansionPanelSummary>
         <ExpansionPanelDetails classes={classesExpansionPanelDetails}>
           <Typography>
-            There are five ways. First, the club website (www.belmontrunners.com) provides information about upcoming
-            training runs. Second, our Facebook page includes general information and breaking news. Third, we have a
-            Facebook members-only group that provides pictures, more detailed information, and opportunities to
-            communicate with other club members. Fourth, we have an Instagram page with more content. Finally, we have a
-            monthly newsletter that provides updates on our club.
+            There are five ways. First, the club website (<a href='https://www.belmontrunners.com'
+                                                             rel='noreferrer noopener'>belmontrunners.com</a>) provides
+            information about upcoming training runs. Second, our <a href='https://www.facebook.com/belmontrunnersclub'
+                                                                     target='_blank'
+                                                                     rel='noreferrer noopener'>Facebook
+            page</a> includes general information and breaking news. Third, we have a <a
+            href='https://www.facebook.com/groups/402959680279126' target='_blank' rel='noreferrer noopener'>Facebook
+            members-only group</a> that provides pictures, more detailed information, and opportunities to
+            communicate with other club members. Fourth, we have an <a href='https://www.instagram.com/belmontrunners/'>Instagram
+            page</a> with more content. Finally, we have a monthly newsletter that provides updates on our club.
           </Typography>
         </ExpansionPanelDetails>
       </ExpansionPanel>
@@ -221,7 +226,7 @@ export default function FaqPage () {
         </ExpansionPanelSummary>
         <ExpansionPanelDetails classes={classesExpansionPanelDetails}>
           <Typography>
-            If you have general questions, we have a chat on the bottom right of your screen. You can
+            If you have general questions, we have a chat on the bottom right of this page. You can
             also call us <a href='tel:650-239-6300' target='_blank' rel='noreferrer noopener'>(650) 239-6300</a> or
             email us (<a href='mailto://belmontrunners@gmail.com' target='_blank'
                          rel='noreferrer noopener'>belmontrunners@gmail.com</a>) and we can answer your questions.
