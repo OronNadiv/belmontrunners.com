@@ -30,7 +30,7 @@
     "parse-full-name": "^1.2.3",
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
-    "stripe": "^7.6.0",
+    "stripe": "^7.8.0",
     "underscore": "^1.9.1"
   },
   "devDependencies": {
