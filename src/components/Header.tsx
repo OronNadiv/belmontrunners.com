@@ -333,8 +333,8 @@ function Header (props: IHeaderProps) {
           </Link>
           {
             !isSmallDevice &&
-            <Link to={FAQ} className={classes.menuItem}>
-              <div className='text-white d-flex align-items-center' style={{ marginLeft: '13em' }}>
+            <Link to={FAQ} className={classes.menuItem} style={{ marginLeft: '13em' }}>
+              <div className='text-white d-flex align-items-center'>
                 <FAQIcon />
                 <span className='mx-2'>FAQ</span>
               </div>
@@ -343,8 +343,8 @@ function Header (props: IHeaderProps) {
 
           {
             !isSmallDevice &&
-            <a href={BLOG} className={classes.menuItem}>
-              <div className='text-white d-flex align-items-center' style={{ marginLeft: '7em' }}>
+            <a href={BLOG} className={classes.menuItem} style={{ marginLeft: '7em' }}>
+              <div className='text-white d-flex align-items-center'>
                 <BlogIcon />
                 <span className='mx-2'>Blog</span>
               </div>
@@ -352,8 +352,8 @@ function Header (props: IHeaderProps) {
           }
           {
             !isSmallDevice && isMember &&
-            <Link to={MEMBERS} className={classes.menuItem}>
-              <div className='text-white d-flex align-items-center' style={{ marginLeft: '7em' }}>
+            <Link to={MEMBERS} className={classes.menuItem} style={{ marginLeft: '7em' }}>
+              <div className='text-white d-flex align-items-center'>
                 <MembersIcon />
                 <span className='mx-2'>Members</span>
               </div>
