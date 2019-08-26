@@ -353,7 +353,7 @@ function Header (props: IHeaderProps) {
           {
             !isSmallDevice && isMember &&
             <Link to={MEMBERS} className={classes.menuItem}>
-              <div className='text-white' style={{ marginLeft: '7em' }}>
+              <div className='text-white d-flex align-items-center' style={{ marginLeft: '7em' }}>
                 <MembersIcon />
                 <span className='mx-2'>Members</span>
               </div>
