@@ -6,8 +6,6 @@ import SignUpStepperButton from './SignUpStepperButton'
 import LoggedInState from '../../components/HOC/LoggedInState'
 import { connect } from 'react-redux'
 import { ADDRESS1, ADDRESS2, CITY, DATE_OF_BIRTH, GENDER, PHONE, STATE, ZIP } from '../../fields'
-import { DatePicker, MuiPickersUtilsProvider } from "material-ui-pickers"
-import MomentUtils from '@date-io/moment'
 import { compose, pick } from 'underscore'
 import UserDetails from '../../components/UserDetails'
 import UpdateUserData from '../../components/HOC/UpdateUserData'
@@ -54,37 +52,6 @@ const SignUpStepUserProfile = ({ onNextClicked, userData, isLast, isCurrentUserL
         </form>
       )}
     />
-}
-
-function DatePickerWrapper (props) {
-  const {
-    input: { name, onChange, value, ...restInput },
-    meta,
-    ...rest
-  } = props
-  const showError =
-    ((meta.submitError && !meta.dirtySinceLastSubmit) || meta.error) &&
-    meta.touched
-
-  return (
-    <MuiPickersUtilsProvider utils={MomentUtils}>
-      <DatePicker
-        {...rest}
-        name={name}
-        format={'LL'}
-        helperText={showError ? meta.error || meta.submitError : undefined}
-        error={showError}
-        inputProps={restInput}
-        onChange={onChange}
-        value={value === '' ? null : value}
-      />
-    </MuiPickersUtilsProvider>
-  )
-}
-
-DatePickerWrapper.propTypes = {
-  input: PropTypes.object,
-  meta: PropTypes.object
 }
 
 SignUpStepUserProfile.propTypes = {
