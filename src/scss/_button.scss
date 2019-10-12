@@ -88,18 +88,19 @@
 .banner_btn{
 	padding: 0px 30px;
 	line-height: 50px;
-	background: rgba(255, 255, 255, .10);
+	//background: rgba(255, 255, 255, .10);
 	color: #fff;
 	display: inline-block;
 	border-radius: 5px;
-	border: 1px solid #7a8186;
-	font-size: 13px;
+	//border: 1px solid #7a8186;
+	font-size: 14px;
 	font-family: $rob;
 	font-weight: 500;
 	@include transition;
 	&:hover{
 		color: #fff;
 	}
+	background-image: linear-gradient(45deg,#141da2,#9b5cf6);
 }
 .white_bg_btn{
 	background: #fff;

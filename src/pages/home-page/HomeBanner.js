@@ -12,6 +12,9 @@ function HomeBanner() {
               <br />
               Redwood City and the surrounding area
             </p>
+            <a className="banner_btn" href="https://blog.belmontrunners.com">
+              Read our blog
+            </a>
           </div>
         </div>
       </div>
