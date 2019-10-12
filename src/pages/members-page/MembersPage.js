@@ -1,11 +1,18 @@
 import 'firebase/functions'
 import firebase from 'firebase'
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState } from 'react'
 import { DISPLAY_NAME, GRAVATAR_URL, PHOTO_URL, UID } from '../../fields'
 import * as PropTypes from 'prop-types'
 import * as Sentry from '@sentry/browser'
 import { connect } from 'react-redux'
-import { Avatar, Chip, CircularProgress, makeStyles, Paper, Snackbar } from '@material-ui/core'
+import {
+  Avatar,
+  Chip,
+  CircularProgress,
+  makeStyles,
+  Paper,
+  Snackbar
+} from '@material-ui/core'
 import DirectionsRun from '@material-ui/icons/DirectionsRun'
 import FuzzySearch from 'fuzzy-search'
 import LoggedInState from '../../components/HOC/LoggedInState'
@@ -16,7 +23,12 @@ import { MEMBERS, ROOT } from '../../urls'
 import SearchBox from '../../components/SearchBox'
 import { Map as IMap } from 'immutable'
 
-function MembersPage ({ currentUser, location: { pathname }, history, userData }) {
+function MembersPage({
+  currentUser,
+  location: { pathname },
+  history,
+  userData
+}) {
   const useStyles = makeStyles(() => ({
     chipAvatar: {
       width: 32,
@@ -33,13 +45,14 @@ function MembersPage ({ currentUser, location: { pathname }, history, userData }
     if (!currentUser) {
       return
     }
-    (async function () {
+    ;(async function() {
       try {
         // return setUsers(require('./members.json'))
         const resp = await firebase.functions().httpsCallable('getMembers')()
-        const data = sortBy(
-          resp.data,
-          (user) => user[UID] === currentUser[UID] ? '_' : user[DISPLAY_NAME].toLowerCase()
+        const data = sortBy(resp.data, user =>
+          user[UID] === currentUser[UID]
+            ? '_'
+            : user[DISPLAY_NAME].toLowerCase()
         )
         setUsers(data)
       } catch (err) {
@@ -65,7 +78,7 @@ function MembersPage ({ currentUser, location: { pathname }, history, userData }
     if (users.length === 0) {
       return
     }
-    const pathnames = pathname.split('/').filter((val) => !!val)
+    const pathnames = pathname.split('/').filter(val => !!val)
     if (pathnames.length < 2) {
       setSelected()
       return
@@ -81,7 +94,7 @@ function MembersPage ({ currentUser, location: { pathname }, history, userData }
 
   const [search, setSearch] = useState('')
 
-  const handleChipSelected = (user) => {
+  const handleChipSelected = user => {
     console.log('user:', user)
     history.push(`${MEMBERS}/${user[UID]}`)
   }
@@ -99,37 +112,41 @@ function MembersPage ({ currentUser, location: { pathname }, history, userData }
       filteredUsers = searcher.search(search)
     }
 
-    return filteredUsers.map(
-      (user) => {
-        let label = user[DISPLAY_NAME]
+    return filteredUsers.map(user => {
+      let label = user[DISPLAY_NAME]
 
-        function getColor () {
-          if (user[UID] === currentUser[UID]) {
-            return 'primary'
-          }
-          return 'default'
-        }
-
+      function getColor() {
         if (user[UID] === currentUser[UID]) {
-          user[PHOTO_URL] = userData.get(PHOTO_URL)
+          return 'primary'
         }
+        return 'default'
+      }
 
-        return <Chip
-          className='my-1 mx-1'
+      if (user[UID] === currentUser[UID]) {
+        user[PHOTO_URL] = userData.get(PHOTO_URL)
+      }
+
+      return (
+        <Chip
+          className="my-1 mx-1"
           avatar={
-            user[PHOTO_URL] ?
-              <Avatar className={classes.chipAvatar} src={user[PHOTO_URL]} /> :
-              user[GRAVATAR_URL] ?
-                <Avatar className={classes.chipAvatar} src={user[GRAVATAR_URL]} /> :
-                <Avatar className={classes.chipAvatar}><DirectionsRun /></Avatar>
+            user[PHOTO_URL] ? (
+              <Avatar className={classes.chipAvatar} src={user[PHOTO_URL]} />
+            ) : user[GRAVATAR_URL] ? (
+              <Avatar className={classes.chipAvatar} src={user[GRAVATAR_URL]} />
+            ) : (
+              <Avatar className={classes.chipAvatar}>
+                <DirectionsRun />
+              </Avatar>
+            )
           }
           onClick={() => handleChipSelected(user)}
           key={user[UID]}
           label={label}
           color={getColor()}
         />
-      }
-    )
+      )
+    })
   }
 
   if (!currentUser) {
@@ -138,30 +155,24 @@ function MembersPage ({ currentUser, location: { pathname }, history, userData }
   }
   return (
     <>
-      {
-        showError &&
+      {showError && (
         <Snackbar
           open
           autoHideDuration={6000}
           message={'Oops! Something went wrong.'}
         />
-      }
-      {
-        !!selected &&
+      )}
+      {!!selected && (
         <UserProfile
           user={selected}
           style={{ width: 250 }}
           onClose={handleDrawerClosed}
         />
-      }
+      )}
       <SearchBox onChange={setSearch} />
-      <Paper className='px-2 py-3'>
-        <div className='d-flex justify-content-between flex-wrap'>
-          {
-            isLoading ?
-              <CircularProgress className='mx-auto' /> :
-              getChips()
-          }
+      <Paper className="px-2 py-3">
+        <div className="d-flex justify-content-between flex-wrap">
+          {isLoading ? <CircularProgress className="mx-auto" /> : getChips()}
         </div>
       </Paper>
     </>

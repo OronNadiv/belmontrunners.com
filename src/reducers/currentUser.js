@@ -19,21 +19,43 @@ export const USER_DATA_UPDATE_FAILURE = `${PREFIX}USER_DATA_UPDATE_FAILURE`
 let isRegistered
 
 const fetchUserData = async () => {
-  const userRef = firebase.firestore().doc(`users/${firebase.auth().currentUser[UID]}`)
+  const userRef = firebase
+    .firestore()
+    .doc(`users/${firebase.auth().currentUser[UID]}`)
   const userDoc = await userRef.get()
   const userData = userDoc.data() || {}
   return userData
 }
 
 const fetchPermissions = async () => {
-  const { docUsersRead, docUsersWrite, docUsersDelete, docContactsRead, docContactsWrite } = await Promise
-    .props({
-      docUsersRead: firebase.firestore().doc('permissions/usersRead').get(),
-      docUsersWrite: firebase.firestore().doc('permissions/usersWrite').get(),
-      docUsersDelete: firebase.firestore().doc('permissions/usersDelete').get(),
-      docContactsRead: firebase.firestore().doc('permissions/subscribersRead').get(),
-      docContactsWrite: firebase.firestore().doc('permissions/subscribersWrite').get()
-    })
+  const {
+    docUsersRead,
+    docUsersWrite,
+    docUsersDelete,
+    docContactsRead,
+    docContactsWrite
+  } = await Promise.props({
+    docUsersRead: firebase
+      .firestore()
+      .doc('permissions/usersRead')
+      .get(),
+    docUsersWrite: firebase
+      .firestore()
+      .doc('permissions/usersWrite')
+      .get(),
+    docUsersDelete: firebase
+      .firestore()
+      .doc('permissions/usersDelete')
+      .get(),
+    docContactsRead: firebase
+      .firestore()
+      .doc('permissions/subscribersRead')
+      .get(),
+    docContactsWrite: firebase
+      .firestore()
+      .doc('permissions/subscribersWrite')
+      .get()
+  })
   return {
     usersRead: docUsersRead.data(),
     usersWrite: docUsersWrite.data(),
@@ -67,8 +89,10 @@ export const fetchCurrentUser = () => {
         } else {
           console.log('current user is not null')
           try {
-            const [permissions, userData] = await Promise
-              .all([fetchPermissions(), fetchUserData()])
+            const [permissions, userData] = await Promise.all([
+              fetchPermissions(),
+              fetchUserData()
+            ])
             const currentUser = firebase.auth().currentUser
             console.log('permissions', permissions)
             console.log('userData', userData)
@@ -80,14 +104,22 @@ export const fetchCurrentUser = () => {
                 userData
               }
             })
-            const { metadata: { creationTime, lastSignInTime }, emailVerified } = currentUser
+            const {
+              metadata: { creationTime, lastSignInTime },
+              emailVerified
+            } = currentUser
             console.log('emailVerified:', emailVerified)
             try {
               if (!emailVerified) {
                 const emailVerificationSentAt = userData.emailVerificationSentAt
                 console.log('emailVerificationSentAt:', emailVerificationSentAt)
 
-                if (!emailVerificationSentAt || moment(emailVerificationSentAt).add(1, 'day').isBefore(moment())) {
+                if (
+                  !emailVerificationSentAt ||
+                  moment(emailVerificationSentAt)
+                    .add(1, 'day')
+                    .isBefore(moment())
+                ) {
                   sendEmailVerification()(dispatch, getState)
                 }
               }
@@ -95,14 +127,24 @@ export const fetchCurrentUser = () => {
               Sentry.captureException(error)
               console.error('email verification.', error)
             }
-            console.log('firebase.auth().currentUser:', firebase.auth().currentUser)
-            const createdAt = moment(creationTime).utc().format()
-            const lastSignedInAt = moment(lastSignInTime).utc().format()
-            updateUserData({
-              createdAt,
-              lastSignedInAt,
-              emailVerified
-            }, { merge: true })(dispatch, getState)
+            console.log(
+              'firebase.auth().currentUser:',
+              firebase.auth().currentUser
+            )
+            const createdAt = moment(creationTime)
+              .utc()
+              .format()
+            const lastSignedInAt = moment(lastSignInTime)
+              .utc()
+              .format()
+            updateUserData(
+              {
+                createdAt,
+                lastSignedInAt,
+                emailVerified
+              },
+              { merge: true }
+            )(dispatch, getState)
           } catch (error) {
             Sentry.captureException(error)
             console.error(error)
@@ -116,11 +158,15 @@ export const fetchCurrentUser = () => {
 export const sendEmailVerification = () => {
   return async (dispatch, getState) => {
     await getState().currentUser.currentUser.sendEmailVerification()
-    const emailVerificationSentAt = moment().utc().format()
-    updateUserData({
-      emailVerificationSentAt
-    }, { merge: true })(dispatch, getState)
-
+    const emailVerificationSentAt = moment()
+      .utc()
+      .format()
+    updateUserData(
+      {
+        emailVerificationSentAt
+      },
+      { merge: true }
+    )(dispatch, getState)
   }
 }
 
@@ -133,7 +179,9 @@ export const updateUserData = (values, options = { merge: true }, context) => {
       type: USER_DATA_UPDATE_REQUEST,
       context
     })
-    const userRef = firebase.firestore().doc(`users/${firebase.auth().currentUser[UID]}`)
+    const userRef = firebase
+      .firestore()
+      .doc(`users/${firebase.auth().currentUser[UID]}`)
     try {
       await userRef.set(values, options)
       const userData = await fetchUserData()
@@ -178,7 +226,10 @@ const ACTION_HANDLERS = {
     }
     return state
   },
-  [FETCHED_CURRENT_USER]: (state = initialState, { data: { permissions, currentUser, userData } }) => {
+  [FETCHED_CURRENT_USER]: (
+    state = initialState,
+    { data: { permissions, currentUser, userData } }
+  ) => {
     state = {
       ...state,
       currentUser,
@@ -189,7 +240,6 @@ const ACTION_HANDLERS = {
     }
     return state
   },
-
 
   [USER_DATA_UPDATE_REQUEST]: (state = initialState, { context }) => {
     state = {
@@ -221,7 +271,7 @@ const ACTION_HANDLERS = {
   }
 }
 
-export default function reducer (state = initialState, action = {}) {
+export default function reducer(state = initialState, action = {}) {
   const handler = ACTION_HANDLERS[action.type]
   return handler ? handler(state, action) : state
 }

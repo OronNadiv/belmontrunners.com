@@ -10,7 +10,14 @@ import {
 } from '../../messages'
 import { Redirect, withRouter } from 'react-router-dom'
 import { ROOT } from '../../urls'
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core'
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle
+} from '@material-ui/core'
 import * as Sentry from '@sentry/browser'
 
 const STATE_CLOSE = 'close'
@@ -18,7 +25,7 @@ const STATE_ERROR_MESSAGE = 'errorMessage'
 const STATE_IS_SUCCESS = 'isSuccess'
 
 class VerifyEmailPage extends Component {
-  constructor (props) {
+  constructor(props) {
     console.log('RecoverEmailPage ctor')
     super(props)
     this.state = {
@@ -28,7 +35,7 @@ class VerifyEmailPage extends Component {
     }
   }
 
-  processError (error) {
+  processError(error) {
     const { code, message } = error
     switch (code) {
       case 'auth/expired-action-code':
@@ -53,14 +60,12 @@ class VerifyEmailPage extends Component {
         return
       default:
         Sentry.captureException(error)
-        console.error('RecoverEmailPage',
-          'code:', code,
-          'message:', message)
+        console.error('RecoverEmailPage', 'code:', code, 'message:', message)
         this.setState({ errorMessage: message })
     }
   }
 
-  async componentDidMount () {
+  async componentDidMount() {
     // Get the restored email address.
     const oobCode = this.props.location.state.query.oobCode
 
@@ -73,7 +78,7 @@ class VerifyEmailPage extends Component {
     }
   }
 
-  render () {
+  render() {
     const close = this.state[STATE_CLOSE]
     const errorMessage = this.state[STATE_ERROR_MESSAGE]
     const isSuccess = this.state[STATE_IS_SUCCESS]
@@ -87,27 +92,27 @@ class VerifyEmailPage extends Component {
       <Dialog
         open
         fullWidth
-        maxWidth='xs'
+        maxWidth="xs"
         onClose={() => this.setState({ [STATE_CLOSE]: true })}
         aria-labelledby="form-dialog-title"
       >
-        <DialogTitle>
-          Verify Email
-        </DialogTitle>
+        <DialogTitle>Verify Email</DialogTitle>
 
         <DialogContent>
           <DialogContentText>
-            {
-              isSuccess &&
-              <div className='text-success text-center'>
+            {isSuccess && (
+              <div className="text-success text-center">
                 Your email has been verified
               </div>
-            }
+            )}
             {errorMessage}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => this.setState({ [STATE_CLOSE]: true })} color="primary">
+          <Button
+            onClick={() => this.setState({ [STATE_CLOSE]: true })}
+            color="primary"
+          >
             Close
           </Button>
         </DialogActions>

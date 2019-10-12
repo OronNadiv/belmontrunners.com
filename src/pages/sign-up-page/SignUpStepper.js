@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import {Stepper, Step, StepLabel} from '@material-ui/core'
+import { Stepper, Step, StepLabel } from '@material-ui/core'
 
 import SignUpStepAuth from './SignUpStepAuth'
 import SignUpStepPayment from './SignUpStepPayment'
@@ -13,7 +13,7 @@ export const STEP_AUTHENTICATION = 'STEP_AUTHENTICATION'
 export const STEP_USER_DETAILS = 'STEP_USER_DETAILS'
 export const STEP_MEMBERSHIP = 'STEP_MEMBERSHIP'
 
-function SignUpStepper ({ steps }) {
+function SignUpStepper({ steps }) {
   const [activeStep, setActiveStep] = useState(0)
 
   const handleNext = () => {
@@ -21,30 +21,30 @@ function SignUpStepper ({ steps }) {
   }
 
   const getStepsHeaders = () => {
-    return steps.map((step) => {
+    return steps.map(step => {
       switch (step) {
         case STEP_AUTHENTICATION:
-          return <Step key={0}>
-            <StepLabel>
-              Account
-            </StepLabel>
-          </Step>
+          return (
+            <Step key={0}>
+              <StepLabel>Account</StepLabel>
+            </Step>
+          )
 
         case STEP_USER_DETAILS:
-          return <Step key={1}>
-            <StepLabel>
-              Profile
-            </StepLabel>
-          </Step>
+          return (
+            <Step key={1}>
+              <StepLabel>Profile</StepLabel>
+            </Step>
+          )
 
         case STEP_MEMBERSHIP:
-          return <Step key={2}>
-            <StepLabel>
-              Membership
-            </StepLabel>
-          </Step>
+          return (
+            <Step key={2}>
+              <StepLabel>Membership</StepLabel>
+            </Step>
+          )
         default:
-          throw new Error("Unknown step.  step: " + step)
+          throw new Error('Unknown step.  step: ' + step)
       }
     })
   }
@@ -52,28 +52,39 @@ function SignUpStepper ({ steps }) {
   const getStep = () => {
     switch (steps[activeStep]) {
       case STEP_AUTHENTICATION:
-        return <SignUpStepAuth isLast={activeStep === steps.length - 1} onNextClicked={handleNext} />
+        return (
+          <SignUpStepAuth
+            isLast={activeStep === steps.length - 1}
+            onNextClicked={handleNext}
+          />
+        )
       case STEP_USER_DETAILS:
-        return <SignUpStepUserProfile isLast={activeStep === steps.length - 1} onNextClicked={handleNext} />
+        return (
+          <SignUpStepUserProfile
+            isLast={activeStep === steps.length - 1}
+            onNextClicked={handleNext}
+          />
+        )
       case STEP_MEMBERSHIP:
-        return <SignUpStepPayment isLast={activeStep === steps.length - 1} onNextClicked={handleNext} />
+        return (
+          <SignUpStepPayment
+            isLast={activeStep === steps.length - 1}
+            onNextClicked={handleNext}
+          />
+        )
       default:
         return <Redirect to={ROOT} />
-
     }
   }
 
   return (
     <>
-      {
-        steps.length > 1 &&
+      {steps.length > 1 && (
         <Stepper alternativeLabel activeStep={activeStep}>
           {getStepsHeaders()}
         </Stepper>
-      }
-      {
-        getStep()
-      }
+      )}
+      {getStep()}
     </>
   )
 }

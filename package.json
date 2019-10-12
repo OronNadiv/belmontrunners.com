@@ -72,9 +72,20 @@
     "underscore.string": "^3.3.5",
     "uuid": "^3.3.3"
   },
+  "devDependencies": {
+    "@types/underscore": "^1.9.2",
+    "eslint-config-standard": "^13.0.1",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-node": "^9.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-react": "^7.14.3",
+    "eslint-plugin-standard": "^4.0.1",
+    "prettier": "^1.18.2"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint .",
@@ -93,14 +104,5 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ],
-  "devDependencies": {
-    "@types/underscore": "^1.9.2",
-    "eslint-config-standard": "^13.0.1",
-    "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-node": "^9.1.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-react": "^7.14.3",
-    "eslint-plugin-standard": "^4.0.1"
-  }
+  ]
 }

@@ -1,9 +1,9 @@
-import React, { useState } from "react"
-import Gallery from "react-photo-gallery"
-import Carousel, { Modal, ModalGateway } from "react-images"
+import React, { useState } from 'react'
+import Gallery from 'react-photo-gallery'
+import Carousel, { Modal, ModalGateway } from 'react-images'
 import * as PropTypes from 'prop-types'
 
-function DailyGallery ({ date, items }) {
+function DailyGallery({ date, items }) {
   const [currentImage, setCurrentImage] = useState(0)
   const [viewerIsOpen, setViewerIsOpen] = useState(false)
 

@@ -2,7 +2,7 @@ import React from 'react'
 import { GoogleApiWrapper, Map as GoogleMap } from 'google-maps-react'
 import * as PropTypes from 'prop-types'
 
-function Map ({ google }) {
+function Map({ google }) {
   return (
     <section className="home_map_area">
       <div id="mapBox2" className="mapBox2">
@@ -11,20 +11,21 @@ function Map ({ google }) {
         {/*data-zoom="14"*/}
         {/*data-mlat="37.5214784"*/}
         {/*data-mlon="-122.26">*/}
-        <GoogleMap google={google}
-                   zoom={14}
-                   initialCenter={{
-                     lat: 37.5214784,
-                     lng: -122.26
-                   }}
-                   scrollwheel={false}
-                   navigationControl={false}
-                   mapTypeControl={false}
-                   scaleControl={false}
-                   draggable={false}
-                   streetViewControl={false}
-                   zoomControl={false}
-                   fullscreenControl={false}
+        <GoogleMap
+          google={google}
+          zoom={14}
+          initialCenter={{
+            lat: 37.5214784,
+            lng: -122.26
+          }}
+          scrollwheel={false}
+          navigationControl={false}
+          mapTypeControl={false}
+          scaleControl={false}
+          draggable={false}
+          streetViewControl={false}
+          zoomControl={false}
+          fullscreenControl={false}
         />
       </div>
 
@@ -36,7 +37,8 @@ function Map ({ google }) {
                 <i className="lnr lnr-envelope" />
               </div>
               <div className="media-body">
-                <h4>belmontrunners@gmail.com
+                <h4>
+                  belmontrunners@gmail.com
                   {/*<a style="color: #222222;" href="mailto:belmontrunners@gmail.com"*/}
                   {/*target="_top">belmontrunners@gmail.com</a>*/}
                 </h4>

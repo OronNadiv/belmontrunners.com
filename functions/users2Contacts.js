@@ -1,18 +1,25 @@
 const { calc, IS_A_MEMBER } = require('./membershipUtils')
-const { ARRAY_KEY, DISPLAY_NAME, EMAIL, SUBSCRIBER_IS_ACTIVE, IS_MEMBER, MEMBERSHIP_EXPIRES_AT, UID } = require('./fields')
+const {
+  ARRAY_KEY,
+  DISPLAY_NAME,
+  EMAIL,
+  SUBSCRIBER_IS_ACTIVE,
+  IS_MEMBER,
+  MEMBERSHIP_EXPIRES_AT,
+  UID
+} = require('./fields')
 
 const Promise = require('bluebird')
-const normalizeEmail = require("normalize-email")
+const normalizeEmail = require('normalize-email')
 const _ = require('underscore')
 
-module.exports = (admin) => {
+module.exports = admin => {
   const firestore = admin.firestore()
   return async () => {
-    const { usersCollection, contactsDoc } = await Promise
-      .props({
-        usersCollection: firestore.collection('users').get(),
-        contactsDoc: firestore.doc('subscribers/items').get()
-      })
+    const { usersCollection, contactsDoc } = await Promise.props({
+      usersCollection: firestore.collection('users').get(),
+      contactsDoc: firestore.doc('subscribers/items').get()
+    })
     let data = contactsDoc.data()
 
     if (!data || !data[ARRAY_KEY]) {
@@ -20,7 +27,7 @@ module.exports = (admin) => {
     }
     const contacts = data[ARRAY_KEY]
 
-// load all users
+    // load all users
     const users = []
     usersCollection.forEach(userDoc => {
       const user = userDoc.data()
@@ -32,8 +39,8 @@ module.exports = (admin) => {
     Update contacts information from users by UID.
     Handles case where a user changed a displayName or email
      */
-    users.forEach((user) => {
-      const foundContact = contacts.find((contact) => {
+    users.forEach(user => {
+      const foundContact = contacts.find(contact => {
         return contact[UID] === user[UID]
       })
       if (foundContact) {
@@ -48,8 +55,8 @@ module.exports = (admin) => {
     This handles cases where a user was created with an email of an existing subscriber.
     Now we "promote" this subscriber to be a user.
      */
-    contacts.forEach((contact) => {
-      const foundUser = users.find((user) => {
+    contacts.forEach(contact => {
+      const foundUser = users.find(user => {
         return normalizeEmail(contact[EMAIL]) === normalizeEmail(user[EMAIL])
       })
       if (foundUser) {
@@ -62,7 +69,7 @@ module.exports = (admin) => {
     /*
     Add new users to the contacts list
      */
-    users.forEach((user) => {
+    users.forEach(user => {
       const foundContact = _.findWhere(contacts, { [UID]: user[UID] })
       if (foundContact) {
         return
@@ -77,7 +84,7 @@ module.exports = (admin) => {
       contacts.push(contact)
     })
     // set isMember
-    contacts.forEach((contact) => {
+    contacts.forEach(contact => {
       contact[IS_MEMBER] = calc(contact)[IS_A_MEMBER]
     })
 

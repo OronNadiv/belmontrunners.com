@@ -1,14 +1,22 @@
-import {Button} from '@material-ui/core'
+import { Button } from '@material-ui/core'
 import React from 'react'
 import * as PropTypes from 'prop-types'
 
-function SignUpStepperButton ({ primaryText, secondaryText, primaryDisabled, secondaryDisabled, handlePrimaryClicked, handleSecondaryClicked, showPrimary, showSecondary }) {
+function SignUpStepperButton({
+  primaryText,
+  secondaryText,
+  primaryDisabled,
+  secondaryDisabled,
+  handlePrimaryClicked,
+  handleSecondaryClicked,
+  showPrimary,
+  showSecondary
+}) {
   return (
-    <div className='d-flex justify-content-between my-5'>
-      {
-        showSecondary &&
+    <div className="d-flex justify-content-between my-5">
+      {showSecondary && (
         <Button
-          className='mr-4'
+          className="mr-4"
           variant="contained"
           color="default"
           fullWidth
@@ -17,9 +25,8 @@ function SignUpStepperButton ({ primaryText, secondaryText, primaryDisabled, sec
         >
           {secondaryText}
         </Button>
-      }
-      {
-        showPrimary &&
+      )}
+      {showPrimary && (
         <Button
           variant="contained"
           color="primary"
@@ -29,7 +36,7 @@ function SignUpStepperButton ({ primaryText, secondaryText, primaryDisabled, sec
         >
           {primaryText}
         </Button>
-      }
+      )}
     </div>
   )
 }

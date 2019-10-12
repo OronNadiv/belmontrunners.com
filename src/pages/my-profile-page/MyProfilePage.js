@@ -8,20 +8,29 @@ import MyProfileFacebook from './MyProfileFacebook'
 import { goToTop } from 'react-scrollable-anchor'
 import { compose } from 'underscore'
 
-function MyProfilePage ({ currentUser }) {
+function MyProfilePage({ currentUser }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(goToTop, [currentUser])
 
-  const handleSubmissionChanged = ((value) => {
+  const handleSubmissionChanged = value => {
     setIsSubmitting(value)
-  })
+  }
 
-  return currentUser &&
-    <div className='mx-auto py-5 px-3' style={{ maxWidth: 500 }}>
-      <MyProfileFacebook onSubmitting={handleSubmissionChanged} isSubmitting={isSubmitting} />
-      <MyProfileForm onSubmitting={handleSubmissionChanged} isSubmitting={isSubmitting} />
-    </div>
+  return (
+    currentUser && (
+      <div className="mx-auto py-5 px-3" style={{ maxWidth: 500 }}>
+        <MyProfileFacebook
+          onSubmitting={handleSubmissionChanged}
+          isSubmitting={isSubmitting}
+        />
+        <MyProfileForm
+          onSubmitting={handleSubmissionChanged}
+          isSubmitting={isSubmitting}
+        />
+      </div>
+    )
+  )
 }
 
 MyProfilePage.propTypes = {
@@ -40,5 +49,8 @@ const mapStateToProps = ({ currentUser: { currentUser } }) => {
 
 export default compose(
   LoggedInState(),
-  connect(mapStateToProps, mapDispatchToProps)
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )
 )(MyProfilePage)

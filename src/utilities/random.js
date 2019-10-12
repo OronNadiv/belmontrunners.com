@@ -1,11 +1,10 @@
-export function shuffle (array) {
+export function shuffle(array) {
   let currentIndex = array.length
   let temporaryValue
   let randomIndex
 
   // While there remain elements to shuffle...
   while (0 !== currentIndex) {
-
     // Pick a remaining element...
     randomIndex = Math.floor(Math.random() * currentIndex)
     currentIndex -= 1

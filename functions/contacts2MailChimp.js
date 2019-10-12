@@ -5,7 +5,7 @@ const rp = require('request-promise')
 const Promise = require('bluebird')
 const md5 = require('md5')
 
-module.exports = (admin) => {
+module.exports = admin => {
   const firestore = admin.firestore()
 
   return async () => {
@@ -34,27 +34,27 @@ module.exports = (admin) => {
     // }
 
     const syncActive = async () => {
-      const body = active
-        .map((contact) => {
-          const mailChimpContact = {
-            email_address: contact[EMAIL]
+      const body = active.map(contact => {
+        const mailChimpContact = {
+          email_address: contact[EMAIL]
+        }
+        const displayName = contact[DISPLAY_NAME]
+        if (displayName) {
+          const name = parseFullName(displayName)
+          mailChimpContact.merge_fields = {
+            FNAME: name.first || '',
+            LNAME: name.last || ''
           }
-          const displayName = contact[DISPLAY_NAME]
-          if (displayName) {
-            const name = parseFullName(displayName)
-            mailChimpContact.merge_fields = {
-              FNAME: name.first || '',
-              LNAME: name.last || ''
-            }
-          }
-          return mailChimpContact
-        })
+        }
+        return mailChimpContact
+      })
       await Promise.each(body, async item => {
         try {
           await rp({
             method: 'POST',
-            uri: 'https://username:2b7213c2cc3789df0376d0629facc0b5-us3@us3.api.mailchimp.com/3.0/lists/7cffd16da0/members/',
-            body: { ...item, status: "subscribed" },
+            uri:
+              'https://username:2b7213c2cc3789df0376d0629facc0b5-us3@us3.api.mailchimp.com/3.0/lists/7cffd16da0/members/',
+            body: { ...item, status: 'subscribed' },
             json: true
           })
           console.info('done POST:', item.email_address)
@@ -63,13 +63,18 @@ module.exports = (admin) => {
             try {
               await rp({
                 method: 'PUT',
-                uri: `https://username:2b7213c2cc3789df0376d0629facc0b5-us3@us3.api.mailchimp.com/3.0/lists/7cffd16da0/members/${md5(item.email_address.toLowerCase())}`,
+                uri: `https://username:2b7213c2cc3789df0376d0629facc0b5-us3@us3.api.mailchimp.com/3.0/lists/7cffd16da0/members/${md5(
+                  item.email_address.toLowerCase()
+                )}`,
                 body: item,
                 json: true
               })
               console.info('done PUT:', item.email_address)
             } catch (err2) {
-              console.error('error PUT:', err2 && err2.error ? err2.error : err2)
+              console.error(
+                'error PUT:',
+                err2 && err2.error ? err2.error : err2
+              )
             }
           } else {
             console.error('error POST:', err && err.error ? err.error : err)

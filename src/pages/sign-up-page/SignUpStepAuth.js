@@ -14,7 +14,14 @@ import SignUpStepperButton from './SignUpStepperButton'
 import Promise from 'bluebird'
 import s from 'underscore.string'
 import LoggedInState from '../../components/HOC/LoggedInState'
-import { PRIVACY_POLICY, PRIVACY_POLICY_FILE_NAME, TOS, TOS_FILE_NAME, WAVER, WAVER_FILE_NAME } from '../../urls'
+import {
+  PRIVACY_POLICY,
+  PRIVACY_POLICY_FILE_NAME,
+  TOS,
+  TOS_FILE_NAME,
+  WAVER,
+  WAVER_FILE_NAME
+} from '../../urls'
 import moment from 'moment'
 import * as Sentry from '@sentry/browser'
 import { Field, Form } from 'react-final-form'
@@ -23,11 +30,14 @@ import { goToTop } from 'react-scrollable-anchor'
 import { compose } from 'underscore'
 
 const required = value => (value ? undefined : 'Required')
-const isEmail = value => (!value || !isEmailComponent.validate(value) ? INVALID_EMAIL : undefined)
-const minPasswordLength = value => (value.length < 6 ? INVALID_PASSWORD_LENGTH(6) : undefined)
-const composeValidators = (...validators) => value => validators.reduce((error, validator) => error || validator(value), undefined)
+const isEmail = value =>
+  !value || !isEmailComponent.validate(value) ? INVALID_EMAIL : undefined
+const minPasswordLength = value =>
+  value.length < 6 ? INVALID_PASSWORD_LENGTH(6) : undefined
+const composeValidators = (...validators) => value =>
+  validators.reduce((error, validator) => error || validator(value), undefined)
 
-function SignUpStepAuth ({ onNextClicked, isLast }) {
+function SignUpStepAuth({ onNextClicked, isLast }) {
   const [errorMessage, setErrorMessage] = useState('')
   const [isSigningUp, setIsSigningUp] = useState(false)
 
@@ -40,7 +50,11 @@ function SignUpStepAuth ({ onNextClicked, isLast }) {
   }, [errorMessage])
 
   const signUp = async (providerName, fullName, email, password) => {
-    const displayName = s(fullName).clean().words().map((w) => s.capitalize(w)).join(" ")
+    const displayName = s(fullName)
+      .clean()
+      .words()
+      .map(w => s.capitalize(w))
+      .join(' ')
 
     setErrorMessage('')
     setIsSigningUp(true)
@@ -51,13 +65,14 @@ function SignUpStepAuth ({ onNextClicked, isLast }) {
     let promise
     switch (providerName.toLowerCase()) {
       case 'email':
-        promise = Promise.resolve(firebase.auth().createUserWithEmailAndPassword(email, password))
-          .tap((user) => {
-            console.log('calling updateProfile', user)
-            return firebase.auth().currentUser.updateProfile({
-              [DISPLAY_NAME]: displayName
-            })
+        promise = Promise.resolve(
+          firebase.auth().createUserWithEmailAndPassword(email, password)
+        ).tap(user => {
+          console.log('calling updateProfile', user)
+          return firebase.auth().currentUser.updateProfile({
+            [DISPLAY_NAME]: displayName
           })
+        })
         break
       case 'facebook':
         promise = firebase.auth().signInWithPopup(providerFacebook)
@@ -72,7 +87,9 @@ function SignUpStepAuth ({ onNextClicked, isLast }) {
     }
     try {
       await promise
-      const userRef = firebase.firestore().doc(`users/${firebase.auth().currentUser[UID]}`)
+      const userRef = firebase
+        .firestore()
+        .doc(`users/${firebase.auth().currentUser[UID]}`)
       const doc = await userRef.get()
       let values = {}
       if (!doc.exists) {
@@ -81,9 +98,13 @@ function SignUpStepAuth ({ onNextClicked, isLast }) {
           tosUrl: TOS_FILE_NAME,
           tosAcceptedAt: moment().format(),
           waverUrl: WAVER_FILE_NAME,
-          waverAcceptedAt: moment().utc().format(),
+          waverAcceptedAt: moment()
+            .utc()
+            .format(),
           privacyPolicyUrl: PRIVACY_POLICY_FILE_NAME,
-          privacyPolicyAcceptedAt: moment().utc().format()
+          privacyPolicyAcceptedAt: moment()
+            .utc()
+            .format()
         }
       }
       const { email, displayName, photoURL } = firebase.auth().currentUser
@@ -101,11 +122,8 @@ function SignUpStepAuth ({ onNextClicked, isLast }) {
     }
   }
 
-  const handleSignUpError = (error) => {
-    const {
-      code,
-      message
-    } = error
+  const handleSignUpError = error => {
+    const { code, message } = error
     switch (code) {
       case 'auth/invalid-email':
         setErrorMessage(INVALID_EMAIL)
@@ -123,11 +141,10 @@ function SignUpStepAuth ({ onNextClicked, isLast }) {
     }
   }
 
-  const handleSignUpWithEmail = async (values) => {
+  const handleSignUpWithEmail = async values => {
     console.log('handleSignUpWithEmail called.  Values:', values)
     await signUp('email', values[DISPLAY_NAME], values[EMAIL], values[PASSWORD])
   }
-
 
   // const handleSignInWithProvider = (providerName) => {
   //   signUp(providerName)
@@ -149,34 +166,36 @@ function SignUpStepAuth ({ onNextClicked, isLast }) {
         <div className='mt-4 text-center text-dark'>Or sign up with email</div>
 */}
 
-      {
-        errorMessage &&
-        <div className='mt-2 text-danger text-center'>{errorMessage}</div>
-      }
+      {errorMessage && (
+        <div className="mt-2 text-danger text-center">{errorMessage}</div>
+      )}
 
       <Form
         onSubmit={handleSignUpWithEmail}
         render={({ handleSubmit, form }) => (
-          <form onSubmit={handleSubmit} method='POST' className='container-fluid'>
-
-            <div className='row'>
+          <form
+            onSubmit={handleSubmit}
+            method="POST"
+            className="container-fluid"
+          >
+            <div className="row">
               <Field
                 style={{ minHeight: 68 }}
-                label='Your email'
-                type='email'
+                label="Your email"
+                type="email"
                 fullWidth
-                margin='normal'
+                margin="normal"
                 name={EMAIL}
                 component={TextField}
                 validate={composeValidators(required, isEmail)}
               />
             </div>
 
-            <div className='row'>
+            <div className="row">
               <Field
                 style={{ minHeight: 68 }}
-                label='Your full name'
-                margin='normal'
+                label="Your full name"
+                margin="normal"
                 fullWidth
                 name={DISPLAY_NAME}
                 component={TextField}
@@ -184,12 +203,12 @@ function SignUpStepAuth ({ onNextClicked, isLast }) {
               />
             </div>
 
-            <div className='row'>
+            <div className="row">
               <Field
                 style={{ minHeight: 68 }}
-                label='Your password'
-                type='password'
-                margin='normal'
+                label="Your password"
+                type="password"
+                margin="normal"
                 fullWidth
                 name={PASSWORD}
                 component={TextField}
@@ -200,14 +219,24 @@ function SignUpStepAuth ({ onNextClicked, isLast }) {
             {
               // todo: add 'confirm password' field
             }
-            <div className='mt-2 mb-2 text-center'>
-              By clicking “NEXT”, you agree to our <a href={TOS}
-                                                      target='_blank' rel='noopener noreferrer'>terms of
-              service</a>, <a
-              href={PRIVACY_POLICY} target='_blank'
-              rel='noopener noreferrer'>privacy statement</a> and <a
-              href={WAVER} target='_blank'
-              rel='noopener noreferrer'>release of liability</a>. We’ll occasionally send you account related emails.
+            <div className="mt-2 mb-2 text-center">
+              By clicking “NEXT”, you agree to our{' '}
+              <a href={TOS} target="_blank" rel="noopener noreferrer">
+                terms of service
+              </a>
+              ,{' '}
+              <a
+                href={PRIVACY_POLICY}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                privacy statement
+              </a>{' '}
+              and{' '}
+              <a href={WAVER} target="_blank" rel="noopener noreferrer">
+                release of liability
+              </a>
+              . We’ll occasionally send you account related emails.
             </div>
             <SignUpStepperButton
               handlePrimaryClicked={() => form.submit()}
@@ -227,6 +256,6 @@ SignUpStepAuth.propTypes = {
   onNextClicked: PropTypes.func.isRequired
 }
 
-export default compose(
-  LoggedInState({ isRequiredToBeLoggedIn: false })
-)(SignUpStepAuth)
+export default compose(LoggedInState({ isRequiredToBeLoggedIn: false }))(
+  SignUpStepAuth
+)

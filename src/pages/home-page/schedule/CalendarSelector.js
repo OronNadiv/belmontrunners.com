@@ -32,23 +32,26 @@ const YAHOO = 'YAHOO'
 
 const ICAL_LINK = 'https://www.belmontrunners.com/public/basic.ical'
 
-function CalendarSelector ({ fullScreen }) {
+function CalendarSelector({ fullScreen }) {
   const [anchorEl, setAnchorEl] = useState(null)
   const [showDialog, setShowDialog] = useState(false)
   const [videoId, setVideoId] = useState(null)
   const [copied, setCopied] = useState(false)
 
-  function handleClick (event) {
+  function handleClick(event) {
     setAnchorEl(event.currentTarget)
   }
 
-  function handleClose (provider) {
+  function handleClose(provider) {
     setAnchorEl(null)
     setShowDialog(true)
     switch (provider) {
       case GOOGLE:
         setShowDialog(false)
-        window.open("https://calendar.google.com/calendar?cid=guvk2qu1oo369ns50tvatdot7v8chd1t@import.calendar.google.com", "_blank")
+        window.open(
+          'https://calendar.google.com/calendar?cid=guvk2qu1oo369ns50tvatdot7v8chd1t@import.calendar.google.com',
+          '_blank'
+        )
         break
       case ICAL:
         setVideoId('')
@@ -71,7 +74,7 @@ function CalendarSelector ({ fullScreen }) {
   }
 
   return (
-    <div className='ical-tutorials'>
+    <div className="ical-tutorials">
       <Snackbar
         anchorOrigin={{
           vertical: 'bottom',
@@ -79,49 +82,60 @@ function CalendarSelector ({ fullScreen }) {
         }}
         open={copied}
         autoHideDuration={6000}
-        message={"Link copied"}
+        message={'Link copied'}
         onClose={() => {
           setCopied(false)
         }}
       />
 
-      <Dialog onClose={handleClose} open={showDialog}
-              fullScreen={fullScreen}
-              aria-labelledby="simple-dialog-title">
-        {
-          fullScreen &&
+      <Dialog
+        onClose={handleClose}
+        open={showDialog}
+        fullScreen={fullScreen}
+        aria-labelledby="simple-dialog-title"
+      >
+        {fullScreen && (
           <Toolbar>
-            <IconButton edge="start" color="inherit" onClick={handleClose} aria-label="Close">
+            <IconButton
+              edge="start"
+              color="inherit"
+              onClick={handleClose}
+              aria-label="Close"
+            >
               <CloseIcon />
             </IconButton>
           </Toolbar>
+        )}
 
-        }
-
-        <div className='mx-auto my-4'>
-          <Paper className='d-flex align-items-center mx-2' elevation={3}>
-            <div className='ical-link ml-3'>{ICAL_LINK}</div>
-            <CopyToClipboard className='ml-3' text={ICAL_LINK} onCopy={() => {
-              setCopied(true)
-              !videoId && setShowDialog(false)
-            }}>
+        <div className="mx-auto my-4">
+          <Paper className="d-flex align-items-center mx-2" elevation={3}>
+            <div className="ical-link ml-3">{ICAL_LINK}</div>
+            <CopyToClipboard
+              className="ml-3"
+              text={ICAL_LINK}
+              onCopy={() => {
+                setCopied(true)
+                !videoId && setShowDialog(false)
+              }}
+            >
               <Button variant="contained" color="primary">
                 COPY
               </Button>
             </CopyToClipboard>
           </Paper>
         </div>
-        {
-          videoId &&
-          <div className='mx-auto mb-4'>
-            <iframe title='Add to my calendar' className='mx-2'
-                    src={`https://www.youtube.com/embed/${videoId}?rel=0`}
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen>
-            </iframe>
+        {videoId && (
+          <div className="mx-auto mb-4">
+            <iframe
+              title="Add to my calendar"
+              className="mx-2"
+              src={`https://www.youtube.com/embed/${videoId}?rel=0`}
+              frameBorder="0"
+              allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
           </div>
-        }
+        )}
       </Dialog>
       <Button
         aria-haspopup="true"
@@ -139,7 +153,6 @@ function CalendarSelector ({ fullScreen }) {
         keepMounted
         open={Boolean(anchorEl)}
         onClose={handleClose}
-
         elevation={0}
         getContentAnchorEl={null}
         anchorOrigin={{
@@ -193,7 +206,6 @@ function CalendarSelector ({ fullScreen }) {
     </div>
   )
 }
-
 
 CalendarSelector.propTypes = {
   fullScreen: PropTypes.bool.isRequired

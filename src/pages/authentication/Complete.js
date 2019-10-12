@@ -11,17 +11,24 @@ import {
   USER_DISABLED_INVALID_URL,
   USER_NOT_FOUND_INVALID_URL
 } from '../../messages'
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core'
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle
+} from '@material-ui/core'
 import * as Sentry from '@sentry/browser'
 
 class Complete extends Component {
-  constructor (props) {
+  constructor(props) {
     console.log('Complete ctor called.')
     super(props)
     this.state = {}
   }
 
-  processError (error) {
+  processError(error) {
     const { code, message } = error
     console.log('code:', code, 'message:', message)
     switch (code) {
@@ -39,14 +46,12 @@ class Complete extends Component {
         break
       default:
         Sentry.captureException(error)
-        console.error('in Complete',
-          'code:', code,
-          'message:', message)
+        console.error('in Complete', 'code:', code, 'message:', message)
         this.setState({ errorMessage: message })
     }
   }
 
-  async componentDidMount () {
+  async componentDidMount() {
     const { search } = this.props.location
 
     const query = queryString.parse(search) || {}
@@ -57,13 +62,15 @@ class Complete extends Component {
       let redirect
       if (mode) {
         redirect = (
-          <Redirect to={{
-            pathname: `/${mode}`,
-            state: {
-              info,
-              query
-            }
-          }} />
+          <Redirect
+            to={{
+              pathname: `/${mode}`,
+              state: {
+                info,
+                query
+              }
+            }}
+          />
         )
       } else {
         redirect = <Redirect to={ROOT} />
@@ -75,7 +82,7 @@ class Complete extends Component {
     }
   }
 
-  render () {
+  render() {
     const { redirect, errorMessage } = this.state
 
     if (redirect) {
@@ -83,22 +90,19 @@ class Complete extends Component {
     } else if (!errorMessage) {
       return ''
     }
-    return (<Dialog
+    return (
+      <Dialog
         open
         fullWidth
-        maxWidth='xs'
+        maxWidth="xs"
         onClose={() => this.setState({ redirect: <Redirect to={ROOT} /> })}
         aria-labelledby="form-dialog-title"
       >
-        <DialogTitle>
-          Error
-        </DialogTitle>
+        <DialogTitle>Error</DialogTitle>
 
         <DialogContent>
           <DialogContentText>
-            <div className='text-danger text-center'>
-              {errorMessage}
-            </div>
+            <div className="text-danger text-center">{errorMessage}</div>
           </DialogContentText>
         </DialogContent>
         <DialogActions>

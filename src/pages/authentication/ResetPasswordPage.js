@@ -2,7 +2,14 @@ import 'firebase/auth'
 import firebase from 'firebase'
 import React, { useEffect, useState } from 'react'
 import { withRouter } from 'react-router-dom'
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core'
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle
+} from '@material-ui/core'
 import { TextField } from 'final-form-material-ui'
 import { ROOT } from '../../urls'
 import * as PropTypes from 'prop-types'
@@ -15,14 +22,15 @@ import { goToTop } from 'react-scrollable-anchor'
 const WEAK_PASSWORD = 'Password is too weak.'
 
 const required = value => (value ? undefined : 'Required')
-const composeValidators = (...validators) => value => validators.reduce((error, validator) => error || validator(value), undefined)
+const composeValidators = (...validators) => value =>
+  validators.reduce((error, validator) => error || validator(value), undefined)
 const minPasswordLength = value => {
   const res = value.length < 6 ? INVALID_PASSWORD_LENGTH(6) : undefined
   console.log('res', value, res)
   return res
 }
 
-function ResetPasswordPage ({ history, location }) {
+function ResetPasswordPage({ history, location }) {
   const [errorMessage, setErrorMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
@@ -35,21 +43,18 @@ function ResetPasswordPage ({ history, location }) {
     errorMessage && goToTop()
   }, [errorMessage])
 
-
-  const handleError = (error) => {
+  const handleError = error => {
     const { code, message } = error
     if (code === 'auth/weak-password') {
       setErrorMessage(WEAK_PASSWORD)
     } else {
       Sentry.captureException(error)
-      console.error('ResetPasswordPage',
-        'code:', code,
-        'message:', message)
+      console.error('ResetPasswordPage', 'code:', code, 'message:', message)
       setErrorMessage(message)
     }
   }
 
-  const handleSubmit = async (values) => {
+  const handleSubmit = async values => {
     const newPassword = values[PASSWORD]
 
     const oobCode = location.state.query.oobCode
@@ -73,70 +78,61 @@ function ResetPasswordPage ({ history, location }) {
 
   return (
     <Form
-      onSubmit={(values) => handleSubmit(values)}
+      onSubmit={values => handleSubmit(values)}
       render={({ handleSubmit, form }) => (
-        <form onSubmit={handleSubmit} method='POST'>
-
+        <form onSubmit={handleSubmit} method="POST">
           <Dialog
             open
             fullWidth
-            maxWidth='xs'
+            maxWidth="xs"
             onClose={handleClose}
             aria-labelledby="form-dialog-title"
           >
-            <DialogTitle>
-              Reset Password
-            </DialogTitle>
+            <DialogTitle>Reset Password</DialogTitle>
 
             <DialogContent>
-              {
-                errorMessage &&
+              {errorMessage && (
                 <DialogContentText>
-                  <div className='text-danger text-center'>
-                    {errorMessage}
+                  <div className="text-danger text-center">{errorMessage}</div>
+                </DialogContentText>
+              )}
+              {isSuccess ? (
+                <DialogContentText>
+                  <div className="text-success text-center">
+                    {RESET_PASSWORD_SUCCESS}
                   </div>
                 </DialogContentText>
-              }
-              {
-                isSuccess
-                  ?
-                  <DialogContentText>
-                    <div className='text-success text-center'>
-                      {RESET_PASSWORD_SUCCESS}
-                    </div>
-                  </DialogContentText>
-                  :
-                  <Field
-                    label='New password'
-                    type='password'
-                    margin='normal'
-                    fullWidth
-                    name={PASSWORD}
-                    component={TextField}
-                    validate={composeValidators(required, minPasswordLength)}
-                  />
-              }
+              ) : (
+                <Field
+                  label="New password"
+                  type="password"
+                  margin="normal"
+                  fullWidth
+                  name={PASSWORD}
+                  component={TextField}
+                  validate={composeValidators(required, minPasswordLength)}
+                />
+              )}
             </DialogContent>
-            {
-              isSuccess
-                ?
-                <DialogActions>
-                  <Button onClick={handleClose} color="primary">
-                    Close
-                  </Button>
-                </DialogActions>
-                :
-                <DialogActions>
-                  <Button onClick={handleClose}>
-                    Cancel
-                  </Button>
-                  <Button type="button" color="primary"
-                          onClick={() => form.submit()}
-                          disabled={isSubmitting}>
-                    Set new password
-                  </Button>
-                </DialogActions>
-            }
+            {isSuccess ? (
+              <DialogActions>
+                <Button onClick={handleClose} color="primary">
+                  Close
+                </Button>
+              </DialogActions>
+            ) : (
+              <DialogActions>
+                <Button onClick={handleClose}>Cancel</Button>
+                <Button
+                  type="button"
+                  color="primary"
+                  onClick={() => form.submit()}
+                  disabled={isSubmitting}
+                >
+                  Set new password
+                </Button>
+              </DialogActions>
+            )}
           </Dialog>
         </form>
       )}

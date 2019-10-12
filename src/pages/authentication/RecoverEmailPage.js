@@ -10,7 +10,14 @@ import {
 } from '../../messages'
 import { Redirect, withRouter } from 'react-router-dom'
 import { ROOT } from '../../urls'
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core'
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle
+} from '@material-ui/core'
 import * as Sentry from '@sentry/browser'
 
 const STATE_CLOSE = 'close'
@@ -18,7 +25,7 @@ const STATE_ERROR_MESSAGE = 'errorMessage'
 const STATE_IS_SUCCESS = 'isSuccess'
 
 class RecoverEmailPage extends Component {
-  constructor (props) {
+  constructor(props) {
     console.log('RecoverEmailPage ctor')
     super(props)
     this.state = {
@@ -28,7 +35,7 @@ class RecoverEmailPage extends Component {
     }
   }
 
-  processError (error) {
+  processError(error) {
     const { code, message } = error
     switch (code) {
       case 'auth/expired-action-code':
@@ -53,28 +60,24 @@ class RecoverEmailPage extends Component {
         return
       default:
         Sentry.captureException(error)
-        console.error('RecoverEmailPage',
-          'code:', code,
-          'message:', message)
+        console.error('RecoverEmailPage', 'code:', code, 'message:', message)
         this.setState({
           [STATE_ERROR_MESSAGE]: message
         })
     }
   }
 
-  async componentDidMount () {
+  async componentDidMount() {
     // Get the restored email address.
     const oobCode = this.props.location.state.query.oobCode
     const restoredEmail = this.props.location.state.info.data.email
 
     console.log('calling applyActionCode')
     try {
-      await firebase.auth()
-        .applyActionCode(oobCode)
+      await firebase.auth().applyActionCode(oobCode)
       console.log('calling sendPasswordResetEmail')
       try {
-        await firebase.auth()
-          .sendPasswordResetEmail(restoredEmail)
+        await firebase.auth().sendPasswordResetEmail(restoredEmail)
         this.setState({
           [STATE_IS_SUCCESS]: true,
           [STATE_ERROR_MESSAGE]: ''
@@ -82,9 +85,7 @@ class RecoverEmailPage extends Component {
       } catch (error) {
         const { code, message } = error
         Sentry.captureException(error)
-        console.error('RecoverEmailPage',
-          'code:', code,
-          'message:', message)
+        console.error('RecoverEmailPage', 'code:', code, 'message:', message)
         this.setState({
           [STATE_ERROR_MESSAGE]: message
         })
@@ -94,7 +95,7 @@ class RecoverEmailPage extends Component {
     }
   }
 
-  render () {
+  render() {
     const close = this.state[STATE_CLOSE]
     const errorMessage = this.state[STATE_ERROR_MESSAGE]
     const isSuccess = this.state[STATE_IS_SUCCESS]
@@ -110,29 +111,30 @@ class RecoverEmailPage extends Component {
       <Dialog
         open
         fullWidth
-        maxWidth='xs'
+        maxWidth="xs"
         onClose={() => this.setState({ [STATE_CLOSE]: true })}
         aria-labelledby="form-dialog-title"
       >
-        <DialogTitle>
-          Recover Email
-        </DialogTitle>
+        <DialogTitle>Recover Email</DialogTitle>
 
         <DialogContent>
           <DialogContentText>
-            {
-              isSuccess &&
-              <div className='text-success text-center '>
-                Your email ({restoredEmail}) has been successfully recovered.<br />
-                A password reset confirmation email has been sent to your email.
-                Please follow the instructions in the email to reset your password.
+            {isSuccess && (
+              <div className="text-success text-center ">
+                Your email ({restoredEmail}) has been successfully recovered.
+                <br />A password reset confirmation email has been sent to your
+                email. Please follow the instructions in the email to reset your
+                password.
               </div>
-            }
+            )}
             {errorMessage}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => this.setState({ [STATE_CLOSE]: true })} color="primary">
+          <Button
+            onClick={() => this.setState({ [STATE_CLOSE]: true })}
+            color="primary"
+          >
             Close
           </Button>
         </DialogActions>

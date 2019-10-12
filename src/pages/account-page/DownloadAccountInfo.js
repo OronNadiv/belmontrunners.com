@@ -9,7 +9,7 @@ import UpdateUserData from '../../components/HOC/UpdateUserData'
 import DownloadButton from 'react-dfb'
 import moment from 'moment'
 
-function DownloadAccountInfo ({ currentUser, userData, isSubmitting }) {
+function DownloadAccountInfo({ currentUser, userData, isSubmitting }) {
   userData = userData.toJS()
 
   const [downloadData, setDownloadData] = useState()
@@ -22,28 +22,38 @@ function DownloadAccountInfo ({ currentUser, userData, isSubmitting }) {
     })
   }
 
-  return currentUser &&
-    <Card className='d-flex flex-row align-content-center my-4'>
-      <div className='mr-auto'>
-        <CardContent>
-          <Typography component="h6" variant="h6">
-            Export account data
-          </Typography>
-          <Typography color="textSecondary">
-            Get all your personal information
-          </Typography>
-        </CardContent>
-      </div>
-      <span className='px-3 d-flex'>
-          <div className='align-self-center'>
-            <DownloadButton downloadData={downloadData} onClick={handleDownloadPI}>
-              <Button variant="contained" color="primary" disabled={isSubmitting}>
+  return (
+    currentUser && (
+      <Card className="d-flex flex-row align-content-center my-4">
+        <div className="mr-auto">
+          <CardContent>
+            <Typography component="h6" variant="h6">
+              Export account data
+            </Typography>
+            <Typography color="textSecondary">
+              Get all your personal information
+            </Typography>
+          </CardContent>
+        </div>
+        <span className="px-3 d-flex">
+          <div className="align-self-center">
+            <DownloadButton
+              downloadData={downloadData}
+              onClick={handleDownloadPI}
+            >
+              <Button
+                variant="contained"
+                color="primary"
+                disabled={isSubmitting}
+              >
                 Download
               </Button>
             </DownloadButton>
           </div>
         </span>
-    </Card>
+      </Card>
+    )
+  )
 }
 
 DownloadAccountInfo.propTypes = {

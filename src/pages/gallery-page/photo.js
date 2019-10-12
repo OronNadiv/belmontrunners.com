@@ -1,12 +1,12 @@
-import React from "react"
-import PropTypes from "prop-types"
+import React from 'react'
+import PropTypes from 'prop-types'
 
-const imgWithClick = { cursor: "pointer" }
+const imgWithClick = { cursor: 'pointer' }
 
 const Photo = ({ index, onClick, photo, margin, direction, top, left }) => {
   const imgStyle = { margin: margin }
-  if (direction === "column") {
-    imgStyle.position = "absolute"
+  if (direction === 'column') {
+    imgStyle.position = 'absolute'
     imgStyle.left = left
     imgStyle.top = top
   }
@@ -33,6 +33,5 @@ Photo.propTypes = {
   direction: PropTypes.string.isRequired,
   top: PropTypes.number,
   left: PropTypes.number
-
 }
 export default Photo

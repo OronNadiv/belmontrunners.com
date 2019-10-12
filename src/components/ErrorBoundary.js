@@ -3,17 +3,17 @@ import * as Sentry from '@sentry/browser'
 import * as PropTypes from 'prop-types'
 
 class ErrorBoundary extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = { hasError: false }
   }
 
-  componentDidCatch (err, info) {
+  componentDidCatch(err, info) {
     this.setState({ hasError: true })
     Sentry.captureException(err)
   }
 
-  render () {
+  render() {
     return this.props.children
   }
 }

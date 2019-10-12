@@ -9,22 +9,35 @@ import ChangeEmail from './ChangeEmail'
 import DeleteAccount from './DeleteAccount'
 import ChangePassword from './ChangePassword'
 
-function AccountPage ({ currentUser }) {
+function AccountPage({ currentUser }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(goToTop, [currentUser])
 
-  const handleSubmissionChanged = ((value) => {
+  const handleSubmissionChanged = value => {
     setIsSubmitting(value)
-  })
+  }
 
-  return !currentUser ? null :
-    <div className='mx-auto py-5 px-3' style={{ maxWidth: 600 }}>
-      <ChangeEmail onSubmitting={handleSubmissionChanged} isSubmitting={isSubmitting} />
-      <ChangePassword onSubmitting={handleSubmissionChanged} isSubmitting={isSubmitting} />
-      <DownloadAccountInfo onSubmitting={handleSubmissionChanged} isSubmitting={isSubmitting} />
-      <DeleteAccount onSubmitting={handleSubmissionChanged} isSubmitting={isSubmitting} />
+  return !currentUser ? null : (
+    <div className="mx-auto py-5 px-3" style={{ maxWidth: 600 }}>
+      <ChangeEmail
+        onSubmitting={handleSubmissionChanged}
+        isSubmitting={isSubmitting}
+      />
+      <ChangePassword
+        onSubmitting={handleSubmissionChanged}
+        isSubmitting={isSubmitting}
+      />
+      <DownloadAccountInfo
+        onSubmitting={handleSubmissionChanged}
+        isSubmitting={isSubmitting}
+      />
+      <DeleteAccount
+        onSubmitting={handleSubmissionChanged}
+        isSubmitting={isSubmitting}
+      />
     </div>
+  )
 }
 
 AccountPage.propTypes = {

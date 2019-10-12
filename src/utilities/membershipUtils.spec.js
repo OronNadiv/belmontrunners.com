@@ -1,4 +1,10 @@
-import { calc, WAS_NEVER_A_MEMBER, IS_A_MEMBER, IS_MEMBERSHIP_EXPIRED, IS_MEMBERSHIP_EXPIRES_SOON } from './membershipUtils'
+import {
+  calc,
+  WAS_NEVER_A_MEMBER,
+  IS_A_MEMBER,
+  IS_MEMBERSHIP_EXPIRED,
+  IS_MEMBERSHIP_EXPIRES_SOON
+} from './membershipUtils'
 import moment from 'moment'
 import { MEMBERSHIP_EXPIRES_AT } from '../fields'
 import { each } from 'underscore'
@@ -25,7 +31,7 @@ it('membershipUtils', () => {
       [IS_MEMBERSHIP_EXPIRED]: true,
       [IS_MEMBERSHIP_EXPIRES_SOON]: false,
       [IS_A_MEMBER]: false,
-        [WAS_NEVER_A_MEMBER]: false
+      [WAS_NEVER_A_MEMBER]: false
     },
     null: {
       [IS_MEMBERSHIP_EXPIRED]: false,

@@ -4,7 +4,17 @@ import React from 'react'
 import * as PropTypes from 'prop-types'
 import { Form } from 'react-final-form'
 import { connect } from 'react-redux'
-import { ADDRESS1, ADDRESS2, CITY, DATE_OF_BIRTH, DISPLAY_NAME, GENDER, PHONE, STATE, ZIP } from '../../fields'
+import {
+  ADDRESS1,
+  ADDRESS2,
+  CITY,
+  DATE_OF_BIRTH,
+  DISPLAY_NAME,
+  GENDER,
+  PHONE,
+  STATE,
+  ZIP
+} from '../../fields'
 import { sendEmailVerification as sendEmailVerificationAction } from '../../reducers/currentUser'
 import { compose, pick } from 'underscore'
 import UserDetails from '../../components/UserDetails'
@@ -13,10 +23,17 @@ import { Button } from '@material-ui/core'
 import { withRouter } from 'react-router-dom'
 import UpdateUserData from '../../components/HOC/UpdateUserData'
 
-function MyProfileForm ({ updateUserData, currentUser, userData, history, isSubmitting, onSubmitting }) {
+function MyProfileForm({
+  updateUserData,
+  currentUser,
+  userData,
+  history,
+  isSubmitting,
+  onSubmitting
+}) {
   userData = userData.toJS()
 
-  const handleSubmit = async (values) => {
+  const handleSubmit = async values => {
     console.log('submitting values:', JSON.stringify(values, 0, 2))
     try {
       onSubmitting(true)
@@ -31,7 +48,7 @@ function MyProfileForm ({ updateUserData, currentUser, userData, history, isSubm
       onSubmitting(false)
       Sentry.captureException(error)
       console.error('error response:', error)
-// todo: show an error message
+      // todo: show an error message
     }
   }
 
@@ -39,42 +56,57 @@ function MyProfileForm ({ updateUserData, currentUser, userData, history, isSubm
     history.push(ROOT)
   }
 
-  const initialValues = pick(userData, ADDRESS1, ADDRESS2, CITY, DATE_OF_BIRTH, DISPLAY_NAME, GENDER, PHONE, STATE, ZIP)
+  const initialValues = pick(
+    userData,
+    ADDRESS1,
+    ADDRESS2,
+    CITY,
+    DATE_OF_BIRTH,
+    DISPLAY_NAME,
+    GENDER,
+    PHONE,
+    STATE,
+    ZIP
+  )
 
-  return currentUser &&
-    <>
-      <Form onSubmit={(values) => handleSubmit(values)}
-            initialValues={initialValues}
-            render={({ handleSubmit, form, values }) => (
-              <form onSubmit={handleSubmit} method='POST'>
-                <UserDetails values={values} showDisplayName />
-                <div className='d-flex justify-content-between my-5'>
-                  <Button
-                    className='mr-4'
-                    variant="contained"
-                    color="default"
-                    fullWidth
-                    type="button"
-                    onClick={() => handleClose()}
-                    disabled={isSubmitting}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    fullWidth
-                    type="button"
-                    onClick={() => form.submit()}
-                    disabled={isSubmitting}
-                  >
-                    Save
-                  </Button>
-                </div>
-              </form>
-            )}
-      />
-    </>
+  return (
+    currentUser && (
+      <>
+        <Form
+          onSubmit={values => handleSubmit(values)}
+          initialValues={initialValues}
+          render={({ handleSubmit, form, values }) => (
+            <form onSubmit={handleSubmit} method="POST">
+              <UserDetails values={values} showDisplayName />
+              <div className="d-flex justify-content-between my-5">
+                <Button
+                  className="mr-4"
+                  variant="contained"
+                  color="default"
+                  fullWidth
+                  type="button"
+                  onClick={() => handleClose()}
+                  disabled={isSubmitting}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  fullWidth
+                  type="button"
+                  onClick={() => form.submit()}
+                  disabled={isSubmitting}
+                >
+                  Save
+                </Button>
+              </div>
+            </form>
+          )}
+        />
+      </>
+    )
+  )
 }
 
 MyProfileForm.propTypes = {
@@ -105,5 +137,8 @@ const mapStateToProps = ({ currentUser: { currentUser, userData } }) => {
 export default compose(
   UpdateUserData,
   withRouter,
-  connect(mapStateToProps, mapDispatchToProps)
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )
 )(MyProfileForm)

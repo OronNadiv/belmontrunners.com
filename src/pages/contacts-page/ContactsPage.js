@@ -1,14 +1,31 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import firebase from 'firebase'
-import { Checkbox, Chip, IconButton, Paper, Snackbar, Typography } from '@material-ui/core'
+import {
+  Checkbox,
+  Chip,
+  IconButton,
+  Paper,
+  Snackbar,
+  Typography
+} from '@material-ui/core'
 import FuzzySearch from 'fuzzy-search'
-import { Close as CloseIcon, FileCopy as CopyIcon, SaveAlt as SaveIcon } from '@material-ui/icons'
+import {
+  Close as CloseIcon,
+  FileCopy as CopyIcon,
+  SaveAlt as SaveIcon
+} from '@material-ui/icons'
 import * as PropTypes from 'prop-types'
 import LoggedInState from '../../components/HOC/LoggedInState'
 import { connect } from 'react-redux'
 import normalizeEmail from 'normalize-email'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
-import { DISPLAY_NAME, EMAIL, IS_MEMBER, SUBSCRIBERS_ARRAY_KEY, UID } from '../../fields'
+import {
+  DISPLAY_NAME,
+  EMAIL,
+  IS_MEMBER,
+  SUBSCRIBERS_ARRAY_KEY,
+  UID
+} from '../../fields'
 import moment from 'moment'
 import { ROOT } from '../../urls'
 import { Redirect } from 'react-router-dom'
@@ -19,7 +36,7 @@ import SearchBox from '../../components/SearchBox'
 import { compose } from 'underscore'
 import { fromJS, List as IList } from 'immutable'
 
-function ContactsPage ({ currentUser, allowRead }) {
+function ContactsPage({ currentUser, allowRead }) {
   const [contacts, setContacts] = useState([])
   const [filteredContacts, setFilteredContacts] = useState(new IList())
   const [search, setSearch] = useState('')
@@ -41,17 +58,16 @@ function ContactsPage ({ currentUser, allowRead }) {
     }
 
     const csvExporter = new ExportToCsv(options)
-    const items = filteredContacts
-      .map(item => {
-        const displayName = item.get(DISPLAY_NAME)
-        const email = item.get(EMAIL)
-        const name = parseFullName(displayName)
-        return {
-          "Email Address": email,
-          "First Name": name.first || '',
-          "Last Name": name.last || ''
-        }
-      })
+    const items = filteredContacts.map(item => {
+      const displayName = item.get(DISPLAY_NAME)
+      const email = item.get(EMAIL)
+      const name = parseFullName(displayName)
+      return {
+        'Email Address': email,
+        'First Name': name.first || '',
+        'Last Name': name.last || ''
+      }
+    })
     csvExporter.generateCsv(items.toJS())
   }
 
@@ -62,7 +78,10 @@ function ContactsPage ({ currentUser, allowRead }) {
 
     const run = async () => {
       try {
-        const contactsData = await firebase.firestore().doc('subscribers/items').get()
+        const contactsData = await firebase
+          .firestore()
+          .doc('subscribers/items')
+          .get()
         const contacts = contactsData.data()[SUBSCRIBERS_ARRAY_KEY]
 
         setContacts(contacts)
@@ -84,9 +103,13 @@ function ContactsPage ({ currentUser, allowRead }) {
     }
 
     tmpContacts = tmpContacts.filter(contact => {
-      return (showMembers && contact[IS_MEMBER]) ||
-        (showUsers && ((showMembers && contact[UID]) || (contact[UID] && !contact[IS_MEMBER]))) ||
+      return (
+        (showMembers && contact[IS_MEMBER]) ||
+        (showUsers &&
+          ((showMembers && contact[UID]) ||
+            (contact[UID] && !contact[IS_MEMBER]))) ||
         (showSubscribers && !contact[UID])
+      )
     })
     setFilteredContacts(fromJS(tmpContacts))
   }, [contacts, search, showMembers, showUsers, showSubscribers])
@@ -113,33 +136,33 @@ function ContactsPage ({ currentUser, allowRead }) {
   }, [copyToClipboard])
 
   const getChips = () => {
-    return filteredContacts.toJS().map(
-      (contact) => {
-        let label
-        if (contact[DISPLAY_NAME]) {
-          label = `${contact[DISPLAY_NAME] || ''} (${contact[EMAIL]})`
-        } else {
-          label = contact[EMAIL]
-        }
+    return filteredContacts.toJS().map(contact => {
+      let label
+      if (contact[DISPLAY_NAME]) {
+        label = `${contact[DISPLAY_NAME] || ''} (${contact[EMAIL]})`
+      } else {
+        label = contact[EMAIL]
+      }
 
-        function getColor () {
-          if (contact[IS_MEMBER]) {
-            return 'primary'
-          }
-          if (contact[UID]) {
-            return 'secondary'
-          }
-          return 'default'
+      function getColor() {
+        if (contact[IS_MEMBER]) {
+          return 'primary'
         }
+        if (contact[UID]) {
+          return 'secondary'
+        }
+        return 'default'
+      }
 
-        return <Chip
-          className='my-1 mx-1'
+      return (
+        <Chip
+          className="my-1 mx-1"
           key={contact[UID] || normalizeEmail(contact[EMAIL])}
           label={label}
           color={getColor()}
         />
-      }
-    )
+      )
+    })
   }
 
   if (currentUser && allowRead !== true) {
@@ -158,7 +181,12 @@ function ContactsPage ({ currentUser, allowRead }) {
         onClose={() => setCopied(false)}
         message={<span id="message-id">Copied to clipboard</span>}
         action={[
-          <IconButton key="close" aria-label="Close" color="inherit" onClick={() => this.setState({ copied: false })}>
+          <IconButton
+            key="close"
+            aria-label="Close"
+            color="inherit"
+            onClick={() => this.setState({ copied: false })}
+          >
             <CloseIcon />
           </IconButton>
         ]}
@@ -166,50 +194,38 @@ function ContactsPage ({ currentUser, allowRead }) {
 
       <SearchBox placeholder="Fuzzy Search" onChange={setSearch} />
 
-      <div className='d-flex flex-row flex-wrap justify-content-center mb-4'>
-        <div className='d-flex flex-row align-items-center'
-             onClick={() => setShowMembers(!showMembers)}
+      <div className="d-flex flex-row flex-wrap justify-content-center mb-4">
+        <div
+          className="d-flex flex-row align-items-center"
+          onClick={() => setShowMembers(!showMembers)}
         >
-          <Checkbox
-            checked={showMembers}
-
-          />
-          <Chip
-            label='Members'
-            color='primary'
-          />
+          <Checkbox checked={showMembers} />
+          <Chip label="Members" color="primary" />
         </div>
-        <div className='d-flex flex-row align-items-center mx-4'
-             onClick={() => setShowUsers(!showUsers)}
+        <div
+          className="d-flex flex-row align-items-center mx-4"
+          onClick={() => setShowUsers(!showUsers)}
         >
-          <Checkbox
-            checked={showUsers}
-          />
-          <Chip
-            label='Users'
-            color='secondary'
-          />
+          <Checkbox checked={showUsers} />
+          <Chip label="Users" color="secondary" />
         </div>
-        <div className='d-flex flex-row align-items-center'
-             onClick={() => setShowSubscribers(!showSubscribers)}
+        <div
+          className="d-flex flex-row align-items-center"
+          onClick={() => setShowSubscribers(!showSubscribers)}
         >
-          <Checkbox
-            checked={showSubscribers}
-          />
-          <Chip
-            label='Subscribers'
-            color='default'
-          />
+          <Checkbox checked={showSubscribers} />
+          <Chip label="Subscribers" color="default" />
         </div>
       </div>
-      <Paper className='px-2 py-3'>
-        <Typography variant="h5" component="h3" className='ml-3'>
+      <Paper className="px-2 py-3">
+        <Typography variant="h5" component="h3" className="ml-3">
           Contacts ({filteredContacts.size})
           <CopyToClipboard
             text={clipboard}
             onCopy={() => {
               setCopied(true)
-            }}>
+            }}
+          >
             <IconButton disabled={!filteredContacts.size}>
               <CopyIcon />
             </IconButton>
@@ -217,9 +233,8 @@ function ContactsPage ({ currentUser, allowRead }) {
           <IconButton onClick={exportToCSV} disabled={!filteredContacts.size}>
             <SaveIcon />
           </IconButton>
-
         </Typography>
-        <div className='d-flex justify-content-between flex-wrap'>
+        <div className="d-flex justify-content-between flex-wrap">
           {getChips()}
         </div>
       </Paper>

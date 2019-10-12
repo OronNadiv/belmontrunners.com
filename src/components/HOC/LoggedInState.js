@@ -10,8 +10,8 @@ const LoggedInState = (params = {}) => {
   isRequiredToBeLoggedIn = !!isRequiredToBeLoggedIn
   canSwitchToLogin = !!canSwitchToLogin
 
-  return (WrappedComponent) => {
-    const Inner = (props) => {
+  return WrappedComponent => {
+    const Inner = props => {
       // name = name || WrappedComponent.name
       const { ___isCurrentUserLoaded___, ___currentUser___ } = props
       const [redirectToRoot, setRedirectToRoot] = useState(null)
@@ -45,31 +45,47 @@ const LoggedInState = (params = {}) => {
         const isLoggedIn = !!___currentUser___
 
         if (isLoggedIn === isRequiredToBeLoggedIn) {
-          console.log('state is as expected',
-            'initialIsLoggedIn', initialIsLoggedIn,
-            'isLoggedIn:', isLoggedIn,
-            'isRequiredToBeLoggedIn:', isRequiredToBeLoggedIn)
+          console.log(
+            'state is as expected',
+            'initialIsLoggedIn',
+            initialIsLoggedIn,
+            'isLoggedIn:',
+            isLoggedIn,
+            'isRequiredToBeLoggedIn:',
+            isRequiredToBeLoggedIn
+          )
           setRedirectToRoot(false)
           return
         }
 
         // state is not as expected
         if (!canSwitchToLogin) {
-          console.log('cannot switch to a valid state.  that means redirect to root.')
+          console.log(
+            'cannot switch to a valid state.  that means redirect to root.'
+          )
           setRedirectToRoot(true)
           return
         }
 
         // ok, can switch but only to login state.  Let's see if the user was previously logged in')'
         if (!initialIsLoggedIn && isLoggedIn) {
-          console.log('the user switched from not logged in to logged in.  We are all good.')
+          console.log(
+            'the user switched from not logged in to logged in.  We are all good.'
+          )
           setRedirectToRoot(false)
           return
         }
 
-        console.log('user switched state to not logged in and it\'s not allowed.')
+        console.log(
+          "user switched state to not logged in and it's not allowed."
+        )
         return setRedirectToRoot(true)
-      }, [___currentUser___, initialIsLoggedIn, ___isCurrentUserLoaded___, redirectToRoot])
+      }, [
+        ___currentUser___,
+        initialIsLoggedIn,
+        ___isCurrentUserLoaded___,
+        redirectToRoot
+      ])
 
       if (!___isCurrentUserLoaded___ || redirectToRoot === null) {
         return '' // todo: better to show loading spinner
@@ -78,15 +94,21 @@ const LoggedInState = (params = {}) => {
       delete filteredProps.___currentUser___
       delete filteredProps.___isCurrentUserLoaded___
 
-      return redirectToRoot ?
-        <Redirect to={{
-          pathname: SIGN_IN,
-          state: { redirectUrl: props.location.pathname }
-        }} /> :
+      return redirectToRoot ? (
+        <Redirect
+          to={{
+            pathname: SIGN_IN,
+            state: { redirectUrl: props.location.pathname }
+          }}
+        />
+      ) : (
         <WrappedComponent {...filteredProps} />
+      )
     }
 
-    const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, currentUser } }) => {
+    const mapStateToProps = ({
+      currentUser: { isCurrentUserLoaded, currentUser }
+    }) => {
       return {
         ___isCurrentUserLoaded___: isCurrentUserLoaded,
         ___currentUser___: currentUser

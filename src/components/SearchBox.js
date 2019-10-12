@@ -3,7 +3,7 @@ import SearchIcon from '@material-ui/icons/Search'
 import React from 'react'
 import * as PropTypes from 'prop-types'
 
-function SearchBox ({ onChange, placeholder = 'Search', children }) {
+function SearchBox({ onChange, placeholder = 'Search', children }) {
   const useStyles = makeStyles(() => ({
     paper: {
       // margin: '20px 10px',
@@ -23,11 +23,11 @@ function SearchBox ({ onChange, placeholder = 'Search', children }) {
   }))
   const classes = useStyles()
 
-  function handleSearch (event) {
+  function handleSearch(event) {
     onChange(event.target.value)
   }
 
-//    {/*<div className='d-flex justify-content-center row'>*/}
+  //    {/*<div className='d-flex justify-content-center row'>*/}
   return (
     <div>
       <Paper className={`${classes.paper} mx-auto my-4`}>

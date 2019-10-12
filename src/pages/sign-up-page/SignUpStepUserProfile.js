@@ -5,17 +5,32 @@ import { Form } from 'react-final-form'
 import SignUpStepperButton from './SignUpStepperButton'
 import LoggedInState from '../../components/HOC/LoggedInState'
 import { connect } from 'react-redux'
-import { ADDRESS1, ADDRESS2, CITY, DATE_OF_BIRTH, GENDER, PHONE, STATE, ZIP } from '../../fields'
+import {
+  ADDRESS1,
+  ADDRESS2,
+  CITY,
+  DATE_OF_BIRTH,
+  GENDER,
+  PHONE,
+  STATE,
+  ZIP
+} from '../../fields'
 import { compose, pick } from 'underscore'
 import UserDetails from '../../components/UserDetails'
 import UpdateUserData from '../../components/HOC/UpdateUserData'
 import { goToTop } from 'react-scrollable-anchor'
 
-const SignUpStepUserProfile = ({ onNextClicked, userData, isLast, isCurrentUserLoaded, updateUserData }) => {
+const SignUpStepUserProfile = ({
+  onNextClicked,
+  userData,
+  isLast,
+  isCurrentUserLoaded,
+  updateUserData
+}) => {
   userData = userData.toJS()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = async (values) => {
+  const handleSubmit = async values => {
     console.log('submitting values:', JSON.stringify(values, 0, 2))
 
     setIsSubmitting(true)
@@ -32,15 +47,25 @@ const SignUpStepUserProfile = ({ onNextClicked, userData, isLast, isCurrentUserL
     goToTop()
   })
 
-  const initialValues = pick(userData, ADDRESS1, ADDRESS2, CITY, DATE_OF_BIRTH, GENDER, PHONE, STATE, ZIP)
-  return !isCurrentUserLoaded ?
-    '' :
+  const initialValues = pick(
+    userData,
+    ADDRESS1,
+    ADDRESS2,
+    CITY,
+    DATE_OF_BIRTH,
+    GENDER,
+    PHONE,
+    STATE,
+    ZIP
+  )
+  return !isCurrentUserLoaded ? (
+    ''
+  ) : (
     <Form
-      onSubmit={(values) => handleSubmit(values)}
+      onSubmit={values => handleSubmit(values)}
       initialValues={initialValues}
       render={({ handleSubmit, form, values }) => (
-        <form onSubmit={handleSubmit} method='POST'>
-
+        <form onSubmit={handleSubmit} method="POST">
           <UserDetails values={values} />
 
           <SignUpStepperButton
@@ -52,6 +77,7 @@ const SignUpStepUserProfile = ({ onNextClicked, userData, isLast, isCurrentUserL
         </form>
       )}
     />
+  )
 }
 
 SignUpStepUserProfile.propTypes = {
@@ -63,7 +89,9 @@ SignUpStepUserProfile.propTypes = {
   onNextClicked: PropTypes.func.isRequired
 }
 
-const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, userData } }) => {
+const mapStateToProps = ({
+  currentUser: { isCurrentUserLoaded, userData }
+}) => {
   return {
     isCurrentUserLoaded,
     userData: userData || new IMap()

@@ -12,7 +12,13 @@ import {
   USER_NOT_FOUND_INVALID_EMAIL_OR_PASSWORD,
   WRONG_PASSWORD_INVALID_EMAIL_OR_PASSWORD
 } from '../../messages'
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core'
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle
+} from '@material-ui/core'
 import { FORGOT_PASSWORD, ROOT } from '../../urls'
 import LoggedInState from '../../components/HOC/LoggedInState'
 import * as Sentry from '@sentry/browser'
@@ -26,11 +32,14 @@ import { connect } from 'react-redux'
 // const providerFacebook = new firebase.auth.FacebookAuthProvider()
 
 const required = value => (value ? undefined : 'Required')
-const isEmail = value => (!value || !isEmailComponent.validate(value) ? INVALID_EMAIL : undefined)
-const minPasswordLength = value => (value.length < 6 ? INVALID_PASSWORD_LENGTH(6) : undefined)
-const composeValidators = (...validators) => value => validators.reduce((error, validator) => error || validator(value), undefined)
+const isEmail = value =>
+  !value || !isEmailComponent.validate(value) ? INVALID_EMAIL : undefined
+const minPasswordLength = value =>
+  value.length < 6 ? INVALID_PASSWORD_LENGTH(6) : undefined
+const composeValidators = (...validators) => value =>
+  validators.reduce((error, validator) => error || validator(value), undefined)
 
-function SignInPage ({ history, location, currentUser }) {
+function SignInPage({ history, location, currentUser }) {
   const [errorMessage, setErrorMessage] = useState('')
   const [isSigningIn, setIsSigningIn] = useState(false)
 
@@ -40,8 +49,7 @@ function SignInPage ({ history, location, currentUser }) {
     errorMessage && goToTop()
   }, [errorMessage])
 
-  const handleSignInError = (error) => {
-
+  const handleSignInError = error => {
     const { code, message } = error
     switch (code) {
       case 'auth/invalid-email':
@@ -58,9 +66,7 @@ function SignInPage ({ history, location, currentUser }) {
         break
       default:
         Sentry.captureException(error)
-        console.error('SignInPage',
-          'code:', code,
-          'message:', message)
+        console.error('SignInPage', 'code:', code, 'message:', message)
         setErrorMessage(message)
     }
   }
@@ -76,10 +82,11 @@ function SignInPage ({ history, location, currentUser }) {
       //   break
       case 'email':
       default:
-        promise = firebase.auth().signInWithEmailAndPassword(params[EMAIL], params[PASSWORD])
+        promise = firebase
+          .auth()
+          .signInWithEmailAndPassword(params[EMAIL], params[PASSWORD])
         break
     }
-
 
     try {
       setIsSigningIn(true)
@@ -92,7 +99,7 @@ function SignInPage ({ history, location, currentUser }) {
     // todo: when sign-in is done via provider, redirect to user details and then maybe to payments
   }
 
-  const handleSignInWithEmail = async (values) => {
+  const handleSignInWithEmail = async values => {
     setErrorMessage('')
 
     await signIn('email', values)
@@ -101,7 +108,6 @@ function SignInPage ({ history, location, currentUser }) {
   // const handleSignInWithProvider = (providerName) => {
   //   signIn(providerName)
   // }
-
 
   const handleClose = () => {
     history.push(ROOT)
@@ -124,17 +130,15 @@ function SignInPage ({ history, location, currentUser }) {
     <Form
       onSubmit={handleSignInWithEmail}
       render={({ handleSubmit, form }) => (
-        <form onSubmit={handleSubmit} method='POST'>
+        <form onSubmit={handleSubmit} method="POST">
           <Dialog
             open
             fullWidth
-            maxWidth='xs'
+            maxWidth="xs"
             onClose={handleClose}
             aria-labelledby="form-dialog-title"
           >
-            <DialogTitle>
-              Sign In
-            </DialogTitle>
+            <DialogTitle>Sign In</DialogTitle>
 
             <DialogContent>
               {/*
@@ -151,24 +155,25 @@ function SignInPage ({ history, location, currentUser }) {
           <div className="mt-4 text-center text-dark">Or sign in with email</div>
 */}
 
-              {
-                errorMessage &&
-                <div className="mt-2 text-danger text-center">{errorMessage}</div>
-              }
+              {errorMessage && (
+                <div className="mt-2 text-danger text-center">
+                  {errorMessage}
+                </div>
+              )}
 
               <Field
-                label='Your email'
-                margin='normal'
-                type='email'
+                label="Your email"
+                margin="normal"
+                type="email"
                 fullWidth
                 name={EMAIL}
                 component={TextField}
                 validate={composeValidators(required, isEmail)}
               />
               <Field
-                label='Your password'
-                type='password'
-                margin='normal'
+                label="Your password"
+                type="password"
+                margin="normal"
                 fullWidth
                 name={PASSWORD}
                 component={TextField}
@@ -176,25 +181,25 @@ function SignInPage ({ history, location, currentUser }) {
               />
 
               <p className="float-right">
-                Forgot<Link to={FORGOT_PASSWORD} className="ml-2">Password?</Link>
+                Forgot
+                <Link to={FORGOT_PASSWORD} className="ml-2">
+                  Password?
+                </Link>
               </p>
-
             </DialogContent>
 
             <DialogActions>
-              <Button
-                onClick={handleClose}
-                disabled={isSigningIn}
-              >
+              <Button onClick={handleClose} disabled={isSigningIn}>
                 Cancel
               </Button>
-              <Button type="button" color="primary"
-                      onClick={() => form.submit()}
-                      disabled={isSigningIn}
+              <Button
+                type="button"
+                color="primary"
+                onClick={() => form.submit()}
+                disabled={isSigningIn}
               >
                 Sign in
               </Button>
-
             </DialogActions>
           </Dialog>
         </form>

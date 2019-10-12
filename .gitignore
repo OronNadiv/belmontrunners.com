@@ -24,7 +24,6 @@ yarn-error.log*
 
 .idea
 **/deploy.sh
-**/lambda.zip
 eventure
 
 .firebase

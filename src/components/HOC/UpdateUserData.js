@@ -6,14 +6,22 @@ import * as PropTypes from 'prop-types'
 import uuid from 'uuid/v4'
 import { findWhere } from 'underscore'
 
-function UpdateUserData (WrappedComponent) {
-  function Inner (props) {
-    const { ___currentUser___, ___userDataUpdating___, ___userDataUpdateError___, updateUserData, ___userDataUpdateContext___ } = props
+function UpdateUserData(WrappedComponent) {
+  function Inner(props) {
+    const {
+      ___currentUser___,
+      ___userDataUpdating___,
+      ___userDataUpdateError___,
+      updateUserData,
+      ___userDataUpdateContext___
+    } = props
     const [deferreds, setDeferreds] = useState([])
     const prevUserDataUpdating = usePrevious(___userDataUpdating___)
     useEffect(() => {
       if (prevUserDataUpdating && !___userDataUpdating___ && deferreds.length) {
-        const promise = findWhere(deferreds, { context: ___userDataUpdateContext___ })
+        const promise = findWhere(deferreds, {
+          context: ___userDataUpdateContext___
+        })
         if (promise) {
           if (!___userDataUpdateError___) {
             promise.resolve()
@@ -22,15 +30,20 @@ function UpdateUserData (WrappedComponent) {
           }
         }
       }
-
-    }, [prevUserDataUpdating, ___userDataUpdating___, ___userDataUpdateError___, ___userDataUpdateContext___, deferreds])
+    }, [
+      prevUserDataUpdating,
+      ___userDataUpdating___,
+      ___userDataUpdateError___,
+      ___userDataUpdateContext___,
+      deferreds
+    ])
 
     const updateUserDataWrapper = async (vals, options) => {
       if (!___currentUser___) {
         throw new Error('user was not loaded yet or unauthenticated.')
       }
       const context = uuid()
-      var promise = new Promise(function (resolve, reject) {
+      var promise = new Promise(function(resolve, reject) {
         deferreds.push({ resolve: resolve, reject: reject, context })
       })
 
@@ -50,7 +63,14 @@ function UpdateUserData (WrappedComponent) {
     return <WrappedComponent {...newProps} />
   }
 
-  const mapStateToProps = ({ currentUser: { currentUser, userDataUpdating, userDataUpdateError, userDataUpdateContext } }) => {
+  const mapStateToProps = ({
+    currentUser: {
+      currentUser,
+      userDataUpdating,
+      userDataUpdateError,
+      userDataUpdateContext
+    }
+  }) => {
     return {
       ___currentUser___: currentUser,
       ___userDataUpdating___: userDataUpdating,
@@ -69,7 +89,10 @@ function UpdateUserData (WrappedComponent) {
     ___userDataUpdateContext___: PropTypes.any,
     updateUserData: PropTypes.func.isRequired
   }
-  return connect(mapStateToProps, mapDispatchToProps)(Inner)
+  return connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(Inner)
 }
 
 export default UpdateUserData

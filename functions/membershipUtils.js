@@ -9,12 +9,20 @@ const IS_MEMBERSHIP_EXPIRES_SOON = 'IS_MEMBERSHIP_EXPIRES_SOON'
 const calc = (userData, duration = moment.duration(1, 'month')) => {
   const membershipExpiresAt = userData[MEMBERSHIP_EXPIRES_AT]
 
-  const isAMember = membershipExpiresAt && moment().isBefore(moment(membershipExpiresAt))
-  console.log('isAMember:', isAMember, 'membershipExpiresAt:', membershipExpiresAt)
-  const isMembershipExpired = membershipExpiresAt && moment(membershipExpiresAt).isBefore(moment())
+  const isAMember =
+    membershipExpiresAt && moment().isBefore(moment(membershipExpiresAt))
+  console.log(
+    'isAMember:',
+    isAMember,
+    'membershipExpiresAt:',
+    membershipExpiresAt
+  )
+  const isMembershipExpired =
+    membershipExpiresAt && moment(membershipExpiresAt).isBefore(moment())
   return {
     [IS_A_MEMBER]: Boolean(isAMember),
-    [IS_MEMBERSHIP_EXPIRES_SOON]: isAMember && moment(membershipExpiresAt).isBefore(moment().add(duration)),
+    [IS_MEMBERSHIP_EXPIRES_SOON]:
+      isAMember && moment(membershipExpiresAt).isBefore(moment().add(duration)),
     [IS_MEMBERSHIP_EXPIRED]: Boolean(isMembershipExpired),
     [WAS_NEVER_A_MEMBER]: !isAMember && !isMembershipExpired
   }
@@ -27,4 +35,3 @@ module.exports = {
   IS_MEMBERSHIP_EXPIRED,
   IS_MEMBERSHIP_EXPIRES_SOON
 }
-

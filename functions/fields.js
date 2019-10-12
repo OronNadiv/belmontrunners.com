@@ -19,5 +19,5 @@ module.exports = {
   GRAVATAR_URL: 'gravatarUrl',
 
   ONLY_ME: 'ONLY_ME',
-  MEMBERS: 'MEMBERS',
+  MEMBERS: 'MEMBERS'
 }

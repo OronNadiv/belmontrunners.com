@@ -9,9 +9,11 @@ export const linkToFacebook = async (currentUser, userData, updateUserData) => {
 
     let photoUrl = userData[PHOTO_URL]
     if (!photoUrl) {
-      const foundProviderData = currentUser.providerData.find(({ photoURL }) => {
-        return Boolean(photoURL)
-      })
+      const foundProviderData = currentUser.providerData.find(
+        ({ photoURL }) => {
+          return Boolean(photoURL)
+        }
+      )
       if (foundProviderData) {
         photoUrl = foundProviderData[PHOTO_URL]
       }

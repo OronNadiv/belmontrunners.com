@@ -1,6 +1,15 @@
 import 'firebase/auth'
 import firebase from 'firebase'
-import { Avatar, ClickAwayListener, Divider, Grow, MenuItem, MenuList, Paper, Popper } from '@material-ui/core'
+import {
+  Avatar,
+  ClickAwayListener,
+  Divider,
+  Grow,
+  MenuItem,
+  MenuList,
+  Paper,
+  Popper
+} from '@material-ui/core'
 import React, { useEffect, useState } from 'react'
 import { ACCOUNT, CONTACTS, PROFILE, ROOT, USERS } from '../urls'
 import * as PropTypes from 'prop-types'
@@ -9,7 +18,10 @@ import LoggedInState from './HOC/LoggedInState'
 import { DISPLAY_NAME, EMAIL, PHOTO_URL, UID } from '../fields'
 import { Map as IMap } from 'immutable'
 import { makeStyles } from '@material-ui/core/styles'
-import { KeyboardArrowDown as ArrowDropDownIcon, KeyboardArrowUp as ArrowDropUpIcon } from '@material-ui/icons'
+import {
+  KeyboardArrowDown as ArrowDropDownIcon,
+  KeyboardArrowUp as ArrowDropUpIcon
+} from '@material-ui/icons'
 import initials from 'initials'
 import { withRouter } from 'react-router-dom'
 import { compose } from 'underscore'
@@ -17,8 +29,13 @@ import { calc, IS_A_MEMBER } from '../utilities/membershipUtils'
 import gravatar from 'gravatar'
 import rp from 'request-promise'
 
-function Profile ({ allowUsersPage, allowContactsPage, isMember, userData, history }) {
-
+function Profile({
+  allowUsersPage,
+  allowContactsPage,
+  isMember,
+  userData,
+  history
+}) {
   const useStyles = makeStyles({
     avatarWrapper: {
       alignItems: 'center',
@@ -57,7 +74,10 @@ function Profile ({ allowUsersPage, allowContactsPage, isMember, userData, histo
     const func = async () => {
       if (!userData[PHOTO_URL] && !isGravatarFetched) {
         console.log('userData[EMAIL]:', userData[EMAIL])
-        const uri = gravatar.url(userData[EMAIL], { protocol: 'https', default: '404' })
+        const uri = gravatar.url(userData[EMAIL], {
+          protocol: 'https',
+          default: '404'
+        })
         try {
           console.log('before RP')
           await rp(uri)
@@ -74,12 +94,16 @@ function Profile ({ allowUsersPage, allowContactsPage, isMember, userData, histo
     func()
   }, [userData, isGravatarFetched])
 
-  function handleToggle () {
+  function handleToggle() {
     setOpen(prevOpen => !prevOpen)
   }
 
-  const handleClose = (url) => (event) => {
-    if (anchorRef.current && event && anchorRef.current.contains(event.target)) {
+  const handleClose = url => event => {
+    if (
+      anchorRef.current &&
+      event &&
+      anchorRef.current.contains(event.target)
+    ) {
       return
     }
     history.push(url)
@@ -94,50 +118,72 @@ function Profile ({ allowUsersPage, allowContactsPage, isMember, userData, histo
   }
   return (
     <>
-      <div className={classes.avatarWrapper} ref={anchorRef} onClick={handleToggle}>
-        <Avatar className={classes.avatar} src={userData[PHOTO_URL] || gravatarUrl}>
-          {
-            initials(userData[DISPLAY_NAME])
-          }
+      <div
+        className={classes.avatarWrapper}
+        ref={anchorRef}
+        onClick={handleToggle}
+      >
+        <Avatar
+          className={classes.avatar}
+          src={userData[PHOTO_URL] || gravatarUrl}
+        >
+          {initials(userData[DISPLAY_NAME])}
         </Avatar>
         <div>
-          {
-            open ?
-              <ArrowDropUpIcon className={classes.carrot} /> :
-              <ArrowDropDownIcon className={classes.carrot} />
-          }
+          {open ? (
+            <ArrowDropUpIcon className={classes.carrot} />
+          ) : (
+            <ArrowDropDownIcon className={classes.carrot} />
+          )}
         </div>
       </div>
-      <Popper open={open} anchorEl={anchorRef.current} transition placement='bottom-end' className={classes.popper}>
+      <Popper
+        open={open}
+        anchorEl={anchorRef.current}
+        transition
+        placement="bottom-end"
+        className={classes.popper}
+      >
         {({ TransitionProps }) => (
-          <Grow
-            {...TransitionProps}
-            style={{ transformOrigin: 'center top' }}
-          >
-            <Paper id='menu-list-grow'>
+          <Grow {...TransitionProps} style={{ transformOrigin: 'center top' }}>
+            <Paper id="menu-list-grow">
               <ClickAwayListener onClickAway={handleClose()}>
                 <MenuList>
-                  <MenuItem onClick={handleClose(PROFILE)} className={classes.menuItem}>
+                  <MenuItem
+                    onClick={handleClose(PROFILE)}
+                    className={classes.menuItem}
+                  >
                     Profile
                   </MenuItem>
-                  <MenuItem onClick={handleClose(ACCOUNT)} className={classes.menuItem}>
+                  <MenuItem
+                    onClick={handleClose(ACCOUNT)}
+                    className={classes.menuItem}
+                  >
                     Account
                   </MenuItem>
-                  {
-                    allowUsersPage &&
-                    <MenuItem onClick={handleClose(USERS)} className={classes.menuItem}>
+                  {allowUsersPage && (
+                    <MenuItem
+                      onClick={handleClose(USERS)}
+                      className={classes.menuItem}
+                    >
                       Users
                     </MenuItem>
-                  }
-                  {
-                    allowContactsPage &&
-                    <MenuItem onClick={handleClose(CONTACTS)} className={classes.menuItem}>
+                  )}
+                  {allowContactsPage && (
+                    <MenuItem
+                      onClick={handleClose(CONTACTS)}
+                      className={classes.menuItem}
+                    >
                       Contacts
                     </MenuItem>
-                  }
+                  )}
                   <Divider />
-                  <MenuItem onClick={(event) => firebase.auth().signOut() && handleClose(ROOT)(event)}
-                            className={classes.menuItem}>
+                  <MenuItem
+                    onClick={event =>
+                      firebase.auth().signOut() && handleClose(ROOT)(event)
+                    }
+                    className={classes.menuItem}
+                  >
                     Sign out
                   </MenuItem>
                 </MenuList>
@@ -159,14 +205,18 @@ Profile.propTypes = {
   isMember: PropTypes.bool.isRequired
 }
 
-const mapStateToProps = ({ currentUser: { permissions, currentUser, userData } }) => {
+const mapStateToProps = ({
+  currentUser: { permissions, currentUser, userData }
+}) => {
   return {
-    allowUsersPage: !!currentUser && (
-      !!permissions.usersRead[currentUser[UID]] ||
-      !!permissions.usersWrite[currentUser[UID]]),
-    allowContactsPage: !!currentUser && (
-      !!permissions.contactsRead[currentUser[UID]] ||
-      !!permissions.contactsWrite[currentUser[UID]]),
+    allowUsersPage:
+      !!currentUser &&
+      (!!permissions.usersRead[currentUser[UID]] ||
+        !!permissions.usersWrite[currentUser[UID]]),
+    allowContactsPage:
+      !!currentUser &&
+      (!!permissions.contactsRead[currentUser[UID]] ||
+        !!permissions.contactsWrite[currentUser[UID]]),
     userData: userData || new IMap(),
     isMember: userData && calc(userData.toJS())[IS_A_MEMBER]
   }
@@ -177,4 +227,3 @@ export default compose(
   LoggedInState({ name: 'Profile' }),
   connect(mapStateToProps)
 )(Profile)
-

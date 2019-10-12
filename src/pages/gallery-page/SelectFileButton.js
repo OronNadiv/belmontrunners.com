@@ -2,22 +2,23 @@ import React from 'react'
 import * as PropTypes from 'prop-types'
 
 const SelectFileButton = props => (
-
-  <span className='selectFileButton'>
-        <input
-          id="___SelectFileButton___"
-          type="file"
-          accept="image/*"
-          onChange={props.onChange}
-          multiple={props.multiple}
-          hidden
-        />
-        <span onClick={() => {
-          global.document.getElementById('___SelectFileButton___').click()
-        }}>
-            {props.button}
-        </span>
+  <span className="selectFileButton">
+    <input
+      id="___SelectFileButton___"
+      type="file"
+      accept="image/*"
+      onChange={props.onChange}
+      multiple={props.multiple}
+      hidden
+    />
+    <span
+      onClick={() => {
+        global.document.getElementById('___SelectFileButton___').click()
+      }}
+    >
+      {props.button}
     </span>
+  </span>
 )
 
 SelectFileButton.propTypes = {

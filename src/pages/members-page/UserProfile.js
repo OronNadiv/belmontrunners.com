@@ -58,7 +58,7 @@ const PNF = googleLibPhoneNumber.PhoneNumberFormat
 const phoneUtil = googleLibPhoneNumber.PhoneNumberUtil.getInstance()
 const DRAWER_WIDTH = 270
 
-function UserProfile ({ onClose, user, userData, updateUserData, currentUser }) {
+function UserProfile({ onClose, user, userData, updateUserData, currentUser }) {
   userData = userData.toJS()
   const visibility = userData.visibility || {}
   const theme = useTheme()
@@ -91,7 +91,7 @@ function UserProfile ({ onClose, user, userData, updateUserData, currentUser }) 
   const [openMenus, setOpenMenus] = useState({})
   const [errorMessage, setErrorMessage] = useState('')
 
-  function getPhone () {
+  function getPhone() {
     if (!user[PHONE]) {
       return
     }
@@ -99,22 +99,30 @@ function UserProfile ({ onClose, user, userData, updateUserData, currentUser }) 
     return phoneUtil.format(number, PNF.NATIONAL)
   }
 
-  function getAddress () {
-    if (user[ADDRESS1] || user[ADDRESS2] || user[CITY] || user[STATE] || user[ZIP]) {
-      return <div>
-        {user[ADDRESS1] && user[ADDRESS1]}
-        {user[ADDRESS1] && <br />}
-        {user[ADDRESS2] && user[ADDRESS2]}
-        {user[ADDRESS2] && <br />}
-        {user[CITY] && `${user[CITY]}, `}
-        {user[STATE] && `${user[STATE]} `}
-        {user[ZIP] && user[ZIP]}
-      </div>
+  function getAddress() {
+    if (
+      user[ADDRESS1] ||
+      user[ADDRESS2] ||
+      user[CITY] ||
+      user[STATE] ||
+      user[ZIP]
+    ) {
+      return (
+        <div>
+          {user[ADDRESS1] && user[ADDRESS1]}
+          {user[ADDRESS1] && <br />}
+          {user[ADDRESS2] && user[ADDRESS2]}
+          {user[ADDRESS2] && <br />}
+          {user[CITY] && `${user[CITY]}, `}
+          {user[STATE] && `${user[STATE]} `}
+          {user[ZIP] && user[ZIP]}
+        </div>
+      )
     }
     return null
   }
 
-  function getKeyVal (label, value, icon, currVisibility, onVisibilityChanged) {
+  function getKeyVal(label, value, icon, currVisibility, onVisibilityChanged) {
     const handleOpen = () => {
       openMenus[label] = true
       setOpenMenus({ ...openMenus })
@@ -125,32 +133,31 @@ function UserProfile ({ onClose, user, userData, updateUserData, currentUser }) 
       setOpenMenus({ ...openMenus })
     }
 
-    const handleRef = (ref) => {
+    const handleRef = ref => {
       refs[label] = ref
       setRefs(refs)
     }
 
     return (
-      <div className='mt-4' style={{ order: value ? 1 : 10000 }}>
-        <div className='d-flex align-items-top'>
+      <div className="mt-4" style={{ order: value ? 1 : 10000 }}>
+        <div className="d-flex align-items-top">
           {icon}
           {/*<div className='mr-1 text-secondary' style={{ width: 90 }}>{label}:</div>*/}
           <div>{value || 'Not sharing'}</div>
         </div>
-        {
-          currentUser[UID] === user[UID] &&
-          <div className='mt-2'>
-            <small
-              onClick={handleOpen}
-              ref={handleRef}
-            >
-              <span className='text-muted'>Visible to: </span>
+        {currentUser[UID] === user[UID] && (
+          <div className="mt-2">
+            <small onClick={handleOpen} ref={handleRef}>
+              <span className="text-muted">Visible to: </span>
               {currVisibility === ONLY_ME && 'Only me'}
               {currVisibility === MEMBERS && 'Club members'}
-              <span className='text-primary' style={{ cursor: 'pointer' }}> (change)</span>
+              <span className="text-primary" style={{ cursor: 'pointer' }}>
+                {' '}
+                (change)
+              </span>
             </small>
           </div>
-        }
+        )}
         <Menu
           id="customized-menu"
           anchorEl={refs[label]}
@@ -158,19 +165,23 @@ function UserProfile ({ onClose, user, userData, updateUserData, currentUser }) 
           open={!!openMenus[label]}
           onClose={handleClose}
         >
-          <MenuItem onClick={() => {
-            onVisibilityChanged(ONLY_ME)
-            handleClose()
-          }}>
+          <MenuItem
+            onClick={() => {
+              onVisibilityChanged(ONLY_ME)
+              handleClose()
+            }}
+          >
             <ListItemIcon>
               <PersonIcon />
             </ListItemIcon>
             <ListItemText primary="Only me" />
           </MenuItem>
-          <MenuItem onClick={() => {
-            onVisibilityChanged(MEMBERS)
-            handleClose()
-          }}>
+          <MenuItem
+            onClick={() => {
+              onVisibilityChanged(MEMBERS)
+              handleClose()
+            }}
+          >
             <ListItemIcon>
               <GroupIcon />
             </ListItemIcon>
@@ -181,8 +192,8 @@ function UserProfile ({ onClose, user, userData, updateUserData, currentUser }) 
     )
   }
 
-  function handleVisibilityChanged (keys) {
-    return async (val) => {
+  function handleVisibilityChanged(keys) {
+    return async val => {
       keys.forEach(key => {
         visibility[key] = val
       })
@@ -198,52 +209,50 @@ function UserProfile ({ onClose, user, userData, updateUserData, currentUser }) 
     }
   }
 
-  const connectedToFacebook = Boolean(findWhere(currentUser.providerData, { providerId: 'facebook.com' }))
+  const connectedToFacebook = Boolean(
+    findWhere(currentUser.providerData, { providerId: 'facebook.com' })
+  )
 
-  const avatarUrl = (
+  const avatarUrl =
     (user[PHOTO_URL] &&
       `${user[PHOTO_URL]}?width=${AVATAR_WIDTH}&&height=${AVATAR_HEIGHT}`) ||
-    (user[GRAVATAR_URL] &&
-      `${user[GRAVATAR_URL]}?s=${AVATAR_WIDTH}`) || null
-  )
+    (user[GRAVATAR_URL] && `${user[GRAVATAR_URL]}?s=${AVATAR_WIDTH}`) ||
+    null
 
   return (
     <SwipeableDrawer
       open
       anchor="right"
-      onOpen={() => {
-      }}
+      onOpen={() => {}}
       onClose={onClose}
       className={classes.drawer}
       classes={{
         paper: classes.drawerPaper
       }}
     >
-      {
-        errorMessage && (
-          <Snackbar
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'center'
-            }}
-            open
-            autoHideDuration={10000}
-            onClose={() => {
-              setErrorMessage('')
-            }}
-          >
-            <SnackbarContent
-              aria-describedby="client-snackbar"
-              style={{ backgroundColor: '#673ab7' }}
-              message={errorMessage}
-            />
-          </Snackbar>
-        )
-      }
+      {errorMessage && (
+        <Snackbar
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'center'
+          }}
+          open
+          autoHideDuration={10000}
+          onClose={() => {
+            setErrorMessage('')
+          }}
+        >
+          <SnackbarContent
+            aria-describedby="client-snackbar"
+            style={{ backgroundColor: '#673ab7' }}
+            message={errorMessage}
+          />
+        </Snackbar>
+      )}
 
-      <div className='clearfix'>
+      <div className="clearfix">
         <IconButton
-          className='float-left'
+          className="float-left"
           key="close"
           aria-label="Close"
           color="inherit"
@@ -253,66 +262,65 @@ function UserProfile ({ onClose, user, userData, updateUserData, currentUser }) 
         </IconButton>
       </div>
       <div className={`mx-5 ${classes.root}`}>
-        <div className='d-flex flex-column align-items-center'>
-          <Avatar className={` ${classes.avatar}`}
-                  src={avatarUrl}>{initials(user[DISPLAY_NAME])}</Avatar>
-          <div className='mt-3'>
-            {user[DISPLAY_NAME]}
-          </div>
-          {
-            currentUser[UID] === user[UID] &&
-            !connectedToFacebook &&
-            <div className='mt-2'>
+        <div className="d-flex flex-column align-items-center">
+          <Avatar className={` ${classes.avatar}`} src={avatarUrl}>
+            {initials(user[DISPLAY_NAME])}
+          </Avatar>
+          <div className="mt-3">{user[DISPLAY_NAME]}</div>
+          {currentUser[UID] === user[UID] && !connectedToFacebook && (
+            <div className="mt-2">
               <small>
-                <span className='text-muted font-weight-bold'>Missing photo? </span>
-                <span className='text-primary' style={{ cursor: 'pointer' }} onClick={handleLinkToFacebook}>Link to Facebook</span>
+                <span className="text-muted font-weight-bold">
+                  Missing photo?{' '}
+                </span>
+                <span
+                  className="text-primary"
+                  style={{ cursor: 'pointer' }}
+                  onClick={handleLinkToFacebook}
+                >
+                  Link to Facebook
+                </span>
               </small>
             </div>
-          }
+          )}
         </div>
-        <div className='d-flex flex-column align-items-center my-4'>
-          {
-            getKeyVal(
-              'Email',
-              user[EMAIL], // getEmail(),
-              <EmailIcon className='mr-2' style={{ fill: '#D2D6DB' }} />,
-              visibility[EMAIL] || defaultVisibility[EMAIL],
-              (val) => handleVisibilityChanged([EMAIL])(val)
-            )
-          }
-          {
-            getKeyVal(
-              'Phone',
-              getPhone(),
-              <SmartPhoneIcon className='mr-2' style={{ fill: '#D2D6DB' }} />,
-              visibility[PHONE] || defaultVisibility[PHONE],
-              (val) => handleVisibilityChanged([PHONE])(val)
-            )
-          }
-          {
-            getKeyVal(
-              'Address',
-              getAddress(),
-              <HomeIcon className='mr-2' style={{ fill: '#D2D6DB' }} />,
-              visibility[ADDRESS1] || defaultVisibility[ADDRESS1],
-              (val) => handleVisibilityChanged([ADDRESS1, ADDRESS2, CITY, STATE, ZIP])(val)
-            )
-          }
-          {
-            getKeyVal(
-              'Birthday',
-              user[DATE_OF_BIRTH] && moment(user[DATE_OF_BIRTH]).format('MMMM D'),
-              <CakeIcon className='mr-2' style={{ fill: '#D2D6DB' }} />,
-              visibility[DATE_OF_BIRTH] || defaultVisibility[DATE_OF_BIRTH],
-              (val) => handleVisibilityChanged([DATE_OF_BIRTH])(val)
-            )
-          }
+        <div className="d-flex flex-column align-items-center my-4">
+          {getKeyVal(
+            'Email',
+            user[EMAIL], // getEmail(),
+            <EmailIcon className="mr-2" style={{ fill: '#D2D6DB' }} />,
+            visibility[EMAIL] || defaultVisibility[EMAIL],
+            val => handleVisibilityChanged([EMAIL])(val)
+          )}
+          {getKeyVal(
+            'Phone',
+            getPhone(),
+            <SmartPhoneIcon className="mr-2" style={{ fill: '#D2D6DB' }} />,
+            visibility[PHONE] || defaultVisibility[PHONE],
+            val => handleVisibilityChanged([PHONE])(val)
+          )}
+          {getKeyVal(
+            'Address',
+            getAddress(),
+            <HomeIcon className="mr-2" style={{ fill: '#D2D6DB' }} />,
+            visibility[ADDRESS1] || defaultVisibility[ADDRESS1],
+            val =>
+              handleVisibilityChanged([ADDRESS1, ADDRESS2, CITY, STATE, ZIP])(
+                val
+              )
+          )}
+          {getKeyVal(
+            'Birthday',
+            user[DATE_OF_BIRTH] && moment(user[DATE_OF_BIRTH]).format('MMMM D'),
+            <CakeIcon className="mr-2" style={{ fill: '#D2D6DB' }} />,
+            visibility[DATE_OF_BIRTH] || defaultVisibility[DATE_OF_BIRTH],
+            val => handleVisibilityChanged([DATE_OF_BIRTH])(val)
+          )}
         </div>
       </div>
     </SwipeableDrawer>
   )
 }
-
 
 UserProfile.propTypes = {
   user: PropTypes.object.isRequired,
@@ -322,7 +330,9 @@ UserProfile.propTypes = {
   userData: PropTypes.object.isRequired
 }
 
-const mapStateToProps = ({ currentUser: { currentUser, userData = new IMap() } }) => {
+const mapStateToProps = ({
+  currentUser: { currentUser, userData = new IMap() }
+}) => {
   return {
     currentUser,
     userData

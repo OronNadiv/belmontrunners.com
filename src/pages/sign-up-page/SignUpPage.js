@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from 'react'
-import SignUpStepper, { STEP_AUTHENTICATION, STEP_MEMBERSHIP, STEP_USER_DETAILS } from './SignUpStepper'
+import SignUpStepper, {
+  STEP_AUTHENTICATION,
+  STEP_MEMBERSHIP,
+  STEP_USER_DETAILS
+} from './SignUpStepper'
 import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-function SignUpPage ({ isCurrentUserLoaded, currentUser }) {
+function SignUpPage({ isCurrentUserLoaded, currentUser }) {
   const [steps, setSteps] = useState()
   useEffect(() => {
     if (!isCurrentUserLoaded) {
@@ -20,14 +24,13 @@ function SignUpPage ({ isCurrentUserLoaded, currentUser }) {
     }
   }, [isCurrentUserLoaded, currentUser, steps])
 
-
   if (!isCurrentUserLoaded || !steps) {
     // todo: show loading
     return <></>
   }
   console.log('steps:', steps)
   return (
-    <div style={{ maxWidth: 350 }} className='mx-auto'>
+    <div style={{ maxWidth: 350 }} className="mx-auto">
       <SignUpStepper steps={steps} />
     </div>
   )
@@ -38,7 +41,9 @@ SignUpPage.propTypes = {
   currentUser: PropTypes.object
 }
 
-const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, currentUser } }) => {
+const mapStateToProps = ({
+  currentUser: { isCurrentUserLoaded, currentUser }
+}) => {
   return {
     isCurrentUserLoaded,
     currentUser

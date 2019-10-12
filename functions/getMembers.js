@@ -21,7 +21,7 @@ const {
 
 const _ = require('underscore')
 const functions = require('firebase-functions')
-const isMember = (user) => calc(user)[IS_A_MEMBER]
+const isMember = user => calc(user)[IS_A_MEMBER]
 
 const defaultVisibility = {
   [UID]: MEMBERS,
@@ -39,20 +39,26 @@ const defaultVisibility = {
   [IS_MEMBER]: MEMBERS,
   [GRAVATAR_URL]: MEMBERS
 }
-module.exports = (admin) => {
+module.exports = admin => {
   const firestore = admin.firestore()
   return async (data, context) => {
     if (!context || !context.auth || !context.auth[UID]) {
-      throw new functions.https.HttpsError('unauthenticated', 'unauthenticated.')
+      throw new functions.https.HttpsError(
+        'unauthenticated',
+        'unauthenticated.'
+      )
     }
 
-    const applyFilters = (user) => {
+    const applyFilters = user => {
       if (context.auth[UID] === user[UID]) {
         if (!user.isMember) {
-          throw new functions.https.HttpsError('permission-denied', JSON.stringify({
-            status: 403,
-            message: 'user is not a member.'
-          }))
+          throw new functions.https.HttpsError(
+            'permission-denied',
+            JSON.stringify({
+              status: 403,
+              message: 'user is not a member.'
+            })
+          )
         }
         return user
       }
@@ -84,7 +90,7 @@ module.exports = (admin) => {
 
     users = _.chain(users)
       .map(applyFilters)
-      .filter((user) => user[IS_MEMBER])
+      .filter(user => user[IS_MEMBER])
       .value()
     return users
   }

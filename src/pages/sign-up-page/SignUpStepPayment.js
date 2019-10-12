@@ -10,23 +10,37 @@ import moment from 'moment'
 import Promise from 'bluebird'
 import { ROOT } from '../../urls'
 import { connect } from 'react-redux'
-import { DATE_OF_BIRTH, MEMBERSHIP_EXPIRES_AT, NOT_INTERESTED_IN_BECOMING_A_MEMBER } from '../../fields'
+import {
+  DATE_OF_BIRTH,
+  MEMBERSHIP_EXPIRES_AT,
+  NOT_INTERESTED_IN_BECOMING_A_MEMBER
+} from '../../fields'
 import * as Sentry from '@sentry/browser'
 import { withRouter } from 'react-router-dom'
 import UpdateUserData from '../../components/HOC/UpdateUserData'
 import { goToTop } from 'react-scrollable-anchor'
 import { compose } from 'underscore'
-import { calc, IS_A_MEMBER, IS_MEMBERSHIP_EXPIRES_SOON } from '../../utilities/membershipUtils'
+import {
+  calc,
+  IS_A_MEMBER,
+  IS_MEMBERSHIP_EXPIRES_SOON
+} from '../../utilities/membershipUtils'
 
 const MEMBERSHIP_FEE_ADULT = 25
 const MEMBERSHIP_FEE_KID = 15
 
-function SignUpStepPayment ({
-                              currentUser: { displayName, uid, email }, history,
-                              updateUserData, stripe, isLast,
-                              needToPay, totalAmount, membershipExpiresAt, onNextClicked,
-                              youngerThan13
-                            }) {
+function SignUpStepPayment({
+  currentUser: { displayName, uid, email },
+  history,
+  updateUserData,
+  stripe,
+  isLast,
+  needToPay,
+  totalAmount,
+  membershipExpiresAt,
+  onNextClicked,
+  youngerThan13
+}) {
   useEffect(() => {
     goToTop()
   }, [])
@@ -45,7 +59,9 @@ function SignUpStepPayment ({
       }
       return stripeResponse
     } catch (error) {
-      throw new Error(`unknown stripe response.  response: ${JSON.stringify(error)}`)
+      throw new Error(
+        `unknown stripe response.  response: ${JSON.stringify(error)}`
+      )
     }
   }
 
@@ -76,14 +92,20 @@ function SignUpStepPayment ({
           setConfirmationNumber(stripeConfirmationId)
 
           const transactionsRef = firebase.firestore().doc(
-            `users/${uid}/transactions/${moment().utc().format()}`)
-          const transactionsLastRef = firebase.firestore().doc(
-            `users/${uid}/transactions/latest`)
+            `users/${uid}/transactions/${moment()
+              .utc()
+              .format()}`
+          )
+          const transactionsLastRef = firebase
+            .firestore()
+            .doc(`users/${uid}/transactions/latest`)
 
           let newMembershipExpiresAt
           const yearFromNow = moment().add(1, 'year')
           if (membershipExpiresAt) {
-            const membershipExpiresAtPlusOneYear = moment(membershipExpiresAt).add(1, 'year')
+            const membershipExpiresAtPlusOneYear = moment(
+              membershipExpiresAt
+            ).add(1, 'year')
             if (membershipExpiresAtPlusOneYear.isBefore(yearFromNow)) {
               newMembershipExpiresAt = yearFromNow
             } else {
@@ -96,7 +118,9 @@ function SignUpStepPayment ({
           const values = {
             // stripeResponse: JSON.stringify(stripeResponse),
             stripeResponse,
-            paidAt: moment().utc().format(),
+            paidAt: moment()
+              .utc()
+              .format(),
             paidAmount: totalAmount,
             confirmationNumber: stripeConfirmationId
           }
@@ -105,11 +129,13 @@ function SignUpStepPayment ({
             transactionsLastRef.set(values)
           ])
           try {
-            await updateUserData({
-              [NOT_INTERESTED_IN_BECOMING_A_MEMBER]: false,
-              [MEMBERSHIP_EXPIRES_AT]: newMembershipExpiresAt.utc().format()
-            }, { merge: true })
-
+            await updateUserData(
+              {
+                [NOT_INTERESTED_IN_BECOMING_A_MEMBER]: false,
+                [MEMBERSHIP_EXPIRES_AT]: newMembershipExpiresAt.utc().format()
+              },
+              { merge: true }
+            )
           } catch (error) {
             Sentry.captureException(error)
             console.error('failed to update user data.', error)
@@ -129,7 +155,7 @@ function SignUpStepPayment ({
       } catch (error) {
         Sentry.captureException(error)
         // todo:handle case where charge failed by showing an error message
-        console.error("stripeError:", error)
+        console.error('stripeError:', error)
       } finally {
         setIsSubmitting(false)
       }
@@ -140,24 +166,29 @@ function SignUpStepPayment ({
 
   const getBody = () => {
     if (confirmationNumber) {
-      return <div className='text-success text-center mt-4'>
-        <div>
-          <div>Complete successfully</div>
-          <div>Confirmation: {confirmationNumber.substring(3)}</div>
+      return (
+        <div className="text-success text-center mt-4">
+          <div>
+            <div>Complete successfully</div>
+            <div>Confirmation: {confirmationNumber.substring(3)}</div>
+          </div>
         </div>
-      </div>
+      )
     }
 
     if (needToPay === false) {
       if (youngerThan13) {
         return (
           <>
-            <div className='text-warning text-justify mt-4'>
-              Kids 12 and under are welcome to join the club, but cannot register online. For more information, please
-              talk to one of the board members during your next run
+            <div className="text-warning text-justify mt-4">
+              Kids 12 and under are welcome to join the club, but cannot
+              register online. For more information, please talk to one of the
+              board members during your next run
             </div>
-            <div className='text-justify mt-4'>
-              Due to the California Consumer Privacy Act (CCPA) and the Children&#39;s Online Privacy Protection Act (COPPA), this account will be automatically disabled within 24 hours.
+            <div className="text-justify mt-4">
+              Due to the California Consumer Privacy Act (CCPA) and the
+              Children&#39;s Online Privacy Protection Act (COPPA), this account
+              will be automatically disabled within 24 hours.
             </div>
           </>
         )
@@ -165,39 +196,47 @@ function SignUpStepPayment ({
 
       return (
         <>
-          <div className='text-success text-center mt-4'>Your membership expires
-            on {moment(membershipExpiresAt).format("MMMM Do YYYY")}</div>
-          <div className='text-success text-center'>You can renew it
-            after {moment(membershipExpiresAt).subtract(1, 'month').format("MMMM Do YYYY")}
+          <div className="text-success text-center mt-4">
+            Your membership expires on{' '}
+            {moment(membershipExpiresAt).format('MMMM Do YYYY')}
+          </div>
+          <div className="text-success text-center">
+            You can renew it after{' '}
+            {moment(membershipExpiresAt)
+              .subtract(1, 'month')
+              .format('MMMM Do YYYY')}
           </div>
         </>
       )
     }
 
     // need to pay.
-    return (<>
-        <h6 className='mt-3'>Membership fees</h6>
-        &bull; Adult (18 and over): $25<br />
-        &bull; Kids: $15.<br />
-
-        <h4 className='my-4'>Total amount:
-          ${totalAmount > 0 ? totalAmount : ''}
+    return (
+      <>
+        <h6 className="mt-3">Membership fees</h6>
+        &bull; Adult (18 and over): $25
+        <br />
+        &bull; Kids: $15.
+        <br />
+        <h4 className="my-4">
+          Total amount: ${totalAmount > 0 ? totalAmount : ''}
         </h4>
-        {
-          membershipExpiresAt &&
-          <div className='text-warning mb-2 text-center'>
-            {
-              moment(membershipExpiresAt).isAfter(moment()) ?
-                `Membership will expire on ${moment(membershipExpiresAt).format("MMMM Do YYYY")}` :
-                `Membership expired on ${moment(membershipExpiresAt).format("MMMM Do YYYY")}`
-            }
+        {membershipExpiresAt && (
+          <div className="text-warning mb-2 text-center">
+            {moment(membershipExpiresAt).isAfter(moment())
+              ? `Membership will expire on ${moment(membershipExpiresAt).format(
+                  'MMMM Do YYYY'
+                )}`
+              : `Membership expired on ${moment(membershipExpiresAt).format(
+                  'MMMM Do YYYY'
+                )}`}
           </div>
-        }
-        <h5 className='mb-2'>
-          Credit or debit card
-        </h5>
-        <CardElement onReady={(el) => el.focus()} />
-        {errorMessage && <div className='text-danger text-center'>{errorMessage}</div>}
+        )}
+        <h5 className="mb-2">Credit or debit card</h5>
+        <CardElement onReady={el => el.focus()} />
+        {errorMessage && (
+          <div className="text-danger text-center">{errorMessage}</div>
+        )}
       </>
     )
   }
@@ -208,47 +247,68 @@ function SignUpStepPayment ({
     history.push(ROOT)
   }
 
-  function handleNextClicked () {
-    confirmationNumber || needToPay === false ? onNextClicked() : setIsSubmitting(true)
+  function handleNextClicked() {
+    confirmationNumber || needToPay === false
+      ? onNextClicked()
+      : setIsSubmitting(true)
   }
 
   return (
     <div className="justify-content-center">
-      <h5 className='mt-5'>
-        Benefits to being part of Belmont Runners
-      </h5>
-      &bull; Each member receives the Belmont Runners official&nbsp;<a
-      target='_blank' rel='noopener noreferrer'
-      href={`https://www.belmontrunners.com/documents/running-shirt.png`}>Running Shirt</a>
+      <h5 className="mt-5">Benefits to being part of Belmont Runners</h5>
+      &bull; Each member receives the Belmont Runners official&nbsp;
+      <a
+        target="_blank"
+        rel="noopener noreferrer"
+        href={`https://www.belmontrunners.com/documents/running-shirt.png`}
+      >
+        Running Shirt
+      </a>
       <br />
-      &bull; Training at group runs and walks<br />
-      &bull; Free or discounted workshops, clinics, and classes<br />
-      &bull; Discounted entry to the Belmont Water Dog Run<br />
-      &bull; Discounted entry to other local races<br />
-      &bull; Membership with the Road Runners Club of America<br />
-      &bull; Liability insurance coverage<br />
-      &bull; Discounts at local restaurants<br />
-      &bull; Social events with fun, active local runners and walkers<br />
-      &bull; 10% discount at <a target='_blank' rel='noopener noreferrer' href='https://arunnersmind.com'>A Runner’s
-      Mind</a><br />
-
+      &bull; Training at group runs and walks
+      <br />
+      &bull; Free or discounted workshops, clinics, and classes
+      <br />
+      &bull; Discounted entry to the Belmont Water Dog Run
+      <br />
+      &bull; Discounted entry to other local races
+      <br />
+      &bull; Membership with the Road Runners Club of America
+      <br />
+      &bull; Liability insurance coverage
+      <br />
+      &bull; Discounts at local restaurants
+      <br />
+      &bull; Social events with fun, active local runners and walkers
+      <br />
+      &bull; 10% discount at{' '}
+      <a
+        target="_blank"
+        rel="noopener noreferrer"
+        href="https://arunnersmind.com"
+      >
+        A Runner’s Mind
+      </a>
+      <br />
       {getBody()}
-      {
-        (needToPay === false || needToPay === true) &&
+      {(needToPay === false || needToPay === true) && (
         <SignUpStepperButton
           handlePrimaryClicked={handleNextClicked}
-          primaryText={confirmationNumber || needToPay === false ?
-            (isLast ? 'Finish' : 'Next')
-            : "Pay Now"}
+          primaryText={
+            confirmationNumber || needToPay === false
+              ? isLast
+                ? 'Finish'
+                : 'Next'
+              : 'Pay Now'
+          }
           primaryDisabled={!!isSubmitting}
           showPrimary
-
           handleSecondaryClicked={handleClose}
           secondaryText={'Finish later'}
           secondaryDisabled={!!isSubmitting}
           showSecondary={needToPay === true && !confirmationNumber}
         />
-      }
+      )}
     </div>
   )
 }
@@ -276,7 +336,6 @@ SignUpStepPayment.propTypes = {
 }
 
 const mapStateToProps = ({ currentUser: { currentUser, userData } }) => {
-
   userData = userData ? userData.toJS() : {}
   let membershipExpiresAt = null
   let needToPay = false
@@ -294,10 +353,16 @@ const mapStateToProps = ({ currentUser: { currentUser, userData } }) => {
 
     const membershipData = calc(userData)
     membershipExpiresAt = userData[MEMBERSHIP_EXPIRES_AT]
-    if (!membershipData[IS_A_MEMBER] || membershipData[IS_MEMBERSHIP_EXPIRES_SOON]) {
+    if (
+      !membershipData[IS_A_MEMBER] ||
+      membershipData[IS_MEMBERSHIP_EXPIRES_SOON]
+    ) {
       needToPay = true
     }
-    youngerThan13 = (userData[DATE_OF_BIRTH] && moment().diff(moment(userData[DATE_OF_BIRTH]), 'years') < 13) || false
+    youngerThan13 =
+      (userData[DATE_OF_BIRTH] &&
+        moment().diff(moment(userData[DATE_OF_BIRTH]), 'years') < 13) ||
+      false
     if (youngerThan13) {
       needToPay = false
     }

@@ -1,21 +1,21 @@
 /* global drift */
-import React, { useCallback, useEffect } from "react"
-import * as PropTypes from "prop-types"
+import React, { useCallback, useEffect } from 'react'
+import * as PropTypes from 'prop-types'
 import { Map as IMap } from 'immutable'
 
 const Drift = ({ appId, config, userId, attributes }) => {
   userId = userId || ''
   config = new IMap(config)
   attributes = new IMap(attributes)
-  const insertScript = (scriptText) => {
-    const element = document.createElement("script")
+  const insertScript = scriptText => {
+    const element = document.createElement('script')
     element.innerText = scriptText
     element.async = true
     document.body.appendChild(element)
     return element
   }
 
-  const removeElement = (element) => {
+  const removeElement = element => {
     document.body.removeChild(element)
   }
 
@@ -57,7 +57,7 @@ const Drift = ({ appId, config, userId, attributes }) => {
 
   useEffect(() => {
     let elem
-    if (typeof window !== "undefined") {
+    if (typeof window !== 'undefined') {
       elem = addMainScript()
     }
     return () => {
@@ -67,7 +67,7 @@ const Drift = ({ appId, config, userId, attributes }) => {
 
   useEffect(() => {
     let elem
-    if (typeof window !== "undefined" && drift) {
+    if (typeof window !== 'undefined' && drift) {
       elem = addIdentityVariables()
     }
     return () => {

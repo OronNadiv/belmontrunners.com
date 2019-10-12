@@ -3,7 +3,7 @@ import MomentUtils from '@date-io/moment'
 import * as PropTypes from 'prop-types'
 import React from 'react'
 
-function DatePickerWrapper (props) {
+function DatePickerWrapper(props) {
   const {
     input: { name, onChange, value, ...restInput },
     meta,

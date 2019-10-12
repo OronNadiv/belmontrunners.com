@@ -19,7 +19,6 @@ Meeting point: https://goo.gl/maps/${googleMapId}`
   return `${description}${facebookEvent || ''}${googleMap || ''}`
 }
 
-
 module.exports = () => async () => {
   try {
     const cal = ical({
@@ -29,8 +28,11 @@ module.exports = () => async () => {
       timezone: 'America/Los_Angeles'
     })
 
-    const events = await csv()
-      .fromStream(request.get("https://docs.google.com/spreadsheets/d/1FZOB291KWLoutpr0s6VeK5EtvuiQ8uhe497nOmWoqPA/export?format=csv&usp=sharing"))
+    const events = await csv().fromStream(
+      request.get(
+        'https://docs.google.com/spreadsheets/d/1FZOB291KWLoutpr0s6VeK5EtvuiQ8uhe497nOmWoqPA/export?format=csv&usp=sharing'
+      )
+    )
     events
       .map(event => {
         event.month--
@@ -43,21 +45,19 @@ module.exports = () => async () => {
       .sort((a, b) => {
         return a.moment.valueOf() - b.moment.valueOf()
       })
-      .forEach((event) => {
+      .forEach(event => {
         const isMembersOnly = event['is-members-only-event'] === 'TRUE'
-        cal.createEvent(
-          {
-            start: event.moment,
-            end: moment(event.moment).add(2, 'hours'),
-            summary: (isMembersOnly ? '[MEMBERS ONLY] ' : '') + event.subject,
-            location: event.where,
-            description: getDescription({
-              description: event.what,
-              facebookEventId: event['facebook-event-id'],
-              googleMapId: event['google-map-id']
-            })
-          }
-        )
+        cal.createEvent({
+          start: event.moment,
+          end: moment(event.moment).add(2, 'hours'),
+          summary: (isMembersOnly ? '[MEMBERS ONLY] ' : '') + event.subject,
+          location: event.where,
+          description: getDescription({
+            description: event.what,
+            facebookEventId: event['facebook-event-id'],
+            googleMapId: event['google-map-id']
+          })
+        })
       })
 
     return cal.toString()

@@ -20,7 +20,7 @@ const Subscribe = () => {
   const [notRobot, setNotRobot] = useState(true) // NOTE: setting to true disables the captcha verification.
 
   useEffect(() => {
-    (async function () {
+    ;(async function() {
       if (!isSubmitting || !notRobot) {
         return
       }
@@ -36,7 +36,9 @@ const Subscribe = () => {
       }
       if (!isEmail.validate(email)) {
         console.warn('email is invalid.')
-        setMessage('You have entered an invalid e-mail address. Please try again.')
+        setMessage(
+          'You have entered an invalid e-mail address. Please try again.'
+        )
         setMessageLevel('alert-warning')
         setIsSubmitting(false)
         return
@@ -47,7 +49,8 @@ const Subscribe = () => {
       try {
         await rp({
           method: 'POST',
-          uri: 'https://c0belq1th0.execute-api.us-west-1.amazonaws.com/default/contact',
+          uri:
+            'https://c0belq1th0.execute-api.us-west-1.amazonaws.com/default/contact',
           body: {
             name: email,
             email: email,
@@ -83,7 +86,6 @@ My email address is: ${email}`
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSubmitting, notRobot])
 
-
   const [recaptcha, setRecaptcha] = useState()
   useEffect(() => {
     const unsubscribe = () => {
@@ -95,20 +97,30 @@ My email address is: ${email}`
       window.recaptchaWidgetId = null
     }
     if (!recaptcha || !!window.recaptchaWidgetId || notRobot) {
-      console.log('Not registering captcha.',
-        '!recaptcha:', !recaptcha,
-        '!!window.recaptchaWidgetId:', !!window.recaptchaWidgetId,
-        'notRobot:', notRobot)
+      console.log(
+        'Not registering captcha.',
+        '!recaptcha:',
+        !recaptcha,
+        '!!window.recaptchaWidgetId:',
+        !!window.recaptchaWidgetId,
+        'notRobot:',
+        notRobot
+      )
       return
     }
-    console.log('Registering recaptcha.',
-      '!recaptcha:', !recaptcha,
-      '!!window.recaptchaWidgetId:', !!window.recaptchaWidgetId,
-      'notRobot:', notRobot)
+    console.log(
+      'Registering recaptcha.',
+      '!recaptcha:',
+      !recaptcha,
+      '!!window.recaptchaWidgetId:',
+      !!window.recaptchaWidgetId,
+      'notRobot:',
+      notRobot
+    )
 
     window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(recaptcha, {
       size: 'invisible',
-      callback: (response) => {
+      callback: response => {
         console.log('captcha succeeded.', response)
         setNotRobot(true)
       },
@@ -117,49 +129,59 @@ My email address is: ${email}`
         setCaptchaFailed(true)
       }
     })
-    window.recaptchaVerifier.render().then((widgetId) => {
+    window.recaptchaVerifier.render().then(widgetId => {
       window.recaptchaWidgetId = widgetId
     })
     return unsubscribe
   }, [recaptcha, notRobot])
 
   return (
-    <section className='subscribe_area pad_btm'>
-      <div className='container'>
-        <div className='main_title'>
+    <section className="subscribe_area pad_btm">
+      <div className="container">
+        <div className="main_title">
           <h2>Weekly email</h2>
         </div>
-        <div className='row'>
-          <div className='col-lg-5 col-md-6 col-sm-6 mx-auto'>
-            <div className='single-footer-widget'>
-              <p className='text-center'>Get updates about runs and other events.</p>
-              <div id='mc_embed_signup'>
-                <div className='subscribe_form relative'>
-                  <div className='input-group d-flex flex-row'>
-                    <input name='EMAIL' placeholder={placeholder}
-                           onFocus={() => setPlaceholder('')}
-                           onBlur={() => setPlaceholder(DEFAULT_PLACE_HOLDER)}
-                           required type='email'
-                           onChange={(event) => setEmail(event.target.value)}
-                           value={email} />
-                    <button className='btn sub-btn' disabled={isSubmitting}
-                            ref={(ref) => setRecaptcha(ref)}
-                            onClick={(e) => {
-                              e && e.preventDefault()
-                              setIsSubmitting(true)
-                            }}>
+        <div className="row">
+          <div className="col-lg-5 col-md-6 col-sm-6 mx-auto">
+            <div className="single-footer-widget">
+              <p className="text-center">
+                Get updates about runs and other events.
+              </p>
+              <div id="mc_embed_signup">
+                <div className="subscribe_form relative">
+                  <div className="input-group d-flex flex-row">
+                    <input
+                      name="EMAIL"
+                      placeholder={placeholder}
+                      onFocus={() => setPlaceholder('')}
+                      onBlur={() => setPlaceholder(DEFAULT_PLACE_HOLDER)}
+                      required
+                      type="email"
+                      onChange={event => setEmail(event.target.value)}
+                      value={email}
+                    />
+                    <button
+                      className="btn sub-btn"
+                      disabled={isSubmitting}
+                      ref={ref => setRecaptcha(ref)}
+                      onClick={e => {
+                        e && e.preventDefault()
+                        setIsSubmitting(true)
+                      }}
+                    >
                       Subscribe
                     </button>
                   </div>
-                  <div role='alert' className={'mt-10 alert ' + messageLevel}>{message}</div>
+                  <div role="alert" className={'mt-10 alert ' + messageLevel}>
+                    {message}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      {
-        captchaFailed &&
+      {captchaFailed && (
         <Snackbar
           anchorOrigin={{
             vertical: 'bottom',
@@ -171,7 +193,7 @@ My email address is: ${email}`
             console.log('onClose')
             setCaptchaFailed(false)
           }}
-          message={"Submission failed."}
+          message={'Submission failed.'}
           action={[
             <IconButton
               key="close"
@@ -186,7 +208,7 @@ My email address is: ${email}`
             </IconButton>
           ]}
         />
-      }
+      )}
     </section>
   )
 }

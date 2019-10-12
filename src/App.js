@@ -44,15 +44,16 @@ import LogRocket from 'logrocket'
 import setupLogRocketReact from 'logrocket-react'
 import FaqPage from './pages/faq-page/FaqPage'
 
-function Wrapper (props = {}) {
-
+function Wrapper(props = {}) {
   return (
     <>
       <Header />
       {props.inHomePage && <HomePage />}
       {props.inHomePage && props.children}
 
-      {!props.inHomePage && <div className='mb-4 mx-1 mx-sm-2 mx-md-3'> {props.children} </div>}
+      {!props.inHomePage && (
+        <div className="mb-4 mx-1 mx-sm-2 mx-md-3"> {props.children} </div>
+      )}
       <Footer />
     </>
   )
@@ -63,7 +64,7 @@ Wrapper.propTypes = {
   children: PropTypes.element
 }
 
-function App ({ fetchCurrentUser, isCurrentUserLoaded, currentUser }) {
+function App({ fetchCurrentUser, isCurrentUserLoaded, currentUser }) {
   useEffect(() => {
     LogRocket.init('qv4xmc/belmont-runners')
     setupLogRocketReact(LogRocket)
@@ -82,20 +83,24 @@ function App ({ fetchCurrentUser, isCurrentUserLoaded, currentUser }) {
         })
 
         LogRocket.getSessionURL(sessionURL => {
-          Sentry.configureScope((scope) => {
+          Sentry.configureScope(scope => {
             scope.setUser({
               id: currentUser[UID],
               email: currentUser[EMAIL],
               displayName: currentUser[DISPLAY_NAME]
             })
-            scope.setExtra("sessionURL", sessionURL)
+            scope.setExtra('sessionURL', sessionURL)
           })
         })
       } else {
         LogRocket.getSessionURL(sessionURL => {
-          Sentry.configureScope((scope) => {
-            scope.setUser({ email: undefined, displayName: undefined, uid: undefined })
-            scope.setExtra("sessionURL", sessionURL)
+          Sentry.configureScope(scope => {
+            scope.setUser({
+              email: undefined,
+              displayName: undefined,
+              uid: undefined
+            })
+            scope.setExtra('sessionURL', sessionURL)
           })
         })
       }
@@ -104,7 +109,12 @@ function App ({ fetchCurrentUser, isCurrentUserLoaded, currentUser }) {
   }, [currentUser])
 
   const enableCampaigns = window.innerHeight >= 600
-  console.log('enableCampaigns:', enableCampaigns, 'window.innerHeight:', window.innerHeight)
+  console.log(
+    'enableCampaigns:',
+    enableCampaigns,
+    'window.innerHeight:',
+    window.innerHeight
+  )
   return (
     <>
       <Switch>
@@ -234,15 +244,11 @@ function App ({ fetchCurrentUser, isCurrentUserLoaded, currentUser }) {
           )}
         />
 
-        <Route
-          path={ROOT}
-          render={() => <Wrapper inHomePage />}
-        />
+        <Route path={ROOT} render={() => <Wrapper inHomePage />} />
       </Switch>
-      {
-        isCurrentUserLoaded &&
+      {isCurrentUserLoaded && (
         <Drift
-          appId='fxagpvvrufk4'
+          appId="fxagpvvrufk4"
           userId={currentUser ? currentUser[UID] : ''}
           attributes={{
             email: currentUser && currentUser[EMAIL],
@@ -253,7 +259,7 @@ function App ({ fetchCurrentUser, isCurrentUserLoaded, currentUser }) {
             enableCampaigns
           }}
         />
-      }
+      )}
     </>
   )
 }
@@ -268,11 +274,16 @@ const mapDispatchToProps = {
   fetchCurrentUser: fetchCurrentUserAction
 }
 
-const mapStateToProps = ({ currentUser: { currentUser, isCurrentUserLoaded } }) => {
+const mapStateToProps = ({
+  currentUser: { currentUser, isCurrentUserLoaded }
+}) => {
   return {
     isCurrentUserLoaded,
     currentUser
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(App)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(App)

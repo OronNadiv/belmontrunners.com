@@ -8,11 +8,10 @@ import Map from './Map'
 import Notifications from './Notifications'
 import { goToTop } from 'react-scrollable-anchor'
 
-function Home () {
+function Home() {
   useEffect(() => {
     goToTop()
   }, [])
-
 
   return (
     <div>

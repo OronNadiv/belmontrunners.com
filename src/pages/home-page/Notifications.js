@@ -21,26 +21,45 @@ import { Link } from 'react-router-dom'
 const POPUP_PAY_MEMBERSHIP_SNOOZED_AT = 'popupPayMembershipSnoozedAt'
 const POPUP_RECEIVED_SHIRT_AT = 'popupReceivedShirtSnoozedAt'
 
-function Notifications ({ currentUser, userData, updateUserData }) {
+function Notifications({ currentUser, userData, updateUserData }) {
   userData = userData.toJS()
 
   const [notification, setNotification] = useState()
 
-  const wasPopupDismissed = ({ notificationKey, duration = moment.duration(7, 'days') }) => {
-    const snoozedAt = userData.notifications && userData.notifications[notificationKey]
+  const wasPopupDismissed = ({
+    notificationKey,
+    duration = moment.duration(7, 'days')
+  }) => {
+    const snoozedAt =
+      userData.notifications && userData.notifications[notificationKey]
 
     if (!!snoozedAt && moment().isBefore(moment(snoozedAt).add(duration))) {
       console.log(notificationKey + ' dismissed.  snoozedAt:', snoozedAt)
       return true
     }
 
-    console.log('not dismissed.',
-      'userData:', userData,
-      'snoozedAt:', snoozedAt,
-      "moment(snoozedAt).add(2, 'days'):", moment(snoozedAt).add(2, 'days').format(),
-      'moment():', moment().format(),
-      "moment(snoozedAt).add(2, 'days').isAfter(moment()):", moment(snoozedAt).add(2, 'days').isAfter(moment()),
-      'total:', (!!snoozedAt && moment(snoozedAt).add(2, 'days').isAfter(moment())))
+    console.log(
+      'not dismissed.',
+      'userData:',
+      userData,
+      'snoozedAt:',
+      snoozedAt,
+      "moment(snoozedAt).add(2, 'days'):",
+      moment(snoozedAt)
+        .add(2, 'days')
+        .format(),
+      'moment():',
+      moment().format(),
+      "moment(snoozedAt).add(2, 'days').isAfter(moment()):",
+      moment(snoozedAt)
+        .add(2, 'days')
+        .isAfter(moment()),
+      'total:',
+      !!snoozedAt &&
+        moment(snoozedAt)
+          .add(2, 'days')
+          .isAfter(moment())
+    )
 
     return false
   }
@@ -48,7 +67,16 @@ function Notifications ({ currentUser, userData, updateUserData }) {
   const dismissNotification = async ({ notificationKey }) => {
     try {
       setNotification()
-      await updateUserData({ notifications: { [notificationKey]: moment().utc().format() } }, { merge: true })
+      await updateUserData(
+        {
+          notifications: {
+            [notificationKey]: moment()
+              .utc()
+              .format()
+          }
+        },
+        { merge: true }
+      )
     } catch (error) {
       Sentry.captureException(error)
       console.error('error while dismissNotification.  error:', error)
@@ -60,7 +88,9 @@ function Notifications ({ currentUser, userData, updateUserData }) {
   }
 
   const processPayMembershipNotification = () => {
-    if (wasPopupDismissed({ notificationKey: POPUP_PAY_MEMBERSHIP_SNOOZED_AT })) {
+    if (
+      wasPopupDismissed({ notificationKey: POPUP_PAY_MEMBERSHIP_SNOOZED_AT })
+    ) {
       return false
     }
 
@@ -69,7 +99,10 @@ function Notifications ({ currentUser, userData, updateUserData }) {
     let message
     if (membershipStatus[WAS_NEVER_A_MEMBER]) {
       message = 'become a member'
-    } else if (membershipStatus[IS_MEMBERSHIP_EXPIRES_SOON] || membershipStatus[IS_MEMBERSHIP_EXPIRED]) {
+    } else if (
+      membershipStatus[IS_MEMBERSHIP_EXPIRES_SOON] ||
+      membershipStatus[IS_MEMBERSHIP_EXPIRED]
+    ) {
       message = 'renew your membership'
     } else {
       // is a member
@@ -77,21 +110,33 @@ function Notifications ({ currentUser, userData, updateUserData }) {
     }
 
     showNotification({
-      message:
+      message: (
         <>
-          Click <Link
-          style={{ color: LINK_COLOR }}
-          to={{
-            pathname: JOIN
-          }}>HERE</Link> to {message}
-        </>,
-      action:
+          Click{' '}
+          <Link
+            style={{ color: LINK_COLOR }}
+            to={{
+              pathname: JOIN
+            }}
+          >
+            HERE
+          </Link>{' '}
+          to {message}
+        </>
+      ),
+      action: (
         <Button
           style={{ color: ACTION_COLOR }}
           size="small"
-          onClick={async () => await dismissNotification({ notificationKey: POPUP_PAY_MEMBERSHIP_SNOOZED_AT })}>
+          onClick={async () =>
+            await dismissNotification({
+              notificationKey: POPUP_PAY_MEMBERSHIP_SNOOZED_AT
+            })
+          }
+        >
           Remind me later
         </Button>
+      )
     })
     return true
   }
@@ -100,7 +145,8 @@ function Notifications ({ currentUser, userData, updateUserData }) {
     console.log('processReceivedShirt called.', userData)
     const membershipStatus = calc(userData)
 
-    if (wasPopupDismissed({ notificationKey: POPUP_RECEIVED_SHIRT_AT }) ||
+    if (
+      wasPopupDismissed({ notificationKey: POPUP_RECEIVED_SHIRT_AT }) ||
       membershipStatus[WAS_NEVER_A_MEMBER] ||
       membershipStatus[IS_MEMBERSHIP_EXPIRED]
     ) {
@@ -117,40 +163,56 @@ function Notifications ({ currentUser, userData, updateUserData }) {
       showNotification({
         message:
           'No problem. Please reach out to Doug or Shelly on the next Saturday run.',
-        action:
+        action: (
           <Button
             style={{ color: ACTION_COLOR }}
             size="small"
-            onClick={async () => await dismissNotification({ notificationKey: POPUP_RECEIVED_SHIRT_AT })}>
+            onClick={async () =>
+              await dismissNotification({
+                notificationKey: POPUP_RECEIVED_SHIRT_AT
+              })
+            }
+          >
             Remind me later
           </Button>
+        )
       })
     }
     showNotification({
-      message:
-        'Did you receive a running shirt',
-      action:
+      message: 'Did you receive a running shirt',
+      action: (
         <>
           <Button
-            color='secondary'
+            color="secondary"
             size="small"
             onClick={async () => {
               try {
-                await updateUserData({ [DID_RECEIVED_SHIRT]: true }, { merge: true })
+                await updateUserData(
+                  { [DID_RECEIVED_SHIRT]: true },
+                  { merge: true }
+                )
                 setNotification()
               } catch (error) {
                 Sentry.captureException(error)
-                console.error('error while updating [DID_RECEIVED_SHIRT] to true.  error:', error)
+                console.error(
+                  'error while updating [DID_RECEIVED_SHIRT] to true.  error:',
+                  error
+                )
               }
-            }}>
+            }}
+          >
             YES
-          </Button> / <Button
-          color='secondary'
-          size="small"
-          onClick={() => showDougShelly()}>
-          NO
-        </Button>
+          </Button>{' '}
+          /{' '}
+          <Button
+            color="secondary"
+            size="small"
+            onClick={() => showDougShelly()}
+          >
+            NO
+          </Button>
         </>
+      )
     })
     return true
   }
@@ -160,7 +222,9 @@ function Notifications ({ currentUser, userData, updateUserData }) {
       setNotification()
       return
     }
-    processPayMembershipNotification() || processReceivedShirt() || setNotification()
+    processPayMembershipNotification() ||
+      processReceivedShirt() ||
+      setNotification()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser])
 

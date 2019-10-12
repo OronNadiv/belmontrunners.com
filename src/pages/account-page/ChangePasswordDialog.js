@@ -1,9 +1,19 @@
 import 'firebase/auth'
 import firebase from 'firebase'
 import React, { useState } from 'react'
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core'
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle
+} from '@material-ui/core'
 import { TextField } from 'final-form-material-ui'
-import { INVALID_PASSWORD_LENGTH, PASSWORDS_MISMATCH, WRONG_PASSWORD } from '../../messages'
+import {
+  INVALID_PASSWORD_LENGTH,
+  PASSWORDS_MISMATCH,
+  WRONG_PASSWORD
+} from '../../messages'
 import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import * as Sentry from '@sentry/browser'
@@ -11,19 +21,20 @@ import { PASSWORD } from '../../fields'
 import { Field, Form } from 'react-final-form'
 
 const required = value => (value ? undefined : 'Required')
-const composeValidators = (...validators) => value => validators.reduce((error, validator) => error || validator(value), undefined)
-const minPasswordLength = value => (value.length < 6 ? INVALID_PASSWORD_LENGTH(6) : undefined)
+const composeValidators = (...validators) => value =>
+  validators.reduce((error, validator) => error || validator(value), undefined)
+const minPasswordLength = value =>
+  value.length < 6 ? INVALID_PASSWORD_LENGTH(6) : undefined
 
 const PASSWORD1 = 'password1'
 const PASSWORD2 = 'password2'
 
-function ChangePasswordDialog ({ onClose, currentUser }) {
-
+function ChangePasswordDialog({ onClose, currentUser }) {
   const [errorMessage, setErrorMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
 
-  const handleSubmit = async (values) => {
+  const handleSubmit = async values => {
     const password0 = values[PASSWORD]
     const password1 = values[PASSWORD1]
     const password2 = values[PASSWORD2]
@@ -35,7 +46,10 @@ function ChangePasswordDialog ({ onClose, currentUser }) {
     setErrorMessage('')
     setIsSubmitting(true)
 
-    const credentials = firebase.auth.EmailAuthProvider.credential(currentUser.email, password0)
+    const credentials = firebase.auth.EmailAuthProvider.credential(
+      currentUser.email,
+      password0
+    )
     try {
       await currentUser.reauthenticateWithCredential(credentials)
       try {
@@ -44,9 +58,13 @@ function ChangePasswordDialog ({ onClose, currentUser }) {
       } catch (error) {
         const { code, message } = error
         Sentry.captureException(error)
-        console.error('currentUser.updatePassword.',
-          'code:', code,
-          'message:', message)
+        console.error(
+          'currentUser.updatePassword.',
+          'code:',
+          code,
+          'message:',
+          message
+        )
         setErrorMessage(message)
       }
     } catch (error) {
@@ -55,9 +73,13 @@ function ChangePasswordDialog ({ onClose, currentUser }) {
         setErrorMessage(WRONG_PASSWORD)
       } else {
         Sentry.captureException(error)
-        console.error('currentUser.reauthenticateWithCredential.',
-          'code:', code,
-          'message:', message)
+        console.error(
+          'currentUser.reauthenticateWithCredential.',
+          'code:',
+          code,
+          'message:',
+          message
+        )
         setErrorMessage(message)
       }
     } finally {
@@ -75,93 +97,85 @@ function ChangePasswordDialog ({ onClose, currentUser }) {
     <Form
       onSubmit={handleSubmit}
       render={({ handleSubmit, form }) => (
-        <form onSubmit={handleSubmit} method='POST'>
-
+        <form onSubmit={handleSubmit} method="POST">
           <Dialog
             open
             fullWidth
-            maxWidth='xs'
+            maxWidth="xs"
             onClose={handleClose}
             aria-labelledby="form-dialog-title"
           >
-            <DialogTitle>
-              Change Password
-            </DialogTitle>
+            <DialogTitle>Change Password</DialogTitle>
 
             <DialogContent>
-              {
-                errorMessage &&
-                <div className="mt-2 text-danger text-center">{errorMessage}</div>
-              }
-              {
-                isSuccess
-                  ?
-                  <div className='text-success text-center mt-4'>Password changed successfully.</div>
-                  :
-                  <div>
-                    <Field
-                      label='Current password'
-                      type='password'
-                      margin='normal'
-                      fullWidth
-                      name={PASSWORD}
-                      component={TextField}
-                      validate={composeValidators(required, minPasswordLength)}
-                    />
+              {errorMessage && (
+                <div className="mt-2 text-danger text-center">
+                  {errorMessage}
+                </div>
+              )}
+              {isSuccess ? (
+                <div className="text-success text-center mt-4">
+                  Password changed successfully.
+                </div>
+              ) : (
+                <div>
+                  <Field
+                    label="Current password"
+                    type="password"
+                    margin="normal"
+                    fullWidth
+                    name={PASSWORD}
+                    component={TextField}
+                    validate={composeValidators(required, minPasswordLength)}
+                  />
 
-                    <Field
-                      label='New password'
-                      type='password'
-                      margin='normal'
-                      fullWidth
-                      name={PASSWORD1}
-                      component={TextField}
-                      validate={composeValidators(required, minPasswordLength)}
-                    />
+                  <Field
+                    label="New password"
+                    type="password"
+                    margin="normal"
+                    fullWidth
+                    name={PASSWORD1}
+                    component={TextField}
+                    validate={composeValidators(required, minPasswordLength)}
+                  />
 
-                    <Field
-                      label='Confirm new password'
-                      type='password'
-                      margin='normal'
-                      fullWidth
-                      name={PASSWORD2}
-                      component={TextField}
-                      validate={composeValidators(required, minPasswordLength)}
-                    />
-                  </div>
-              }
+                  <Field
+                    label="Confirm new password"
+                    type="password"
+                    margin="normal"
+                    fullWidth
+                    name={PASSWORD2}
+                    component={TextField}
+                    validate={composeValidators(required, minPasswordLength)}
+                  />
+                </div>
+              )}
             </DialogContent>
 
             <DialogActions>
-              {
-                isSuccess
-                  ?
+              {isSuccess ? (
+                <Button type="button" color="primary" onClick={handleClose}>
+                  Close
+                </Button>
+              ) : (
+                <div>
+                  <Button
+                    type="button"
+                    onClick={handleClose}
+                    disabled={isSubmitting}
+                  >
+                    Cancel
+                  </Button>
                   <Button
                     type="button"
                     color="primary"
-                    onClick={handleClose}
+                    disabled={isSubmitting}
+                    onClick={form.submit}
                   >
-                    Close
+                    Submit
                   </Button>
-                  :
-                  <div>
-                    <Button
-                      type="button"
-                      onClick={handleClose}
-                      disabled={isSubmitting}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      type="button"
-                      color="primary"
-                      disabled={isSubmitting}
-                      onClick={form.submit}
-                    >
-                      Submit
-                    </Button>
-                  </div>
-              }
+                </div>
+              )}
             </DialogActions>
           </Dialog>
         </form>
@@ -169,7 +183,6 @@ function ChangePasswordDialog ({ onClose, currentUser }) {
     />
   )
 }
-
 
 ChangePasswordDialog.propTypes = {
   currentUser: PropTypes.object.isRequired,
