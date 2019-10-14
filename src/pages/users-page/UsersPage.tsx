@@ -392,7 +392,7 @@ function UsersPage (props: UsersPageProps) {
             options={{
               selectableRows: allowDelete ? 'single' : 'none',
               print: false,
-              responsive: "scroll",
+              responsive: "stacked",
               rowsPerPage: 100,
               customToolbarSelect: (selectedRows) => {
                 return allowDelete &&

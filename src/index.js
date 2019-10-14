@@ -13,7 +13,7 @@ import * as serviceWorker from './serviceWorker'
 import * as Sentry from '@sentry/browser'
 import firebase from 'firebase'
 import theme from './MuiTheme'
-import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider'
+import { MuiThemeProvider } from '@material-ui/core/styles'
 
 // firebase init
 const config = {
