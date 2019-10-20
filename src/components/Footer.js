@@ -60,19 +60,7 @@ function Footer() {
     <footer className="footer-area pad_btm">
       <div className="container">
         <div className="row footer-bottom d-flex justify-content-between text-center align-items-center">
-          <div className="col-lg-5 col-md-12">{getRssFeed()}</div>
-          <p className="col-lg-5 col-md-6 col-sm-12 my-4 footer-text ">
-            This website was built with{' '}
-            <i className={`${classes.i} fas fa-heart`} aria-hidden="true" /> by{' '}
-            <a
-              href="https://www.oronnadiv.com"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Oron Nadiv
-            </a>
-          </p>
-          <div className="col-lg-2 col-md-6 col-sm-12 footer-social text-center">
+          <div className="col-lg-4 col-md-12 footer-social">
             <a
               target="_blank"
               rel="noopener noreferrer"
@@ -94,7 +82,26 @@ function Footer() {
             >
               <i className="fab fa-strava" />
             </a>
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://blog.belmontrunners.com"
+            >
+              <i className="fas fa-blog" />
+            </a>
           </div>
+          <div className="col-lg-4 col-md-12 my-md-4">{getRssFeed()}</div>
+          <p className="col-lg-4 col-md-12 footer-text ">
+            This website was built with{' '}
+            <i className={`${classes.i} fas fa-heart`} aria-hidden="true" /> by{' '}
+            <a
+              href="https://www.oronnadiv.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Oron Nadiv
+            </a>
+          </p>
         </div>
       </div>
     </footer>
