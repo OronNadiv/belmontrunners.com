@@ -100,19 +100,32 @@ function EventSchedule() {
       return
     }
     filteredEvents.forEach(filteredEvent => {
-      rawWeather.find(({ dt, weather, main: { temp } }) => {
-        const weatherTS = moment.unix(dt)
-        const weatherPlus3H = moment.unix(dt).add(3, 'h')
+      rawWeather.find((currEntry, index) => {
+        const currDT = moment.unix(currEntry.dt)
+        const currTemp = currEntry.main.temp
+        let nextDT
+        let nextTemp
+        const nextEntry = rawWeather[index + 1]
+        if (nextEntry) {
+          nextDT = moment.unix(nextEntry.dt)
+          nextTemp = nextEntry.main.temp
+        } else {
+          nextDT = moment(currDT).add(3, 'h')
+          nextTemp = currTemp
+        }
         const isBetween = filteredEvent.moment.isBetween(
-          weatherTS,
-          weatherPlus3H,
+          currDT,
+          nextDT,
           null,
           '[)'
         )
         if (isBetween) {
-          filteredEvent.weatherDescription = weather[0].description
-          filteredEvent.weatherIcon = weather[0].icon
-          filteredEvent.weatherTemp = temp
+          filteredEvent.weatherDescription = currEntry.weather[0].description
+          filteredEvent.weatherIcon = currEntry.weather[0].icon
+          filteredEvent.weatherTemp =
+            currTemp +
+            ((nextTemp - currTemp) / (nextDT.unix() - currDT.unix())) *
+              (filteredEvent.moment.unix() - currDT.unix())
           return true
         }
         return false
