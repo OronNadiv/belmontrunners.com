@@ -5,7 +5,9 @@ import moment from 'moment'
 import CalendarSelector from './CalendarSelector'
 import ExpendMoreIcon from '@material-ui/icons/ExpandMore'
 import { IconButton } from '@material-ui/core'
+import rp from 'request-promise'
 
+const CITY_ID = 5392423
 const SPREADSHEET_URL =
   'https://docs.google.com/spreadsheets/d/1FZOB291KWLoutpr0s6VeK5EtvuiQ8uhe497nOmWoqPA/export?format=csv&usp=sharing'
 
@@ -40,6 +42,8 @@ const getFacebookEventLink = eventElement => {
 }
 
 function EventSchedule() {
+  const [rawEvents, setRawEvents] = useState([])
+  const [rawWeather, setRawWeather] = useState([])
   const [events, setEvents] = useState([])
   const [filteredEvents, setFilteredEvents] = useState([])
   const [daysAhead, setDaysAhead] = useState(15)
@@ -47,34 +51,74 @@ function EventSchedule() {
 
   useEffect(() => {
     ;(async function() {
-      const allEvents = await csv().fromStream(request.get(SPREADSHEET_URL))
-      const events = allEvents
-        .map(event => {
-          event.month--
-          event.moment = moment(event)
-          return event
-        })
-        .filter(event => {
-          return (
-            event.moment.isValid() &&
-            event.moment.isAfter(moment().subtract(1, 'day'))
-          )
-        })
-        .sort((a, b) => {
-          return a.moment.valueOf() - b.moment.valueOf()
-        })
-      setEvents(events)
+      const rawWeather = await rp({
+        url: `https://openweathermap.org/data/2.5/forecast?id=${CITY_ID}&appid=b6907d289e10d714a6e88b30761fae22&units=imperial`,
+        json: true
+      })
+      setRawWeather(rawWeather.list)
     })()
   }, [])
 
   useEffect(() => {
     ;(async function() {
-      const filteredEvents = events.filter(event => {
-        return event.moment.isBefore(moment().add(daysAhead, 'day'))
-      })
-      setFilteredEvents(filteredEvents)
+      const rawEvents = await csv().fromStream(request.get(SPREADSHEET_URL))
+      setRawEvents(rawEvents)
     })()
+  }, [])
+
+  useEffect(() => {
+    if (!rawEvents.length) {
+      return
+    }
+    const events = rawEvents
+      .map(event => {
+        event.month--
+        event.moment = moment(event)
+        return event
+      })
+      .filter(event => {
+        return (
+          event.moment.isValid() &&
+          event.moment.isAfter(moment().subtract(1, 'day'))
+        )
+      })
+      .sort((a, b) => {
+        return a.moment.valueOf() - b.moment.valueOf()
+      })
+    setEvents(events)
+  }, [rawEvents])
+
+  useEffect(() => {
+    const filteredEvents = events.filter(event => {
+      return event.moment.isBefore(moment().add(daysAhead, 'day'))
+    })
+    setFilteredEvents(filteredEvents)
   }, [events, daysAhead])
+
+  useEffect(() => {
+    if (!rawWeather.length || !filteredEvents.length) {
+      return
+    }
+    filteredEvents.forEach(filteredEvent => {
+      rawWeather.find(({ dt, weather, main: { temp } }) => {
+        const weatherTS = moment.unix(dt)
+        const weatherPlus3H = moment.unix(dt).add(3, 'h')
+        const isBetween = filteredEvent.moment.isBetween(
+          weatherTS,
+          weatherPlus3H,
+          null,
+          '[)'
+        )
+        if (isBetween) {
+          filteredEvent.weatherDescription = weather[0].description
+          filteredEvent.weatherIcon = weather[0].icon
+          filteredEvent.weatherTemp = temp
+          return true
+        }
+        return false
+      })
+    })
+  }, [filteredEvents, rawWeather])
 
   return (
     <section className="event_schedule_area pad_btm">
@@ -123,13 +167,27 @@ function EventSchedule() {
                         <span />
                       )}
                     </div>
-                    {event['is-members-only-event'] === 'TRUE' && (
-                      <img
-                        src="img/schedule/members-only-t.png"
-                        alt=""
-                        style={{ width: '5em' }}
-                      />
-                    )}
+                    <div className="flex-d text-center">
+                      {event['is-members-only-event'] === 'TRUE' && (
+                        <img
+                          src="img/schedule/members-only-t.png"
+                          alt=""
+                          style={{ width: '5em' }}
+                        />
+                      )}
+                      {event.weatherDescription && (
+                        <div className="flex-d flex-row align-content-center ">
+                          <img
+                            alt="weather icon"
+                            src={`https://openweathermap.org/img/wn/${event.weatherIcon}.png`}
+                          />
+                          <div>{event.weatherDescription}</div>
+                          <div className="weather-temp">
+                            {Math.round(event.weatherTemp)} °F
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )
               })}

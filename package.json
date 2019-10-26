@@ -44,7 +44,7 @@
     "logrocket-react": "^3.0.1",
     "material-ui-pickers": "^2.2.4",
     "moment": "^2.24.0",
-    "mui-datatables": "^2.12.3",
+    "mui-datatables": "^2.12.4",
     "node-sass": "^4.13.0",
     "normalize-email": "^1.1.1",
     "parse-full-name": "^1.2.4",
