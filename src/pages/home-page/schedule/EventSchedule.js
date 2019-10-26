@@ -127,7 +127,7 @@ function EventSchedule() {
                       <img
                         src="img/schedule/members-only-t.png"
                         alt=""
-                        style={{ width: 58 }}
+                        style={{ width: '5em' }}
                       />
                     )}
                   </div>
