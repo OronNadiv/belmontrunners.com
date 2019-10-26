@@ -189,16 +189,23 @@ function EventSchedule() {
                         />
                       )}
                       {event.weatherDescription && (
-                        <div className="flex-d flex-row align-content-center ">
+                        <a
+                          className="flex-d flex-row align-content-center "
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          href={`https://openweathermap.org/city/${CITY_ID}`}
+                        >
                           <img
                             alt="weather icon"
                             src={`https://openweathermap.org/img/wn/${event.weatherIcon}.png`}
                           />
-                          <div>{event.weatherDescription}</div>
+                          <div className="text-muted">
+                            {event.weatherDescription}
+                          </div>
                           <div className="weather-temp">
                             {Math.round(event.weatherTemp)} °F
                           </div>
-                        </div>
+                        </a>
                       )}
                     </div>
                   </div>
