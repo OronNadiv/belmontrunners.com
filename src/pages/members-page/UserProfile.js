@@ -264,7 +264,7 @@ function UserProfile({ onClose, user, userData, updateUserData, currentUser }) {
       <div className={`mx-5 ${classes.root}`}>
         <div className="d-flex flex-column align-items-center">
           <Avatar className={` ${classes.avatar}`} src={avatarUrl}>
-            {initials(user[DISPLAY_NAME])}
+            {!avatarUrl && initials(user[DISPLAY_NAME])}
           </Avatar>
           <div className="mt-3">{user[DISPLAY_NAME]}</div>
           {currentUser[UID] === user[UID] && !connectedToFacebook && (

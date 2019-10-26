@@ -116,6 +116,7 @@ function Profile({
   if (!userData[PHOTO_URL] && !isGravatarFetched) {
     return null
   }
+  let avatarUrl = userData[PHOTO_URL] || gravatarUrl
   return (
     <>
       <div
@@ -123,11 +124,8 @@ function Profile({
         ref={anchorRef}
         onClick={handleToggle}
       >
-        <Avatar
-          className={classes.avatar}
-          src={userData[PHOTO_URL] || gravatarUrl}
-        >
-          {initials(userData[DISPLAY_NAME])}
+        <Avatar className={classes.avatar} src={avatarUrl}>
+          {!avatarUrl && initials(userData[DISPLAY_NAME])}
         </Avatar>
         <div>
           {open ? (

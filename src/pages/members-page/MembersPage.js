@@ -126,19 +126,14 @@ function MembersPage({
         user[PHOTO_URL] = userData.get(PHOTO_URL)
       }
 
+      const avatarUrl = user[PHOTO_URL] || user[GRAVATAR_URL]
       return (
         <Chip
           className="my-1 mx-1"
           avatar={
-            user[PHOTO_URL] ? (
-              <Avatar className={classes.chipAvatar} src={user[PHOTO_URL]} />
-            ) : user[GRAVATAR_URL] ? (
-              <Avatar className={classes.chipAvatar} src={user[GRAVATAR_URL]} />
-            ) : (
-              <Avatar className={classes.chipAvatar}>
-                <DirectionsRun />
-              </Avatar>
-            )
+            <Avatar className={classes.chipAvatar} src={avatarUrl}>
+              {!avatarUrl && <DirectionsRun />}
+            </Avatar>
           }
           onClick={() => handleChipSelected(user)}
           key={user[UID]}
