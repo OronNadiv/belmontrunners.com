@@ -1,5 +1,5 @@
 import 'firebase/auth'
-import firebase from 'firebase'
+import firebase from 'firebase/app'
 import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
 import isEmailComponent from 'isemail'

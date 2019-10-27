@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import MUIDataTable from "mui-datatables"
-import firebase from 'firebase'
+import firebase from 'firebase/app'
 import DeleteIcon from '@material-ui/icons/Delete'
 import * as PropTypes from 'prop-types'
 import {

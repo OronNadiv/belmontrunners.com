@@ -1,5 +1,5 @@
 import 'firebase/auth'
-import firebase from 'firebase'
+import firebase from 'firebase/app'
 import * as PropTypes from 'prop-types'
 import React, { useEffect, useState } from 'react'
 import isEmailComponent from 'isemail'

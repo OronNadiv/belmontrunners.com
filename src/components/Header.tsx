@@ -51,7 +51,7 @@ import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { calc, IS_A_MEMBER } from '../utilities/membershipUtils'
 import { UID } from '../fields'
-import firebase from 'firebase'
+import firebase from 'firebase/app'
 import { ICurrentUserStore } from "../reducers/ICurrentUserStore";
 import { compose } from 'underscore'
 import { IUserData } from "../reducers/IUserData";

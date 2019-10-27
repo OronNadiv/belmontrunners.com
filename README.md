@@ -12,6 +12,7 @@ This repository hosts the source code for our club's [website](https://www.belmo
 - Typescript
 
 #### Third parties:
+
 - [Firebase](https://firebase.google.com/) - Firestore, Functions, Authentication, Storage, and Hosting.
 - [Stripe](https://stripe.com/) - online payment processing.
 - [Mailgun](https://www.mailgun.com/) - email API service.

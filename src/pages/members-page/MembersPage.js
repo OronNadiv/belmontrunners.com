@@ -1,5 +1,5 @@
 import 'firebase/functions'
-import firebase from 'firebase'
+import firebase from 'firebase/app'
 import React, { useEffect, useState } from 'react'
 import { DISPLAY_NAME, GRAVATAR_URL, PHOTO_URL, UID } from '../../fields'
 import * as PropTypes from 'prop-types'

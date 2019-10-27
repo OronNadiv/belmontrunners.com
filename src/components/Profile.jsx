@@ -1,5 +1,5 @@
 import 'firebase/auth'
-import firebase from 'firebase'
+import firebase from 'firebase/app'
 import {
   Avatar,
   ClickAwayListener,
