@@ -1,6 +1,7 @@
 # Belmont Runners
 
-Welcome to the Belmont runners club. This repository has the source code for our club's [website](https://www.belmontrunners.com).
+Welcome to the Belmont runners club.  
+This repository hosts the source code for our club's [website](https://www.belmontrunners.com).
 
 #### Tools:
 
