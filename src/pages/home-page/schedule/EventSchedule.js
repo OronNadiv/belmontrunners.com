@@ -120,12 +120,14 @@ function EventSchedule() {
           '[)'
         )
         if (isBetween) {
-          filteredEvent.weatherDescription = currEntry.weather[0].description
-          filteredEvent.weatherIcon = currEntry.weather[0].icon
-          filteredEvent.weatherTemp =
-            currTemp +
-            ((nextTemp - currTemp) / (nextDT.unix() - currDT.unix())) *
-              (filteredEvent.moment.unix() - currDT.unix())
+          filteredEvent.weather = {
+            description:currEntry.weather[0].description,
+            icon: currEntry.weather[0].icon,
+            temp: currTemp +
+              ((nextTemp - currTemp) / (nextDT.unix() - currDT.unix())) *
+              (filteredEvent.moment.unix() - currDT.unix()),
+            wind: currEntry.wind.speed
+          }
           return true
         }
         return false
@@ -180,33 +182,37 @@ function EventSchedule() {
                         <span />
                       )}
                     </div>
-                    <div className="flex-d text-center">
-                      {event['is-members-only-event'] === 'TRUE' && (
-                        <img
-                          src="img/schedule/members-only-t.png"
-                          alt=""
-                          style={{ width: '5em' }}
-                        />
-                      )}
-                      {event.weatherDescription && (
-                        <a
-                          className="flex-d flex-row align-content-center "
-                          target="_blank"
-                          rel="noreferrer noopener"
-                          href={`https://openweathermap.org/city/${CITY_ID}`}
-                        >
+                    <div>
+                      <div>
+                        {event['is-members-only-event'] === 'TRUE' && (
                           <img
-                            alt="weather icon"
-                            src={`https://openweathermap.org/img/wn/${event.weatherIcon}.png`}
+                            src="img/schedule/members-only-t.png"
+                            alt=""
+                            style={{ width: '5em' }}
                           />
-                          <div className="text-muted">
-                            {event.weatherDescription}
-                          </div>
-                          <div className="weather-temp">
-                            {Math.round(event.weatherTemp)} °F
-                          </div>
-                        </a>
-                      )}
+                        )}
+                      </div>
+                      <div className="text-center">
+                        {event.weather && (
+                          <a
+                            className="flex-d flex-row align-content-center"
+                            target="_blank"
+                            rel="noreferrer noopener"
+                            href={`https://openweathermap.org/city/${CITY_ID}`}
+                          >
+                            <img
+                              alt="weather icon"
+                              src={`https://openweathermap.org/img/wn/${event.weather.icon}.png`}
+                            />
+                            <div className="text-muted">
+                              {event.weather.description}
+                            </div>
+                            <div className="weather-temp">
+                              {Math.round(event.weather.temp)} °F
+                            </div>
+                          </a>
+                        )}
+                      </div>
                     </div>
                   </div>
                 )
