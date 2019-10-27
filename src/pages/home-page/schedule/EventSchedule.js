@@ -42,6 +42,7 @@ const getFacebookEventLink = eventElement => {
 }
 
 function EventSchedule() {
+  const [random, setRandom] = useState(Math.random()) // eslint-disable-line no-unused-vars
   const [rawEvents, setRawEvents] = useState([])
   const [rawWeather, setRawWeather] = useState([])
   const [events, setEvents] = useState([])
@@ -147,6 +148,7 @@ function EventSchedule() {
         return false
       })
     })
+    setRandom(Math.random())
   }, [filteredEvents, rawWeather])
 
   return (
@@ -166,31 +168,35 @@ function EventSchedule() {
               role="tabpanel"
               aria-labelledby="home-tab"
             >
-              {filteredEvents.map((event, index) => {
+              {filteredEvents.map((filteredEvent, index) => {
                 return (
                   <div key={index} className="media">
                     <div className="d-flex">
                       <img src="img/schedule/schedule-3.png" alt="" />
                     </div>
                     <div className="media-body">
-                      <h5>{event.moment.format('MMMM D h:mm a')}</h5>
+                      <h5>{filteredEvent.moment.format('MMMM D h:mm a')}</h5>
                       <h4
                         className={
-                          event['is-special-event'] === 'TRUE'
+                          filteredEvent['is-special-event'] === 'TRUE'
                             ? 'special-event'
                             : undefined
                         }
                       >
-                        {event.moment.format('dddd')} {event.subject}
+                        {filteredEvent.moment.format('dddd')}{' '}
+                        {filteredEvent.subject}
                       </h4>
-                      <p>What: {event.what}</p>
-                      <p>Where: {event.where}</p>
-                      {event['google-map-id'] || event['facebook-event-id'] ? (
+                      <p>What: {filteredEvent.what}</p>
+                      <p>Where: {filteredEvent.where}</p>
+                      {filteredEvent['google-map-id'] ||
+                      filteredEvent['facebook-event-id'] ? (
                         <div className="d-flex flex-wrap">
-                          {event['google-map-id'] &&
-                            getMapLink(event['google-map-id'])}
-                          {event['facebook-event-id'] &&
-                            getFacebookEventLink(event['facebook-event-id'])}
+                          {filteredEvent['google-map-id'] &&
+                            getMapLink(filteredEvent['google-map-id'])}
+                          {filteredEvent['facebook-event-id'] &&
+                            getFacebookEventLink(
+                              filteredEvent['facebook-event-id']
+                            )}
                         </div>
                       ) : (
                         <span />
@@ -198,7 +204,7 @@ function EventSchedule() {
                     </div>
                     <div>
                       <div>
-                        {event['is-members-only-event'] === 'TRUE' && (
+                        {filteredEvent['is-members-only-event'] === 'TRUE' && (
                           <img
                             src="img/schedule/members-only-t.png"
                             alt=""
@@ -207,7 +213,7 @@ function EventSchedule() {
                         )}
                       </div>
                       <div className="text-center">
-                        {event.weather && (
+                        {filteredEvent.weather && (
                           <a
                             className="flex-d flex-row align-content-center"
                             target="_blank"
@@ -216,13 +222,13 @@ function EventSchedule() {
                           >
                             <img
                               alt="weather icon"
-                              src={`https://openweathermap.org/img/wn/${event.weather.icon}.png`}
+                              src={`https://openweathermap.org/img/wn/${filteredEvent.weather.icon}.png`}
                             />
                             <div className="text-muted">
-                              {event.weather.description}
+                              {filteredEvent.weather.description}
                             </div>
                             <div className="weather-temp">
-                              {Math.round(event.weather.temp)} °F
+                              {Math.round(filteredEvent.weather.temp)} °F
                             </div>
                           </a>
                         )}
