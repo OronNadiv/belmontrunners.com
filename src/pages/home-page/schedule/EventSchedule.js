@@ -50,6 +50,7 @@ function EventSchedule() {
   const [loadMoreClicked, setLoadMoreClicked] = useState(0)
 
   useEffect(() => {
+    console.log('1')
     ;(async function() {
       const rawWeather = await rp({
         url: `https://openweathermap.org/data/2.5/forecast?id=${CITY_ID}&appid=b6907d289e10d714a6e88b30761fae22&units=imperial`,
@@ -60,6 +61,7 @@ function EventSchedule() {
   }, [])
 
   useEffect(() => {
+    console.log('2')
     ;(async function() {
       const rawEvents = await csv().fromStream(request.get(SPREADSHEET_URL))
       setRawEvents(rawEvents)
@@ -67,6 +69,7 @@ function EventSchedule() {
   }, [])
 
   useEffect(() => {
+    console.log('3 rawEvents.length:', rawEvents.length)
     if (!rawEvents.length) {
       return
     }
@@ -89,6 +92,10 @@ function EventSchedule() {
   }, [rawEvents])
 
   useEffect(() => {
+    console.log('4 events.length:', events.length, 'daysAhead:', daysAhead)
+    if (!events.length) {
+      return
+    }
     const filteredEvents = events.filter(event => {
       return event.moment.isBefore(moment().add(daysAhead, 'day'))
     })
@@ -96,6 +103,12 @@ function EventSchedule() {
   }, [events, daysAhead])
 
   useEffect(() => {
+    console.log(
+      '5 rawWeather.length:',
+      rawWeather.length,
+      'filteredEvents.length:',
+      filteredEvents.length
+    )
     if (!rawWeather.length || !filteredEvents.length) {
       return
     }
@@ -121,11 +134,12 @@ function EventSchedule() {
         )
         if (isBetween) {
           filteredEvent.weather = {
-            description:currEntry.weather[0].description,
+            description: currEntry.weather[0].description,
             icon: currEntry.weather[0].icon,
-            temp: currTemp +
+            temp:
+              currTemp +
               ((nextTemp - currTemp) / (nextDT.unix() - currDT.unix())) *
-              (filteredEvent.moment.unix() - currDT.unix()),
+                (filteredEvent.moment.unix() - currDT.unix()),
             wind: currEntry.wind.speed
           }
           return true
