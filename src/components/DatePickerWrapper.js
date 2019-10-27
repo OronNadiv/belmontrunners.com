@@ -1,4 +1,4 @@
-import { DatePicker, MuiPickersUtilsProvider } from 'material-ui-pickers'
+import { DatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers'
 import MomentUtils from '@date-io/moment'
 import * as PropTypes from 'prop-types'
 import React from 'react'
@@ -18,7 +18,7 @@ function DatePickerWrapper(props) {
       <DatePicker
         {...rest}
         name={name}
-        format={'LL'}
+        format={'YYYY-MM-DD'}
         helperText={showError ? meta.error || meta.submitError : undefined}
         error={showError}
         inputProps={restInput}

@@ -150,7 +150,7 @@ function UserDetails({ showDisplayName = false }) {
           component={DatePickerWrapper}
           disableFuture
           openTo="year"
-          views={['year', 'month', 'day']}
+          views={['year', 'month', 'date']}
           validate={composeValidators(required, birthday)}
           emptyLabel={''}
           format={value => {
