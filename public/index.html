@@ -49,18 +49,14 @@
 <script src="%PUBLIC_URL%/js/mail-script.js"></script>
 <script src="%PUBLIC_URL%/js/theme.js"></script>
 <script src="https://js.stripe.com/v3/"></script>
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-133308533-194733494"></script>
-<script>
-  window.dataLayer = window.dataLayer || []
+<!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="/__/firebase/7.5.2/firebase-app.js"></script>
 
-  function gtag () {
-    dataLayer.push(arguments)
-  }
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+<script src="/__/firebase/7.5.2/firebase-analytics.js"></script>
 
-  gtag('js', new Date())
-
-  gtag('config', 'UA-133308533-194733494')
-</script>
+<!-- Initialize Firebase -->
+<script src="/__/firebase/init.js"></script>
 </body>
 </html>
