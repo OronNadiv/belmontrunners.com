@@ -7,6 +7,7 @@ import Team from './team/Team'
 import Map from './Map'
 import Notifications from './Notifications'
 import { goToTop } from 'react-scrollable-anchor'
+import Promotion from "./Promotion";
 
 function Home() {
   useEffect(() => {
@@ -17,6 +18,7 @@ function Home() {
     <div>
       <HomeBanner />
       <Welcome />
+      <Promotion />
       <EventSchedule />
       <Subscribe />
       <Team />
