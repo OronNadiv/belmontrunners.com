@@ -8,6 +8,7 @@ import Map from './Map'
 import Notifications from './Notifications'
 import { goToTop } from 'react-scrollable-anchor'
 import Promotion from "./Promotion";
+import moment from 'moment'
 
 function Home() {
   useEffect(() => {
@@ -18,7 +19,7 @@ function Home() {
     <div>
       <HomeBanner />
       <Welcome />
-      <Promotion />
+      {moment().isBefore('2019-12-24') && <Promotion />}
       <EventSchedule />
       <Subscribe />
       <Team />

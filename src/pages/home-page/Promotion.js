@@ -19,25 +19,25 @@ const Promotion = () => {
             <div className='text-center'>
               <Slider {...settings}>
                 <div>
-                  <img className='img-fluid' src='/img/promotion/PO36830499-frontA.png'
+                  <img className='img-fluid rounded' src='/img/promotion/PO36830499-frontA.png'
                        alt="Belmont Runners Winter Fundraiser Fundraiser - unisex shirt design - front" />
                 </div>
                 <div>
-                  <img className='img-fluid' src='/img/promotion/PO36830499-frontW.png'
+                  <img className='img-fluid rounded' src='/img/promotion/PO36830499-frontW.png'
                        alt='Belmont Runners Winter Fundraiser Fundraiser - unisex shirt design - front' />
                 </div>
                 <div>
-                  <img className='img-fluid' src='/img/promotion/PO36830499-frontH.png'
+                  <img className='img-fluid rounded' src='/img/promotion/PO36830499-frontH.png'
                        alt="Belmont Runners Winter Fundraiser Fundraiser - unisex shirt design - front" />
                 </div>
                 <div>
-                  <img className='img-fluid' src='/img/promotion/PO36830499-frontL.png'
+                  <img className='img-fluid rounded' src='/img/promotion/PO36830499-frontL.png'
                        alt='Belmont Runners Winter Fundraiser Fundraiser - unisex shirt design - front' />
                 </div>
               </Slider>
             </div>
           </div>
-          <div className="col-lg-5 offset-lg-1">
+          <div className="col-lg-5 offset-lg-1 my-5">
             <p className='font-weight-bold'>
               Need a gift for that runner in you life?
             </p>
