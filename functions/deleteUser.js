@@ -1,3 +1,6 @@
+const functions = require('firebase-functions')
+const apiKey = functions.config().mailchimp.apikey
+
 const { ARRAY_KEY } = require('./fields')
 const { reject } = require('underscore')
 const rp = require('request-promise')
@@ -43,7 +46,7 @@ module.exports = admin => {
       console.info(`deleteFromMailChimp called.  email: ${email}`)
       await rp({
         method: 'DELETE',
-        uri: `https://username:2b7213c2cc3789df0376d0629facc0b5-us3@us3.api.mailchimp.com/3.0/lists/7cffd16da0/members/${md5(
+        uri: `https://username:${apiKey}@us3.api.mailchimp.com/3.0/lists/7cffd16da0/members/${md5(
           email.toLowerCase()
         )}`
       })

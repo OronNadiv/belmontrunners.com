@@ -1,5 +1,7 @@
-const { DISPLAY_NAME, EMAIL } = require('./fields')
+const functions = require('firebase-functions')
+const apiKey = functions.config().mailchimp.apikey
 
+const { DISPLAY_NAME, EMAIL } = require('./fields')
 const { parseFullName } = require('parse-full-name')
 const rp = require('request-promise')
 const Promise = require('bluebird')
@@ -20,7 +22,7 @@ module.exports = admin => {
     //     try {
     //       await rp({
     //         method: 'PATCH',
-    //         uri: `https://username:2b7213c2cc3789df0376d0629facc0b5-us3@us3.api.mailchimp.com/3.0/lists/7cffd16da0/members/${md5(contact[EMAIL].toLowerCase())}`,
+    //         uri: `https://username:${apiKey}@us3.api.mailchimp.com/3.0/lists/7cffd16da0/members/${md5(contact[EMAIL].toLowerCase())}`,
     //         body: {
     //           "status": "unsubscribed"
     //         },
@@ -52,8 +54,7 @@ module.exports = admin => {
         try {
           await rp({
             method: 'POST',
-            uri:
-              'https://username:2b7213c2cc3789df0376d0629facc0b5-us3@us3.api.mailchimp.com/3.0/lists/7cffd16da0/members/',
+            uri: `https://username:${apiKey}@us3.api.mailchimp.com/3.0/lists/7cffd16da0/members/`,
             body: { ...item, status: 'subscribed' },
             json: true
           })
@@ -63,7 +64,7 @@ module.exports = admin => {
             try {
               await rp({
                 method: 'PUT',
-                uri: `https://username:2b7213c2cc3789df0376d0629facc0b5-us3@us3.api.mailchimp.com/3.0/lists/7cffd16da0/members/${md5(
+                uri: `https://username:${apiKey}@us3.api.mailchimp.com/3.0/lists/7cffd16da0/members/${md5(
                   item.email_address.toLowerCase()
                 )}`,
                 body: item,
