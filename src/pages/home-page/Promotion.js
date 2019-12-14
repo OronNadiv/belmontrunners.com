@@ -34,6 +34,14 @@ const Promotion = () => {
                   <img className='img-fluid rounded' src='/img/promotion/PO36830499-frontL.png'
                        alt='Belmont Runners Winter Fundraiser Fundraiser - unisex shirt design - front' />
                 </div>
+                <div>
+                  <img className='img-fluid rounded' src='/img/promotion/tsconfig.png'
+                       alt='Belmont Runners Winter Fundraiser Fundraiser - unisex shirt design - front' />
+                </div>
+                <div>
+                  <img className='img-fluid rounded' src='/img/promotion/PO36830499-front2womv.png'
+                       alt='Belmont Runners Winter Fundraiser Fundraiser - unisex shirt design - front' />
+                </div>
               </Slider>
             </div>
           </div>

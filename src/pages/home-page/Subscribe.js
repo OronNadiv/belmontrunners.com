@@ -50,7 +50,7 @@ const Subscribe = () => {
         await rp({
           method: 'POST',
           uri:
-            'https://c0belq1th0.execute-api.us-west-1.amazonaws.com/default/contact',
+            'https://www.oronnadiv.com/contact',
           body: {
             name: email,
             email: email,
