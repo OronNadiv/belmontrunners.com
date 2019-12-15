@@ -12,7 +12,7 @@ const LoggedInState = (params = {}) => {
 
   return WrappedComponent => {
     const Inner = props => {
-      // name = name || WrappedComponent.name
+      name = name || WrappedComponent.name
       const { ___isCurrentUserLoaded___, ___currentUser___ } = props
       const [redirectToRoot, setRedirectToRoot] = useState(null)
 
@@ -107,8 +107,8 @@ const LoggedInState = (params = {}) => {
     }
 
     const mapStateToProps = ({
-      currentUser: { isCurrentUserLoaded, currentUser }
-    }) => {
+                               currentUser: { isCurrentUserLoaded, currentUser }
+                             }) => {
       return {
         ___isCurrentUserLoaded___: isCurrentUserLoaded,
         ___currentUser___: currentUser
