@@ -19,10 +19,10 @@ const LoggedInState = (params = {}) => {
       const [initialIsLoggedIn, setInitialIsLoggedIn] = useState(null)
       useEffect(() => {
         if (!___isCurrentUserLoaded___) {
-          console.log(`user hasn't been fetched yet.`)
+          // console.log(`user hasn't been fetched yet.`)
           return
         }
-        console.log('user has been fetched.')
+        // console.log('user has been fetched.')
 
         if (initialIsLoggedIn === null) {
           // save state login for later
@@ -31,54 +31,54 @@ const LoggedInState = (params = {}) => {
       }, [___currentUser___, initialIsLoggedIn, ___isCurrentUserLoaded___])
 
       useEffect(() => {
-        console.log('checkLoginState called.  name:', name)
+        // console.log('checkLoginState called.  name:', name)
         if (!___isCurrentUserLoaded___) {
-          console.log(`user hasn't been fetched yet.`)
+          // console.log(`user hasn't been fetched yet.`)
           return
         }
         if (redirectToRoot) {
-          console.log('initialed redirect.  skipping.')
+          // console.log('initialed redirect.  skipping.')
           return
         }
 
-        console.log('user has been fetched.')
+        // console.log('user has been fetched.')
         const isLoggedIn = !!___currentUser___
 
         if (isLoggedIn === isRequiredToBeLoggedIn) {
-          console.log(
-            'state is as expected',
-            'initialIsLoggedIn',
-            initialIsLoggedIn,
-            'isLoggedIn:',
-            isLoggedIn,
-            'isRequiredToBeLoggedIn:',
-            isRequiredToBeLoggedIn
-          )
+          // console.log(
+          //   'state is as expected',
+          //   'initialIsLoggedIn',
+          //   initialIsLoggedIn,
+          //   'isLoggedIn:',
+          //   isLoggedIn,
+          //   'isRequiredToBeLoggedIn:',
+          //   isRequiredToBeLoggedIn
+          // )
           setRedirectToRoot(false)
           return
         }
 
         // state is not as expected
         if (!canSwitchToLogin) {
-          console.log(
-            'cannot switch to a valid state.  that means redirect to root.'
-          )
+          // console.log(
+          //   'cannot switch to a valid state.  that means redirect to root.'
+          // )
           setRedirectToRoot(true)
           return
         }
 
         // ok, can switch but only to login state.  Let's see if the user was previously logged in')'
         if (!initialIsLoggedIn && isLoggedIn) {
-          console.log(
-            'the user switched from not logged in to logged in.  We are all good.'
-          )
+          // console.log(
+          //   'the user switched from not logged in to logged in.  We are all good.'
+          // )
           setRedirectToRoot(false)
           return
         }
 
-        console.log(
-          "user switched state to not logged in and it's not allowed."
-        )
+        // console.log(
+        //   "user switched state to not logged in and it's not allowed."
+        // )
         return setRedirectToRoot(true)
       }, [
         ___currentUser___,

@@ -16,6 +16,7 @@ This repository hosts the source code for our club's [website](https://www.belmo
 - [Firebase](https://firebase.google.com/) - Firestore, Functions, Authentication, Storage, and Hosting.
 - [Stripe](https://stripe.com/) - online payment processing.
 - [Mailgun](https://www.mailgun.com/) - email API service.
+- [Mailchimp](https://mailchimp.com/) - Updating the contacts directory for email marketing.
 - [Sentry](https://sentry.io/) - error monitoring that helps discover, triage, and prioritize errors in real-time.
 - [Drift](https://www.drift.com/) - live chat.
 - [CircleCI](https://circleci.com/) - continuous integration and delivery.

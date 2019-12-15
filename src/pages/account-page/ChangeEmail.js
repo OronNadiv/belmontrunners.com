@@ -38,7 +38,7 @@ function ChangeEmail({
                   <span className="text-success text-center">verified</span>
                 )}
                 )
-                <div>
+                <br/>
                   <small>
                     {!currentUser.emailVerified && !emailVerificationSent && (
                       <span>
@@ -56,7 +56,6 @@ function ChangeEmail({
                       <span className="text-success text-center">Sent</span>
                     )}
                   </small>
-                </div>
               </Typography>
             </CardContent>
           </div>
