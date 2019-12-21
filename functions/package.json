@@ -2,12 +2,14 @@
   "name": "functions",
   "description": "Cloud Functions for Firebase",
   "scripts": {
-    "lint": "eslint .",
-    "serve": "firebase serve --only functions",
-    "shell": "firebase functions:shell",
+    "lint": "tslint --project tsconfig.json",
+    "build": "tsc",
+    "serve": "npm run build && firebase serve --only functions",
+    "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
-    "logs": "firebase functions:log"
+    "logs": "firebase functions:log",
+    "contacts2MailChimpCMD": "npm run build && node lib/contacts2MailChimpCMD.js"
   },
   "engines": {
     "node": "10"
@@ -31,12 +33,14 @@
     "request": "^2.88.0",
     "request-promise": "^4.2.5",
     "stripe": "^7.14.0",
+    "tslint": "^5.12.0",
+    "typescript": "^3.2.2",
     "underscore": "^1.9.1"
   },
   "devDependencies": {
-    "eslint": "^6.7.2",
-    "eslint-plugin-promise": "^4.2.1",
-    "firebase-functions-test": "^0.1.7"
+    "@types/node": "^12.12.17",
+    "firebase-functions-test": "^0.1.7",
+    "json-to-ts": "^1.6.0"
   },
   "private": true
 }

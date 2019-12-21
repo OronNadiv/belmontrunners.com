@@ -5,7 +5,10 @@ const firestore = admin.firestore()
 // const generateThumbnail = require('./generateThumbnail')(admin)
 const auth2Users = require('./auth2Users')(admin)
 const users2Contacts = require('./users2Contacts')(admin)
-const contacts2MailChimp = require('./contacts2MailChimp')(admin)
+
+const apiKey = functions.config().mailchimp.apikey
+
+const contacts2MailChimp = require('./lib/contacts2MailChimp')(admin, apiKey)
 const generateICal = require('./generateICal')(admin)
 const stripe = require('./stripe')
 const addContact = require('./addContact')(admin)
