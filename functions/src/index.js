@@ -1,21 +1,21 @@
 import Contacts2MailChimp from './contacts2MailChimp'
-
+import Users2Contacts from './users2Contacts'
+import AddContact from './addContact'
 const functions = require('firebase-functions')
 const admin = require('firebase-admin')
 admin.initializeApp()
 const firestore = admin.firestore()
 // const generateThumbnail = require('./generateThumbnail')(admin)
-const auth2Users = require('./auth2Users')(admin)
-const users2Contacts = require('./users2Contacts')(admin)
 
 const apiKey = functions.config().mailchimp.apikey
 
-
+const auth2Users = require('./auth2Users')(admin)
+const users2Contacts = Users2Contacts(admin)
 const contacts2MailChimp = Contacts2MailChimp(admin, apiKey)
+const addContact = AddContact(admin)
 
 const generateICal = require('./generateICal')(admin)
 const stripe = require('./stripe')
-const addContact = require('./addContact')(admin)
 const getMembers = require('./getMembers')(admin)
 const deleteUser = require('./deleteUser')(admin)
 const purgeUsersUnder13 = require('./purgeUsersUnder13')(admin)

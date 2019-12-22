@@ -17,7 +17,7 @@ interface MailChimpContact {
 
 }
 
-const run = (admin: Admin.app.App, apiKey: string) => {
+export default (admin: Admin.app.App, apiKey: string) => {
   return async () => {
     const firestore = admin.firestore()
     const docRef: FirebaseFirestore.DocumentReference = firestore.doc('subscribers/items')
@@ -65,5 +65,3 @@ const run = (admin: Admin.app.App, apiKey: string) => {
     })
   }
 }
-
-export default run
