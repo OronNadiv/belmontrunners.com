@@ -48,33 +48,19 @@ const run = (admin: Admin.app.App, apiKey: string) => {
     await BBPromise.each(body, async (mailChimpContact: MailChimpContact) => {
       try {
         await rp({
-          method: 'POST',
-          uri: `https://username:${apiKey}@us3.api.mailchimp.com/3.0/lists/7cffd16da0/members/`,
-          body: { ...mailChimpContact, status: 'subscribed' },
+          method: 'PUT',
+          uri: `https://username:${apiKey}@us3.api.mailchimp.com/3.0/lists/7cffd16da0/members/${md5(
+            mailChimpContact.email_address.toLowerCase()
+          )}`,
+          body: { ...mailChimpContact, status_if_new: 'subscribed' },
           json: true
         })
-        console.info('done POST:', mailChimpContact.email_address)
+        console.info('done PUT:', mailChimpContact.email_address)
       } catch (err) {
-        if (err && err.error && err.error.status === 400) {
-          try {
-            await rp({
-              method: 'PUT',
-              uri: `https://username:${apiKey}@us3.api.mailchimp.com/3.0/lists/7cffd16da0/members/${md5(
-                mailChimpContact.email_address.toLowerCase()
-              )}`,
-              body: mailChimpContact,
-              json: true
-            })
-            console.info('done PUT:', mailChimpContact.email_address)
-          } catch (err2) {
-            console.error(
-              'error PUT:',
-              err2 && err2.error ? err2.error : err2
-            )
-          }
-        } else {
-          console.error('error POST:', err && err.error ? err.error : err)
-        }
+        console.error(
+          'error PUT:',
+          err && err.error ? err.error : err
+        )
       }
     })
   }
