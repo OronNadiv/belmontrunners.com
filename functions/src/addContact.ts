@@ -18,7 +18,7 @@ export default (admin: Admin.app.App) => {
       console.info('data:', data)
       console.info('context.auth:', context ? context.auth : '')
 
-      let docRef = firestore.doc('subscribers/items')
+      const docRef = firestore.doc('subscribers/items')
       const contactsDoc = await docRef.get()
       let contactsData = contactsDoc.data()
 

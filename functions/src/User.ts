@@ -14,6 +14,8 @@ export interface User {
   gender?: string
   membershipExpiresAt?: string
   createdAt?: string
+  lastSignedInAt?: string
   emailVerified: boolean
   notInterestedInBecomingAMember?: boolean
+  gravatarUrl?: string
 }

@@ -1,17 +1,20 @@
+import * as Admin from 'firebase-admin'
+import { UserRecord } from 'firebase-functions/lib/providers/auth'
+import { User } from './User'
+
 const moment = require('moment')
 const Promise = require('bluebird')
 const gravatar = require('gravatar')
 const rp = require('request-promise')
-const { GRAVATAR_URL } = require('./fields')
 
-module.exports = admin => {
+export default (admin: Admin.app.App) => {
   const firestore = admin.firestore()
   const auth = admin.auth()
 
-  const listAllUsers = async nextPageToken => {
+  const listAllUsers = async (nextPageToken?: string) => {
     // List batch of users, 1000 at a time.
     const listUsersResult = await auth.listUsers(1000, nextPageToken)
-    await Promise.each(listUsersResult.users, async userRecord => {
+    await Promise.each(listUsersResult.users, async (userRecord: UserRecord) => {
       try {
         const {
           uid,
@@ -19,7 +22,7 @@ module.exports = admin => {
           emailVerified,
           displayName,
           metadata: { creationTime, lastSignInTime }
-        } = userRecord.toJSON()
+        } = userRecord
         const gravatarUrl = gravatar.url(email, {
           protocol: 'https',
           default: '404'
@@ -34,20 +37,21 @@ module.exports = admin => {
           hasGravatar = false
         }
 
-        let createdAt = moment(creationTime)
+        const createdAt = moment(creationTime)
           .utc()
           .format()
-        let lastSignedInAt = moment(lastSignInTime)
+        const lastSignedInAt: string = moment(lastSignInTime)
           .utc()
           .format()
         const userRef = firestore.doc(`users/${uid}`)
-        let data = {
+        const data: User = {
+          uid,
           createdAt,
-          email,
+          email: email || '',
           emailVerified,
           displayName,
           lastSignedInAt,
-          [GRAVATAR_URL]: hasGravatar ? gravatarUrl : null
+          gravatarUrl: hasGravatar ? gravatarUrl : null
         }
         await userRef.set(data, { merge: true })
         console.info(`Updated ${uid} ${createdAt} ${lastSignedInAt}`)
@@ -64,6 +68,7 @@ module.exports = admin => {
       await listAllUsers(listUsersResult.pageToken)
     } else {
       console.info('Done.  Exiting...')
+      return
     }
   }
 

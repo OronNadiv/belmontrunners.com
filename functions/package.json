@@ -9,8 +9,9 @@
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log",
-    "users2ContactsCMD": "npm run build && node lib/users2ContactsCMD.js",
-    "contacts2MailChimpCMD": "npm run build && node lib/contacts2MailChimpCMD.js"
+    "auth2UsersCMD": "npm run build && node lib/auth2UsersCMD.js",
+    "contacts2MailChimpCMD": "npm run build && node lib/contacts2MailChimpCMD.js",
+    "users2ContactsCMD": "npm run build && node lib/users2ContactsCMD.js"
   },
   "main": "lib/index.js",
   "engines": {
