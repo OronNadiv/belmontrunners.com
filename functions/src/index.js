@@ -2,6 +2,7 @@ import AddContact from './addContact'
 import Auth2Users from './auth2Users'
 import Contacts2MailChimp from './contacts2MailChimp'
 import DeleteUser from './deleteUser'
+import GenerateICal from './GenerateICal'
 import GetMembers from './getMembers'
 import Users2Contacts from './users2Contacts'
 
@@ -17,10 +18,10 @@ const addContact = AddContact(admin)
 const auth2Users = Auth2Users(admin)
 const contacts2MailChimp = Contacts2MailChimp(admin, apiKey)
 const deleteUser = DeleteUser(admin, apiKey)
+const generateICal = GenerateICal()
 const getMembers = GetMembers(admin)
 const users2Contacts = Users2Contacts(admin)
 
-const generateICal = require('./generateICal')(admin)
 const stripe = require('./stripe')
 const purgeUsersUnder13 = require('./purgeUsersUnder13')(admin)
 const Promise = require('bluebird')
