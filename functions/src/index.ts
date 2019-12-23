@@ -7,13 +7,17 @@ import GetMembers from './getMembers'
 import PurgeUsersUnder13 from './purgeUsersUnder13'
 import Stripe from './stripe'
 import Users2Contacts from './users2Contacts'
+import * as functions from 'firebase-functions'
+import * as Admin from 'firebase-admin'
 
-const functions = require('firebase-functions')
-const admin = require('firebase-admin')
-admin.initializeApp()
+const admin: Admin.app.App = Admin.initializeApp()
 const firestore = admin.firestore()
 
 const apiKey = functions.config().mailchimp.apikey
+const {
+  membership_fee_in_cents,
+  secret_keys: { live, test }
+} = functions.config().stripe
 
 const addContact = AddContact(admin)
 const auth2Users = Auth2Users(admin)
@@ -22,14 +26,8 @@ const deleteUser = DeleteUser(admin, apiKey)
 const generateICal = GenerateICal()
 const getMembers = GetMembers(admin)
 const purgeUsersUnder13 = PurgeUsersUnder13(admin, apiKey, false)
-const users2Contacts = Users2Contacts(admin)
-
-const {
-  membership_fee_in_cents,
-  secret_keys: { live, test }
-} = functions.config().stripe
-
 const stripe = Stripe({ membershipFeeInCents: membership_fee_in_cents, secretKeys: { live, test } })
+const users2Contacts = Users2Contacts(admin)
 
 const Promise = require('bluebird')
 const { EMAIL } = require('./fields')
@@ -82,9 +80,9 @@ exports.contacts2MailChimpCronJob = functions
 
 exports.ical = functions
   .runWith({ memory: '512MB' })
-  .https.onRequest(async (req, res) => {
+  .https.onRequest(async (req: functions.https.Request, res: functions.Response) => {
     try {
-      const body = await generateICal(req)
+      const body = await generateICal()
       res.set({
         'cache-control': 'no-cache, no-store, max-age=0, must-revalidate',
         // 'content-security-policy': "script-src 'report-sample' 'nonce-b3O76BbGW8VYkTGK5Nxtvw' 'unsafe-inline' 'strict-dynamic' https: http: 'unsafe-eval';object-src 'none';base-uri 'self';report-uri /calendar/cspreport",

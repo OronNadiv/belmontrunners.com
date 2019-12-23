@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-import * as admin from 'firebase-admin'
+import * as Admin from 'firebase-admin'
 import contacts2MailChimp from './contacts2MailChimp'
 
 const serviceAccount = require('../serviceAccountKey.json')
 
-const a: admin.app.App = admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
+const admin: Admin.app.App = Admin.initializeApp({
+  credential: Admin.credential.cert(serviceAccount),
   databaseURL: 'https://belmont-runners-1548537264040.firebaseio.com'
 })
 
@@ -15,7 +15,7 @@ if (apiKey === undefined) {
   throw new Error('process.env[\'mailchimp.apikey\'] is missing.')
 }
 
-contacts2MailChimp(a, apiKey)()
+contacts2MailChimp(admin, apiKey)()
   .then((res) => {
     console.info('done', res)
     return

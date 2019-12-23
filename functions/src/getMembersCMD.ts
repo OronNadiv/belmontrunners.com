@@ -1,13 +1,13 @@
 #!/usr/bin/env node
-import * as admin from 'firebase-admin'
+import * as Admin from 'firebase-admin'
 import getMembers from './getMembers'
 import { User } from './User'
 import { https } from 'firebase-functions'
 
 const serviceAccount = require('../serviceAccountKey.json')
 
-const a: admin.app.App = admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
+const admin: Admin.app.App = Admin.initializeApp({
+  credential: Admin.credential.cert(serviceAccount),
   databaseURL: 'https://belmont-runners-1548537264040.firebaseio.com'
 })
 
@@ -22,7 +22,7 @@ const context: https.CallableContext = {
   }
 }
 
-getMembers(a)(
+getMembers(admin)(
   {},
   context
 )

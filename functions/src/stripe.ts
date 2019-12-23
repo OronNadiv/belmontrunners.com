@@ -1,12 +1,14 @@
-const functions = require('firebase-functions')
+import { https } from 'firebase-functions'
+
 const _ = require('underscore')
 
 interface StripeParams {
-  token: {id: string}
+  token: { id: string }
   description: string
   amountInCents: number
   origin: string
 }
+
 interface StripeConfig {
   membershipFeeInCents: string
   secretKeys: {
@@ -14,6 +16,7 @@ interface StripeConfig {
     live: string
   }
 }
+
 export default (config: StripeConfig) => {
   const stripeLive = require('stripe')(config.secretKeys.live)
   const stripeTest = require('stripe')(config.secretKeys.test)
@@ -45,7 +48,7 @@ export default (config: StripeConfig) => {
       })
     } catch (err) {
       console.warn('charge error:', JSON.stringify(err))
-      throw new functions.https.HttpsError(
+      throw new https.HttpsError(
         'invalid-argument',
         JSON.stringify(err)
       )

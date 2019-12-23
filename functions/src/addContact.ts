@@ -8,7 +8,6 @@ const {
   SUBSCRIBERS_ARRAY_KEY
 } = require('./fields')
 const _ = require('underscore')
-const functions = require('firebase-functions')
 
 export default (admin: Admin.app.App) => {
   const firestore = admin.firestore()
@@ -48,7 +47,7 @@ export default (admin: Admin.app.App) => {
       console.info('contact has been added and saved successfully.')
     } catch (err) {
       console.error('error:', err)
-      throw new functions.https.HttpsError(
+      throw new https.HttpsError(
         'internal',
         'Something went wrong...'
       )

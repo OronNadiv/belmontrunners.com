@@ -1,12 +1,11 @@
 #!/usr/bin/env node
 
 import DeleteUser from './deleteUser'
+import * as Admin from 'firebase-admin'
 
-const admin = require('firebase-admin')
 const serviceAccount = require('../serviceAccountKey.json')
-
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+const admin: Admin.app.App = Admin.initializeApp({
+  credential: Admin.credential.cert(serviceAccount)
 })
 
 const apiKey: string | undefined = process.env['mailchimp.apikey']
