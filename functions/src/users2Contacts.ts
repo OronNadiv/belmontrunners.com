@@ -1,8 +1,7 @@
 import Contact from './Contact'
 import * as Admin from 'firebase-admin'
 import { User } from './User'
-
-const { calc, IS_A_MEMBER } = require('./membershipUtils')
+import calc from './membershipUtils'
 const {
   ARRAY_KEY,
   UID
@@ -45,7 +44,7 @@ export default (admin: Admin.app.App) => {
       if (foundContact) {
         foundContact.email = user.email
         foundContact.displayName = user.displayName || ''
-        foundContact.isMember = calc(user)[IS_A_MEMBER]
+        foundContact.isMember = calc(user).isAMember
         foundContact.membershipExpiresAt = user.membershipExpiresAt || ''
       }
     })
@@ -62,7 +61,7 @@ export default (admin: Admin.app.App) => {
       if (foundUser) {
         contact.uid = foundUser.uid
         contact.displayName = foundUser.displayName || ''
-        contact.isMember = calc(foundUser)[IS_A_MEMBER]
+        contact.isMember = calc(foundUser).isAMember
         contact.membershipExpiresAt = foundUser.membershipExpiresAt || ''
       }
     })
@@ -79,7 +78,7 @@ export default (admin: Admin.app.App) => {
         uid: user.uid,
         email: user.email,
         displayName: user.displayName || '',
-        isMember: calc(user)[IS_A_MEMBER],
+        isMember: calc(user).isAMember,
         membershipExpiresAt: user.membershipExpiresAt || '',
         isActive: true
       }

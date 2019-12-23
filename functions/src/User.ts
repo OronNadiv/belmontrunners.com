@@ -1,3 +1,7 @@
+export interface Visibility {
+  [key: string]: string
+}
+
 export interface User {
   uid: string
   address1?: string
@@ -18,4 +22,5 @@ export interface User {
   emailVerified: boolean
   notInterestedInBecomingAMember?: boolean
   gravatarUrl?: string
+  visibility?: Visibility
 }

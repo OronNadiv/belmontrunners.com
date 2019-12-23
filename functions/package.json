@@ -11,6 +11,7 @@
     "logs": "firebase functions:log",
     "auth2UsersCMD": "npm run build && node lib/auth2UsersCMD.js",
     "contacts2MailChimpCMD": "npm run build && node lib/contacts2MailChimpCMD.js",
+    "getMembersCMD": "npm run build && node lib/getMembersCMD.js",
     "users2ContactsCMD": "npm run build && node lib/users2ContactsCMD.js"
   },
   "main": "lib/index.js",

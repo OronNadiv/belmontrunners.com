@@ -1,4 +1,9 @@
-const { calc, IS_A_MEMBER } = require('./membershipUtils')
+import { https } from 'firebase-functions'
+import * as Admin from 'firebase-admin'
+import { User, Visibility } from './User'
+import calc from './membershipUtils'
+
+const _ = require('underscore')
 
 const {
   ADDRESS1,
@@ -9,7 +14,6 @@ const {
   EMAIL,
   GENDER,
   GRAVATAR_URL,
-  IS_MEMBER,
   MEMBERS,
   PHONE,
   PHOTO_URL,
@@ -19,11 +23,7 @@ const {
   ZIP
 } = require('./fields')
 
-const _ = require('underscore')
-const functions = require('firebase-functions')
-const isMember = user => calc(user)[IS_A_MEMBER]
-
-const defaultVisibility = {
+const defaultVisibility: Visibility = {
   [UID]: MEMBERS,
   [DISPLAY_NAME]: MEMBERS,
   [EMAIL]: ONLY_ME,
@@ -36,23 +36,32 @@ const defaultVisibility = {
   [ZIP]: ONLY_ME,
   [GENDER]: ONLY_ME,
   [DATE_OF_BIRTH]: ONLY_ME,
-  [IS_MEMBER]: MEMBERS,
   [GRAVATAR_URL]: MEMBERS
 }
-module.exports = admin => {
+
+export default (admin: Admin.app.App) => {
   const firestore = admin.firestore()
-  return async (data, context) => {
-    if (!context || !context.auth || !context.auth[UID]) {
-      throw new functions.https.HttpsError(
+  return async (data: any, context?: https.CallableContext) => {
+    if (!context || !context.auth || !context.auth.uid) {
+      throw new https.HttpsError(
         'unauthenticated',
         'unauthenticated.'
       )
     }
 
-    const applyFilters = user => {
-      if (context.auth[UID] === user[UID]) {
-        if (!user.isMember) {
-          throw new functions.https.HttpsError(
+    const applyFilters = (user: User) => {
+      if (!context.auth) {
+        throw new https.HttpsError(
+          'permission-denied',
+          JSON.stringify({
+            status: 403,
+            message: 'user is not a member.'
+          })
+        )
+      }
+      if (context.auth.uid === user.uid) {
+        if (!calc(user).isAMember) {
+          throw new https.HttpsError(
             'permission-denied',
             JSON.stringify({
               status: 403,
@@ -62,9 +71,12 @@ module.exports = admin => {
         }
         return user
       }
-      const filteredUser = {}
+      const filteredUser: {
+        [key: string]: any
+      } = {}
+
       const { visibility = {} } = user
-      _.forEach(user, (value, key) => {
+      _.forEach(user, (value: any, key: string) => {
         const currVisibility = visibility[key] || defaultVisibility[key]
 
         switch (currVisibility) {
@@ -79,18 +91,18 @@ module.exports = admin => {
       return filteredUser
     }
 
-    const usersCollection = await firestore.collection('users').get()
-    let users = []
-    usersCollection.forEach(userDoc => {
+    const usersCollection: FirebaseFirestore.QuerySnapshot = await firestore.collection('users').get()
+    let users: any[] = []
+    usersCollection.forEach((userDoc: FirebaseFirestore.QueryDocumentSnapshot) => {
       const user = userDoc.data()
-      user[UID] = userDoc.id
-      user[IS_MEMBER] = isMember(user)
       users.push(user)
     })
 
     users = _.chain(users)
+      .filter((user: User) => {
+        return calc(user).isAMember
+      })
       .map(applyFilters)
-      .filter(user => user[IS_MEMBER])
       .value()
     return users
   }
