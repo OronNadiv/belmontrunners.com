@@ -1,27 +1,23 @@
-const { PHOTO_URL } = require('./fields')
-const Promise = require('bluebird')
+import * as Admin from 'firebase-admin'
 
-module.exports = admin => {
+const BPromise = require('bluebird')
+
+export default (admin: Admin.app.App) => {
   const auth = admin.auth()
 
-  const listAllUsers = async nextPageToken => {
+  const listAllUsers = async (nextPageToken?: string) => {
     // List batch of users, 1000 at a time.
     const listUsersResult = await auth.listUsers(1000, nextPageToken)
-    await Promise.each(listUsersResult.users, async userRecord => {
+    await BPromise.each(listUsersResult.users, async (userRecord: Admin.auth.UserRecord) => {
       try {
-        const { uid, providerData, photoURL } = userRecord.toJSON()
-        const foundProviderData = providerData.find(({ photoURL }) => {
+        const foundProviderData = userRecord.providerData.find(({ photoURL }) => {
           return Boolean(photoURL)
         })
         if (foundProviderData) {
-          console.log(
-            'uid:',
-            uid,
-            'photoURL:',
-            photoURL,
-            'foundProviderData.photoURL:',
-            foundProviderData
-          )
+          console.log(`uid: ${userRecord.uid}
+photoURL: ${userRecord.photoURL}
+foundProviderData.photoURL: ${foundProviderData.photoURL}
+`)
         }
       } catch (err) {
         console.error(err)
