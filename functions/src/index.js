@@ -10,7 +10,6 @@ const functions = require('firebase-functions')
 const admin = require('firebase-admin')
 admin.initializeApp()
 const firestore = admin.firestore()
-// const generateThumbnail = require('./generateThumbnail')(admin)
 
 const apiKey = functions.config().mailchimp.apikey
 
@@ -25,12 +24,7 @@ const users2Contacts = Users2Contacts(admin)
 const stripe = require('./stripe')
 const purgeUsersUnder13 = require('./purgeUsersUnder13')(admin)
 const Promise = require('bluebird')
-const { EMAIL, UID } = require('./fields')
-
-// exports.generateThumbnailHTTP = functions
-//   .runWith({ timeoutSeconds: 120, memory: '1GB' })
-//   .https
-//   .onCall(generateThumbnail)
+const { EMAIL } = require('./fields')
 
 const auth2UsersExec = async () => {
   try {
