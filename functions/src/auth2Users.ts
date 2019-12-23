@@ -3,7 +3,7 @@ import { UserRecord } from 'firebase-functions/lib/providers/auth'
 import { User } from './User'
 
 const moment = require('moment')
-const Promise = require('bluebird')
+const BPromise = require('bluebird')
 const gravatar = require('gravatar')
 const rp = require('request-promise')
 
@@ -14,7 +14,7 @@ export default (admin: Admin.app.App) => {
   const listAllUsers = async (nextPageToken?: string) => {
     // List batch of users, 1000 at a time.
     const listUsersResult = await auth.listUsers(1000, nextPageToken)
-    await Promise.each(listUsersResult.users, async (userRecord: UserRecord) => {
+    await BPromise.each(listUsersResult.users, async (userRecord: UserRecord) => {
       try {
         const {
           uid,

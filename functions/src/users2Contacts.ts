@@ -7,14 +7,14 @@ const {
   UID
 } = require('./fields')
 
-const BPPromise = require('bluebird')
+const BPromise = require('bluebird')
 const normalizeEmail = require('normalize-email')
 const _ = require('underscore')
 
 export default (admin: Admin.app.App) => {
   const firestore: FirebaseFirestore.Firestore = admin.firestore()
   return async () => {
-    const res = await BPPromise.props({
+    const res = await BPromise.props({
       usersCollection: firestore.collection('users').get(),
       contactsDoc: firestore.doc('subscribers/items').get()
     })

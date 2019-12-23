@@ -3,7 +3,7 @@ import * as Admin from 'firebase-admin'
 
 const { parseFullName } = require('parse-full-name')
 const rp = require('request-promise')
-const BBPromise = require('bluebird')
+const BPromise = require('bluebird')
 const md5 = require('md5')
 
 interface MailChimpContactMergeFields {
@@ -45,7 +45,7 @@ export default (admin: Admin.app.App, apiKey: string) => {
       }
       return mailChimpContact
     })
-    await BBPromise.each(body, async (mailChimpContact: MailChimpContact) => {
+    await BPromise.each(body, async (mailChimpContact: MailChimpContact) => {
       try {
         await rp({
           method: 'PUT',
