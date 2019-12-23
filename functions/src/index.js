@@ -4,6 +4,8 @@ import Contacts2MailChimp from './contacts2MailChimp'
 import DeleteUser from './deleteUser'
 import GenerateICal from './GenerateICal'
 import GetMembers from './getMembers'
+import PurgeUsersUnder13 from './purgeUsersUnder13'
+import Stripe from './stripe'
 import Users2Contacts from './users2Contacts'
 
 const functions = require('firebase-functions')
@@ -19,10 +21,16 @@ const contacts2MailChimp = Contacts2MailChimp(admin, apiKey)
 const deleteUser = DeleteUser(admin, apiKey)
 const generateICal = GenerateICal()
 const getMembers = GetMembers(admin)
+const purgeUsersUnder13 = PurgeUsersUnder13(admin, apiKey, false)
 const users2Contacts = Users2Contacts(admin)
 
-const stripe = require('./stripe')
-const purgeUsersUnder13 = require('./purgeUsersUnder13')(admin)
+const {
+  membership_fee_in_cents,
+  secret_keys: { live, test }
+} = functions.config().stripe
+
+const stripe = Stripe({ membershipFeeInCents: membership_fee_in_cents, secretKeys: { live, test } })
+
 const Promise = require('bluebird')
 const { EMAIL } = require('./fields')
 
