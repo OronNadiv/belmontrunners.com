@@ -1,8 +1,10 @@
 import AddContact from './addContact'
 import Auth2Users from './auth2Users'
 import Contacts2MailChimp from './contacts2MailChimp'
+import DeleteUser from './deleteUser'
 import GetMembers from './getMembers'
 import Users2Contacts from './users2Contacts'
+
 const functions = require('firebase-functions')
 const admin = require('firebase-admin')
 admin.initializeApp()
@@ -14,12 +16,12 @@ const apiKey = functions.config().mailchimp.apikey
 const addContact = AddContact(admin)
 const auth2Users = Auth2Users(admin)
 const contacts2MailChimp = Contacts2MailChimp(admin, apiKey)
+const deleteUser = DeleteUser(admin, apiKey)
 const getMembers = GetMembers(admin)
 const users2Contacts = Users2Contacts(admin)
 
 const generateICal = require('./generateICal')(admin)
 const stripe = require('./stripe')
-const deleteUser = require('./deleteUser')(admin)
 const purgeUsersUnder13 = require('./purgeUsersUnder13')(admin)
 const Promise = require('bluebird')
 const { EMAIL, UID } = require('./fields')
@@ -114,13 +116,13 @@ exports.getMembers = functions
 exports.deleteUser = functions
   .runWith({ timeoutSeconds: 30, memory: '512MB' })
   .https.onCall(async (data, context) => {
-    if (!context || !context.auth || !context.auth[UID]) {
+    if (!context || !context.auth || !context.auth.uid) {
       throw new functions.https.HttpsError(
         'unauthenticated',
         'unauthenticated.'
       )
     }
-    const currentUID = context.auth[UID]
+    const currentUID = context.auth.uid
     const targetUID = data.uid
     let targetEmail
     if (targetUID !== currentUID) {
@@ -143,5 +145,5 @@ exports.deleteUser = functions
     } else {
       targetEmail = context.auth.token[EMAIL]
     }
-    await deleteUser({ [UID]: targetUID, [EMAIL]: targetEmail })
+    await deleteUser({ uid: targetUID, email: targetEmail })
   })
