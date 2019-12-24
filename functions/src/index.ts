@@ -27,7 +27,7 @@ const deleteUserImpl = DeleteUser(admin, apiKey)
 const generateICal = GenerateICal()
 const getMembersImpl = GetMembers(admin)
 const purgeUsersUnder13 = PurgeUsersUnder13(admin, apiKey, false)
-const stripeImpl = Stripe({ membershipFeeInCents: membership_fee_in_cents, secretKeys: { live, test } })
+const stripeImpl = Stripe(admin, { membershipFeeInCents: membership_fee_in_cents, secretKeys: { live, test } })
 const users2Contacts = Users2Contacts(admin)
 
 const Promise = require('bluebird')

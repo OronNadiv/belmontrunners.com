@@ -7,13 +7,11 @@ import './Stripe.scss'
 import * as PropTypes from 'prop-types'
 import LoggedInState from '../../components/HOC/LoggedInState'
 import moment from 'moment'
-import Promise from 'bluebird'
 import { ROOT } from '../../urls'
 import { connect } from 'react-redux'
 import {
   DATE_OF_BIRTH,
   MEMBERSHIP_EXPIRES_AT,
-  NOT_INTERESTED_IN_BECOMING_A_MEMBER
 } from '../../fields'
 import * as Sentry from '@sentry/browser'
 import { withRouter } from 'react-router-dom'
@@ -90,57 +88,6 @@ function SignUpStepPayment({
 
           const stripeConfirmationId = response.data.id
           setConfirmationNumber(stripeConfirmationId)
-
-          const transactionsRef = firebase.firestore().doc(
-            `users/${uid}/transactions/${moment()
-              .utc()
-              .format()}`
-          )
-          const transactionsLastRef = firebase
-            .firestore()
-            .doc(`users/${uid}/transactions/latest`)
-
-          let newMembershipExpiresAt
-          const yearFromNow = moment().add(1, 'year')
-          if (membershipExpiresAt) {
-            const membershipExpiresAtPlusOneYear = moment(
-              membershipExpiresAt
-            ).add(1, 'year')
-            if (membershipExpiresAtPlusOneYear.isBefore(yearFromNow)) {
-              newMembershipExpiresAt = yearFromNow
-            } else {
-              newMembershipExpiresAt = membershipExpiresAtPlusOneYear
-            }
-          } else {
-            newMembershipExpiresAt = yearFromNow
-          }
-
-          const values = {
-            // stripeResponse: JSON.stringify(stripeResponse),
-            stripeResponse,
-            paidAt: moment()
-              .utc()
-              .format(),
-            paidAmount: totalAmount,
-            confirmationNumber: stripeConfirmationId
-          }
-          await Promise.all([
-            transactionsRef.set(values),
-            transactionsLastRef.set(values)
-          ])
-          try {
-            await updateUserData(
-              {
-                [NOT_INTERESTED_IN_BECOMING_A_MEMBER]: false,
-                [MEMBERSHIP_EXPIRES_AT]: newMembershipExpiresAt.utc().format()
-              },
-              { merge: true }
-            )
-          } catch (error) {
-            Sentry.captureException(error)
-            console.error('failed to update user data.', error)
-            // note: update of userData failed, everything else complete successfully.
-          }
         } catch (error) {
           console.warn('Error from stripe.  error:', error)
           if (error && error.message) {
