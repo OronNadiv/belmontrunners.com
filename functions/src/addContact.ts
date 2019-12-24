@@ -1,12 +1,9 @@
 import Contact from './Contact'
 import * as Admin from 'firebase-admin'
 import { https } from 'firebase-functions'
+import { EMAIL, SUBSCRIBERS_ARRAY_KEY } from './fields'
 
 const moment = require('moment')
-const {
-  EMAIL,
-  SUBSCRIBERS_ARRAY_KEY
-} = require('./fields')
 const _ = require('underscore')
 
 export default (admin: Admin.app.App) => {

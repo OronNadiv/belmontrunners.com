@@ -2,10 +2,7 @@ import { https } from 'firebase-functions'
 import * as Admin from 'firebase-admin'
 import { User, Visibility } from './User'
 import calc from './membershipUtils'
-
-const _ = require('underscore')
-
-const {
+import {
   ADDRESS1,
   ADDRESS2,
   CITY,
@@ -21,7 +18,9 @@ const {
   STATE,
   UID,
   ZIP
-} = require('./fields')
+} from './fields'
+
+const _ = require('underscore')
 
 const defaultVisibility: Visibility = {
   [UID]: MEMBERS,

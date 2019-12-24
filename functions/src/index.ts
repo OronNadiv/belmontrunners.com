@@ -2,13 +2,14 @@ import AddContact from './addContact'
 import Auth2Users from './auth2Users'
 import Contacts2MailChimp from './contacts2MailChimp'
 import DeleteUser from './deleteUser'
-import GenerateICal from './GenerateICal'
+import GenerateICal from './generateICal'
 import GetMembers from './getMembers'
 import PurgeUsersUnder13 from './purgeUsersUnder13'
 import Stripe from './stripe'
 import Users2Contacts from './users2Contacts'
 import * as functions from 'firebase-functions'
 import * as Admin from 'firebase-admin'
+import { EMAIL } from './fields'
 
 const admin: Admin.app.App = Admin.initializeApp()
 const firestore = admin.firestore()
@@ -19,18 +20,17 @@ const {
   secret_keys: { live, test }
 } = functions.config().stripe
 
-const addContact = AddContact(admin)
+const addContactImpl = AddContact(admin)
 const auth2Users = Auth2Users(admin)
 const contacts2MailChimp = Contacts2MailChimp(admin, apiKey)
-const deleteUser = DeleteUser(admin, apiKey)
+const deleteUserImpl = DeleteUser(admin, apiKey)
 const generateICal = GenerateICal()
-const getMembers = GetMembers(admin)
+const getMembersImpl = GetMembers(admin)
 const purgeUsersUnder13 = PurgeUsersUnder13(admin, apiKey, false)
-const stripe = Stripe({ membershipFeeInCents: membership_fee_in_cents, secretKeys: { live, test } })
+const stripeImpl = Stripe({ membershipFeeInCents: membership_fee_in_cents, secretKeys: { live, test } })
 const users2Contacts = Users2Contacts(admin)
 
 const Promise = require('bluebird')
-const { EMAIL } = require('./fields')
 
 const auth2UsersExec = async () => {
   try {
@@ -44,15 +44,15 @@ const auth2UsersExec = async () => {
   }
 }
 
-exports.purgeUsersUnder13CronJob = functions.pubsub
+export const purgeUsersUnder13CronJob = functions.pubsub
   .schedule('10 */6 * * *')
   .onRun(async () => await purgeUsersUnder13())
-exports.auth2UsersCronJob = functions.pubsub
+export const auth2UsersCronJob = functions.pubsub
   .schedule('20 */6 * * *')
   .onRun(async () => await auth2UsersExec)
-exports.auth2UsersOnCreate = functions.auth.user().onCreate(auth2UsersExec)
+export const auth2UsersOnCreate = functions.auth.user().onCreate(auth2UsersExec)
 
-exports.users2ContactsCronJob = functions.pubsub
+export const users2ContactsCronJob = functions.pubsub
   .schedule('30 */6 * * *')
   .onRun(async () => {
     try {
@@ -63,7 +63,7 @@ exports.users2ContactsCronJob = functions.pubsub
     }
   })
 
-exports.contacts2MailChimpCronJob = functions
+export const contacts2MailChimpCronJob = functions
   .runWith({ timeoutSeconds: 180 })
   .pubsub.schedule('40 */6 * * *')
   .onRun(async () => {
@@ -78,7 +78,7 @@ exports.contacts2MailChimpCronJob = functions
     }
   })
 
-exports.ical = functions
+export const ical = functions
   .runWith({ memory: '512MB' })
   .https.onRequest(async (req: functions.https.Request, res: functions.Response) => {
     try {
@@ -104,17 +104,17 @@ exports.ical = functions
     }
   })
 
-exports.stripe = functions.runWith({ memory: '512MB' }).https.onCall(stripe)
+export const stripe = functions.runWith({ memory: '512MB' }).https.onCall(stripeImpl)
 
-exports.addContact = functions
+export const addContact = functions
   .runWith({ memory: '512MB' })
-  .https.onCall(addContact)
+  .https.onCall(addContactImpl)
 
-exports.getMembers = functions
+export const getMembers = functions
   .runWith({ timeoutSeconds: 30, memory: '512MB' })
-  .https.onCall(getMembers)
+  .https.onCall(getMembersImpl)
 
-exports.deleteUser = functions
+export const deleteUser = functions
   .runWith({ timeoutSeconds: 30, memory: '512MB' })
   .https.onCall(async (data, context) => {
     if (!context || !context.auth || !context.auth.uid) {
@@ -146,5 +146,5 @@ exports.deleteUser = functions
     } else {
       targetEmail = context.auth.token[EMAIL]
     }
-    await deleteUser({ uid: targetUID, email: targetEmail })
+    await deleteUserImpl({ uid: targetUID, email: targetEmail })
   })

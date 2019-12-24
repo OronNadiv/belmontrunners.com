@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import * as Admin from 'firebase-admin'
-import GetPhotoUrl from './getPhotoUrl'
+import GetPhotoURL from './getPhotoURL'
 
 const serviceAccount = require('../serviceAccountKey.json')
 
@@ -11,7 +11,7 @@ const admin: Admin.app.App = Admin.initializeApp({
 })
 
 
-GetPhotoUrl(admin)()
+GetPhotoURL(admin)()
   .then((res) => {
     console.info('GetPhotoUrl:', res)
     // const copyAuthValues = require('./setDefaultPhotoURL')

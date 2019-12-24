@@ -1,7 +1,7 @@
 import * as Admin from 'firebase-admin'
 import Contact from './Contact'
+import { ARRAY_KEY } from './fields'
 
-const { ARRAY_KEY } = require('./fields')
 const { reject } = require('underscore')
 const rp = require('request-promise')
 const md5 = require('md5')
@@ -25,14 +25,12 @@ export default (admin: Admin.app.App, apiKey: string) => {
 
     const deleteFromUsers = async () => {
       console.info(`deleteFromUsers called.  uid: ${uid}`)
-
       await firestore.doc(`users/${uid}`).delete()
       console.info('deleteFromUsers complete successfully.')
     }
 
     const deleteFromContacts = async () => {
       console.info(`deleteFromContacts called.  uid: ${uid}`)
-
       const contactsData = await contactsDoc.get()
       const contacts = contactsData.data()
       if (contacts && contacts[ARRAY_KEY]) {
@@ -64,11 +62,9 @@ export default (admin: Admin.app.App, apiKey: string) => {
       }
     }
 
-    return async () => {
-      await deleteFromUsers()
-      await deleteFromContacts()
-      await deleteFromAuth()
-      await deleteFromMailChimp()
-    }
+    await deleteFromUsers()
+    await deleteFromContacts()
+    await deleteFromAuth()
+    await deleteFromMailChimp()
   }
 }

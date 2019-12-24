@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import GenerateICal from './generateIcal'
+import GenerateICal from './generateICal'
 
 GenerateICal()()
   .then((res) => {

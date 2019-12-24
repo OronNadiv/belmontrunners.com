@@ -2,10 +2,7 @@ import Contact from './Contact'
 import * as Admin from 'firebase-admin'
 import { User } from './User'
 import calc from './membershipUtils'
-const {
-  ARRAY_KEY,
-  UID
-} = require('./fields')
+import { ARRAY_KEY, UID } from './fields'
 
 const BPromise = require('bluebird')
 const normalizeEmail = require('normalize-email')
