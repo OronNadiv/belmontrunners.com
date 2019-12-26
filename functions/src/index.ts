@@ -5,6 +5,7 @@ import DeleteUser from './deleteUser'
 import GenerateICal from './generateICal'
 import GetMembers from './getMembers'
 import PurgeUsersUnder13 from './purgeUsersUnder13'
+import SendMembershipRenewalEmails, { OutgoingEmailsConfig } from './sendMembershipRenewalEmails'
 import Stripe from './stripe'
 import Users2Contacts from './users2Contacts'
 import * as functions from 'firebase-functions'
@@ -15,6 +16,8 @@ const admin: Admin.app.App = Admin.initializeApp()
 const firestore = admin.firestore()
 
 const apiKey = functions.config().mailchimp.apikey
+const outgoingEmailsConfig: OutgoingEmailsConfig = functions.config().outgoing_emails
+
 const {
   membership_fee_in_cents,
   secret_keys: { live, test }
@@ -27,6 +30,7 @@ const deleteUserImpl = DeleteUser(admin, apiKey)
 const generateICal = GenerateICal()
 const getMembersImpl = GetMembers(admin)
 const purgeUsersUnder13 = PurgeUsersUnder13(admin, apiKey, false)
+const sendMembershipRenewalEmailsImpl = SendMembershipRenewalEmails(admin, outgoingEmailsConfig)
 const stripeImpl = Stripe(admin, { membershipFeeInCents: membership_fee_in_cents, secretKeys: { live, test } })
 const users2Contacts = Users2Contacts(admin)
 
@@ -44,6 +48,9 @@ const auth2UsersExec = async () => {
   }
 }
 
+export const sendMembershipRenewalEmails = functions.pubsub
+  .schedule('0  8 * * *') // default TZ is America/Los_Angeles
+  .onRun(async () => await sendMembershipRenewalEmailsImpl())
 export const purgeUsersUnder13CronJob = functions.pubsub
   .schedule('10 */6 * * *')
   .onRun(async () => await purgeUsersUnder13())
