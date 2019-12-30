@@ -52,9 +52,10 @@ import { connect } from 'react-redux'
 import { calc, IS_A_MEMBER } from '../utilities/membershipUtils'
 import { UID } from '../fields'
 import firebase from 'firebase/app'
-import { ICurrentUserStore } from "../reducers/ICurrentUserStore";
+import { CurrentUserStore } from "../entities/User";
 import { compose } from 'underscore'
-import { IUserData } from "../reducers/IUserData";
+import { User } from "../entities/User";
+import { auth } from '../firebase'
 
 const TOOLBAR_HEIGHT = 72
 const DRAWER_WIDTH = 240
@@ -312,7 +313,7 @@ function Header (props: IHeaderProps) {
                 <Link to={ROOT}
                       onClick={() => {
                         handleDrawerClose()
-                        firebase.auth().signOut()
+                        auth.signOut()
                       }}>
                   <ListItem button>
                     <ListItemIcon><SignOutIcon color='primary' /></ListItemIcon>
@@ -410,11 +411,11 @@ Header.propTypes = {
   isMember: PropTypes.bool.isRequired
 }
 
-const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, currentUser, permissions, userData } }: ICurrentUserStore) => {
+const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, currentUser, permissions, userData } }: CurrentUserStore) => {
   return {
     allowUsersPage: !!currentUser && (permissions.usersRead[currentUser[UID]] || permissions.usersWrite[currentUser[UID]]),
     allowContactsPage: !!currentUser && (permissions.contactsRead[currentUser[UID]] || permissions.contactsWrite[currentUser[UID]]),
-    isMember: userData && calc(userData.toJS() as IUserData)[IS_A_MEMBER],
+    isMember: userData && calc(userData.toJS() as User)[IS_A_MEMBER],
     isCurrentUserLoaded,
     currentUser
   }

@@ -1,5 +1,4 @@
-import 'firebase/auth'
-import firebase from 'firebase/app'
+import { auth } from '../../firebase'
 import React, { Component } from 'react'
 import queryString from 'query-string'
 import * as PropTypes from 'prop-types'
@@ -58,7 +57,7 @@ class Complete extends Component {
     const { mode, oobCode } = query
 
     try {
-      const info = await firebase.auth().checkActionCode(oobCode)
+      const info = await auth.checkActionCode(oobCode)
       let redirect
       if (mode) {
         redirect = (

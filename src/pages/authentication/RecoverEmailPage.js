@@ -1,5 +1,3 @@
-// import 'firebase/auth'
-import firebase from 'firebase/app'
 import React, { Component } from 'react'
 import * as PropTypes from 'prop-types'
 import {
@@ -19,6 +17,7 @@ import {
   DialogTitle
 } from '@material-ui/core'
 import * as Sentry from '@sentry/browser'
+import { auth } from '../../firebase'
 
 const STATE_CLOSE = 'close'
 const STATE_ERROR_MESSAGE = 'errorMessage'
@@ -74,10 +73,10 @@ class RecoverEmailPage extends Component {
 
     console.log('calling applyActionCode')
     try {
-      await firebase.auth().applyActionCode(oobCode)
+      await auth.applyActionCode(oobCode)
       console.log('calling sendPasswordResetEmail')
       try {
-        await firebase.auth().sendPasswordResetEmail(restoredEmail)
+        await auth.sendPasswordResetEmail(restoredEmail)
         this.setState({
           [STATE_IS_SUCCESS]: true,
           [STATE_ERROR_MESSAGE]: ''

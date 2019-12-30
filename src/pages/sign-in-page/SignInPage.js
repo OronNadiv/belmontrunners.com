@@ -1,5 +1,4 @@
-import 'firebase/auth'
-import firebase from 'firebase/app'
+import { auth } from '../../firebase'
 import * as PropTypes from 'prop-types'
 import React, { useEffect, useState } from 'react'
 import isEmailComponent from 'isemail'
@@ -75,16 +74,14 @@ function SignInPage({ history, location, currentUser }) {
     let promise
     switch (providerName.toLowerCase()) {
       // case 'facebook':
-      //   promise = firebase.auth().signInWithPopup(providerFacebook)
+      //   promise = auth.signInWithPopup(providerFacebook)
       //   break
       // case 'google':
-      //   promise = firebase.auth().signInWithPopup(providerGoogle)
+      //   promise = auth.signInWithPopup(providerGoogle)
       //   break
       case 'email':
       default:
-        promise = firebase
-          .auth()
-          .signInWithEmailAndPassword(params[EMAIL], params[PASSWORD])
+        promise = auth.signInWithEmailAndPassword(params[EMAIL], params[PASSWORD])
         break
     }
 

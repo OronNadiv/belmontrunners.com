@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import MUIDataTable from "mui-datatables"
+import MUIDataTable from 'mui-datatables'
 import firebase from 'firebase/app'
 import DeleteIcon from '@material-ui/icons/Delete'
 import * as PropTypes from 'prop-types'
@@ -21,27 +21,27 @@ import {
   STATE,
   UID,
   ZIP
-} from "../../fields";
-import moment from "moment";
-import LoggedInState from "../../components/HOC/LoggedInState";
+} from '../../fields'
+import moment from 'moment'
+import LoggedInState from '../../components/HOC/LoggedInState'
 import { goToTop } from 'react-scrollable-anchor'
 import googleLibPhoneNumber from 'google-libphonenumber'
 import _, { compose } from 'underscore'
 import { connect } from 'react-redux'
-import { ICurrentUserStore } from "../../reducers/ICurrentUserStore";
 import { Avatar, Checkbox, IconButton } from '@material-ui/core'
 import * as Sentry from '@sentry/browser'
-import { IUserData } from "../../reducers/IUserData";
-import { ROOT } from "../../urls";
+import { User, CurrentUserStore } from '../../entities/User'
+import { ROOT } from '../../urls'
 import { Redirect } from 'react-router-dom'
-import ConfirmDeletion from "./ConfirmDeletion";
+import ConfirmDeletion from './ConfirmDeletion'
 import {
   calc,
   IS_A_MEMBER,
   IS_MEMBERSHIP_EXPIRED,
   IS_MEMBERSHIP_EXPIRES_SOON,
   WAS_NEVER_A_MEMBER
-} from "../../utilities/membershipUtils";
+} from '../../utilities/membershipUtils'
+import { firestore } from '../../firebase'
 
 const PNF = googleLibPhoneNumber.PhoneNumberFormat
 const phoneUtil = googleLibPhoneNumber.PhoneNumberUtil.getInstance()
@@ -57,20 +57,20 @@ interface UsersPageProps {
   allowDelete: boolean
 }
 
-interface IUserDataExtended extends IUserData {
+interface UserDataExtended extends User {
   MEMBERSHIP_STATUS: string
 }
 
 
-function UsersPage (props: UsersPageProps) {
+function UsersPage(props: UsersPageProps) {
   const { currentUser, allowDelete, allowRead, allowWrite } = props
 
-  const [rows, setRows] = useState<IUserDataExtended[]>([])
-  const [rowToDelete, setRowToDelete] = useState<IUserDataExtended | undefined>(undefined)
+  const [rows, setRows] = useState<UserDataExtended[]>([])
+  const [rowToDelete, setRowToDelete] = useState<UserDataExtended | undefined>(undefined)
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
 
   const loadMembers = useCallback(async () => {
-    const usersRef = firebase.firestore().collection('users')
+    const usersRef = firestore.collection('users')
     const doc = await usersRef.get()
     // exception will be handled by ErrorBoundary
     let rows: any = []
@@ -84,7 +84,7 @@ function UsersPage (props: UsersPageProps) {
           data[PHONE] = ''
         }
 
-        let userData: IUserDataExtended = {
+        let userData: UserDataExtended = {
           [UID]: doc.id,
           [PHOTO_URL]: data[PHOTO_URL] || '',
           [DISPLAY_NAME]: data[DISPLAY_NAME],
@@ -108,7 +108,7 @@ function UsersPage (props: UsersPageProps) {
         }
 
         try {
-          let calc1 = calc(userData);
+          let calc1 = calc(userData)
           if (calc1[IS_A_MEMBER]) {
             userData[MEMBERSHIP_STATUS] = 'Is a member'
           } else if (calc1[IS_MEMBERSHIP_EXPIRED]) {
@@ -140,13 +140,13 @@ function UsersPage (props: UsersPageProps) {
     allowRead && loadMembers()
   }, [allowRead, loadMembers])
 
-  const handleToggleReceivedShirt = async (userData: IUserDataExtended, isChecked: boolean) => {
-    const userRef = firebase.firestore().doc(`users/${userData[UID]}`)
+  const handleToggleReceivedShirt = async (userData: UserDataExtended, isChecked: boolean) => {
+    const userRef = firestore.doc(`users/${userData[UID]}`)
     await userRef.set({ [DID_RECEIVED_SHIRT]: isChecked }, { merge: true })
   }
 
-  const handleNotInterested = async (userData: IUserDataExtended, isChecked: boolean) => {
-    const userRef = firebase.firestore().doc(`users/${userData[UID]}`)
+  const handleNotInterested = async (userData: UserDataExtended, isChecked: boolean) => {
+    const userRef = firestore.doc(`users/${userData[UID]}`)
     await userRef.set({ [NOT_INTERESTED_IN_BECOMING_A_MEMBER]: isChecked }, { merge: true })
   }
 
@@ -205,7 +205,7 @@ function UsersPage (props: UsersPageProps) {
     },
     {
       name: CITY,
-      label: 'City',
+      label: 'City'
     },
     {
       name: STATE,
@@ -243,7 +243,7 @@ function UsersPage (props: UsersPageProps) {
             if (!tableMeta.rowData) {
               return value
             }
-            const userData = _.findWhere(rows, { [UID]: tableMeta.rowData[0] }) as IUserDataExtended
+            const userData = _.findWhere(rows, { [UID]: tableMeta.rowData[0] }) as UserDataExtended
             if (!userData) {
               return value
             }
@@ -282,7 +282,7 @@ function UsersPage (props: UsersPageProps) {
     {
       name: MEMBERSHIP_STATUS,
       label: 'Membership Status',
-      options: {},
+      options: {}
     },
     {
       name: DID_RECEIVED_SHIRT,
@@ -300,7 +300,7 @@ function UsersPage (props: UsersPageProps) {
               disabled={!allowWrite}
               onChange={async (event, isChecked) => {
                 try {
-                  const userData = _.findWhere(rows, { [UID]: tableMeta.rowData[0] }) as IUserDataExtended
+                  const userData = _.findWhere(rows, { [UID]: tableMeta.rowData[0] }) as UserDataExtended
                   await handleToggleReceivedShirt(userData, isChecked)
                   updateValue(isChecked, undefined, undefined)
                 } catch (error) {
@@ -386,13 +386,13 @@ function UsersPage (props: UsersPageProps) {
       {
         !rows.length ? '' :
           <MUIDataTable
-            title={"Users List"}
+            title={'Users List'}
             data={rows}
             columns={columns}
             options={{
               selectableRows: allowDelete ? 'single' : 'none',
               print: false,
-              responsive: "stacked",
+              responsive: 'stacked',
               rowsPerPage: 100,
               customToolbarSelect: (selectedRows) => {
                 return allowDelete &&
@@ -418,13 +418,18 @@ UsersPage.propTypes = {
   currentUser: PropTypes.object.isRequired
 }
 
-const mapStateToProps = (state: ICurrentUserStore) => {
-  let currentUserElement = state.currentUser.currentUser[UID];
+const mapStateToProps = (state: CurrentUserStore) => {
+  const permissions = state.currentUser.permissions
+  const currentUser = state.currentUser.currentUser
+  if (!currentUser) {
+    throw new Error('missing current user')
+  }
+  const uid = currentUser.uid
   return {
-    allowRead: !!state.currentUser.currentUser && state.currentUser.permissions.usersRead[currentUserElement],
-    allowWrite: !!state.currentUser.currentUser && state.currentUser.permissions.usersWrite[currentUserElement],
-    allowDelete: !!state.currentUser.currentUser && state.currentUser.permissions.usersDelete[currentUserElement],
-    currentUser: state.currentUser.currentUser || {}
+    allowRead: permissions && permissions.usersRead[uid],
+    allowWrite: permissions && permissions.usersWrite[uid],
+    allowDelete: permissions && permissions.usersDelete[uid],
+    currentUser: currentUser || {}
   }
 }
 

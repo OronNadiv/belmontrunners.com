@@ -1,5 +1,4 @@
-import 'firebase/auth'
-import firebase from 'firebase/app'
+import { auth } from '../firebase'
 import {
   Avatar,
   ClickAwayListener,
@@ -30,12 +29,12 @@ import gravatar from 'gravatar'
 import rp from 'request-promise'
 
 function Profile({
-  allowUsersPage,
-  allowContactsPage,
-  isMember,
-  userData,
-  history
-}) {
+                   allowUsersPage,
+                   allowContactsPage,
+                   isMember,
+                   userData,
+                   history
+                 }) {
   const useStyles = makeStyles({
     avatarWrapper: {
       alignItems: 'center',
@@ -178,7 +177,7 @@ function Profile({
                   <Divider />
                   <MenuItem
                     onClick={event =>
-                      firebase.auth().signOut() && handleClose(ROOT)(event)
+                      auth.signOut() && handleClose(ROOT)(event)
                     }
                     className={classes.menuItem}
                   >
@@ -204,8 +203,8 @@ Profile.propTypes = {
 }
 
 const mapStateToProps = ({
-  currentUser: { permissions, currentUser, userData }
-}) => {
+                           currentUser: { permissions, currentUser, userData }
+                         }) => {
   return {
     allowUsersPage:
       !!currentUser &&

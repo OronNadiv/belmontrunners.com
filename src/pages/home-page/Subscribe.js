@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import isEmail from 'isemail'
 import * as Sentry from '@sentry/browser'
-import 'firebase/auth'
-import 'firebase/functions'
+import {functions} from '../../firebase'
 import firebase from 'firebase/app'
 import { IconButton, Snackbar } from '@material-ui/core'
 import { Close as CloseIcon } from '@material-ui/icons'
@@ -60,7 +59,7 @@ My email address is: ${email}`
           },
           json: true
         })
-        const addContact = firebase.functions().httpsCallable('addContact')
+        const addContact = functions.httpsCallable('addContact')
 
         console.log('calling addContact')
         const response = await addContact({ email })

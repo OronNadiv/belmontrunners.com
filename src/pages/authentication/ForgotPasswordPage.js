@@ -1,5 +1,3 @@
-import 'firebase/auth'
-import firebase from 'firebase/app'
 import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
 import isEmailComponent from 'isemail'
@@ -18,6 +16,7 @@ import LoggedInState from '../../components/HOC/LoggedInState'
 import { Field, Form } from 'react-final-form'
 import { EMAIL } from '../../fields'
 import * as Sentry from '@sentry/browser'
+import { auth } from '../../firebase'
 
 const required = value => (value ? undefined : 'Required')
 const isEmail = value =>
@@ -66,7 +65,7 @@ class ForgotPasswordPage extends Component {
       [STATE_IS_SUBMITTING]: true
     })
     try {
-      await firebase.auth().sendPasswordResetEmail(email)
+      await auth.sendPasswordResetEmail(email)
       this.setState({
         [STATE_IS_SUCCESS]: true
       })

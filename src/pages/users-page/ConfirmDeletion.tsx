@@ -1,9 +1,8 @@
-import 'firebase/functions'
 import React from 'react'
 import { Button, Snackbar } from '@material-ui/core'
 import * as PropTypes from 'prop-types'
 import { DISPLAY_NAME, EMAIL, UID } from '../../fields'
-import { IUserData } from "../../reducers/IUserData";
+import { User } from "../../entities/User";
 
 const confirmDeletion = (props: confirmDeletionProps) => {
   const { row, onClose } = props
@@ -35,7 +34,7 @@ const confirmDeletion = (props: confirmDeletionProps) => {
 
 interface confirmDeletionProps {
   onClose: (shouldDelete: boolean) => any,
-  row: IUserData
+  row: User
 }
 
 confirmDeletion.propTypes = {

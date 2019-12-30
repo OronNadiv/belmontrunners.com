@@ -1,5 +1,4 @@
-import 'firebase/functions'
-import firebase from 'firebase/app'
+import {functions} from '../../firebase'
 import React, { useEffect, useState } from 'react'
 import { CardElement, injectStripe } from 'react-stripe-elements'
 import SignUpStepperButton from './SignUpStepperButton'
@@ -81,7 +80,7 @@ function SignUpStepPayment({
           description: `Annual membership for Belmont Runners. name: ${displayName} email: ${email}  uid: ${uid}`,
           amountInCents: totalAmount * 100
         }
-        const stripeFunction = firebase.functions().httpsCallable('stripe')
+        const stripeFunction = functions.httpsCallable('stripe')
 
         try {
           const response = await stripeFunction(body)

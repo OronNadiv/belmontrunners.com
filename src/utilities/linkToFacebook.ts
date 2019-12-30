@@ -1,8 +1,10 @@
-import 'firebase/auth'
 import firebase from 'firebase/app'
-import { PHOTO_URL } from '../fields'
 
-export const linkToFacebook = async (currentUser, userData, updateUserData) => {
+import { PHOTO_URL } from '../fields'
+import { UserOptionalProps } from '../entities/User'
+import { UpdateUserData } from '../reducers/currentUser'
+
+export const linkToFacebook = async (currentUser: firebase.User, userData: UserOptionalProps, updateUserData: UpdateUserData) => {
   try {
     console.log('handleLinkToFacebook called.')
     await currentUser.linkWithPopup(new firebase.auth.FacebookAuthProvider())
@@ -10,12 +12,12 @@ export const linkToFacebook = async (currentUser, userData, updateUserData) => {
     let photoUrl = userData[PHOTO_URL]
     if (!photoUrl) {
       const foundProviderData = currentUser.providerData.find(
-        ({ photoURL }) => {
-          return Boolean(photoURL)
+        (userInfo) => {
+          return userInfo && Boolean(userInfo.photoURL)
         }
       )
-      if (foundProviderData) {
-        photoUrl = foundProviderData[PHOTO_URL]
+      if (foundProviderData && foundProviderData.photoURL) {
+        photoUrl = foundProviderData.photoURL
       }
     }
     // doing this in order to trigger an update.
@@ -26,18 +28,20 @@ export const linkToFacebook = async (currentUser, userData, updateUserData) => {
   }
 }
 
-export const unlinkFromFacebook = async (currentUser, updateUserData) => {
+export const unlinkFromFacebook = async (currentUser: firebase.User, updateUserData: UpdateUserData) => {
   try {
     console.log('UnlinkFromFacebook called.')
     await currentUser.unlink('facebook.com')
-    const foundProviderData = currentUser.providerData.find(({ photoURL }) => {
-      return Boolean(photoURL)
-    })
+    const foundProviderData = currentUser.providerData.find(
+      (userInfo) => {
+        return userInfo && Boolean(userInfo.photoURL)
+      }
+    )
     const photoUrl = foundProviderData ? foundProviderData[PHOTO_URL] : null
     console.log('foundProviderData :', foundProviderData)
     console.log('photoUrl :', photoUrl)
     // doing this in order to trigger an update.
-    await updateUserData({ [PHOTO_URL]: photoUrl }, { merge: true })
+    await updateUserData({ [PHOTO_URL]: null }, { merge: true })
   } catch (err) {
     console.log('err:', err)
     throw new Error('Disconnection failed')

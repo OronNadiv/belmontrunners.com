@@ -1,5 +1,4 @@
-import 'firebase/auth'
-import firebase from 'firebase/app'
+import { auth } from '../../firebase'
 import React, { useEffect, useState } from 'react'
 import { withRouter } from 'react-router-dom'
 import {
@@ -63,7 +62,7 @@ function ResetPasswordPage({ history, location }) {
     setIsSubmitting(true)
 
     try {
-      await firebase.auth().confirmPasswordReset(oobCode, newPassword)
+      await auth.confirmPasswordReset(oobCode, newPassword)
       setIsSuccess(true)
     } catch (error) {
       handleError(error)

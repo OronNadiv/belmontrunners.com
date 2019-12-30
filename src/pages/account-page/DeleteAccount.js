@@ -1,6 +1,4 @@
-import 'firebase/auth'
-import 'firebase/functions'
-import firebase from 'firebase/app'
+import {functions} from '../../firebase'
 import React, { useState } from 'react'
 import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -28,7 +26,7 @@ function DeleteAccount({ currentUser, onSubmitting, isSubmitting, history }) {
     if (shouldDeleteAccount) {
       try {
         onSubmitting(true)
-        await firebase.functions().httpsCallable('deleteUser')({
+        await functions.httpsCallable('deleteUser')({
           [UID]: currentUser[UID]
         })
         onSubmitting(false)

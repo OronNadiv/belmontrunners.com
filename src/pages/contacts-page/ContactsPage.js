@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import firebase from 'firebase/app'
+import { firestore } from '../../firebase'
 import {
   Checkbox,
   Chip,
@@ -78,8 +78,7 @@ function ContactsPage({ currentUser, allowRead }) {
 
     const run = async () => {
       try {
-        const contactsData = await firebase
-          .firestore()
+        const contactsData = await firestore
           .doc('subscribers/items')
           .get()
         const contacts = contactsData.data()[SUBSCRIBERS_ARRAY_KEY]

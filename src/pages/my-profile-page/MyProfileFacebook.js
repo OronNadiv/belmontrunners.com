@@ -1,4 +1,3 @@
-import 'firebase/auth'
 import { Map as IMap } from 'immutable'
 import React, { useState } from 'react'
 import * as PropTypes from 'prop-types'
@@ -21,11 +20,11 @@ import {
 import * as Sentry from '@sentry/browser'
 
 function MyProfileFacebook({
-  updateUserData,
-  currentUser,
-  userData,
-  onSubmitting
-}) {
+                             updateUserData,
+                             currentUser,
+                             userData,
+                             onSubmitting
+                           }) {
   userData = userData.toJS()
 
   const [

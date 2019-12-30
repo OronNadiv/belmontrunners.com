@@ -1,4 +1,4 @@
-import 'firebase/auth'
+import { auth, firestore } from '../../firebase'
 import firebase from 'firebase/app'
 import React, { useEffect, useState } from 'react'
 import { TextField } from 'final-form-material-ui'
@@ -66,30 +66,29 @@ function SignUpStepAuth({ onNextClicked, isLast }) {
     switch (providerName.toLowerCase()) {
       case 'email':
         promise = Promise.resolve(
-          firebase.auth().createUserWithEmailAndPassword(email, password)
+          auth.createUserWithEmailAndPassword(email, password)
         ).tap(user => {
           console.log('calling updateProfile', user)
-          return firebase.auth().currentUser.updateProfile({
+          return auth.currentUser.updateProfile({
             [DISPLAY_NAME]: displayName
           })
         })
         break
       case 'facebook':
-        promise = firebase.auth().signInWithPopup(providerFacebook)
+        promise = auth.signInWithPopup(providerFacebook)
         break
       case 'google':
-        promise = firebase.auth().signInWithPopup(providerGoogle)
+        promise = auth.signInWithPopup(providerGoogle)
         break
       default:
         console.error('missing default provider. returning facebook.')
-        promise = firebase.auth().signInWithPopup(providerFacebook)
+        promise = auth.signInWithPopup(providerFacebook)
         break
     }
     try {
       await promise
-      const userRef = firebase
-        .firestore()
-        .doc(`users/${firebase.auth().currentUser[UID]}`)
+      const userRef = firestore
+        .doc(`users/${auth.currentUser[UID]}`)
       const doc = await userRef.get()
       let values = {}
       if (!doc.exists) {
@@ -107,7 +106,7 @@ function SignUpStepAuth({ onNextClicked, isLast }) {
             .format()
         }
       }
-      const { email, displayName, photoURL } = firebase.auth().currentUser
+      const { email, displayName, photoURL } = auth.currentUser
       values = {
         ...values,
         email,

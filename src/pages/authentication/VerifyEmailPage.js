@@ -1,5 +1,4 @@
-import 'firebase/auth'
-import firebase from 'firebase/app'
+import { auth } from '../../firebase'
 import React, { Component } from 'react'
 import * as PropTypes from 'prop-types'
 import {
@@ -71,7 +70,7 @@ class VerifyEmailPage extends Component {
 
     console.log('calling applyActionCode')
     try {
-      await firebase.auth().applyActionCode(oobCode)
+      await auth.applyActionCode(oobCode)
       this.setState({ [STATE_IS_SUCCESS]: true })
     } catch (error) {
       this.processError(error)

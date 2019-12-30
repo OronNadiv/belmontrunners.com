@@ -1,11 +1,17 @@
-import firebase from 'firebase/app'
-import 'firebase/auth'
-import 'firebase/firestore'
-import Promise from 'bluebird'
 import * as Sentry from '@sentry/browser'
-import moment from 'moment'
 import { fromJS } from 'immutable'
-import { UID } from '../fields'
+import {
+  CurrentUserData,
+  CurrentUserPermissions,
+  CurrentUserStore,
+  User,
+  UserOptionalProps
+} from '../entities/User'
+import { auth, firestore } from '../firebase'
+import { Dispatch, Action } from 'redux'
+
+const Promise = require('bluebird')
+const moment = require('moment')
 
 const PREFIX = 'CURRENT_USER'
 
@@ -16,14 +22,17 @@ export const USER_DATA_UPDATE_REQUEST = `${PREFIX}USER_DATA_UPDATE_REQUEST`
 export const USER_DATA_UPDATE_SUCCESS = `${PREFIX}USER_DATA_UPDATE_SUCCESS`
 export const USER_DATA_UPDATE_FAILURE = `${PREFIX}USER_DATA_UPDATE_FAILURE`
 
-let isRegistered
+let isRegistered: boolean
 
 const fetchUserData = async () => {
-  const userRef = firebase
-    .firestore()
-    .doc(`users/${firebase.auth().currentUser[UID]}`)
+  const currentUser = auth.currentUser
+  if (!currentUser) {
+    throw new Error('current user is null')
+  }
+  const userRef = firestore
+    .doc(`users/${currentUser.uid}`)
   const userDoc = await userRef.get()
-  const userData = userDoc.data() || {}
+  const userData = userDoc.data() || {} as User
   return userData
 }
 
@@ -35,24 +44,19 @@ const fetchPermissions = async () => {
     docContactsRead,
     docContactsWrite
   } = await Promise.props({
-    docUsersRead: firebase
-      .firestore()
+    docUsersRead: firestore
       .doc('permissions/usersRead')
       .get(),
-    docUsersWrite: firebase
-      .firestore()
+    docUsersWrite: firestore
       .doc('permissions/usersWrite')
       .get(),
-    docUsersDelete: firebase
-      .firestore()
+    docUsersDelete: firestore
       .doc('permissions/usersDelete')
       .get(),
-    docContactsRead: firebase
-      .firestore()
+    docContactsRead: firestore
       .doc('permissions/subscribersRead')
       .get(),
-    docContactsWrite: firebase
-      .firestore()
+    docContactsWrite: firestore
       .doc('permissions/subscribersWrite')
       .get()
   })
@@ -66,7 +70,7 @@ const fetchPermissions = async () => {
 }
 
 export const fetchCurrentUser = () => {
-  return (dispatch, getState) => {
+  return (dispatch: Dispatch, getState: () => CurrentUserStore) => {
     if (getState().currentUser.isCurrentUserLoading) {
       return
     }
@@ -75,8 +79,8 @@ export const fetchCurrentUser = () => {
     })
     if (!isRegistered) {
       isRegistered = true
-      firebase.auth().onAuthStateChanged(async () => {
-        if (!firebase.auth().currentUser) {
+      auth.onAuthStateChanged(async () => {
+        if (!auth.currentUser) {
           console.log('current user is null')
           dispatch({
             type: FETCHED_CURRENT_USER,
@@ -93,7 +97,7 @@ export const fetchCurrentUser = () => {
               fetchPermissions(),
               fetchUserData()
             ])
-            const currentUser = firebase.auth().currentUser
+            const currentUser = auth.currentUser
             console.log('permissions', permissions)
             console.log('userData', userData)
             dispatch({
@@ -128,13 +132,13 @@ export const fetchCurrentUser = () => {
               console.error('email verification.', error)
             }
             console.log(
-              'firebase.auth().currentUser:',
-              firebase.auth().currentUser
+              'auth.currentUser:',
+              auth.currentUser
             )
-            const createdAt = moment(creationTime)
+            const createdAt: string = moment(creationTime)
               .utc()
               .format()
-            const lastSignedInAt = moment(lastSignInTime)
+            const lastSignedInAt: string = moment(lastSignInTime)
               .utc()
               .format()
             updateUserData(
@@ -156,22 +160,32 @@ export const fetchCurrentUser = () => {
 }
 
 export const sendEmailVerification = () => {
-  return async (dispatch, getState) => {
-    await getState().currentUser.currentUser.sendEmailVerification()
-    const emailVerificationSentAt = moment()
+  return async (dispatch: Dispatch, getState: () => CurrentUserStore) => {
+    const currentUser = getState().currentUser.currentUser
+    if (!currentUser) {
+      throw new Error('current user is null')
+    }
+    await currentUser.sendEmailVerification()
+    const emailVerificationSentAt: string = moment()
       .utc()
       .format()
+    const values: UserOptionalProps = {
+      emailVerificationSentAt
+    }
     updateUserData(
-      {
-        emailVerificationSentAt
-      },
+      values,
       { merge: true }
     )(dispatch, getState)
   }
 }
 
-export const updateUserData = (values, options = { merge: true }, context) => {
-  return async (dispatch, getState) => {
+export type UpdateUserData = (values: UserOptionalProps, options?: firebase.firestore.SetOptions, context?: any) => any
+export const updateUserData = (values: UserOptionalProps, options = { merge: true }, context?: any) => {
+  return async (dispatch: Dispatch, getState: () => CurrentUserStore) => {
+    const currentUser = auth.currentUser
+    if (!currentUser) {
+      throw new Error('current user is null')
+    }
     if (getState().currentUser.isCurrentUserLoading) {
       return
     }
@@ -179,9 +193,8 @@ export const updateUserData = (values, options = { merge: true }, context) => {
       type: USER_DATA_UPDATE_REQUEST,
       context
     })
-    const userRef = firebase
-      .firestore()
-      .doc(`users/${firebase.auth().currentUser[UID]}`)
+    const userRef = firestore
+      .doc(`users/${currentUser.uid}`)
     try {
       await userRef.set(values, options)
       const userData = await fetchUserData()
@@ -202,12 +215,13 @@ export const updateUserData = (values, options = { merge: true }, context) => {
   }
 }
 
-const initialState = {
+const initialState: CurrentUserData = {
   isCurrentUserLoading: false,
   isCurrentUserLoaded: false,
-  currentUser: null,
+  currentUser: undefined,
   permissions: {
     usersRead: {},
+    contactsWrite: {},
     usersWrite: {},
     usersDelete: {},
     contactsRead: {}
@@ -217,8 +231,17 @@ const initialState = {
   userDataUpdateError: null
 }
 
-const ACTION_HANDLERS = {
-  [FETCHING_CURRENT_USER]: (state = initialState) => {
+interface ActionHandlerDef {
+  [index: string]: (state: CurrentUserData, abc: any) => CurrentUserData
+}
+
+const actionHandler
+  : ActionHandlerDef
+  = {
+  [FETCHING_CURRENT_USER]: (state: CurrentUserData) => {
+    if (!state) {
+      state = initialState
+    }
     state = {
       ...state,
       isCurrentUserLoading: true,
@@ -228,7 +251,14 @@ const ACTION_HANDLERS = {
   },
   [FETCHED_CURRENT_USER]: (
     state = initialState,
-    { data: { permissions, currentUser, userData } }
+    { data: { permissions, currentUser, userData } }:
+      {
+        data: {
+          permissions: CurrentUserPermissions,
+          currentUser: firebase.User,
+          userData: any
+        }
+      }
   ) => {
     state = {
       ...state,
@@ -241,7 +271,9 @@ const ACTION_HANDLERS = {
     return state
   },
 
-  [USER_DATA_UPDATE_REQUEST]: (state = initialState, { context }) => {
+  [USER_DATA_UPDATE_REQUEST]: (
+    state = initialState,
+    { context }: { context?: any }) => {
     state = {
       ...state,
       userDataUpdating: true,
@@ -250,17 +282,17 @@ const ACTION_HANDLERS = {
     }
     return state
   },
-  [USER_DATA_UPDATE_SUCCESS]: (state = initialState, { data, context }) => {
+  [USER_DATA_UPDATE_SUCCESS]: (state = initialState, { data, context }: { data: UserOptionalProps, context?: any }) => {
     state = {
       ...state,
-      userData: fromJS(data),
+      userData: fromJS(data) as User,
       userDataUpdating: false,
       userDataUpdateError: null,
       userDataUpdateContext: context
     }
     return state
   },
-  [USER_DATA_UPDATE_FAILURE]: (state = initialState, { error, context }) => {
+  [USER_DATA_UPDATE_FAILURE]: (state = initialState, { error, context }: { error?: any, context?: any }) => {
     state = {
       ...state,
       userDataUpdating: false,
@@ -271,7 +303,10 @@ const ACTION_HANDLERS = {
   }
 }
 
-export default function reducer(state = initialState, action = {}) {
-  const handler = ACTION_HANDLERS[action.type]
+export default function reducer(state: CurrentUserData, action: Action<string>) {
+  if (!state) {
+    state = initialState
+  }
+  const handler = actionHandler[action.type]
   return handler ? handler(state, action) : state
 }

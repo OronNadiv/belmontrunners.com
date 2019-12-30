@@ -1,5 +1,4 @@
-import 'firebase/functions'
-import firebase from 'firebase/app'
+import {functions} from '../../firebase'
 import React, { useEffect, useState } from 'react'
 import { DISPLAY_NAME, GRAVATAR_URL, PHOTO_URL, UID } from '../../fields'
 import * as PropTypes from 'prop-types'
@@ -48,7 +47,7 @@ function MembersPage({
     ;(async function() {
       try {
         // return setUsers(require('./members.json'))
-        const resp = await firebase.functions().httpsCallable('getMembers')()
+        const resp = await functions.httpsCallable('getMembers')()
         const data = sortBy(resp.data, user =>
           user[UID] === currentUser[UID]
             ? '_'
