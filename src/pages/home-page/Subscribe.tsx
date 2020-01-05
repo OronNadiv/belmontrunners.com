@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import isEmail from 'isemail'
 import * as Sentry from '@sentry/browser'
-import {functions} from '../../firebase'
+import { functions } from '../../firebase'
 import firebase from 'firebase/app'
 import { IconButton, Snackbar } from '@material-ui/core'
 import { Close as CloseIcon } from '@material-ui/icons'
@@ -15,6 +15,8 @@ const Subscribe = () => {
   const [message, setMessage] = useState('')
   const [messageLevel, setMessageLevel] = useState('')
   const [placeholder, setPlaceholder] = useState(DEFAULT_PLACE_HOLDER)
+  const [recaptchaWidgetId, setRecaptchaWidgetId] = useState('')
+  const [recaptchaVerifier, setRecaptchaVerifier] = useState()
   const [captchaFailed, setCaptchaFailed] = useState(false)
   const [notRobot, setNotRobot] = useState(true) // NOTE: setting to true disables the captcha verification.
 
@@ -89,19 +91,19 @@ My email address is: ${email}`
   useEffect(() => {
     const unsubscribe = () => {
       console.log('unsubscribe called.')
-      if (window.recaptchaVerifier) {
-        window.recaptchaVerifier.clear()
-        window.recaptchaVerifier = null
+      if (recaptchaVerifier) {
+        recaptchaVerifier.clear()
+        setRecaptchaVerifier(null)
       }
-      window.recaptchaWidgetId = null
+      setRecaptchaWidgetId('')
     }
-    if (!recaptcha || !!window.recaptchaWidgetId || notRobot) {
+    if (!recaptcha || !!recaptchaWidgetId || notRobot) {
       console.log(
         'Not registering captcha.',
         '!recaptcha:',
         !recaptcha,
         '!!window.recaptchaWidgetId:',
-        !!window.recaptchaWidgetId,
+        !!recaptchaWidgetId,
         'notRobot:',
         notRobot
       )
@@ -111,15 +113,15 @@ My email address is: ${email}`
       'Registering recaptcha.',
       '!recaptcha:',
       !recaptcha,
-      '!!window.recaptchaWidgetId:',
-      !!window.recaptchaWidgetId,
+      '!!recaptchaWidgetId:',
+      !!recaptchaWidgetId,
       'notRobot:',
       notRobot
     )
 
-    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(recaptcha, {
+    const tempRecaptchaVerifier  = new firebase.auth.RecaptchaVerifier(recaptcha, {
       size: 'invisible',
-      callback: response => {
+      callback: (response: any) => {
         console.log('captcha succeeded.', response)
         setNotRobot(true)
       },
@@ -128,11 +130,17 @@ My email address is: ${email}`
         setCaptchaFailed(true)
       }
     })
-    window.recaptchaVerifier.render().then(widgetId => {
-      window.recaptchaWidgetId = widgetId
-    })
+    setRecaptchaVerifier(tempRecaptchaVerifier)
     return unsubscribe
-  }, [recaptcha, notRobot])
+  }, [recaptcha, notRobot, recaptchaWidgetId, recaptchaVerifier])
+
+  useEffect(() => {
+    recaptchaVerifier && recaptchaVerifier.render()
+      .then((widgetId: string) => {
+        setRecaptchaWidgetId(widgetId)
+      })
+  }, [recaptchaVerifier])
+
 
   return (
     <section className="subscribe_area pad_btm">

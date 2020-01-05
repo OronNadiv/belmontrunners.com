@@ -2,7 +2,7 @@ import React from 'react'
 import { GoogleApiWrapper, Map as GoogleMap } from 'google-maps-react'
 import * as PropTypes from 'prop-types'
 
-function Map({ google }) {
+function Map({ google }: { google: any }) {
   return (
     <section className="home_map_area">
       <div id="mapBox2" className="mapBox2">
@@ -18,8 +18,8 @@ function Map({ google }) {
             lat: 37.5214784,
             lng: -122.26
           }}
+
           scrollwheel={false}
-          navigationControl={false}
           mapTypeControl={false}
           scaleControl={false}
           draggable={false}

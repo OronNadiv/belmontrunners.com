@@ -1,6 +1,23 @@
 import React, { useEffect, useState } from 'react'
 import { makeStyles } from '@material-ui/core'
-import ig from 'instagram-scraping'
+
+const ig = require('instagram-scraping')
+
+interface ISource {
+  src: string
+}
+
+interface IMedia {
+  media_id: string
+  thumbnail_resource: ISource[]
+  text: string
+}
+
+interface IFeed {
+  medias: IMedia[]
+}
+
+const initialFeed: IFeed | undefined = undefined
 
 function Footer() {
   const useStyles = makeStyles(() => ({
@@ -10,10 +27,10 @@ function Footer() {
   }))
   const classes = useStyles()
 
-  const [feed, setFeed] = useState(0)
+  const [feed, setFeed] = useState(initialFeed)
 
   useEffect(() => {
-    ig.scrapeUserPage('belmontrunners').then(result => {
+    ig.scrapeUserPage('belmontrunners').then((result: any) => {
       setFeed(result)
     })
   }, [])
@@ -22,7 +39,7 @@ function Footer() {
     if (!feed) {
       return null
     }
-    const getImage = media => {
+    const getImage = (media: IMedia) => {
       return (
         <li key={media.media_id}>
           <a

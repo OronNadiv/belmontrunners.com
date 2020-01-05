@@ -69,7 +69,8 @@ const fetchPermissions = async () => {
   }
 }
 
-export const fetchCurrentUser = () => {
+export type FetchCurrentUser = () => (dispatch: Dispatch, getState: () => CurrentUserStore) => any
+export const fetchCurrentUser: FetchCurrentUser = () => {
   return (dispatch: Dispatch, getState: () => CurrentUserStore) => {
     if (getState().currentUser.isCurrentUserLoading) {
       return

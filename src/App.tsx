@@ -1,9 +1,10 @@
+import firebase from 'firebase/app'
 import React, { useEffect } from 'react'
 import Footer from './components/Footer'
 import './App.css'
 import './scss/style.scss'
 import * as PropTypes from 'prop-types'
-import { fetchCurrentUser as fetchCurrentUserAction } from './reducers/currentUser'
+import { FetchCurrentUser, fetchCurrentUser as fetchCurrentUserAction } from './reducers/currentUser'
 import { connect } from 'react-redux'
 import { Route, Switch } from 'react-router-dom'
 import SignIn from './pages/sign-in-page/SignInPage'
@@ -41,10 +42,17 @@ import usePrevious from './components/usePrevious'
 import { DISPLAY_NAME, EMAIL, PHOTO_URL, UID } from './fields'
 import AccountPage from './pages/account-page/AccountPage'
 import LogRocket from 'logrocket'
-import setupLogRocketReact from 'logrocket-react'
 import FaqPage from './pages/faq-page/FaqPage'
+import { CurrentUserStore } from './entities/User'
 
-function Wrapper(props = {}) {
+const setupLogRocketReact = require('logrocket-react')
+
+interface WrapperProps {
+  inHomePage?: boolean
+  children?: any
+}
+
+function Wrapper(props: WrapperProps = {}) {
   return (
     <>
       <Header />
@@ -64,7 +72,13 @@ Wrapper.propTypes = {
   children: PropTypes.element
 }
 
-function App({ fetchCurrentUser, isCurrentUserLoaded, currentUser }) {
+interface AppProps {
+  fetchCurrentUser: FetchCurrentUser
+  isCurrentUserLoaded: boolean
+  currentUser: firebase.User
+}
+
+function App({ fetchCurrentUser, isCurrentUserLoaded, currentUser }: AppProps) {
   useEffect(() => {
     LogRocket.init('qv4xmc/belmont-runners')
     setupLogRocketReact(LogRocket)
@@ -77,18 +91,20 @@ function App({ fetchCurrentUser, isCurrentUserLoaded, currentUser }) {
     if (prevCurrentUser !== currentUser) {
       console.log('currentUser is different:', currentUser)
       if (currentUser) {
-        LogRocket.identify(currentUser[UID], {
-          name: currentUser[DISPLAY_NAME],
-          email: currentUser[EMAIL]
-        })
+        const userTraits = {
+          email: currentUser.email || '',
+          name: currentUser.displayName || ''
+        }
+        LogRocket.identify(currentUser.uid, userTraits)
 
         LogRocket.getSessionURL(sessionURL => {
           Sentry.configureScope(scope => {
-            scope.setUser({
-              id: currentUser[UID],
-              email: currentUser[EMAIL],
-              displayName: currentUser[DISPLAY_NAME]
-            })
+            const user: Sentry.User = {
+              id: currentUser.uid,
+              email: currentUser.email || undefined,
+              displayName: currentUser.displayName
+            }
+            scope.setUser(user)
             scope.setExtra('sessionURL', sessionURL)
           })
         })
@@ -122,9 +138,15 @@ function App({ fetchCurrentUser, isCurrentUserLoaded, currentUser }) {
           exact
           path={JOIN}
           render={() => (
-            <Wrapper>
-              <SignUpPage />
-            </Wrapper>
+            <>
+              {/*
+  // @ts-ignore */}
+              <Wrapper>
+                {/*
+  // @ts-ignore */}
+                <SignUpPage />
+              </Wrapper>
+            </>
           )}
         />
         <Route
@@ -274,9 +296,7 @@ const mapDispatchToProps = {
   fetchCurrentUser: fetchCurrentUserAction
 }
 
-const mapStateToProps = ({
-  currentUser: { currentUser, isCurrentUserLoaded }
-}) => {
+const mapStateToProps = ({ currentUser: { currentUser, isCurrentUserLoaded } }: CurrentUserStore) => {
   return {
     isCurrentUserLoaded,
     currentUser
@@ -286,4 +306,5 @@ const mapStateToProps = ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
+// @ts-ignore
 )(App)
