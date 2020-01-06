@@ -1,7 +1,19 @@
 import React from 'react'
 import { shuffle } from '../../../utilities/random'
 
-const team = shuffle(require('./teamMembers.json'))
+interface ITeamMember {
+  name: string
+  title: string
+  email: string
+  image: string
+  instagram?: string
+  twitter?: string
+  linkedin?: string
+  facebook?: string
+  website: string
+}
+
+const team : ITeamMember[] = shuffle(require('./teamMembers.json'))
 
 const getTeam = () => {
   return team.map((member, index) => {
