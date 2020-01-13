@@ -22,23 +22,33 @@ import { ROOT } from '../../urls'
 import { Button } from '@material-ui/core'
 import { withRouter } from 'react-router-dom'
 import UpdateUserData from '../../components/HOC/UpdateUserData'
+import { CurrentUserStore, UserOptionalProps } from '../../entities/User'
+
+interface Props {
+  updateUserData: any,
+  currentUser: firebase.User,
+  userData: any,
+  history: any,
+  isSubmitting: boolean,
+  onSubmitting: (arg0: boolean) => void
+}
 
 function MyProfileForm({
-  updateUserData,
-  currentUser,
-  userData,
-  history,
-  isSubmitting,
-  onSubmitting
-}) {
-  userData = userData.toJS()
+                         updateUserData,
+                         currentUser,
+                         userData,
+                         history,
+                         isSubmitting,
+                         onSubmitting
+                       }: Props) {
+  const currentUserData: UserOptionalProps = userData.toJS()
 
-  const handleSubmit = async values => {
-    console.log('submitting values:', JSON.stringify(values, 0, 2))
+  const handleSubmit = async (values: UserOptionalProps) => {
+    console.log('submitting values:', JSON.stringify(values, null, 2))
     try {
       onSubmitting(true)
       await Promise.all([
-        currentUser.updateProfile({ [DISPLAY_NAME]: values[DISPLAY_NAME] }),
+        currentUser.updateProfile({ [DISPLAY_NAME]: values.displayName }),
         updateUserData(values, { merge: true })
       ])
 
@@ -57,7 +67,7 @@ function MyProfileForm({
   }
 
   const initialValues = pick(
-    userData,
+    currentUserData,
     ADDRESS1,
     ADDRESS2,
     CITY,
@@ -70,6 +80,7 @@ function MyProfileForm({
   )
 
   return (
+    // @ts-ignore
     currentUser && (
       <>
         <Form
@@ -77,6 +88,8 @@ function MyProfileForm({
           initialValues={initialValues}
           render={({ handleSubmit, form, values }) => (
             <form onSubmit={handleSubmit} method="POST">
+              {/*
+  // @ts-ignore */}
               <UserDetails values={values} showDisplayName />
               <div className="d-flex justify-content-between my-5">
                 <Button
@@ -113,10 +126,10 @@ MyProfileForm.propTypes = {
   currentUser: PropTypes.object.isRequired,
   userData: PropTypes.object.isRequired,
 
-  // from HOC
+// from HOC
   updateUserData: PropTypes.func.isRequired,
 
-  // from router-dom
+// from router-dom
   history: PropTypes.object.isRequired,
 
   onSubmitting: PropTypes.func.isRequired,
@@ -127,9 +140,10 @@ const mapDispatchToProps = {
   sendEmailVerification: sendEmailVerificationAction
 }
 
-const mapStateToProps = ({ currentUser: { currentUser, userData } }) => {
+const mapStateToProps = ({ currentUser: { currentUser, userData } }: CurrentUserStore) => {
   return {
     currentUser,
+    // @ts-ignore
     userData: userData || new IMap()
   }
 }

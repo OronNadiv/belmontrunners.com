@@ -74,6 +74,7 @@
     "uuid": "^3.3.3"
   },
   "devDependencies": {
+    "@types/gravatar": "^1.8.0",
     "@types/underscore": "^1.9.4",
     "eslint-config-standard": "^14.1.0",
     "eslint-plugin-import": "^2.19.1",

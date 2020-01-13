@@ -14,27 +14,29 @@ import { ACCOUNT, CONTACTS, PROFILE, ROOT, USERS } from '../urls'
 import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import LoggedInState from './HOC/LoggedInState'
-import { DISPLAY_NAME, EMAIL, PHOTO_URL, UID } from '../fields'
 import { Map as IMap } from 'immutable'
 import { makeStyles } from '@material-ui/core/styles'
 import {
   KeyboardArrowDown as ArrowDropDownIcon,
   KeyboardArrowUp as ArrowDropUpIcon
 } from '@material-ui/icons'
+// @ts-ignore
 import initials from 'initials'
 import { withRouter } from 'react-router-dom'
 import { compose } from 'underscore'
 import { calc, IS_A_MEMBER } from '../utilities/membershipUtils'
 import gravatar from 'gravatar'
 import rp from 'request-promise'
+import { CurrentUserStore, UserOptionalProps } from '../entities/User'
 
-function Profile({
-                   allowUsersPage,
-                   allowContactsPage,
-                   isMember,
-                   userData,
-                   history
-                 }) {
+interface Props {
+  allowUsersPage: boolean
+  allowContactsPage: boolean
+  userData: any
+  history: any
+}
+
+function Profile({ allowUsersPage, allowContactsPage, userData, history }: Props) {
   const useStyles = makeStyles({
     avatarWrapper: {
       alignItems: 'center',
@@ -61,19 +63,20 @@ function Profile({
     }
   })
   const classes = useStyles()
-  const anchorRef = React.useRef(null)
+  const anchorRef: any = React.useRef(null)
   const [open, setOpen] = React.useState(false)
   const [isGravatarFetched, setIsGravatarFetched] = useState(false)
   const [gravatarUrl, setGravatarUrl] = useState()
+  const currentUserData: UserOptionalProps = userData.toJS()
 
   useEffect(() => {
     if (!userData || isGravatarFetched) {
       return
     }
     const func = async () => {
-      if (!userData[PHOTO_URL] && !isGravatarFetched) {
-        console.log('userData[EMAIL]:', userData[EMAIL])
-        const uri = gravatar.url(userData[EMAIL], {
+      if (!currentUserData.photoURL && !isGravatarFetched && currentUserData.email) {
+        console.log('userData[EMAIL]:', currentUserData.email)
+        const uri = gravatar.url(currentUserData.email, {
           protocol: 'https',
           default: '404'
         })
@@ -97,7 +100,7 @@ function Profile({
     setOpen(prevOpen => !prevOpen)
   }
 
-  const handleClose = url => event => {
+  const handleClose = (url: string) => (event: any) => {
     if (
       anchorRef.current &&
       event &&
@@ -110,12 +113,11 @@ function Profile({
     setOpen(false)
   }
 
-  userData = userData.toJS()
 
-  if (!userData[PHOTO_URL] && !isGravatarFetched) {
+  if (!currentUserData.photoURL && !isGravatarFetched) {
     return null
   }
-  let avatarUrl = userData[PHOTO_URL] || gravatarUrl
+  let avatarUrl = currentUserData.photoURL || gravatarUrl
   return (
     <>
       <div
@@ -124,7 +126,7 @@ function Profile({
         onClick={handleToggle}
       >
         <Avatar className={classes.avatar} src={avatarUrl}>
-          {!avatarUrl && initials(userData[DISPLAY_NAME])}
+          {!avatarUrl && initials(currentUserData.displayName)}
         </Avatar>
         <div>
           {open ? (
@@ -144,7 +146,7 @@ function Profile({
         {({ TransitionProps }) => (
           <Grow {...TransitionProps} style={{ transformOrigin: 'center top' }}>
             <Paper id="menu-list-grow">
-              <ClickAwayListener onClickAway={handleClose()}>
+              <ClickAwayListener onClickAway={handleClose('')}>
                 <MenuList>
                   <MenuItem
                     onClick={handleClose(PROFILE)}
@@ -202,18 +204,17 @@ Profile.propTypes = {
   isMember: PropTypes.bool.isRequired
 }
 
-const mapStateToProps = ({
-                           currentUser: { permissions, currentUser, userData }
-                         }) => {
+const mapStateToProps = ({ currentUser: { permissions, currentUser, userData } }: CurrentUserStore) => {
   return {
     allowUsersPage:
       !!currentUser &&
-      (!!permissions.usersRead[currentUser[UID]] ||
-        !!permissions.usersWrite[currentUser[UID]]),
+      (!!permissions.usersRead[currentUser.uid] ||
+        !!permissions.usersWrite[currentUser.uid]),
     allowContactsPage:
       !!currentUser &&
-      (!!permissions.contactsRead[currentUser[UID]] ||
-        !!permissions.contactsWrite[currentUser[UID]]),
+      (!!permissions.contactsRead[currentUser.uid] ||
+        !!permissions.contactsWrite[currentUser.uid]),
+    // @ts-ignore
     userData: userData || new IMap(),
     isMember: userData && calc(userData.toJS())[IS_A_MEMBER]
   }

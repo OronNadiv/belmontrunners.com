@@ -17,18 +17,18 @@ import {
 import DatePickerWrapper from './DatePickerWrapper'
 import * as PropTypes from 'prop-types'
 
-const states = require('./states_titlecase.json')
-const required = value => (value ? undefined : 'Required')
-const mustBeNumber = value => (isNaN(value) ? 'Must be a number' : undefined)
+const states: [{ name: string, abbreviation: string }] = require('./states_titlecase.json')
+const required = (value: string) => (value ? undefined : 'Required')
+const mustBeNumber = (value: number) => (isNaN(value) ? 'Must be a number' : undefined)
 const MAX_YEAR = moment().year() - 5
 const MIN_YEAR = moment().year() - 120
-const birthday = value => {
+const birthday = (value: string) => {
   const val = moment(value, 'YYYY-MM-DD')
   return !val.isValid() || val.year() < MIN_YEAR || val.year() > MAX_YEAR
     ? 'Invalid birthday'
     : undefined
 }
-const composeValidators = (...validators) => value =>
+const composeValidators = (...validators: any[]) => (value: any) =>
   validators.reduce((error, validator) => error || validator(value), undefined)
 
 function UserDetails({ showDisplayName = false }) {
@@ -95,6 +95,7 @@ function UserDetails({ showDisplayName = false }) {
           <Field
             style={{ minWidth: 120 }}
             name={STATE}
+            // @ts-ignore
             component={Select}
             validate={required}
             label="State"
@@ -114,6 +115,7 @@ function UserDetails({ showDisplayName = false }) {
           <Field
             style={{ width: 120 }}
             name={GENDER}
+            // @ts-ignore
             component={Select}
             validate={required}
             label="Gender"
@@ -158,13 +160,11 @@ function UserDetails({ showDisplayName = false }) {
             if (!value) {
               return null
             }
-            const res = moment(value, 'YYYY-MM-DD')
-            return res
+            return moment(value, 'YYYY-MM-DD')
           }}
           parse={value => {
             // to json
-            const res = value.format('YYYY-MM-DD')
-            return res
+            return value.format('YYYY-MM-DD')
           }}
           InputLabelProps={{
             shrink: true

@@ -8,6 +8,7 @@ export interface UserOptionalProps {
   address1?: string | null
   address2?: string | null
   city?: string | null
+  email?: string
   state?: string | null
   zip?: string | null
   displayName?: string | null
