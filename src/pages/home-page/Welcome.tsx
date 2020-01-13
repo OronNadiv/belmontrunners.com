@@ -25,7 +25,7 @@ function Welcome() {
               </p>
               <p>
                 We welcome runners of all abilities by hosting training events
-                ranging from 2 miles to 10k and beyond.
+                ranging from 5k to 10k and beyond.
               </p>
               <p>
                 Our events are usually held in Belmont every Saturday morning at
