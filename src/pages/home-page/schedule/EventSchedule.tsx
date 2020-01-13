@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import request from 'request'
 import csv from 'csvtojson'
-import moment from 'moment'
+import moment, { Moment } from 'moment'
 import CalendarSelector from './CalendarSelector'
 import ExpendMoreIcon from '@material-ui/icons/ExpandMore'
 import { IconButton } from '@material-ui/core'
@@ -11,7 +11,7 @@ const CITY_ID = 5392423
 const SPREADSHEET_URL =
   'https://docs.google.com/spreadsheets/d/1FZOB291KWLoutpr0s6VeK5EtvuiQ8uhe497nOmWoqPA/export?format=csv&usp=sharing'
 
-const getMapLink = eventElement => {
+const getMapLink = (eventElement: string) => {
   return (
     <span style={{ paddingRight: '1em' }}>
       <a
@@ -26,7 +26,7 @@ const getMapLink = eventElement => {
   )
 }
 
-const getFacebookEventLink = eventElement => {
+const getFacebookEventLink = (eventElement: string) => {
   return (
     <span>
       <a
@@ -41,8 +41,29 @@ const getFacebookEventLink = eventElement => {
   )
 }
 
+interface Weather {
+  icon: string
+  description: string
+  temp: number
+  wind: number
+}
+
+interface CSVEvent {
+  month: number
+  moment: Moment,
+  'is-special-event': string,
+  subject: string,
+  what: string,
+  where: string,
+  'google-map-id'?: string
+  'facebook-event-id'?: string
+  'is-members-only-event'?: string
+  weather: Weather
+}
+
 function EventSchedule() {
-  const [random, setRandom] = useState(Math.random()) // eslint-disable-line no-unused-vars
+  // eslint-disable-next-line
+  const [random, setRandom] = useState(Math.random())
   const [rawEvents, setRawEvents] = useState([])
   const [rawWeather, setRawWeather] = useState([])
   const [events, setEvents] = useState([])
@@ -64,6 +85,7 @@ function EventSchedule() {
   useEffect(() => {
     console.log('2')
     ;(async function() {
+      // @ts-ignore
       const rawEvents = await csv().fromStream(request.get(SPREADSHEET_URL))
       setRawEvents(rawEvents)
     })()
@@ -75,20 +97,21 @@ function EventSchedule() {
       return
     }
     const events = rawEvents
-      .map(event => {
+      .map((event: CSVEvent) => {
         event.month--
         event.moment = moment(event)
         return event
       })
-      .filter(event => {
+      .filter((event: CSVEvent) => {
         return (
           event.moment.isValid() &&
           event.moment.isAfter(moment().subtract(1, 'day'))
         )
       })
-      .sort((a, b) => {
+      .sort((a: { moment: Moment }, b: { moment: Moment }) => {
         return a.moment.valueOf() - b.moment.valueOf()
       })
+    // @ts-ignore
     setEvents(events)
   }, [rawEvents])
 
@@ -97,11 +120,27 @@ function EventSchedule() {
     if (!events.length) {
       return
     }
-    const filteredEvents = events.filter(event => {
+    const filteredEvents = events.filter((event: { moment: Moment }) => {
       return event.moment.isBefore(moment().add(daysAhead, 'day'))
     })
     setFilteredEvents(filteredEvents)
   }, [events, daysAhead])
+
+  interface RawWeather {
+    dt: number
+    main: {
+      temp: number
+    }
+    weather: [
+      {
+        description: string
+        icon: string
+      }
+    ]
+    wind: {
+      speed: number
+    }
+  }
 
   useEffect(() => {
     console.log(
@@ -113,13 +152,14 @@ function EventSchedule() {
     if (!rawWeather.length || !filteredEvents.length) {
       return
     }
-    filteredEvents.forEach(filteredEvent => {
-      rawWeather.find((currEntry, index) => {
+
+    filteredEvents.forEach((filteredEvent: CSVEvent) => {
+      rawWeather.find((currEntry: RawWeather, index) => {
         const currDT = moment.unix(currEntry.dt)
         const currTemp = currEntry.main.temp
         let nextDT
         let nextTemp
-        const nextEntry = rawWeather[index + 1]
+        const nextEntry: RawWeather = rawWeather[index + 1]
         if (nextEntry) {
           nextDT = moment.unix(nextEntry.dt)
           nextTemp = nextEntry.main.temp
@@ -130,7 +170,7 @@ function EventSchedule() {
         const isBetween = filteredEvent.moment.isBetween(
           currDT,
           nextDT,
-          null,
+          undefined,
           '[)'
         )
         if (isBetween) {
@@ -140,7 +180,7 @@ function EventSchedule() {
             temp:
               currTemp +
               ((nextTemp - currTemp) / (nextDT.unix() - currDT.unix())) *
-                (filteredEvent.moment.unix() - currDT.unix()),
+              (filteredEvent.moment.unix() - currDT.unix()),
             wind: currEntry.wind.speed
           }
           return true
@@ -168,75 +208,79 @@ function EventSchedule() {
               role="tabpanel"
               aria-labelledby="home-tab"
             >
-              {filteredEvents.map((filteredEvent, index) => {
-                return (
-                  <div key={index} className="media">
-                    <div className="d-flex">
-                      <img src="img/schedule/schedule-3.png" alt="" />
-                    </div>
-                    <div className="media-body">
-                      <h5>{filteredEvent.moment.format('MMMM D h:mm a')}</h5>
-                      <h4
-                        className={
-                          filteredEvent['is-special-event'] === 'TRUE'
-                            ? 'special-event'
-                            : undefined
-                        }
-                      >
-                        {filteredEvent.moment.format('dddd')}{' '}
-                        {filteredEvent.subject}
-                      </h4>
-                      <p>What: {filteredEvent.what}</p>
-                      <p>Where: {filteredEvent.where}</p>
-                      {filteredEvent['google-map-id'] ||
-                      filteredEvent['facebook-event-id'] ? (
-                        <div className="d-flex flex-wrap">
-                          {filteredEvent['google-map-id'] &&
-                            getMapLink(filteredEvent['google-map-id'])}
-                          {filteredEvent['facebook-event-id'] &&
-                            getFacebookEventLink(
-                              filteredEvent['facebook-event-id']
-                            )}
+              {
+                filteredEvents.map(
+                  (filteredEvent: CSVEvent, index) => {
+                    return (
+                      <div key={index} className="media">
+                        <div className="d-flex">
+                          <img src="img/schedule/schedule-3.png" alt="" />
                         </div>
-                      ) : (
-                        <span />
-                      )}
-                    </div>
-                    <div>
-                      <div>
-                        {filteredEvent['is-members-only-event'] === 'TRUE' && (
-                          <img
-                            src="img/schedule/members-only-t.png"
-                            alt=""
-                            style={{ width: '5em' }}
-                          />
-                        )}
-                      </div>
-                      <div className="text-center">
-                        {filteredEvent.weather && (
-                          <a
-                            className="flex-d flex-row align-content-center"
-                            target="_blank"
-                            rel="noreferrer noopener"
-                            href={`https://openweathermap.org/city/${CITY_ID}`}
+                        <div className="media-body">
+                          <h5>{filteredEvent.moment.format('MMMM D h:mm a')}</h5>
+                          <h4
+                            className={
+                              filteredEvent['is-special-event'] === 'TRUE'
+                                ? 'special-event'
+                                : undefined
+                            }
                           >
-                            <img
-                              alt="weather icon"
-                              src={`https://openweathermap.org/img/wn/${filteredEvent.weather.icon}.png`}
-                            />
-                            <div className="text-muted">
-                              {filteredEvent.weather.description}
+                            {filteredEvent.moment.format('dddd')}{' '}
+                            {filteredEvent.subject}
+                          </h4>
+                          <p>What: {filteredEvent.what}</p>
+                          <p>Where: {filteredEvent.where}</p>
+                          {filteredEvent['google-map-id'] ||
+                          filteredEvent['facebook-event-id'] ? (
+                            <div className="d-flex flex-wrap">
+                              {filteredEvent['google-map-id'] &&
+                              getMapLink(filteredEvent['google-map-id'])}
+                              {filteredEvent['facebook-event-id'] &&
+                              getFacebookEventLink(
+                                filteredEvent['facebook-event-id']
+                              )}
                             </div>
-                            <div className="weather-temp">
-                              {Math.round(filteredEvent.weather.temp)} °F
-                            </div>
-                          </a>
-                        )}
+                          ) : (
+                            <span />
+                          )}
+                        </div>
+                        <div>
+                          <div>
+                            {filteredEvent['is-members-only-event'] === 'TRUE' && (
+                              <img
+                                src="img/schedule/members-only-t.png"
+                                alt=""
+                                style={{ width: '5em' }}
+                              />
+                            )}
+                          </div>
+                          <div className="text-center">
+                            {filteredEvent.weather && (
+                              <a
+                                className="flex-d flex-row align-content-center"
+                                target="_blank"
+                                rel="noreferrer noopener"
+                                href={`https://openweathermap.org/city/${CITY_ID}`}
+                              >
+                                <img
+                                  alt="weather icon"
+                                  src={`https://openweathermap.org/img/wn/${filteredEvent.weather.icon}.png`}
+                                />
+                                <div className="text-muted">
+                                  {filteredEvent.weather.description}
+                                </div>
+                                <div className="weather-temp">
+                                  {Math.round(filteredEvent.weather.temp)} °F
+                                </div>
+                              </a>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
+                    )
+                  }
                 )
-              })}
+              }
             </div>
           </div>
         </div>

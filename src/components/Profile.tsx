@@ -94,7 +94,7 @@ function Profile({ allowUsersPage, allowContactsPage, userData, history }: Props
     }
 
     func()
-  }, [userData, isGravatarFetched])
+  }, [userData, isGravatarFetched, currentUserData.email, currentUserData.photoURL])
 
   function handleToggle() {
     setOpen(prevOpen => !prevOpen)

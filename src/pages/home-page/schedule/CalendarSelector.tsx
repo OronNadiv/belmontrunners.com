@@ -16,6 +16,7 @@ import GoogleCalendarIcon from './GoogleCalendarIcon'
 import IosIcon from './IosIcon'
 import MicrosoftOutlookIcon from './MicrosoftOutlookIcon'
 import YahooIcon from './YahooIcon'
+// @ts-ignore
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import LinkIcon from './LinkIcon'
 import MacOSIcon from './MacOSIcon'
@@ -32,17 +33,17 @@ const YAHOO = 'YAHOO'
 
 const ICAL_LINK = 'https://www.belmontrunners.com/public/basic.ical'
 
-function CalendarSelector({ fullScreen }) {
+function CalendarSelector({ fullScreen }: { fullScreen?: boolean }) {
   const [anchorEl, setAnchorEl] = useState(null)
   const [showDialog, setShowDialog] = useState(false)
-  const [videoId, setVideoId] = useState(null)
+  const [videoId, setVideoId] = useState('')
   const [copied, setCopied] = useState(false)
 
-  function handleClick(event) {
+  function handleClick(event: any) {
     setAnchorEl(event.currentTarget)
   }
 
-  function handleClose(provider) {
+  function handleClose(provider: any) {
     setAnchorEl(null)
     setShowDialog(true)
     switch (provider) {
