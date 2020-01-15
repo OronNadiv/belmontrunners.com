@@ -1,17 +1,23 @@
 import firebase from 'firebase/app'
 
+export enum VisibilityEnum {
+  ONLY_ME = 'ONLY_ME',
+  MEMBERS = 'MEMBERS'
+}
+
 export interface Visibility {
-  [key: string]: string
+  [key: string]: VisibilityEnum
 }
 
 export interface UserOptionalProps {
   address1?: string | null
   address2?: string | null
   city?: string | null
+  uid?: string
   email?: string
   state?: string | null
   zip?: string | null
-  displayName?: string | null
+  displayName?: string
   photoURL?: string | null
   dateOfBirth?: string | null
   phone?: string | null

@@ -1,5 +1,6 @@
 import * as PropTypes from 'prop-types'
 import React, { useState } from 'react'
+// @ts-ignore
 import initials from 'initials'
 import moment from 'moment'
 import {
@@ -15,7 +16,6 @@ import {
   PHONE,
   PHOTO_URL,
   STATE,
-  UID,
   ZIP
 } from '../../fields'
 import googleLibPhoneNumber from 'google-libphonenumber'
@@ -46,6 +46,8 @@ import { Map as IMap } from 'immutable'
 import UpdateUserData from '../../components/HOC/UpdateUserData'
 import { linkToFacebook } from '../../utilities/linkToFacebook'
 import { findWhere } from 'underscore'
+import { CurrentUserStore, UserOptionalProps, VisibilityEnum } from '../../entities/User'
+import { UpdateUserData as UpdateUserDataFunc } from '../../reducers/currentUser'
 
 const defaultVisibility = {
   [EMAIL]: ONLY_ME,
@@ -58,16 +60,24 @@ const PNF = googleLibPhoneNumber.PhoneNumberFormat
 const phoneUtil = googleLibPhoneNumber.PhoneNumberUtil.getInstance()
 const DRAWER_WIDTH = 270
 
-function UserProfile({ onClose, user, userData, updateUserData, currentUser }) {
-  userData = userData.toJS()
-  const visibility = userData.visibility || {}
+interface Props {
+  onClose: () => void
+  currentUser: firebase.User
+  userData: any
+  user: UserOptionalProps
+  updateUserData: UpdateUserDataFunc
+}
+
+function UserProfile({ onClose, user, userData, updateUserData, currentUser }: Props) {
+  const currentUserData: UserOptionalProps = userData.toJS()
+  const visibility = currentUserData.visibility || {}
   const theme = useTheme()
   const isSmallDevice = useMediaQuery(theme.breakpoints.down('sm'))
 
   const AVATAR_WIDTH = 100
   const AVATAR_HEIGHT = 100
 
-  const drawerPaper = {}
+  const drawerPaper: { width?: string, minWidth?: number } = {}
   isSmallDevice && (drawerPaper.width = '100%')
   !isSmallDevice && (drawerPaper.minWidth = DRAWER_WIDTH)
 
@@ -87,42 +97,48 @@ function UserProfile({ onClose, user, userData, updateUserData, currentUser }) {
   })
   const classes = useStyles()
 
-  const [refs, setRefs] = useState({})
-  const [openMenus, setOpenMenus] = useState({})
+  const [refs, setRefs] = useState()
+  const [openMenus, setOpenMenus] = useState()
   const [errorMessage, setErrorMessage] = useState('')
+  !!refs || setRefs({})
+  !!openMenus || setOpenMenus({})
 
   function getPhone() {
-    if (!user[PHONE]) {
+    if (!user.phone) {
       return
     }
-    const number = phoneUtil.parseAndKeepRawInput(user[PHONE], 'US')
+    const number = phoneUtil.parseAndKeepRawInput(user.phone, 'US')
     return phoneUtil.format(number, PNF.NATIONAL)
   }
 
   function getAddress() {
     if (
-      user[ADDRESS1] ||
-      user[ADDRESS2] ||
-      user[CITY] ||
-      user[STATE] ||
-      user[ZIP]
+      user.address1 ||
+      user.address2 ||
+      user.city ||
+      user.state ||
+      user.zip
     ) {
       return (
         <div>
-          {user[ADDRESS1] && user[ADDRESS1]}
-          {user[ADDRESS1] && <br />}
-          {user[ADDRESS2] && user[ADDRESS2]}
-          {user[ADDRESS2] && <br />}
-          {user[CITY] && `${user[CITY]}, `}
-          {user[STATE] && `${user[STATE]} `}
-          {user[ZIP] && user[ZIP]}
+          {user.address1 && user.address1}
+          {user.address1 && <br />}
+          {user.address2 && user.address2}
+          {user.address2 && <br />}
+          {user.city && `${user.city}, `}
+          {user.state && `${user.state} `}
+          {user.zip && user.zip}
         </div>
       )
     }
     return null
   }
 
-  function getKeyVal(label, value, icon, currVisibility, onVisibilityChanged) {
+  const getKeyVal = (label: string,
+                     icon: any,
+                     currVisibility: VisibilityEnum,
+                     onVisibilityChanged: (arg0: VisibilityEnum) => void,
+                     value?: string | null | JSX.Element) => {
     const handleOpen = () => {
       openMenus[label] = true
       setOpenMenus({ ...openMenus })
@@ -133,7 +149,7 @@ function UserProfile({ onClose, user, userData, updateUserData, currentUser }) {
       setOpenMenus({ ...openMenus })
     }
 
-    const handleRef = ref => {
+    const handleRef = (ref: any) => {
       refs[label] = ref
       setRefs(refs)
     }
@@ -145,7 +161,7 @@ function UserProfile({ onClose, user, userData, updateUserData, currentUser }) {
           {/*<div className='mr-1 text-secondary' style={{ width: 90 }}>{label}:</div>*/}
           <div>{value || 'Not sharing'}</div>
         </div>
-        {currentUser[UID] === user[UID] && (
+        {currentUser.uid === user.uid && (
           <div className="mt-2">
             <small onClick={handleOpen} ref={handleRef}>
               <span className="text-muted">Visible to: </span>
@@ -160,14 +176,14 @@ function UserProfile({ onClose, user, userData, updateUserData, currentUser }) {
         )}
         <Menu
           id="customized-menu"
-          anchorEl={refs[label]}
+          anchorEl={refs && refs[label]}
           keepMounted
-          open={!!openMenus[label]}
+          open={openMenus && !!openMenus[label]}
           onClose={handleClose}
         >
           <MenuItem
             onClick={() => {
-              onVisibilityChanged(ONLY_ME)
+              onVisibilityChanged(VisibilityEnum.ONLY_ME)
               handleClose()
             }}
           >
@@ -178,7 +194,7 @@ function UserProfile({ onClose, user, userData, updateUserData, currentUser }) {
           </MenuItem>
           <MenuItem
             onClick={() => {
-              onVisibilityChanged(MEMBERS)
+              onVisibilityChanged(VisibilityEnum.MEMBERS)
               handleClose()
             }}
           >
@@ -192,9 +208,9 @@ function UserProfile({ onClose, user, userData, updateUserData, currentUser }) {
     )
   }
 
-  function handleVisibilityChanged(keys) {
-    return async val => {
-      keys.forEach(key => {
+  const handleVisibilityChanged = (keys: string[]) => {
+    return async (val: VisibilityEnum) => {
+      keys.forEach((key: string) => {
         visibility[key] = val
       })
       await updateUserData({ visibility }, { merge: true })
@@ -203,7 +219,7 @@ function UserProfile({ onClose, user, userData, updateUserData, currentUser }) {
 
   const handleLinkToFacebook = async () => {
     try {
-      await linkToFacebook(currentUser, userData, updateUserData)
+      await linkToFacebook(currentUser, currentUserData, updateUserData)
     } catch (error) {
       setErrorMessage('Operation failed')
     }
@@ -223,7 +239,8 @@ function UserProfile({ onClose, user, userData, updateUserData, currentUser }) {
     <SwipeableDrawer
       open
       anchor="right"
-      onOpen={() => {}}
+      onOpen={() => {
+      }}
       onClose={onClose}
       className={classes.drawer}
       classes={{
@@ -263,11 +280,11 @@ function UserProfile({ onClose, user, userData, updateUserData, currentUser }) {
       </div>
       <div className={`mx-5 ${classes.root}`}>
         <div className="d-flex flex-column align-items-center">
-          <Avatar className={` ${classes.avatar}`} src={avatarUrl}>
+          <Avatar className={` ${classes.avatar}`} src={avatarUrl || undefined}>
             {!avatarUrl && initials(user[DISPLAY_NAME])}
           </Avatar>
           <div className="mt-3">{user[DISPLAY_NAME]}</div>
-          {currentUser[UID] === user[UID] && !connectedToFacebook && (
+          {currentUser.uid === user.uid && !connectedToFacebook && (
             <div className="mt-2">
               <small>
                 <span className="text-muted font-weight-bold">
@@ -287,34 +304,32 @@ function UserProfile({ onClose, user, userData, updateUserData, currentUser }) {
         <div className="d-flex flex-column align-items-center my-4">
           {getKeyVal(
             'Email',
-            user[EMAIL], // getEmail(),
             <EmailIcon className="mr-2" style={{ fill: '#D2D6DB' }} />,
             visibility[EMAIL] || defaultVisibility[EMAIL],
-            val => handleVisibilityChanged([EMAIL])(val)
+            (val: VisibilityEnum) => handleVisibilityChanged([EMAIL])(val),
+            user.email // getEmail(),
           )}
           {getKeyVal(
             'Phone',
-            getPhone(),
             <SmartPhoneIcon className="mr-2" style={{ fill: '#D2D6DB' }} />,
             visibility[PHONE] || defaultVisibility[PHONE],
-            val => handleVisibilityChanged([PHONE])(val)
+            (val: VisibilityEnum) => handleVisibilityChanged([PHONE])(val),
+            getPhone()
           )}
           {getKeyVal(
             'Address',
-            getAddress(),
             <HomeIcon className="mr-2" style={{ fill: '#D2D6DB' }} />,
-            visibility[ADDRESS1] || defaultVisibility[ADDRESS1],
-            val =>
-              handleVisibilityChanged([ADDRESS1, ADDRESS2, CITY, STATE, ZIP])(
-                val
-              )
+            visibility.address1 || defaultVisibility.address1,
+            (val: VisibilityEnum) =>
+              handleVisibilityChanged([ADDRESS1, ADDRESS2, CITY, STATE, ZIP])(val),
+            getAddress()
           )}
           {getKeyVal(
             'Birthday',
-            user[DATE_OF_BIRTH] && moment(user[DATE_OF_BIRTH]).format('MMMM D'),
             <CakeIcon className="mr-2" style={{ fill: '#D2D6DB' }} />,
             visibility[DATE_OF_BIRTH] || defaultVisibility[DATE_OF_BIRTH],
-            val => handleVisibilityChanged([DATE_OF_BIRTH])(val)
+            (val: VisibilityEnum) => handleVisibilityChanged([DATE_OF_BIRTH])(val),
+            user.dateOfBirth ? moment(user.dateOfBirth).format('MMMM D') : undefined
           )}
         </div>
       </div>
@@ -331,11 +346,16 @@ UserProfile.propTypes = {
 }
 
 const mapStateToProps = ({
-  currentUser: { currentUser, userData = new IMap() }
-}) => {
+                           currentUser: {
+                             currentUser,
+                             userData
+                           }
+                         }: CurrentUserStore) => {
+
   return {
     currentUser,
-    userData
+    // @ts-ignore
+    userData: userData || new IMap()
   }
 }
 

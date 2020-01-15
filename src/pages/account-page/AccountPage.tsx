@@ -8,22 +8,31 @@ import DownloadAccountInfo from './DownloadAccountInfo'
 import ChangeEmail from './ChangeEmail'
 import DeleteAccount from './DeleteAccount'
 import ChangePassword from './ChangePassword'
+import { CurrentUserStore } from '../../entities/User'
 
-function AccountPage({ currentUser }) {
+interface Props {
+  currentUser: firebase.User
+}
+
+function AccountPage({ currentUser }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(goToTop, [currentUser])
 
-  const handleSubmissionChanged = value => {
+  const handleSubmissionChanged = (value: boolean) => {
     setIsSubmitting(value)
   }
 
   return !currentUser ? null : (
     <div className="mx-auto py-5 px-3" style={{ maxWidth: 600 }}>
+      {/*
+  // @ts-ignore */}
       <ChangeEmail
         onSubmitting={handleSubmissionChanged}
         isSubmitting={isSubmitting}
       />
+      {/*
+  // @ts-ignore */}
       <ChangePassword
         onSubmitting={handleSubmissionChanged}
         isSubmitting={isSubmitting}
@@ -44,7 +53,7 @@ AccountPage.propTypes = {
   currentUser: PropTypes.object.isRequired
 }
 
-const mapStateToProps = ({ currentUser: { currentUser } }) => {
+const mapStateToProps = ({ currentUser: { currentUser } }: CurrentUserStore) => {
   return {
     currentUser
   }

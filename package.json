@@ -75,6 +75,7 @@
     "uuid": "^3.3.3"
   },
   "devDependencies": {
+    "@types/fuzzy-search": "^2.1.0",
     "@types/gravatar": "^1.8.0",
     "@types/underscore": "^1.9.4",
     "eslint-config-standard": "^14.1.0",

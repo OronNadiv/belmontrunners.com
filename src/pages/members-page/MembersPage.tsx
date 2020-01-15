@@ -1,6 +1,6 @@
-import {functions} from '../../firebase'
+import { functions } from '../../firebase'
 import React, { useEffect, useState } from 'react'
-import { DISPLAY_NAME, GRAVATAR_URL, PHOTO_URL, UID } from '../../fields'
+import { DISPLAY_NAME, UID } from '../../fields'
 import * as PropTypes from 'prop-types'
 import * as Sentry from '@sentry/browser'
 import { connect } from 'react-redux'
@@ -21,13 +21,22 @@ import { compose, findWhere, sortBy } from 'underscore'
 import { MEMBERS, ROOT } from '../../urls'
 import SearchBox from '../../components/SearchBox'
 import { Map as IMap } from 'immutable'
+import { CurrentUserStore, UserOptionalProps } from '../../entities/User'
+
+interface Props {
+  currentUser: firebase.User
+  location: { pathname: string }
+  history: { push: (arg0: string) => void }
+  userData: any
+}
 
 function MembersPage({
-  currentUser,
-  location: { pathname },
-  history,
-  userData
-}) {
+                       currentUser,
+                       location: { pathname },
+                       history,
+                       userData
+                     }: Props) {
+  const currentUserData: UserOptionalProps = userData.toJS()
   const useStyles = makeStyles(() => ({
     chipAvatar: {
       width: 32,
@@ -38,7 +47,8 @@ function MembersPage({
 
   const [isLoading, setIsLoading] = useState(true)
   const [showError, setShowError] = useState(false)
-  const [users, setUsers] = useState([])
+  const [users, setUsers] = useState()
+  users || setUsers([])
 
   useEffect(() => {
     if (!currentUser) {
@@ -48,11 +58,14 @@ function MembersPage({
       try {
         // return setUsers(require('./members.json'))
         const resp = await functions.httpsCallable('getMembers')()
-        const data = sortBy(resp.data, user =>
-          user[UID] === currentUser[UID]
+        const data = sortBy(resp.data, (user: UserOptionalProps) => {
+          if (!user.displayName) {
+            return
+          }
+          return user.uid === currentUser.uid
             ? '_'
-            : user[DISPLAY_NAME].toLowerCase()
-        )
+            : user.displayName.toLowerCase()
+        })
         setUsers(data)
       } catch (err) {
         console.warn('error from getMembers:', err)
@@ -79,7 +92,7 @@ function MembersPage({
     }
     const pathnames = pathname.split('/').filter(val => !!val)
     if (pathnames.length < 2) {
-      setSelected()
+      setSelected(undefined)
       return
     }
     const selected = findWhere(users, { [UID]: pathnames[1] })
@@ -93,9 +106,9 @@ function MembersPage({
 
   const [search, setSearch] = useState('')
 
-  const handleChipSelected = user => {
+  const handleChipSelected = (user: UserOptionalProps) => {
     console.log('user:', user)
-    history.push(`${MEMBERS}/${user[UID]}`)
+    history.push(`${MEMBERS}/${user.uid}`)
   }
 
   const handleDrawerClosed = () => {
@@ -103,7 +116,7 @@ function MembersPage({
   }
 
   const getChips = () => {
-    let filteredUsers = users
+    let filteredUsers = users || []
     if (search) {
       const searcher = new FuzzySearch(users, [DISPLAY_NAME], {
         caseSensitive: false
@@ -111,21 +124,21 @@ function MembersPage({
       filteredUsers = searcher.search(search)
     }
 
-    return filteredUsers.map(user => {
-      let label = user[DISPLAY_NAME]
+    return filteredUsers.map((user: UserOptionalProps) => {
+      let label = user.displayName
 
       function getColor() {
-        if (user[UID] === currentUser[UID]) {
+        if (user.uid === currentUser.uid) {
           return 'primary'
         }
         return 'default'
       }
 
-      if (user[UID] === currentUser[UID]) {
-        user[PHOTO_URL] = userData.get(PHOTO_URL)
+      if (user.uid === currentUser.uid) {
+        user.photoURL = currentUserData.photoURL
       }
 
-      const avatarUrl = user[PHOTO_URL] || user[GRAVATAR_URL]
+      const avatarUrl = user.photoURL || user.gravatarUrl || undefined
       return (
         <Chip
           className="my-1 mx-1"
@@ -135,7 +148,7 @@ function MembersPage({
             </Avatar>
           }
           onClick={() => handleChipSelected(user)}
-          key={user[UID]}
+          key={user.uid}
           label={label}
           color={getColor()}
         />
@@ -180,9 +193,10 @@ MembersPage.propTypes = {
   history: PropTypes.object.isRequired
 }
 
-const mapStateToProps = ({ currentUser: { currentUser, userData } }) => {
+const mapStateToProps = ({ currentUser: { currentUser, userData } }: CurrentUserStore) => {
   return {
     currentUser,
+    // @ts-ignore
     userData: userData || new IMap()
   }
 }

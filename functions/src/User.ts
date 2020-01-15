@@ -1,5 +1,10 @@
+export enum VisibilityEnum {
+  ONLY_ME = 'ONLY_ME',
+  MEMBERS = 'MEMBERS'
+}
+
 export interface Visibility {
-  [key: string]: string
+  [key: string]: VisibilityEnum
 }
 
 export interface User {
