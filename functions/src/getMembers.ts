@@ -1,6 +1,6 @@
 import { https } from 'firebase-functions'
 import * as Admin from 'firebase-admin'
-import { User, Visibility } from './User'
+import { User, Visibility, VisibilityEnum } from './User'
 import calc from './membershipUtils'
 import {
   ADDRESS1,
@@ -11,31 +11,28 @@ import {
   EMAIL,
   GENDER,
   GRAVATAR_URL,
-  MEMBERS,
   PHONE,
   PHOTO_URL,
-  ONLY_ME,
   STATE,
   UID,
   ZIP
 } from './fields'
-
-const _ = require('underscore')
+import * as _ from 'underscore'
 
 const defaultVisibility: Visibility = {
-  [UID]: MEMBERS,
-  [DISPLAY_NAME]: MEMBERS,
-  [EMAIL]: ONLY_ME,
-  [PHOTO_URL]: MEMBERS,
-  [PHONE]: ONLY_ME,
-  [ADDRESS1]: ONLY_ME,
-  [ADDRESS2]: ONLY_ME,
-  [CITY]: ONLY_ME,
-  [STATE]: ONLY_ME,
-  [ZIP]: ONLY_ME,
-  [GENDER]: ONLY_ME,
-  [DATE_OF_BIRTH]: ONLY_ME,
-  [GRAVATAR_URL]: MEMBERS
+  [UID]: VisibilityEnum.MEMBERS,
+  [DISPLAY_NAME]: VisibilityEnum.MEMBERS,
+  [EMAIL]: VisibilityEnum.ONLY_ME,
+  [PHOTO_URL]: VisibilityEnum.MEMBERS,
+  [PHONE]: VisibilityEnum.ONLY_ME,
+  [ADDRESS1]: VisibilityEnum.ONLY_ME,
+  [ADDRESS2]: VisibilityEnum.ONLY_ME,
+  [CITY]: VisibilityEnum.ONLY_ME,
+  [STATE]: VisibilityEnum.ONLY_ME,
+  [ZIP]: VisibilityEnum.ONLY_ME,
+  [GENDER]: VisibilityEnum.ONLY_ME,
+  [DATE_OF_BIRTH]: VisibilityEnum.ONLY_ME,
+  [GRAVATAR_URL]: VisibilityEnum.MEMBERS
 }
 
 export default (admin: Admin.app.App) => {
@@ -74,17 +71,19 @@ export default (admin: Admin.app.App) => {
         [key: string]: any
       } = {}
 
-      const { visibility = {} } = user
-      _.forEach(user, (value: any, key: string) => {
-        const currVisibility = visibility[key] || defaultVisibility[key]
+      Object.keys(user.visibility || {}).forEach((key) => {
+        // @ts-ignore
+        const value = user.visibility[key]
+        // @ts-ignore
+        const currVisibility: VisibilityEnum = value ? value : defaultVisibility[key]
 
         switch (currVisibility) {
-          case MEMBERS:
+          case VisibilityEnum.MEMBERS:
             filteredUser[key] = value
-            break
-          case ONLY_ME:
+            return undefined
+          case VisibilityEnum.ONLY_ME:
           default:
-            break
+            return undefined
         }
       })
       return filteredUser

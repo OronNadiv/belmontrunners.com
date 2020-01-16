@@ -3,8 +3,14 @@ import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Button, Card, CardContent, Typography } from '@material-ui/core'
 import ChangePasswordDialog from './ChangePasswordDialog'
+import { CurrentUserStore } from '../../entities/User'
 
-function ChangeEmail({ currentUser, onSubmitting, isSubmitting }) {
+interface Props {
+  currentUser: firebase.User
+  isSubmitting: boolean
+}
+
+function ChangeEmail({ currentUser, isSubmitting }: Props) {
   const [showChangePasswordDialog, setShowChangePasswordDialog] = useState(
     false
   )
@@ -51,10 +57,11 @@ ChangeEmail.propTypes = {
   isSubmitting: PropTypes.bool.isRequired
 }
 
-const mapStateToProps = ({ currentUser: { currentUser } }) => {
+const mapStateToProps = ({ currentUser: { currentUser } }: CurrentUserStore) => {
   return {
     currentUser
   }
 }
 
+// @ts-ignore
 export default connect(mapStateToProps)(ChangeEmail)

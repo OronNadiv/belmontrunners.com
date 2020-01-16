@@ -117,7 +117,7 @@ function Profile({ allowUsersPage, allowContactsPage, userData, history }: Props
   if (!currentUserData.photoURL && !isGravatarFetched) {
     return null
   }
-  let avatarUrl = currentUserData.photoURL || gravatarUrl
+  const avatarUrl = currentUserData.photoURL || gravatarUrl
   return (
     <>
       <div

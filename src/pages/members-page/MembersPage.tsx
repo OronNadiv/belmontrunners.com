@@ -125,7 +125,7 @@ function MembersPage({
     }
 
     return filteredUsers.map((user: UserOptionalProps) => {
-      let label = user.displayName
+      const label = user.displayName
 
       function getColor() {
         if (user.uid === currentUser.uid) {

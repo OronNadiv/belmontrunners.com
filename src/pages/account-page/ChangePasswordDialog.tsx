@@ -18,22 +18,39 @@ import { connect } from 'react-redux'
 import * as Sentry from '@sentry/browser'
 import { PASSWORD } from '../../fields'
 import { Field, Form } from 'react-final-form'
+import { CurrentUserStore } from '../../entities/User'
 
-const required = value => (value ? undefined : 'Required')
-const composeValidators = (...validators) => value =>
-  validators.reduce((error, validator) => error || validator(value), undefined)
-const minPasswordLength = value =>
-  value.length < 6 ? INVALID_PASSWORD_LENGTH(6) : undefined
+type Validator = (value: string) => string | undefined
+
+const composeValidators = (validators: Validator[]) => (value: string) => {
+  const reduceFunc = (error: string | undefined, validator: Validator) => {
+    const tmpError = validator(value)
+    return error ? error : tmpError
+  }
+  return validators.reduce(reduceFunc, undefined)
+}
+
+const required: Validator = (value) => (value ? undefined : 'Required')
+const minPasswordLength: Validator = (value) => (value && value.length < 6 ? INVALID_PASSWORD_LENGTH(6) : undefined)
 
 const PASSWORD1 = 'password1'
 const PASSWORD2 = 'password2'
 
-function ChangePasswordDialog({ onClose, currentUser }) {
+interface Props {
+  onClose: () => void
+  currentUser: firebase.User
+}
+
+function ChangePasswordDialog({ onClose, currentUser }: Props) {
   const [errorMessage, setErrorMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
 
-  const handleSubmit = async values => {
+  const handleSubmit = async (values: { [key: string]: any }) => {
+    if (!currentUser.email) {
+      console.error('current user does not have an email.')
+      return
+    }
     const password0 = values[PASSWORD]
     const password1 = values[PASSWORD1]
     const password2 = values[PASSWORD2]
@@ -125,7 +142,7 @@ function ChangePasswordDialog({ onClose, currentUser }) {
                     fullWidth
                     name={PASSWORD}
                     component={TextField}
-                    validate={composeValidators(required, minPasswordLength)}
+                    validate={composeValidators([required, minPasswordLength])}
                   />
 
                   <Field
@@ -135,7 +152,7 @@ function ChangePasswordDialog({ onClose, currentUser }) {
                     fullWidth
                     name={PASSWORD1}
                     component={TextField}
-                    validate={composeValidators(required, minPasswordLength)}
+                    validate={composeValidators([required, minPasswordLength])}
                   />
 
                   <Field
@@ -145,7 +162,7 @@ function ChangePasswordDialog({ onClose, currentUser }) {
                     fullWidth
                     name={PASSWORD2}
                     component={TextField}
-                    validate={composeValidators(required, minPasswordLength)}
+                    validate={composeValidators([required, minPasswordLength])}
                   />
                 </div>
               )}
@@ -188,10 +205,11 @@ ChangePasswordDialog.propTypes = {
   onClose: PropTypes.func.isRequired
 }
 
-const mapStateToProps = ({ currentUser: { currentUser } }) => {
+const mapStateToProps = ({ currentUser: { currentUser } }: CurrentUserStore) => {
   return {
     currentUser
   }
 }
 
+// @ts-ignore
 export default connect(mapStateToProps)(ChangePasswordDialog)

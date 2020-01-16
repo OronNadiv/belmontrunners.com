@@ -73,7 +73,7 @@ function UsersPage(props: UsersPageProps) {
     const usersRef = firestore.collection('users')
     const doc = await usersRef.get()
     // exception will be handled by ErrorBoundary
-    let rows: any = []
+    const rows: any = []
     doc.forEach((doc) => {
       try {
         const data = doc.data()
@@ -84,7 +84,7 @@ function UsersPage(props: UsersPageProps) {
           data[PHONE] = ''
         }
 
-        let userData: UserDataExtended = {
+        const userData: UserDataExtended = {
           [UID]: doc.id,
           [PHOTO_URL]: data[PHOTO_URL] || '',
           [DISPLAY_NAME]: data[DISPLAY_NAME],
@@ -108,7 +108,7 @@ function UsersPage(props: UsersPageProps) {
         }
 
         try {
-          let calc1 = calc(userData)
+          const calc1 = calc(userData)
           if (calc1[IS_A_MEMBER]) {
             userData[MEMBERSHIP_STATUS] = 'Is a member'
           } else if (calc1[IS_MEMBERSHIP_EXPIRED]) {
