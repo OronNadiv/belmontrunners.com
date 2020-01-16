@@ -43,7 +43,7 @@ function MyProfileForm({
                        }: Props) {
   const currentUserData: UserOptionalProps = userData.toJS()
 
-  const handleSubmit = async (values: UserOptionalProps) => {
+  const handleSubmitFunc = async (values: UserOptionalProps) => {
     console.log('submitting values:', JSON.stringify(values, null, 2))
     try {
       onSubmitting(true)
@@ -79,14 +79,16 @@ function MyProfileForm({
     ZIP
   )
 
+  // @ts-ignore
   return (
-    // @ts-ignore
     currentUser && (
       <>
         <Form
-          onSubmit={values => handleSubmit(values)}
+          onSubmit={values => handleSubmitFunc(values)}
           initialValues={initialValues}
-          render={({ handleSubmit, form, values }) => (
+          render={
+  // @ts-ignore */
+            ({ handleSubmit, form, values }) => (
             <form onSubmit={handleSubmit} method="POST">
               {/*
   // @ts-ignore */}

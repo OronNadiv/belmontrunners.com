@@ -73,10 +73,10 @@ function UsersPage(props: UsersPageProps) {
     const usersRef = firestore.collection('users')
     const doc = await usersRef.get()
     // exception will be handled by ErrorBoundary
-    const rows: any = []
-    doc.forEach((doc) => {
+    const res: any = []
+    doc.forEach((docData) => {
       try {
-        const data = doc.data()
+        const data = docData.data()
         if (data[PHONE]) {
           const number = phoneUtil.parseAndKeepRawInput(data[PHONE], 'US')
           data[PHONE] = phoneUtil.format(number, PNF.NATIONAL)
@@ -85,7 +85,7 @@ function UsersPage(props: UsersPageProps) {
         }
 
         const userData: UserDataExtended = {
-          [UID]: doc.id,
+          [UID]: docData.id,
           [PHOTO_URL]: data[PHOTO_URL] || '',
           [DISPLAY_NAME]: data[DISPLAY_NAME],
           [EMAIL]: data[EMAIL],
@@ -125,13 +125,13 @@ function UsersPage(props: UsersPageProps) {
           console.error(error)
         }
 
-        rows.push(userData)
+        res.push(userData)
       } catch (err) {
         console.error('ERROR PROCESSING USER.',
           'err:', err)
       }
     })
-    setRows(rows)
+    setRows(res)
   }, [])
 
   useEffect(goToTop, [currentUser])

@@ -52,9 +52,8 @@ import { connect } from 'react-redux'
 import { calc, IS_A_MEMBER } from '../utilities/membershipUtils'
 import { UID } from '../fields'
 import firebase from 'firebase/app'
-import { CurrentUserStore } from "../entities/User";
+import { CurrentUserStore, User } from '../entities/User'
 import { compose } from 'underscore'
-import { User } from "../entities/User";
 import { auth } from '../firebase'
 
 const TOOLBAR_HEIGHT = 72
@@ -69,7 +68,7 @@ interface IHeaderProps extends RouteComponentProps<{}> {
   isMember: boolean
 }
 
-function Header (props: IHeaderProps) {
+function Header(props: IHeaderProps) {
   const { location: { pathname }, isCurrentUserLoaded, currentUser, allowUsersPage, allowContactsPage, isMember } = props
   const [transparentBackground, setTransparentBackground] = useState(true)
   const [showDrawer, setShowDrawer] = useState(false)
@@ -311,9 +310,9 @@ function Header (props: IHeaderProps) {
               {
                 isSignedIn &&
                 <Link to={ROOT}
-                      onClick={() => {
+                      onClick={async () => {
                         handleDrawerClose()
-                        auth.signOut()
+                        await auth.signOut()
                       }}>
                   <ListItem button>
                     <ListItemIcon><SignOutIcon color='primary' /></ListItemIcon>

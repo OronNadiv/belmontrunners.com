@@ -125,7 +125,7 @@ export const fetchCurrentUser: FetchCurrentUser = () => {
                     .add(1, 'day')
                     .isBefore(moment())
                 ) {
-                  sendEmailVerification()(dispatch, getState)
+                  await sendEmailVerification()(dispatch, getState)
                 }
               }
             } catch (error) {
@@ -142,7 +142,7 @@ export const fetchCurrentUser: FetchCurrentUser = () => {
             const lastSignedInAt: string = moment(lastSignInTime)
               .utc()
               .format()
-            updateUserData(
+            await updateUserData(
               {
                 createdAt,
                 lastSignedInAt,
@@ -173,7 +173,7 @@ export const sendEmailVerification = () => {
     const values: UserOptionalProps = {
       emailVerificationSentAt
     }
-    updateUserData(
+    await updateUserData(
       values,
       { merge: true }
     )(dispatch, getState)
@@ -239,16 +239,13 @@ interface ActionHandlerDef {
 const actionHandler
   : ActionHandlerDef
   = {
-  [FETCHING_CURRENT_USER]: (state: CurrentUserData) => {
-    if (!state) {
-      state = initialState
-    }
-    state = {
+  [FETCHING_CURRENT_USER]: (state: CurrentUserData = initialState) => {
+    const newState = {
       ...state,
       isCurrentUserLoading: true,
       isCurrentUserLoaded: false
     }
-    return state
+    return newState
   },
   [FETCHED_CURRENT_USER]: (
     state = initialState,
@@ -261,7 +258,7 @@ const actionHandler
         }
       }
   ) => {
-    state = {
+    const newState = {
       ...state,
       currentUser,
       permissions,
@@ -269,45 +266,42 @@ const actionHandler
       isCurrentUserLoading: false,
       isCurrentUserLoaded: true
     }
-    return state
+    return newState
   },
 
   [USER_DATA_UPDATE_REQUEST]: (
     state = initialState,
     { context }: { context?: any }) => {
-    state = {
+    const newState = {
       ...state,
       userDataUpdating: true,
       userDataUpdateError: null,
       userDataUpdateContext: context
     }
-    return state
+    return newState
   },
   [USER_DATA_UPDATE_SUCCESS]: (state = initialState, { data, context }: { data: UserOptionalProps, context?: any }) => {
-    state = {
+    const newState = {
       ...state,
       userData: fromJS(data) as User,
       userDataUpdating: false,
       userDataUpdateError: null,
       userDataUpdateContext: context
     }
-    return state
+    return newState
   },
   [USER_DATA_UPDATE_FAILURE]: (state = initialState, { error, context }: { error?: any, context?: any }) => {
-    state = {
+    const newState = {
       ...state,
       userDataUpdating: false,
       userDataUpdateError: error,
       userDataUpdateContext: context
     }
-    return state
+    return newState
   }
 }
 
-export default function reducer(state: CurrentUserData, action: Action<string>) {
-  if (!state) {
-    state = initialState
-  }
+export default function reducer(state: CurrentUserData = initialState, action: Action<string>) {
   const handler = actionHandler[action.type]
   return handler ? handler(state, action) : state
 }

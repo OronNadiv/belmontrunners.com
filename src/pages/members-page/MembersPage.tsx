@@ -95,9 +95,9 @@ function MembersPage({
       setSelected(undefined)
       return
     }
-    const selected = findWhere(users, { [UID]: pathnames[1] })
-    if (selected) {
-      setSelected(selected)
+    const res = findWhere(users, { [UID]: pathnames[1] })
+    if (res) {
+      setSelected(res)
     } else {
       history.push(MEMBERS)
     }

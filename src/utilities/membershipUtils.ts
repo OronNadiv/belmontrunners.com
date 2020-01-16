@@ -7,8 +7,8 @@ const WAS_NEVER_A_MEMBER: string = 'WAS_NEVER_A_MEMBER'
 const IS_MEMBERSHIP_EXPIRED: string = 'IS_MEMBERSHIP_EXPIRED'
 const IS_MEMBERSHIP_EXPIRES_SOON: string = 'IS_MEMBERSHIP_EXPIRES_SOON'
 
-const calc = (userData: User, duration?: moment.Duration) => {
-  duration = duration || moment.duration(1, 'month')
+const calc = (userData: User, durationParam?: moment.Duration) => {
+  const duration = durationParam || moment.duration(1, 'month')
   const membershipExpiresAt = userData[MEMBERSHIP_EXPIRES_AT]
 
   const isAMember = membershipExpiresAt && moment().isBefore(moment(membershipExpiresAt))

@@ -112,7 +112,9 @@ function ChangePasswordDialog({ onClose, currentUser }: Props) {
   return (
     <Form
       onSubmit={handleSubmit}
-      render={({ handleSubmit, form }) => (
+      render={
+        // @ts-ignore */
+        ({ handleSubmit, form }) => (
         <form onSubmit={handleSubmit} method="POST">
           <Dialog
             open

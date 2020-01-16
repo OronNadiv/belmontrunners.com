@@ -74,11 +74,11 @@ function EventSchedule() {
   useEffect(() => {
     console.log('1')
     ;(async function() {
-      const rawWeather = await rp({
+      const res = await rp({
         url: `https://openweathermap.org/data/2.5/forecast?id=${CITY_ID}&appid=b6907d289e10d714a6e88b30761fae22&units=imperial`,
         json: true
       })
-      setRawWeather(rawWeather.list)
+      setRawWeather(res.list)
     })()
   }, [])
 
@@ -86,8 +86,8 @@ function EventSchedule() {
     console.log('2')
     ;(async function() {
       // @ts-ignore
-      const rawEvents = await csv().fromStream(request.get(SPREADSHEET_URL))
-      setRawEvents(rawEvents)
+      const res = await csv().fromStream(request.get(SPREADSHEET_URL))
+      setRawEvents(res)
     })()
   }, [])
 
@@ -96,7 +96,7 @@ function EventSchedule() {
     if (!rawEvents.length) {
       return
     }
-    const events = rawEvents
+    const res = rawEvents
       .map((event: CSVEvent) => {
         event.month--
         event.moment = moment(event)
@@ -112,7 +112,7 @@ function EventSchedule() {
         return a.moment.valueOf() - b.moment.valueOf()
       })
     // @ts-ignore
-    setEvents(events)
+    setEvents(res)
   }, [rawEvents])
 
   useEffect(() => {
@@ -120,10 +120,10 @@ function EventSchedule() {
     if (!events.length) {
       return
     }
-    const filteredEvents = events.filter((event: { moment: Moment }) => {
+    const res = events.filter((event: { moment: Moment }) => {
       return event.moment.isBefore(moment().add(daysAhead, 'day'))
     })
-    setFilteredEvents(filteredEvents)
+    setFilteredEvents(res)
   }, [events, daysAhead])
 
   interface RawWeather {
