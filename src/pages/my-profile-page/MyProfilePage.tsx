@@ -7,13 +7,18 @@ import MyProfileForm from './MyProfileForm'
 import MyProfileFacebook from './MyProfileFacebook'
 import { goToTop } from 'react-scrollable-anchor'
 import { compose } from 'underscore'
+import { CurrentUserStore } from '../../entities/User'
 
-function MyProfilePage({ currentUser }) {
+interface Props {
+  currentUser: firebase.User
+}
+
+function MyProfilePage({ currentUser }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(goToTop, [currentUser])
 
-  const handleSubmissionChanged = value => {
+  const handleSubmissionChanged = (value: boolean) => {
     setIsSubmitting(value)
   }
 
@@ -41,7 +46,7 @@ const mapDispatchToProps = {
   sendEmailVerification: sendEmailVerificationAction
 }
 
-const mapStateToProps = ({ currentUser: { currentUser } }) => {
+const mapStateToProps = ({ currentUser: { currentUser } }: CurrentUserStore) => {
   return {
     currentUser
   }

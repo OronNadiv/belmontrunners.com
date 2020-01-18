@@ -1,5 +1,5 @@
 import React from 'react'
-import { shuffle } from '../../../utilities/random'
+import _ from 'underscore'
 
 interface ITeamMember {
   name: string
@@ -13,7 +13,7 @@ interface ITeamMember {
   website: string
 }
 
-const team : ITeamMember[] = shuffle(require('./teamMembers.json'))
+const team: ITeamMember[] = _.shuffle(require('./teamMembers.json'))
 
 const getTeam = () => {
   return team.map((member, index) => {
