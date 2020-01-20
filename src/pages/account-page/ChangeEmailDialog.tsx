@@ -37,7 +37,7 @@ function ChangeEmailDialog({ currentUser, sendEmailVerification, onClose }: Prop
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
 
-  const handleSubmit = async (values: {
+  const handleSubmitFunc = async (values: {
     [EMAIL1]: string,
     [EMAIL2]: string,
     [PASSWORD]: string
@@ -105,7 +105,7 @@ function ChangeEmailDialog({ currentUser, sendEmailVerification, onClose }: Prop
 
   return (
     <Form
-      onSubmit={handleSubmit}
+      onSubmit={handleSubmitFunc}
       // @ts-ignore
       render={({ handleSubmit, form }) => (
         <form onSubmit={handleSubmit} method="POST">

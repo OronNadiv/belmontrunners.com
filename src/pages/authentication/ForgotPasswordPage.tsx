@@ -40,7 +40,7 @@ const ForgotPasswordPage = () => {
     }
   }
 
-  const handleSubmit = async (values: { [EMAIL]: string }) => {
+  const handleSubmitFunc = async (values: { [EMAIL]: string }) => {
     const email = values[EMAIL]
 
     setErrorMessage('')
@@ -62,7 +62,7 @@ const ForgotPasswordPage = () => {
 
   return (
     <Form
-      onSubmit={(values: { [EMAIL]: string }) => handleSubmit(values)}
+      onSubmit={(values: { [EMAIL]: string }) => handleSubmitFunc(values)}
       // @ts-ignore
       render={({ handleSubmit, form }) => (
         <form onSubmit={handleSubmit} method="POST">

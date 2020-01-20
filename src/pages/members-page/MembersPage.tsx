@@ -47,8 +47,7 @@ function MembersPage({
 
   const [isLoading, setIsLoading] = useState(true)
   const [showError, setShowError] = useState(false)
-  const [users, setUsers] = useState()
-  users || setUsers([])
+  const [users, setUsers] = useState<UserOptionalProps[]>([])
 
   useEffect(() => {
     if (!currentUser) {
@@ -58,7 +57,7 @@ function MembersPage({
       try {
         // return setUsers(require('./members.json'))
         const resp = await functions.httpsCallable('getMembers')()
-        const data = sortBy(resp.data, (user: UserOptionalProps) => {
+        const data: UserOptionalProps[] = sortBy(resp.data, (user: UserOptionalProps) => {
           if (!user.displayName) {
             return
           }

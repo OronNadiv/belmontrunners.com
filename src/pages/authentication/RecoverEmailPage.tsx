@@ -62,7 +62,7 @@ const RecoverEmailPage = ({ location: { state: { info: { data: { email } }, quer
   }
 
   useEffect(() => {
-    const foo = async () => {
+    ;(async function() {
       // Get the restored email address.
 
       console.log('calling applyActionCode')
@@ -82,8 +82,7 @@ const RecoverEmailPage = ({ location: { state: { info: { data: { email } }, quer
       } catch (error) {
         processError(error)
       }
-    }
-    foo()
+    })()
   }, [oobCode, email])
 
   if (close) {

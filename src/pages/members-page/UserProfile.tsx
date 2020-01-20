@@ -240,6 +240,7 @@ function UserProfile({ onClose, user, userData, updateUserData, currentUser }: P
       open
       anchor="right"
       onOpen={() => {
+        // nothing to do here but this prop is still set as required.
       }}
       onClose={onClose}
       className={classes.drawer}

@@ -62,7 +62,7 @@ const VerifyEmailPage = ({ location: { state: { query: { oobCode } } } }: Props)
   }
 
   useEffect(() => {
-    const foo = async () => {
+    ;(async function() {
       // Get the restored email address.
 
       console.log('calling applyActionCode')
@@ -72,8 +72,7 @@ const VerifyEmailPage = ({ location: { state: { query: { oobCode } } } }: Props)
       } catch (error) {
         processError(error)
       }
-    }
-    foo()
+    })()
   }, [oobCode])
 
 

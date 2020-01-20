@@ -33,7 +33,7 @@ function ChangePasswordDialog({ onClose, currentUser }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
 
-  const handleSubmit = async (values: { [key: string]: any }) => {
+  const handleSubmitFunc = async (values: { [key: string]: any }) => {
     if (!currentUser.email) {
       console.error('current user does not have an email.')
       return
@@ -98,7 +98,7 @@ function ChangePasswordDialog({ onClose, currentUser }: Props) {
 
   return (
     <Form
-      onSubmit={handleSubmit}
+      onSubmit={handleSubmitFunc}
       render={
         // @ts-ignore */
         ({ handleSubmit, form }) => (

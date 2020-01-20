@@ -63,7 +63,7 @@ function ResetPasswordPage({ history, location }: Props) {
     [PASSWORD]: string
   }
 
-  const handleSubmit = async (values: SubmitValues) => {
+  const handleSubmitFunc = async (values: SubmitValues) => {
     const newPassword = values[PASSWORD]
 
     const oobCode = location.state.query.oobCode
@@ -87,12 +87,9 @@ function ResetPasswordPage({ history, location }: Props) {
 
   return (
     <Form
-      onSubmit={(values: SubmitValues) => handleSubmit(values)}
-      render={({
-                 // @ts-ignore
-                 handleSubmit,
-                 form
-               }) => (
+      onSubmit={(values: SubmitValues) => handleSubmitFunc(values)}
+      // @ts-ignore
+      render={({ handleSubmit, form }) => (
         <form onSubmit={handleSubmit} method="POST">
           <Dialog
             open

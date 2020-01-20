@@ -58,7 +58,7 @@ const Complete = ({ location: { search } }: Props) => {
     const query: { mode?: string, oobCode?: string } = queryString.parse(search) || {}
     const { mode, oobCode } = query
 
-    const foo = async () => {
+    ;(async function() {
       try {
         if (!oobCode) {
           processError({ code: 'auth/invalid-action-code', message: INVALID_ACTION_CODE_INVALID_URL })
@@ -86,8 +86,7 @@ const Complete = ({ location: { search } }: Props) => {
       } catch (error) {
         processError(error)
       }
-    }
-    foo()
+    })()
   }, [search])
 
   if (redirect) {
