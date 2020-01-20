@@ -71,15 +71,13 @@ export default (admin: Admin.app.App) => {
         [key: string]: any
       } = {}
 
-      Object.keys(user.visibility || {}).forEach((key) => {
-        // @ts-ignore
-        const value = user.visibility[key]
-        // @ts-ignore
-        const currVisibility: VisibilityEnum = value ? value : defaultVisibility[key]
+      const visibility = { ...defaultVisibility, ...(user.visibility || {}) }
+      _.forEach(visibility, (visibilityValue, visibilityKey) => {
 
-        switch (currVisibility) {
+        switch (visibilityValue) {
           case VisibilityEnum.MEMBERS:
-            filteredUser[key] = value
+            // @ts-ignore
+            filteredUser[visibilityKey] = user[visibilityKey]
             return undefined
           case VisibilityEnum.ONLY_ME:
           default:
