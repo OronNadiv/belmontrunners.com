@@ -159,7 +159,7 @@ export const fetchCurrentUser: FetchCurrentUser = () => {
     }
   }
 }
-
+export type SendEmailVerification = () => Promise<void>
 export const sendEmailVerification = () => {
   return async (dispatch: Dispatch, getState: () => CurrentUserStore) => {
     const currentUser = getState().currentUser.currentUser

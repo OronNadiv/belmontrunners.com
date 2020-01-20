@@ -8,12 +8,10 @@ import {
   DialogTitle
 } from '@material-ui/core'
 import { TextField } from 'final-form-material-ui'
-import isEmailComponent from 'isemail'
 import {
   EMAIL_ALREADY_IN_USE,
   EMAILS_DONT_MATCH,
   INVALID_EMAIL,
-  INVALID_PASSWORD_LENGTH,
   WRONG_PASSWORD
 } from '../../messages'
 import * as PropTypes from 'prop-types'
@@ -21,25 +19,29 @@ import { connect } from 'react-redux'
 import * as Sentry from '@sentry/browser'
 import { Field, Form } from 'react-final-form'
 import { PASSWORD } from '../../fields'
-import { sendEmailVerification as sendEmailVerificationAction } from '../../reducers/currentUser'
-
-const required = value => (value ? undefined : 'Required')
-const isEmail = value =>
-  !value || !isEmailComponent.validate(value) ? INVALID_EMAIL : undefined
-const composeValidators = (...validators) => value =>
-  validators.reduce((error, validator) => error || validator(value), undefined)
-const minPasswordLength = value =>
-  value.length < 6 ? INVALID_PASSWORD_LENGTH(6) : undefined
+import { SendEmailVerification, sendEmailVerification as sendEmailVerificationAction } from '../../reducers/currentUser'
+import { required, isEmail, composeValidators, minPasswordLength } from '../../utilities/formValidators'
+import { CurrentUserStore } from '../../entities/User'
 
 const EMAIL1 = 'email1'
 const EMAIL2 = 'email2'
 
-function ChangeEmailDialog({ currentUser, sendEmailVerification, onClose }) {
+interface Props {
+  currentUser: firebase.User
+  sendEmailVerification: SendEmailVerification
+  onClose: () => void
+}
+
+function ChangeEmailDialog({ currentUser, sendEmailVerification, onClose }: Props) {
   const [errorMessage, setErrorMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
 
-  const handleSubmit = async values => {
+  const handleSubmit = async (values: {
+    [EMAIL1]: string,
+    [EMAIL2]: string,
+    [PASSWORD]: string
+  }) => {
     const email1 = values[EMAIL1]
     const email2 = values[EMAIL2]
     const password = values[PASSWORD]
@@ -51,11 +53,12 @@ function ChangeEmailDialog({ currentUser, sendEmailVerification, onClose }) {
     setErrorMessage('')
     setIsSubmitting(true)
 
-    const credentials = firebase.auth.EmailAuthProvider.credential(
-      currentUser.email,
-      password
-    )
     try {
+      const credentials = firebase.auth.EmailAuthProvider.credential(
+        // @ts-ignore At this point, we only support login with email.
+        currentUser.email,
+        password
+      )
       await currentUser.reauthenticateWithCredential(credentials)
       try {
         await currentUser.updateEmail(email1)
@@ -103,6 +106,7 @@ function ChangeEmailDialog({ currentUser, sendEmailVerification, onClose }) {
   return (
     <Form
       onSubmit={handleSubmit}
+      // @ts-ignore
       render={({ handleSubmit, form }) => (
         <form onSubmit={handleSubmit} method="POST">
           <Dialog
@@ -202,7 +206,7 @@ const mapDispatchToProps = {
   sendEmailVerification: sendEmailVerificationAction
 }
 
-const mapStateToProps = ({ currentUser: { currentUser } }) => {
+const mapStateToProps = ({ currentUser: { currentUser } }: CurrentUserStore) => {
   return {
     currentUser
   }
@@ -211,4 +215,5 @@ const mapStateToProps = ({ currentUser: { currentUser } }) => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
+// @ts-ignore
 )(ChangeEmailDialog)

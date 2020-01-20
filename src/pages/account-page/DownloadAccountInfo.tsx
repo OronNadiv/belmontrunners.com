@@ -6,11 +6,19 @@ import { connect } from 'react-redux'
 import { compose } from 'underscore'
 import { Button, Card, CardContent, Typography } from '@material-ui/core'
 import UpdateUserData from '../../components/HOC/UpdateUserData'
+// @ts-ignore
 import DownloadButton from 'react-dfb'
 import moment from 'moment'
+import { CurrentUserStore, UserOptionalProps } from '../../entities/User'
 
-function DownloadAccountInfo({ currentUser, userData, isSubmitting }) {
-  userData = userData.toJS()
+interface Props {
+  currentUser: firebase.User
+  userData: any,
+  isSubmitting: boolean
+}
+
+function DownloadAccountInfo({ currentUser, userData, isSubmitting }: Props) {
+  const userDataJS: UserOptionalProps = userData.toJS()
 
   const [downloadData, setDownloadData] = useState()
 
@@ -18,7 +26,7 @@ function DownloadAccountInfo({ currentUser, userData, isSubmitting }) {
     setDownloadData({
       mime: 'application/json',
       fileName: `account-${moment().format()}.txt`,
-      contentBase64: btoa(JSON.stringify(userData, null, 2))
+      contentBase64: btoa(JSON.stringify(userDataJS, null, 2))
     })
   }
 
@@ -67,9 +75,10 @@ DownloadAccountInfo.propTypes = {
   isSubmitting: PropTypes.bool.isRequired
 }
 
-const mapStateToProps = ({ currentUser: { currentUser, userData } }) => {
+const mapStateToProps = ({ currentUser: { currentUser, userData } }: CurrentUserStore) => {
   return {
     currentUser,
+    // @ts-ignore
     userData: userData || new IMap()
   }
 }

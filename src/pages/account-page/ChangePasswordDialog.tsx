@@ -9,7 +9,6 @@ import {
 } from '@material-ui/core'
 import { TextField } from 'final-form-material-ui'
 import {
-  INVALID_PASSWORD_LENGTH,
   PASSWORDS_MISMATCH,
   WRONG_PASSWORD
 } from '../../messages'
@@ -19,19 +18,7 @@ import * as Sentry from '@sentry/browser'
 import { PASSWORD } from '../../fields'
 import { Field, Form } from 'react-final-form'
 import { CurrentUserStore } from '../../entities/User'
-
-type Validator = (value: string) => string | undefined
-
-const composeValidators = (validators: Validator[]) => (value: string) => {
-  const reduceFunc = (error: string | undefined, validator: Validator) => {
-    const tmpError = validator(value)
-    return error ? error : tmpError
-  }
-  return validators.reduce(reduceFunc, undefined)
-}
-
-const required: Validator = (value) => (value ? undefined : 'Required')
-const minPasswordLength: Validator = (value) => (value && value.length < 6 ? INVALID_PASSWORD_LENGTH(6) : undefined)
+import { required, minPasswordLength, composeValidators } from '../../utilities/formValidators'
 
 const PASSWORD1 = 'password1'
 const PASSWORD2 = 'password2'
@@ -115,89 +102,89 @@ function ChangePasswordDialog({ onClose, currentUser }: Props) {
       render={
         // @ts-ignore */
         ({ handleSubmit, form }) => (
-        <form onSubmit={handleSubmit} method="POST">
-          <Dialog
-            open
-            fullWidth
-            maxWidth="xs"
-            onClose={handleClose}
-            aria-labelledby="form-dialog-title"
-          >
-            <DialogTitle>Change Password</DialogTitle>
+          <form onSubmit={handleSubmit} method="POST">
+            <Dialog
+              open
+              fullWidth
+              maxWidth="xs"
+              onClose={handleClose}
+              aria-labelledby="form-dialog-title"
+            >
+              <DialogTitle>Change Password</DialogTitle>
 
-            <DialogContent>
-              {errorMessage && (
-                <div className="mt-2 text-danger text-center">
-                  {errorMessage}
-                </div>
-              )}
-              {isSuccess ? (
-                <div className="text-success text-center mt-4">
-                  Password changed successfully.
-                </div>
-              ) : (
-                <div>
-                  <Field
-                    label="Current password"
-                    type="password"
-                    margin="normal"
-                    fullWidth
-                    name={PASSWORD}
-                    component={TextField}
-                    validate={composeValidators([required, minPasswordLength])}
-                  />
+              <DialogContent>
+                {errorMessage && (
+                  <div className="mt-2 text-danger text-center">
+                    {errorMessage}
+                  </div>
+                )}
+                {isSuccess ? (
+                  <div className="text-success text-center mt-4">
+                    Password changed successfully.
+                  </div>
+                ) : (
+                  <div>
+                    <Field
+                      label="Current password"
+                      type="password"
+                      margin="normal"
+                      fullWidth
+                      name={PASSWORD}
+                      component={TextField}
+                      validate={composeValidators([required, minPasswordLength])}
+                    />
 
-                  <Field
-                    label="New password"
-                    type="password"
-                    margin="normal"
-                    fullWidth
-                    name={PASSWORD1}
-                    component={TextField}
-                    validate={composeValidators([required, minPasswordLength])}
-                  />
+                    <Field
+                      label="New password"
+                      type="password"
+                      margin="normal"
+                      fullWidth
+                      name={PASSWORD1}
+                      component={TextField}
+                      validate={composeValidators([required, minPasswordLength])}
+                    />
 
-                  <Field
-                    label="Confirm new password"
-                    type="password"
-                    margin="normal"
-                    fullWidth
-                    name={PASSWORD2}
-                    component={TextField}
-                    validate={composeValidators([required, minPasswordLength])}
-                  />
-                </div>
-              )}
-            </DialogContent>
+                    <Field
+                      label="Confirm new password"
+                      type="password"
+                      margin="normal"
+                      fullWidth
+                      name={PASSWORD2}
+                      component={TextField}
+                      validate={composeValidators([required, minPasswordLength])}
+                    />
+                  </div>
+                )}
+              </DialogContent>
 
-            <DialogActions>
-              {isSuccess ? (
-                <Button type="button" color="primary" onClick={handleClose}>
-                  Close
-                </Button>
-              ) : (
-                <div>
-                  <Button
-                    type="button"
-                    onClick={handleClose}
-                    disabled={isSubmitting}
-                  >
-                    Cancel
+              <DialogActions>
+                {isSuccess ? (
+                  <Button type="button" color="primary" onClick={handleClose}>
+                    Close
                   </Button>
-                  <Button
-                    type="button"
-                    color="primary"
-                    disabled={isSubmitting}
-                    onClick={form.submit}
-                  >
-                    Submit
-                  </Button>
-                </div>
-              )}
-            </DialogActions>
-          </Dialog>
-        </form>
-      )}
+                ) : (
+                  <div>
+                    <Button
+                      type="button"
+                      onClick={handleClose}
+                      disabled={isSubmitting}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="button"
+                      color="primary"
+                      disabled={isSubmitting}
+                      onClick={form.submit}
+                    >
+                      Submit
+                    </Button>
+                  </div>
+                )}
+              </DialogActions>
+            </Dialog>
+          </form>
+        )}
     />
   )
 }

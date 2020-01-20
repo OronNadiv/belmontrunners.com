@@ -1,4 +1,4 @@
-import {functions} from '../../firebase'
+import { functions } from '../../firebase'
 import React, { useState } from 'react'
 import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -10,17 +10,22 @@ import { UID } from '../../fields'
 import { ROOT } from '../../urls'
 import * as Sentry from '@sentry/browser'
 import { Snackbar } from '../../components/Snackbar'
+import { CurrentUserStore } from '../../entities/User'
 
-function DeleteAccount({ currentUser, onSubmitting, isSubmitting, history }) {
-  const [showAccountDeletionDialog, setShowAccountDeletionDialog] = useState(
-    false
-  )
+interface Props {
+  currentUser: firebase.User
+  onSubmitting: (arg0: boolean) => void
+  isSubmitting: boolean
+}
+
+function DeleteAccount({ currentUser, onSubmitting, isSubmitting }: Props) {
+  const [showAccountDeletionDialog, setShowAccountDeletionDialog] = useState(false)
   const [error, setError] = useState('')
 
   const handleDeleteAccount = () => {
     setShowAccountDeletionDialog(true)
   }
-  const handleDialogClosed = async shouldDeleteAccount => {
+  const handleDialogClosed = async (shouldDeleteAccount: boolean) => {
     setShowAccountDeletionDialog(false)
     console.log('shouldDeleteAccount:', shouldDeleteAccount)
     if (shouldDeleteAccount) {
@@ -82,11 +87,10 @@ function DeleteAccount({ currentUser, onSubmitting, isSubmitting, history }) {
 DeleteAccount.propTypes = {
   currentUser: PropTypes.object.isRequired,
   onSubmitting: PropTypes.func.isRequired,
-  isSubmitting: PropTypes.bool.isRequired,
-  history: PropTypes.object.isRequired
+  isSubmitting: PropTypes.bool.isRequired
 }
 
-const mapStateToProps = ({ currentUser: { currentUser } }) => {
+const mapStateToProps = ({ currentUser: { currentUser } }: CurrentUserStore) => {
   return {
     currentUser
   }

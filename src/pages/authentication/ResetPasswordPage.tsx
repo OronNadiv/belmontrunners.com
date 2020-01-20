@@ -12,24 +12,30 @@ import {
 import { TextField } from 'final-form-material-ui'
 import { ROOT } from '../../urls'
 import * as PropTypes from 'prop-types'
-import { INVALID_PASSWORD_LENGTH, RESET_PASSWORD_SUCCESS } from '../../messages'
+import { RESET_PASSWORD_SUCCESS } from '../../messages'
 import * as Sentry from '@sentry/browser'
 import { PASSWORD } from '../../fields'
 import { Field, Form } from 'react-final-form'
 import { goToTop } from 'react-scrollable-anchor'
+import { minPasswordLength, required, composeValidators } from '../../utilities/formValidators'
 
 const WEAK_PASSWORD = 'Password is too weak.'
 
-const required = value => (value ? undefined : 'Required')
-const composeValidators = (...validators) => value =>
-  validators.reduce((error, validator) => error || validator(value), undefined)
-const minPasswordLength = value => {
-  const res = value.length < 6 ? INVALID_PASSWORD_LENGTH(6) : undefined
-  console.log('res', value, res)
-  return res
+interface Props {
+  location: {
+    hash: string;
+    pathname: string;
+    search: string;
+    state: {
+      query: {
+        oobCode: string
+      }
+    }
+  }
+  history: { push: (arg0: string) => void }
 }
 
-function ResetPasswordPage({ history, location }) {
+function ResetPasswordPage({ history, location }: Props) {
   const [errorMessage, setErrorMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
@@ -42,7 +48,7 @@ function ResetPasswordPage({ history, location }) {
     errorMessage && goToTop()
   }, [errorMessage])
 
-  const handleError = error => {
+  const handleError = (error: any) => {
     const { code, message } = error
     if (code === 'auth/weak-password') {
       setErrorMessage(WEAK_PASSWORD)
@@ -53,7 +59,11 @@ function ResetPasswordPage({ history, location }) {
     }
   }
 
-  const handleSubmit = async values => {
+  interface SubmitValues {
+    [PASSWORD]: string
+  }
+
+  const handleSubmit = async (values: SubmitValues) => {
     const newPassword = values[PASSWORD]
 
     const oobCode = location.state.query.oobCode
@@ -77,8 +87,12 @@ function ResetPasswordPage({ history, location }) {
 
   return (
     <Form
-      onSubmit={values => handleSubmit(values)}
-      render={({ handleSubmit, form }) => (
+      onSubmit={(values: SubmitValues) => handleSubmit(values)}
+      render={({
+                 // @ts-ignore
+                 handleSubmit,
+                 form
+               }) => (
         <form onSubmit={handleSubmit} method="POST">
           <Dialog
             open
@@ -155,4 +169,5 @@ ResetPasswordPage.propTypes = {
   }).isRequired
 }
 
+// @ts-ignore
 export default withRouter(ResetPasswordPage)

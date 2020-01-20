@@ -10,6 +10,7 @@ export interface Visibility {
 }
 
 export interface UserOptionalProps {
+  notifications?: { [key: string]: string }
   address1?: string | null
   address2?: string | null
   city?: string | null

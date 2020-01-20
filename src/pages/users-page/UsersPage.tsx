@@ -394,6 +394,7 @@ function UsersPage(props: UsersPageProps) {
               print: false,
               responsive: 'stacked',
               rowsPerPage: 100,
+              // eslint-disable-next-line react/display-name
               customToolbarSelect: (selectedRows) => {
                 return allowDelete &&
                   <IconButton aria-label="Delete" disabled={isSubmitting} onClick={() => {

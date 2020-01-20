@@ -1,12 +1,10 @@
 import { auth } from '../../firebase'
 import * as PropTypes from 'prop-types'
 import React, { useEffect, useState } from 'react'
-import isEmailComponent from 'isemail'
 import { Link, withRouter } from 'react-router-dom'
 import { TextField } from 'final-form-material-ui'
 import {
   INVALID_EMAIL,
-  INVALID_PASSWORD_LENGTH,
   POPUP_CLOSED_BEFORE_COMPLETION,
   USER_NOT_FOUND_INVALID_EMAIL_OR_PASSWORD,
   WRONG_PASSWORD_INVALID_EMAIL_OR_PASSWORD
@@ -26,17 +24,9 @@ import { EMAIL, PASSWORD } from '../../fields'
 import { goToTop } from 'react-scrollable-anchor'
 import { compose } from 'underscore'
 import { connect } from 'react-redux'
-
+import { required, isEmail, minPasswordLength, composeValidators } from '../../utilities/formValidators'
 // const providerGoogle = new firebase.auth.GoogleAuthProvider()
 // const providerFacebook = new firebase.auth.FacebookAuthProvider()
-
-const required = value => (value ? undefined : 'Required')
-const isEmail = value =>
-  !value || !isEmailComponent.validate(value) ? INVALID_EMAIL : undefined
-const minPasswordLength = value =>
-  value.length < 6 ? INVALID_PASSWORD_LENGTH(6) : undefined
-const composeValidators = (...validators) => value =>
-  validators.reduce((error, validator) => error || validator(value), undefined)
 
 function SignInPage({ history, location, currentUser }) {
   const [errorMessage, setErrorMessage] = useState('')

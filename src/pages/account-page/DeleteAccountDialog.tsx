@@ -3,8 +3,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 import * as PropTypes from 'prop-types'
 
 interface DeleteAccountDialogProps {
-  onClose (shouldDelete: boolean): () => null,
-
+  onClose: (shouldDelete: boolean) => Promise<void>,
   open: boolean
 }
 

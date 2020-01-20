@@ -16,20 +16,9 @@ import {
 } from '../fields'
 import DatePickerWrapper from './DatePickerWrapper'
 import * as PropTypes from 'prop-types'
+import { mustBeNumber, required, birthday, composeValidators } from '../utilities/formValidators'
 
 const states: [{ name: string, abbreviation: string }] = require('./states_titlecase.json')
-const required = (value: string) => (value ? undefined : 'Required')
-const mustBeNumber = (value: number) => (isNaN(value) ? 'Must be a number' : undefined)
-const MAX_YEAR = moment().year() - 5
-const MIN_YEAR = moment().year() - 120
-const birthday = (value: string) => {
-  const val = moment(value, 'YYYY-MM-DD')
-  return !val.isValid() || val.year() < MIN_YEAR || val.year() > MAX_YEAR
-    ? 'Invalid birthday'
-    : undefined
-}
-const composeValidators = (...validators: any[]) => (value: any) =>
-  validators.reduce((error, validator) => error || validator(value), undefined)
 
 function UserDetails({ showDisplayName = false }) {
   const spacer = <div style={{ flexGrow: 0, flexShrink: 0, width: 20 }} />

@@ -6,7 +6,7 @@ import moment from 'moment/moment'
 import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import * as Sentry from '@sentry/browser'
-import UpdateUserData from '../../components/HOC/UpdateUserData'
+import UpdateUserDataHOC from '../../components/HOC/UpdateUserData'
 import { Map as IMap } from 'immutable'
 import { compose } from 'underscore'
 import {
@@ -17,60 +17,73 @@ import {
 } from '../../utilities/membershipUtils'
 import { JOIN } from '../../urls'
 import { Link } from 'react-router-dom'
+import { CurrentUserStore, User } from '../../entities/User'
+import { UpdateUserData } from '../../reducers/currentUser'
 
 const POPUP_PAY_MEMBERSHIP_SNOOZED_AT = 'popupPayMembershipSnoozedAt'
 const POPUP_RECEIVED_SHIRT_AT = 'popupReceivedShirtSnoozedAt'
 
-function Notifications({ currentUser, userData, updateUserData }) {
-  userData = userData.toJS()
+interface Props {
+  currentUser: firebase.User
+  userData: any
+  updateUserData: UpdateUserData
+}
+
+function Notifications({ currentUser, userData, updateUserData }: Props) {
+  const userDataJS: User = userData.toJS()
 
   const [notification, setNotification] = useState()
 
+  interface Props1 {
+    key: string,
+    duration?: moment.Duration
+  }
+
   const wasPopupDismissed = ({
-    notificationKey,
-    duration = moment.duration(7, 'days')
-  }) => {
+                               key,
+                               duration = moment.duration(7, 'days')
+                             }: Props1) => {
     const snoozedAt =
-      userData.notifications && userData.notifications[notificationKey]
+      userDataJS.notifications ? userDataJS.notifications[key] : undefined
 
     if (!!snoozedAt && moment().isBefore(moment(snoozedAt).add(duration))) {
-      console.log(notificationKey + ' dismissed.  snoozedAt:', snoozedAt)
+      console.log(key + ' dismissed.  snoozedAt:', snoozedAt)
       return true
     }
 
     console.log(
       'not dismissed.',
       'userData:',
-      userData,
+      userDataJS,
       'snoozedAt:',
       snoozedAt,
-      "moment(snoozedAt).add(2, 'days'):",
+      'moment(snoozedAt).add(2, \'days\'):',
       moment(snoozedAt)
         .add(2, 'days')
         .format(),
       'moment():',
       moment().format(),
-      "moment(snoozedAt).add(2, 'days').isAfter(moment()):",
+      'moment(snoozedAt).add(2, \'days\').isAfter(moment()):',
       moment(snoozedAt)
         .add(2, 'days')
         .isAfter(moment()),
       'total:',
       !!snoozedAt &&
-        moment(snoozedAt)
-          .add(2, 'days')
-          .isAfter(moment())
+      moment(snoozedAt)
+        .add(2, 'days')
+        .isAfter(moment())
     )
 
     return false
   }
 
-  const dismissNotification = async ({ notificationKey }) => {
+  const dismissNotification = async ({ key }: { key: string }) => {
     try {
-      setNotification()
+      setNotification(undefined)
       await updateUserData(
         {
           notifications: {
-            [notificationKey]: moment()
+            [key]: moment()
               .utc()
               .format()
           }
@@ -83,18 +96,18 @@ function Notifications({ currentUser, userData, updateUserData }) {
     }
   }
 
-  const showNotification = ({ message, action }) => {
+  const showNotification = ({ message, action }: { message: any, action: any }) => {
     setNotification(<Snackbar message={message} action={action} />)
   }
 
   const processPayMembershipNotification = () => {
     if (
-      wasPopupDismissed({ notificationKey: POPUP_PAY_MEMBERSHIP_SNOOZED_AT })
+      wasPopupDismissed({ key: POPUP_PAY_MEMBERSHIP_SNOOZED_AT })
     ) {
       return false
     }
 
-    const membershipStatus = calc(userData)
+    const membershipStatus = calc(userDataJS)
 
     let message
     if (membershipStatus[WAS_NEVER_A_MEMBER]) {
@@ -130,7 +143,7 @@ function Notifications({ currentUser, userData, updateUserData }) {
           size="small"
           onClick={async () =>
             await dismissNotification({
-              notificationKey: POPUP_PAY_MEMBERSHIP_SNOOZED_AT
+              key: POPUP_PAY_MEMBERSHIP_SNOOZED_AT
             })
           }
         >
@@ -142,18 +155,18 @@ function Notifications({ currentUser, userData, updateUserData }) {
   }
 
   const processReceivedShirt = () => {
-    console.log('processReceivedShirt called.', userData)
-    const membershipStatus = calc(userData)
+    console.log('processReceivedShirt called.', userDataJS)
+    const membershipStatus = calc(userDataJS)
 
     if (
-      wasPopupDismissed({ notificationKey: POPUP_RECEIVED_SHIRT_AT }) ||
+      wasPopupDismissed({ key: POPUP_RECEIVED_SHIRT_AT }) ||
       membershipStatus[WAS_NEVER_A_MEMBER] ||
       membershipStatus[IS_MEMBERSHIP_EXPIRED]
     ) {
       return false
     }
 
-    if (userData[DID_RECEIVED_SHIRT]) {
+    if (userDataJS[DID_RECEIVED_SHIRT]) {
       return false
     }
 
@@ -169,7 +182,7 @@ function Notifications({ currentUser, userData, updateUserData }) {
             size="small"
             onClick={async () =>
               await dismissNotification({
-                notificationKey: POPUP_RECEIVED_SHIRT_AT
+                key: POPUP_RECEIVED_SHIRT_AT
               })
             }
           >
@@ -191,7 +204,7 @@ function Notifications({ currentUser, userData, updateUserData }) {
                   { [DID_RECEIVED_SHIRT]: true },
                   { merge: true }
                 )
-                setNotification()
+                setNotification(undefined)
               } catch (error) {
                 Sentry.captureException(error)
                 console.error(
@@ -219,12 +232,12 @@ function Notifications({ currentUser, userData, updateUserData }) {
 
   useEffect(() => {
     if (!currentUser) {
-      setNotification()
+      setNotification(undefined)
       return
     }
     processPayMembershipNotification() ||
-      processReceivedShirt() ||
-      setNotification()
+    processReceivedShirt() ||
+    setNotification(undefined)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser])
 
@@ -237,14 +250,15 @@ Notifications.propTypes = {
   userData: PropTypes.object.isRequired
 }
 
-const mapStateToProps = ({ currentUser: { currentUser, userData } }) => {
+const mapStateToProps = ({ currentUser: { currentUser, userData } }: CurrentUserStore) => {
   return {
     currentUser,
+    // @ts-ignore
     userData: userData || new IMap()
   }
 }
 
 export default compose(
-  UpdateUserData,
+  UpdateUserDataHOC,
   connect(mapStateToProps)
 )(Notifications)

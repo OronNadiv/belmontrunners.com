@@ -2,11 +2,9 @@ import { auth, firestore } from '../../firebase'
 import firebase from 'firebase/app'
 import React, { useEffect, useState } from 'react'
 import { TextField } from 'final-form-material-ui'
-import isEmailComponent from 'isemail'
 import {
   EMAIL_ALREADY_IN_USE,
   INVALID_EMAIL,
-  INVALID_PASSWORD_LENGTH,
   POPUP_CLOSED_BEFORE_COMPLETION
 } from '../../messages'
 import * as PropTypes from 'prop-types'
@@ -28,14 +26,7 @@ import { Field, Form } from 'react-final-form'
 import { DISPLAY_NAME, EMAIL, PASSWORD, UID } from '../../fields'
 import { goToTop } from 'react-scrollable-anchor'
 import { compose } from 'underscore'
-
-const required = value => (value ? undefined : 'Required')
-const isEmail = value =>
-  !value || !isEmailComponent.validate(value) ? INVALID_EMAIL : undefined
-const minPasswordLength = value =>
-  value.length < 6 ? INVALID_PASSWORD_LENGTH(6) : undefined
-const composeValidators = (...validators) => value =>
-  validators.reduce((error, validator) => error || validator(value), undefined)
+import { required, isEmail, minPasswordLength, composeValidators } from '../../utilities/formValidators'
 
 function SignUpStepAuth({ onNextClicked, isLast }) {
   const [errorMessage, setErrorMessage] = useState('')
