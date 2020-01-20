@@ -9,7 +9,12 @@ import * as PropTypes from 'prop-types'
 const ACTION_COLOR = '#b39ddb'
 const LINK_COLOR = 'crimson'
 
-function Snackbar({ action, message, onClose }) {
+interface Props {
+  action?: string
+  message: string
+  onClose?: () => void
+}
+function Snackbar({ action, message, onClose }: Props) {
   const useStyles = makeStyles(() => ({
     root: {},
     content: { backgroundColor: '#673ab7' }

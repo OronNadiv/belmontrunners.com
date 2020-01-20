@@ -18,6 +18,7 @@ import * as PropTypes from 'prop-types'
 import LoggedInState from '../../components/HOC/LoggedInState'
 import { connect } from 'react-redux'
 import normalizeEmail from 'normalize-email'
+// @ts-ignore
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import {
   DISPLAY_NAME,
@@ -31,13 +32,22 @@ import { ROOT } from '../../urls'
 import { Redirect } from 'react-router-dom'
 import * as Sentry from '@sentry/browser'
 import { ExportToCsv } from 'export-to-csv'
+// @ts-ignore
 import { parseFullName } from 'parse-full-name'
 import SearchBox from '../../components/SearchBox'
 import { compose } from 'underscore'
 import { fromJS, List as IList } from 'immutable'
+import { CurrentUserStore, User } from '../../entities/User'
+import Contact from './Contact'
 
-function ContactsPage({ currentUser, allowRead }) {
-  const [contacts, setContacts] = useState([])
+interface Props {
+  currentUser: User
+  allowRead: boolean
+}
+
+function ContactsPage({ currentUser, allowRead }: Props) {
+  const [contacts, setContacts] = useState<Contact[]>([])
+  // @ts-ignore
   const [filteredContacts, setFilteredContacts] = useState(new IList())
   const [search, setSearch] = useState('')
   const [showMembers, setShowMembers] = useState(true)
@@ -58,9 +68,10 @@ function ContactsPage({ currentUser, allowRead }) {
     }
 
     const csvExporter = new ExportToCsv(options)
-    const items = filteredContacts.map(item => {
-      const displayName = item.get(DISPLAY_NAME)
-      const email = item.get(EMAIL)
+    const items = filteredContacts.map((item: any) => {
+      const itemJS: User = item.toJS()
+      const displayName = itemJS.displayName
+      const email = itemJS.email
       const name = parseFullName(displayName)
       return {
         'Email Address': email,
@@ -72,7 +83,7 @@ function ContactsPage({ currentUser, allowRead }) {
   }
 
   useEffect(() => {
-    if (!currentUser || allowRead !== true) {
+    if (!currentUser || !allowRead) {
       return
     }
 
@@ -81,7 +92,8 @@ function ContactsPage({ currentUser, allowRead }) {
         const contactsData = await firestore
           .doc('subscribers/items')
           .get()
-        const contacts = contactsData.data()[SUBSCRIBERS_ARRAY_KEY]
+        const data: any = contactsData.data()
+        const contacts: Contact[] = data[SUBSCRIBERS_ARRAY_KEY]
 
         setContacts(contacts)
       } catch (error) {
@@ -118,9 +130,11 @@ function ContactsPage({ currentUser, allowRead }) {
   }, [applyFilter])
 
   const copyToClipboard = useCallback(() => {
-    const items = filteredContacts.map(item => {
-      const displayName = item.get(DISPLAY_NAME)
-      const email = item.get(EMAIL)
+    const items = filteredContacts.map((item: any) => {
+      const itemJS: User = item.toJS()
+
+      const displayName = itemJS.displayName
+      const email = itemJS.email
       if (displayName) {
         return `${displayName} <${email}>`
       } else {
@@ -135,19 +149,19 @@ function ContactsPage({ currentUser, allowRead }) {
   }, [copyToClipboard])
 
   const getChips = () => {
-    return filteredContacts.toJS().map(contact => {
+    return filteredContacts.toJS().map((contact: Contact) => {
       let label
-      if (contact[DISPLAY_NAME]) {
-        label = `${contact[DISPLAY_NAME] || ''} (${contact[EMAIL]})`
+      if (contact.displayName) {
+        label = `${contact.displayName || ''} (${contact.email})`
       } else {
-        label = contact[EMAIL]
+        label = contact.email
       }
 
       function getColor() {
-        if (contact[IS_MEMBER]) {
+        if (contact.isMember) {
           return 'primary'
         }
-        if (contact[UID]) {
+        if (contact.uid) {
           return 'secondary'
         }
         return 'default'
@@ -156,7 +170,7 @@ function ContactsPage({ currentUser, allowRead }) {
       return (
         <Chip
           className="my-1 mx-1"
-          key={contact[UID] || normalizeEmail(contact[EMAIL])}
+          key={contact.uid || normalizeEmail(contact.email)}
           label={label}
           color={getColor()}
         />
@@ -164,7 +178,7 @@ function ContactsPage({ currentUser, allowRead }) {
     })
   }
 
-  if (currentUser && allowRead !== true) {
+  if (currentUser && !allowRead) {
     return <Redirect to={ROOT} />
   }
 
@@ -184,7 +198,7 @@ function ContactsPage({ currentUser, allowRead }) {
             key="close"
             aria-label="Close"
             color="inherit"
-            onClick={() => this.setState({ copied: false })}
+            onClick={() => setCopied(false)}
           >
             <CloseIcon />
           </IconButton>
@@ -216,6 +230,11 @@ function ContactsPage({ currentUser, allowRead }) {
           <Chip label="Subscribers" color="default" />
         </div>
       </div>
+      <div className='text-center'>
+        <div>User: Someone who created an account on our website.</div>
+        <div>Member: A user who paid annual membership and the membership has not expired.</div>
+        <div>Subscriber: Someone who added their email address via the subscribe form on our website.</div>
+      </div>
       <Paper className="px-2 py-3">
         <Typography variant="h5" component="h3" className="ml-3">
           Contacts ({filteredContacts.size})
@@ -246,7 +265,7 @@ ContactsPage.propTypes = {
   currentUser: PropTypes.object.isRequired
 }
 
-const mapStateToProps = ({ currentUser: { permissions, currentUser } }) => {
+const mapStateToProps = ({ currentUser: { permissions, currentUser } }: CurrentUserStore) => {
   return {
     allowRead: !!currentUser && !!permissions.contactsRead[currentUser[UID]],
     currentUser

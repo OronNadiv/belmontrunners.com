@@ -3,11 +3,20 @@ import React, { useCallback, useEffect } from 'react'
 import * as PropTypes from 'prop-types'
 import { Map as IMap } from 'immutable'
 
-const Drift = ({ appId, config, userId, attributes }) => {
+interface Props {
+  appId: string
+  config: any // IMap
+  userId: string
+  attributes: any // IMap
+}
+
+const Drift = ({ appId, config, userId, attributes }: Props) => {
   userId = userId || ''
+  // @ts-ignore
   config = new IMap(config)
+  // @ts-ignore
   attributes = new IMap(attributes)
-  const insertScript = scriptText => {
+  const insertScript = (scriptText: string) => {
     const element = document.createElement('script')
     element.innerText = scriptText
     element.async = true
@@ -15,7 +24,7 @@ const Drift = ({ appId, config, userId, attributes }) => {
     return element
   }
 
-  const removeElement = element => {
+  const removeElement = (element: HTMLScriptElement) => {
     document.body.removeChild(element)
   }
 
@@ -56,7 +65,7 @@ const Drift = ({ appId, config, userId, attributes }) => {
   }, [userId, attributes])
 
   useEffect(() => {
-    let elem
+    let elem: HTMLScriptElement
     if (typeof window !== 'undefined') {
       elem = addMainScript()
     }
@@ -66,12 +75,14 @@ const Drift = ({ appId, config, userId, attributes }) => {
   }, [userId, appId, config, addMainScript])
 
   useEffect(() => {
-    let elem
+    let elem: HTMLScriptElement
+    // @ts-ignore
     if (typeof window !== 'undefined' && drift) {
       elem = addIdentityVariables()
     }
     return () => {
       elem && removeElement(elem)
+      // @ts-ignore
       drift && drift.reset()
     }
   }, [userId, attributes, addIdentityVariables])

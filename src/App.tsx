@@ -44,6 +44,7 @@ import AccountPage from './pages/account-page/AccountPage'
 import LogRocket from 'logrocket'
 import FaqPage from './pages/faq-page/FaqPage'
 import { CurrentUserStore } from './entities/User'
+import ErrorBoundary from './components/ErrorBoundary'
 
 const setupLogRocketReact = require('logrocket-react')
 
@@ -54,7 +55,7 @@ interface WrapperProps {
 
 function Wrapper(props: WrapperProps = {}) {
   return (
-    <>
+    <ErrorBoundary>
       <Header />
       {props.inHomePage && <HomePage />}
       {props.inHomePage && props.children}
@@ -63,7 +64,7 @@ function Wrapper(props: WrapperProps = {}) {
         <div className="mb-4 mx-1 mx-sm-2 mx-md-3"> {props.children} </div>
       )}
       <Footer />
-    </>
+    </ErrorBoundary>
   )
 }
 
