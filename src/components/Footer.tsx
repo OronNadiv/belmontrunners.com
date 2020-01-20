@@ -30,9 +30,13 @@ function Footer() {
   const [feed, setFeed] = useState(initialFeed)
 
   useEffect(() => {
-    ig.scrapeUserPage('belmontrunners').then((result: any) => {
-      setFeed(result)
-    })
+    ig.scrapeUserPage('belmontrunners')
+      .then((result: IFeed) => {
+        setFeed(result)
+      })
+      .catch((err: any) => {
+        console.warn('failed to scrape Instagram feed.  error:', err)
+      })
   }, [])
 
   const getRssFeed = () => {
