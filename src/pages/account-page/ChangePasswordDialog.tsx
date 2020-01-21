@@ -131,7 +131,7 @@ function ChangePasswordDialog({ onClose, currentUser }: Props) {
                       fullWidth
                       name={PASSWORD}
                       component={TextField}
-                      validate={composeValidators([required, minPasswordLength])}
+                      validate={composeValidators(required, minPasswordLength)}
                     />
 
                     <Field
@@ -141,7 +141,7 @@ function ChangePasswordDialog({ onClose, currentUser }: Props) {
                       fullWidth
                       name={PASSWORD1}
                       component={TextField}
-                      validate={composeValidators([required, minPasswordLength])}
+                      validate={composeValidators(required, minPasswordLength)}
                     />
 
                     <Field
@@ -151,7 +151,7 @@ function ChangePasswordDialog({ onClose, currentUser }: Props) {
                       fullWidth
                       name={PASSWORD2}
                       component={TextField}
-                      validate={composeValidators([required, minPasswordLength])}
+                      validate={composeValidators(required, minPasswordLength)}
                     />
                   </div>
                 )}
