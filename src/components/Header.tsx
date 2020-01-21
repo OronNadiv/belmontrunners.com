@@ -50,7 +50,6 @@ import $ from 'jquery'
 import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { calc, IS_A_MEMBER } from '../utilities/membershipUtils'
-import { UID } from '../fields'
 import firebase from 'firebase/app'
 import { CurrentUserStore, User } from '../entities/User'
 import { compose } from 'underscore'
@@ -412,8 +411,8 @@ Header.propTypes = {
 
 const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, currentUser, permissions, userData } }: CurrentUserStore) => {
   return {
-    allowUsersPage: !!currentUser && (permissions.usersRead[currentUser[UID]] || permissions.usersWrite[currentUser[UID]]),
-    allowContactsPage: !!currentUser && (permissions.contactsRead[currentUser[UID]] || permissions.contactsWrite[currentUser[UID]]),
+    allowUsersPage: !currentUser ? false : !!(permissions.usersRead[currentUser.uid] || permissions.usersWrite[currentUser.uid]),
+    allowContactsPage: !currentUser ? false : !!(permissions.contactsRead[currentUser.uid] || permissions.contactsWrite[currentUser.uid]),
     isMember: userData && calc(userData.toJS() as User)[IS_A_MEMBER],
     isCurrentUserLoaded,
     currentUser
