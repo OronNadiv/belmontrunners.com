@@ -25,10 +25,21 @@ import { goToTop } from 'react-scrollable-anchor'
 import { compose } from 'underscore'
 import { connect } from 'react-redux'
 import { required, isEmail, minPasswordLength, composeValidators } from '../../utilities/formValidators'
+import { CurrentUserStore } from '../../entities/User'
 // const providerGoogle = new firebase.auth.GoogleAuthProvider()
 // const providerFacebook = new firebase.auth.FacebookAuthProvider()
 
-function SignInPage({ history, location, currentUser }) {
+interface Props {
+  location: {
+    state?: {
+      redirectUrl?: string
+    }
+  }
+  history: { push: (arg0: string) => void }
+  currentUser: firebase.User
+}
+
+function SignInPage({ history, location, currentUser }: Props) {
   const [errorMessage, setErrorMessage] = useState('')
   const [isSigningIn, setIsSigningIn] = useState(false)
 
@@ -38,7 +49,7 @@ function SignInPage({ history, location, currentUser }) {
     errorMessage && goToTop()
   }, [errorMessage])
 
-  const handleSignInError = error => {
+  const handleSignInError = (error: firebase.auth.Error) => {
     const { code, message } = error
     switch (code) {
       case 'auth/invalid-email':
@@ -60,7 +71,12 @@ function SignInPage({ history, location, currentUser }) {
     }
   }
 
-  const signIn = async (providerName, params) => {
+  interface IEmailPassword {
+    email: string
+    password: string
+  }
+
+  const signIn = async (providerName: string, params: IEmailPassword) => {
     let promise
     switch (providerName.toLowerCase()) {
       // case 'facebook':
@@ -71,7 +87,7 @@ function SignInPage({ history, location, currentUser }) {
       //   break
       case 'email':
       default:
-        promise = auth.signInWithEmailAndPassword(params[EMAIL], params[PASSWORD])
+        promise = auth.signInWithEmailAndPassword(params.email, params.password)
         break
     }
 
@@ -86,7 +102,7 @@ function SignInPage({ history, location, currentUser }) {
     // todo: when sign-in is done via provider, redirect to user details and then maybe to payments
   }
 
-  const handleSignInWithEmail = async values => {
+  const handleSignInWithEmail = async (values: IEmailPassword) => {
     setErrorMessage('')
 
     await signIn('email', values)
@@ -116,6 +132,7 @@ function SignInPage({ history, location, currentUser }) {
   return (
     <Form
       onSubmit={handleSignInWithEmail}
+      // @ts-ignore
       render={({ handleSubmit, form }) => (
         <form onSubmit={handleSubmit} method="POST">
           <Dialog
@@ -205,7 +222,7 @@ SignInPage.propTypes = {
   }).isRequired
 }
 
-const mapStateToProps = ({ currentUser: { currentUser } }) => {
+const mapStateToProps = ({ currentUser: { currentUser } }: CurrentUserStore) => {
   return {
     currentUser
   }
