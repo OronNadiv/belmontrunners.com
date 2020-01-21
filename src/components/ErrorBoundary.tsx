@@ -20,7 +20,7 @@ class ErrorBoundary extends Component {
 
 // @ts-ignore
 ErrorBoundary.propTypes = {
-  children: PropTypes.element.isRequired
+  children: PropTypes.node.isRequired
 }
 
 export default ErrorBoundary

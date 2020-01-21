@@ -231,9 +231,11 @@ function ContactsPage({ currentUser, allowRead }: Props) {
         </div>
       </div>
       <div className='text-center'>
-        <div>User: Someone who created an account on our website.</div>
-        <div>Member: A user who paid annual membership and the membership has not expired.</div>
-        <div>Subscriber: Someone who added their email address via the subscribe form on our website.</div>
+        <p>User: someone who created an account on our website.</p>
+        <p>Member: a user who paid annual membership and the membership has not expired.</p>
+        <p>Subscriber: someone who added their email address via the subscribe form on our website.
+        <br/>A subscriber may be converted to a user if they create an account using the same email address.</p>
+        <p>Contact: either a user or a subscriber (basically, everyone is a contact).</p>
       </div>
       <Paper className="px-2 py-3">
         <Typography variant="h5" component="h3" className="ml-3">
