@@ -8,6 +8,7 @@ import {
 import moment from 'moment'
 import { MEMBERSHIP_EXPIRES_AT } from '../fields'
 import { each } from 'underscore'
+import { UserOptionalProps } from '../entities/User'
 
 const inAYear = moment().add(1, 'year')
 const tomorrow = moment().add(1, 'day')
@@ -41,7 +42,7 @@ it('membershipUtils', () => {
     }
   }
   each(data, (expects, time) => {
-    const userData = {
+    const userData: UserOptionalProps = {
       [MEMBERSHIP_EXPIRES_AT]: time
     }
     each(expects, (val, key) => {

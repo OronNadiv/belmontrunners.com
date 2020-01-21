@@ -19,19 +19,29 @@ import { compose, pick } from 'underscore'
 import UserDetails from '../../components/UserDetails'
 import UpdateUserData from '../../components/HOC/UpdateUserData'
 import { goToTop } from 'react-scrollable-anchor'
+import { CurrentUserStore, UserOptionalProps } from '../../entities/User'
+import { UpdateUserData as IUpdateUserData } from '../../reducers/currentUser'
+
+interface Props {
+  onNextClicked: () => void
+  userData: any
+  isLast: boolean
+  isCurrentUserLoaded: boolean
+  updateUserData: IUpdateUserData
+}
 
 const SignUpStepUserProfile = ({
-  onNextClicked,
-  userData,
-  isLast,
-  isCurrentUserLoaded,
-  updateUserData
-}) => {
+                                 onNextClicked,
+                                 userData,
+                                 isLast,
+                                 isCurrentUserLoaded,
+                                 updateUserData
+                               }: Props) => {
   userData = userData.toJS()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = async values => {
-    console.log('submitting values:', JSON.stringify(values, 0, 2))
+  const handleSubmitFunc = async (values: UserOptionalProps) => {
+    console.log('submitting values:', JSON.stringify(values, null, 2))
 
     setIsSubmitting(true)
     try {
@@ -62,10 +72,13 @@ const SignUpStepUserProfile = ({
     ''
   ) : (
     <Form
-      onSubmit={values => handleSubmit(values)}
+      onSubmit={values => handleSubmitFunc(values)}
       initialValues={initialValues}
+      // @ts-ignore
       render={({ handleSubmit, form, values }) => (
         <form onSubmit={handleSubmit} method="POST">
+          {/*
+  // @ts-ignore */}
           <UserDetails values={values} />
 
           <SignUpStepperButton
@@ -89,11 +102,10 @@ SignUpStepUserProfile.propTypes = {
   onNextClicked: PropTypes.func.isRequired
 }
 
-const mapStateToProps = ({
-  currentUser: { isCurrentUserLoaded, userData }
-}) => {
+const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, userData } }: CurrentUserStore) => {
   return {
     isCurrentUserLoaded,
+    // @ts-ignore
     userData: userData || new IMap()
   }
 }

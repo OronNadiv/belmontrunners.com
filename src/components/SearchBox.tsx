@@ -3,7 +3,13 @@ import SearchIcon from '@material-ui/icons/Search'
 import React from 'react'
 import * as PropTypes from 'prop-types'
 
-function SearchBox({ onChange, placeholder = 'Search', children }) {
+interface Props {
+  onChange: (arg0: string) => void
+  placeholder?: string
+  children?: any
+}
+
+function SearchBox({ onChange, placeholder = 'Search', children }: Props) {
   const useStyles = makeStyles(() => ({
     paper: {
       // margin: '20px 10px',
@@ -23,7 +29,7 @@ function SearchBox({ onChange, placeholder = 'Search', children }) {
   }))
   const classes = useStyles()
 
-  function handleSearch(event) {
+  function handleSearch(event: any) {
     onChange(event.target.value)
   }
 

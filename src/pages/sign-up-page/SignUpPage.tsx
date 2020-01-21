@@ -6,8 +6,14 @@ import SignUpStepper, {
 } from './SignUpStepper'
 import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
+import { CurrentUserStore } from '../../entities/User'
 
-function SignUpPage({ isCurrentUserLoaded, currentUser }) {
+interface Props {
+  isCurrentUserLoaded: boolean
+  currentUser: firebase.User
+}
+
+function SignUpPage({ isCurrentUserLoaded, currentUser }: Props) {
   const [steps, setSteps] = useState()
   useEffect(() => {
     if (!isCurrentUserLoaded) {
@@ -41,13 +47,12 @@ SignUpPage.propTypes = {
   currentUser: PropTypes.object
 }
 
-const mapStateToProps = ({
-  currentUser: { isCurrentUserLoaded, currentUser }
-}) => {
+const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, currentUser } }: CurrentUserStore) => {
   return {
     isCurrentUserLoaded,
     currentUser
   }
 }
 
+// @ts-ignore
 export default connect(mapStateToProps)(SignUpPage)

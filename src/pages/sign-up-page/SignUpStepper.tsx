@@ -13,7 +13,11 @@ export const STEP_AUTHENTICATION = 'STEP_AUTHENTICATION'
 export const STEP_USER_DETAILS = 'STEP_USER_DETAILS'
 export const STEP_MEMBERSHIP = 'STEP_MEMBERSHIP'
 
-function SignUpStepper({ steps }) {
+interface Props {
+  steps: string[]
+}
+
+function SignUpStepper({ steps }: Props) {
   const [activeStep, setActiveStep] = useState(0)
 
   const handleNext = () => {
