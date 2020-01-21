@@ -5,6 +5,5 @@ export default createMuiTheme({
   palette: {
     primary: { main: purple[700] }, // Purple and green play nicely together.
     secondary: { main: purple[200] } // This is just green.A700 as hex.
-  },
-  typography: { useNextVariants: true }
+  }
 })

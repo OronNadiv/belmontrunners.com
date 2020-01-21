@@ -7,6 +7,7 @@ import LogRocket from 'logrocket'
 
 export const history = createBrowserHistory()
 
+// @ts-ignore
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
 export default function configureStore(initialState = {}) {
