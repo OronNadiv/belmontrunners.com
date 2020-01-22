@@ -107,12 +107,11 @@ function SignUpStepAuth({ onNextClicked, isLast }: Props) {
             .format()
         }
       }
-      const { email, displayName, photoURL } = auth.currentUser
       values = {
         ...values,
-        email,
-        displayName,
-        photoURL
+        email: auth.currentUser.email,
+        displayName: auth.currentUser.displayName,
+        photoURL: auth.currentUser.photoURL
       }
       await userRef.set(values, { merge: true })
       onNextClicked()

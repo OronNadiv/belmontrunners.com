@@ -92,9 +92,9 @@ function ContactsPage({ currentUser, allowRead }: Props) {
           .doc('subscribers/items')
           .get()
         const data: any = contactsData.data()
-        const contacts: Contact[] = data[SUBSCRIBERS_ARRAY_KEY]
+        const contactsTmp: Contact[] = data[SUBSCRIBERS_ARRAY_KEY]
 
-        setContacts(contacts)
+        setContacts(contactsTmp)
       } catch (error) {
         Sentry.captureException(error)
         console.error(error)

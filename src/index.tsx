@@ -18,7 +18,7 @@ Sentry.init({
   debug: process.env.NODE_ENV !== 'production'
 })
 
-let store = configureStore()
+const store = configureStore()
 
 console.log(
   'process.env.REACT_APP_STRIPE_PUBLIC_KEY:',

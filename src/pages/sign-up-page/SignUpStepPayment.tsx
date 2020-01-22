@@ -8,10 +8,6 @@ import LoggedInState from '../../components/HOC/LoggedInState'
 import moment from 'moment'
 import { ROOT } from '../../urls'
 import { connect } from 'react-redux'
-import {
-  DATE_OF_BIRTH,
-  MEMBERSHIP_EXPIRES_AT
-} from '../../fields'
 import * as Sentry from '@sentry/browser'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 import UpdateUserData from '../../components/HOC/UpdateUserData'
@@ -22,7 +18,7 @@ import {
   IS_A_MEMBER,
   IS_MEMBERSHIP_EXPIRES_SOON
 } from '../../utilities/membershipUtils'
-import { CurrentUserStore } from '../../entities/User'
+import { CurrentUserStore, User } from '../../entities/User'
 
 const MEMBERSHIP_FEE_ADULT = 25
 const MEMBERSHIP_FEE_KID = 15
@@ -296,23 +292,27 @@ SignUpStepPayment.propTypes = {
 }
 
 const mapStateToProps = ({ currentUser: { currentUser, userData } }: CurrentUserStore) => {
-  userData = userData ? userData.toJS() : {}
+  const userDataJS: User = userData ? userData.toJS() : {}
   let membershipExpiresAt = null
   let needToPay = false
   let totalAmount = -1
   let youngerThan13 = false
 
   if (currentUser) {
-    const dateOfBirth = moment(userData[DATE_OF_BIRTH])
-    const isAdult = moment().diff(dateOfBirth, 'years') >= 18
-    if (isAdult) {
+    if (!userDataJS.dateOfBirth) {
+      console.error('missing userDataJS.dateOfBirth')
       totalAmount = MEMBERSHIP_FEE_ADULT
     } else {
-      totalAmount = MEMBERSHIP_FEE_KID
+      const dateOfBirth = moment(userDataJS.dateOfBirth)
+      const isAdult = moment().diff(dateOfBirth, 'years') >= 18
+      if (isAdult) {
+        totalAmount = MEMBERSHIP_FEE_ADULT
+      } else {
+        totalAmount = MEMBERSHIP_FEE_KID
+      }
     }
-
-    const membershipData = calc(userData)
-    membershipExpiresAt = userData[MEMBERSHIP_EXPIRES_AT]
+    const membershipData = calc(userDataJS)
+    membershipExpiresAt = userDataJS.membershipExpiresAt
     if (
       !membershipData[IS_A_MEMBER] ||
       membershipData[IS_MEMBERSHIP_EXPIRES_SOON]
@@ -320,8 +320,8 @@ const mapStateToProps = ({ currentUser: { currentUser, userData } }: CurrentUser
       needToPay = true
     }
     youngerThan13 =
-      (userData[DATE_OF_BIRTH] &&
-        moment().diff(moment(userData[DATE_OF_BIRTH]), 'years') < 13) ||
+      (userDataJS.dateOfBirth &&
+        moment().diff(moment(userDataJS.dateOfBirth), 'years') < 13) ||
       false
     if (youngerThan13) {
       needToPay = false

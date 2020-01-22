@@ -19,7 +19,7 @@ import { compose, pick } from 'underscore'
 import UserDetails from '../../components/UserDetails'
 import UpdateUserData from '../../components/HOC/UpdateUserData'
 import { goToTop } from 'react-scrollable-anchor'
-import { CurrentUserStore, UserOptionalProps } from '../../entities/User'
+import { CurrentUserStore, User, UserOptionalProps } from '../../entities/User'
 import { UpdateUserData as IUpdateUserData } from '../../reducers/currentUser'
 
 interface Props {
@@ -37,7 +37,7 @@ const SignUpStepUserProfile = ({
                                  isCurrentUserLoaded,
                                  updateUserData
                                }: Props) => {
-  userData = userData.toJS()
+  const userDataJS: User = userData.toJS()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleSubmitFunc = async (values: UserOptionalProps) => {
@@ -58,7 +58,7 @@ const SignUpStepUserProfile = ({
   })
 
   const initialValues = pick(
-    userData,
+    userDataJS,
     ADDRESS1,
     ADDRESS2,
     CITY,
