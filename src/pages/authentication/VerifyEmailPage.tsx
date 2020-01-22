@@ -7,7 +7,7 @@ import {
   USER_DISABLED_INVALID_URL,
   USER_NOT_FOUND_INVALID_URL
 } from '../../messages'
-import { Redirect, withRouter } from 'react-router-dom'
+import { Redirect, withRouter, RouteComponentProps } from 'react-router-dom'
 import { ROOT } from '../../urls'
 import {
   Button,
@@ -19,22 +19,7 @@ import {
 } from '@material-ui/core'
 import * as Sentry from '@sentry/browser'
 
-interface Props {
-  location: {
-    state: {
-      query: {
-        oobCode: string
-      }
-      info: {
-        data: {
-          email: string
-        }
-      }
-    }
-  }
-}
-
-const VerifyEmailPage = ({ location: { state: { query: { oobCode } } } }: Props) => {
+const VerifyEmailPage = ({ location: { state: { query: { oobCode } } } }: RouteComponentProps) => {
   const [close, setClose] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [isSuccess, setIsSuccess] = useState(false)

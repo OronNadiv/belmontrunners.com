@@ -20,15 +20,14 @@ import { compose, pick } from 'underscore'
 import UserDetails from '../../components/UserDetails'
 import { ROOT } from '../../urls'
 import { Button } from '@material-ui/core'
-import { withRouter } from 'react-router-dom'
+import { withRouter, RouteComponentProps } from 'react-router-dom'
 import UpdateUserData from '../../components/HOC/UpdateUserData'
 import { CurrentUserStore, UserOptionalProps } from '../../entities/User'
 
-interface Props {
+interface Props extends RouteComponentProps {
   updateUserData: any,
   currentUser: firebase.User,
   userData: any,
-  history: any,
   isSubmitting: boolean,
   onSubmitting: (arg0: boolean) => void
 }
@@ -87,37 +86,37 @@ function MyProfileForm({
           onSubmit={values => handleSubmitFunc(values)}
           initialValues={initialValues}
           render={
-  // @ts-ignore */
+            // @ts-ignore */
             ({ handleSubmit, form, values }) => (
-            <form onSubmit={handleSubmit} method="POST">
-              {/*
+              <form onSubmit={handleSubmit} method="POST">
+                {/*
   // @ts-ignore */}
-              <UserDetails values={values} showDisplayName />
-              <div className="d-flex justify-content-between my-5">
-                <Button
-                  className="mr-4"
-                  variant="contained"
-                  color="default"
-                  fullWidth
-                  type="button"
-                  onClick={() => handleClose()}
-                  disabled={isSubmitting}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  fullWidth
-                  type="button"
-                  onClick={() => form.submit()}
-                  disabled={isSubmitting}
-                >
-                  Save
-                </Button>
-              </div>
-            </form>
-          )}
+                <UserDetails values={values} showDisplayName />
+                <div className="d-flex justify-content-between my-5">
+                  <Button
+                    className="mr-4"
+                    variant="contained"
+                    color="default"
+                    fullWidth
+                    type="button"
+                    onClick={() => handleClose()}
+                    disabled={isSubmitting}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                    type="button"
+                    onClick={() => form.submit()}
+                    disabled={isSubmitting}
+                  >
+                    Save
+                  </Button>
+                </div>
+              </form>
+            )}
         />
       </>
     )

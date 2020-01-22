@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 import queryString from 'query-string'
 import * as PropTypes from 'prop-types'
 import { ROOT } from '../../urls'
-import { Redirect, withRouter } from 'react-router-dom'
+import { Redirect, withRouter, RouteComponentProps } from 'react-router-dom'
 import {
   EXPIRED_ACTION_CODE,
   INVALID_ACTION_CODE_INVALID_URL,
@@ -20,13 +20,7 @@ import {
 } from '@material-ui/core'
 import * as Sentry from '@sentry/browser'
 
-interface Props {
-  location: {
-    search: string
-  }
-}
-
-const Complete = ({ location: { search } }: Props) => {
+const Complete = ({ location: { search } }: RouteComponentProps) => {
 
   const [errorMessage, setErrorMessage] = useState('')
   const [redirect, setRedirect] = useState()

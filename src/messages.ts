@@ -5,8 +5,7 @@ export const EMAIL_ALREADY_IN_USE = 'Email already in use'
 
 // passwords
 export const PASSWORDS_MISMATCH = "Passwords don't match"
-export const MISSING_PASSWORD = 'Please enter a valid password'
-export const INVALID_PASSWORD_LENGTH = num =>
+export const INVALID_PASSWORD_LENGTH = (num: number) =>
   `Password should be at least ${num} characters`
 export const INVALID_EMAIL_OR_PASSWORD = 'Invalid email or password'
 export const WRONG_PASSWORD = 'Wrong password'

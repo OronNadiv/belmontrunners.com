@@ -1,7 +1,7 @@
 import { auth } from '../../firebase'
 import * as PropTypes from 'prop-types'
 import React, { useEffect, useState } from 'react'
-import { Link, withRouter } from 'react-router-dom'
+import { Link, withRouter, RouteComponentProps } from 'react-router-dom'
 import { TextField } from 'final-form-material-ui'
 import {
   INVALID_EMAIL,
@@ -26,16 +26,11 @@ import { compose } from 'underscore'
 import { connect } from 'react-redux'
 import { required, isEmail, minPasswordLength, composeValidators } from '../../utilities/formValidators'
 import { CurrentUserStore } from '../../entities/User'
+
 // const providerGoogle = new firebase.auth.GoogleAuthProvider()
 // const providerFacebook = new firebase.auth.FacebookAuthProvider()
 
-interface Props {
-  location: {
-    state?: {
-      redirectUrl?: string
-    }
-  }
-  history: { push: (arg0: string) => void }
+interface Props extends RouteComponentProps {
   currentUser: firebase.User
 }
 

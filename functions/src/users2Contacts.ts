@@ -11,9 +11,11 @@ const _ = require('underscore')
 export default (admin: Admin.app.App) => {
   const firestore: FirebaseFirestore.Firestore = admin.firestore()
   return async () => {
+    const docRef = firestore.doc('subscribers/items')
+
     const res = await BPromise.props({
       usersCollection: firestore.collection('users').get(),
-      contactsDoc: firestore.doc('subscribers/items').get()
+      contactsDoc: docRef.get()
     })
     const usersCollection: FirebaseFirestore.QuerySnapshot = res.usersCollection
     const contactsDoc: FirebaseFirestore.QueryDocumentSnapshot = res.contactsDoc
@@ -82,6 +84,6 @@ export default (admin: Admin.app.App) => {
       contacts.push(contact)
     })
 
-    await firestore.doc('subscribers/items').set({ [ARRAY_KEY]: contacts })
+    await docRef.set({ [ARRAY_KEY]: contacts })
   }
 }

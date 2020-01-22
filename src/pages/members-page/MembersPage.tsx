@@ -16,17 +16,15 @@ import DirectionsRun from '@material-ui/icons/DirectionsRun'
 import FuzzySearch from 'fuzzy-search'
 import LoggedInState from '../../components/HOC/LoggedInState'
 import UserProfile from './UserProfile'
-import { withRouter } from 'react-router-dom'
+import { withRouter, RouteComponentProps } from 'react-router-dom'
 import { compose, findWhere, sortBy } from 'underscore'
 import { MEMBERS, ROOT } from '../../urls'
 import SearchBox from '../../components/SearchBox'
 import { Map as IMap } from 'immutable'
 import { CurrentUserStore, UserOptionalProps } from '../../entities/User'
 
-interface Props {
+interface Props extends RouteComponentProps {
   currentUser: firebase.User
-  location: { pathname: string }
-  history: { push: (arg0: string) => void }
   userData: any
 }
 

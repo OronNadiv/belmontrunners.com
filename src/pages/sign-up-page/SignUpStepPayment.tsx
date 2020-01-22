@@ -1,4 +1,4 @@
-import {functions} from '../../firebase'
+import { functions } from '../../firebase'
 import React, { useEffect, useState } from 'react'
 import { CardElement, injectStripe } from 'react-stripe-elements'
 import SignUpStepperButton from './SignUpStepperButton'
@@ -10,10 +10,10 @@ import { ROOT } from '../../urls'
 import { connect } from 'react-redux'
 import {
   DATE_OF_BIRTH,
-  MEMBERSHIP_EXPIRES_AT,
+  MEMBERSHIP_EXPIRES_AT
 } from '../../fields'
 import * as Sentry from '@sentry/browser'
-import { withRouter } from 'react-router-dom'
+import { withRouter, RouteComponentProps } from 'react-router-dom'
 import UpdateUserData from '../../components/HOC/UpdateUserData'
 import { goToTop } from 'react-scrollable-anchor'
 import { compose } from 'underscore'
@@ -22,34 +22,49 @@ import {
   IS_A_MEMBER,
   IS_MEMBERSHIP_EXPIRES_SOON
 } from '../../utilities/membershipUtils'
+import { CurrentUserStore } from '../../entities/User'
 
 const MEMBERSHIP_FEE_ADULT = 25
 const MEMBERSHIP_FEE_KID = 15
 
+interface StripeResponse {
+  error?: { message: string }
+}
+
+interface Props extends RouteComponentProps {
+  currentUser: firebase.User
+  needToPay: boolean
+  totalAmount: number
+  isLast: boolean
+  onNextClicked: () => void
+  youngerThan13: boolean
+  membershipExpiresAt?: string
+  stripe: { createToken: (arg0: { type: string }) => StripeResponse }
+}
+
 function SignUpStepPayment({
-  currentUser: { displayName, uid, email },
-  history,
-  updateUserData,
-  stripe,
-  isLast,
-  needToPay,
-  totalAmount,
-  membershipExpiresAt,
-  onNextClicked,
-  youngerThan13
-}) {
+                             currentUser: { displayName, uid, email },
+                             history,
+                             stripe,
+                             isLast,
+                             needToPay,
+                             totalAmount,
+                             membershipExpiresAt,
+                             onNextClicked,
+                             youngerThan13
+                           }: Props) {
   useEffect(() => {
     goToTop()
   }, [])
 
   const [errorMessage, setErrorMessage] = useState()
-  const [isSubmitting, setIsSubmitting] = useState()
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [confirmationNumber, setConfirmationNumber] = useState()
 
   const createToken = async () => {
     try {
-      const stripeResponse = await stripe.createToken({ type: 'card' })
-      console.log('stripeResponse1:', JSON.stringify(stripeResponse, 0, 2))
+      const stripeResponse: StripeResponse = await stripe.createToken({ type: 'card' })
+      console.log('stripeResponse1:', JSON.stringify(stripeResponse, null, 2))
       if (stripeResponse.error) {
         setErrorMessage(stripeResponse.error.message)
         return
@@ -67,7 +82,7 @@ function SignUpStepPayment({
       return
     }
 
-    const run = async () => {
+    ;(async function() {
       try {
         const stripeResponse = await createToken()
         console.log('stripeResponse2:', !!stripeResponse)
@@ -105,8 +120,7 @@ function SignUpStepPayment({
       } finally {
         setIsSubmitting(false)
       }
-    }
-    run()
+    })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSubmitting])
 
@@ -122,7 +136,7 @@ function SignUpStepPayment({
       )
     }
 
-    if (needToPay === false) {
+    if (!needToPay) {
       if (youngerThan13) {
         return (
           <>
@@ -171,11 +185,11 @@ function SignUpStepPayment({
           <div className="text-warning mb-2 text-center">
             {moment(membershipExpiresAt).isAfter(moment())
               ? `Membership will expire on ${moment(membershipExpiresAt).format(
-                  'MMMM Do YYYY'
-                )}`
+                'MMMM Do YYYY'
+              )}`
               : `Membership expired on ${moment(membershipExpiresAt).format(
-                  'MMMM Do YYYY'
-                )}`}
+                'MMMM Do YYYY'
+              )}`}
           </div>
         )}
         <h5 className="mb-2">Credit or debit card</h5>
@@ -194,7 +208,7 @@ function SignUpStepPayment({
   }
 
   function handleNextClicked() {
-    confirmationNumber || needToPay === false
+    confirmationNumber || !needToPay
       ? onNextClicked()
       : setIsSubmitting(true)
   }
@@ -237,24 +251,24 @@ function SignUpStepPayment({
       </a>
       <br />
       {getBody()}
-      {(needToPay === false || needToPay === true) && (
+      {
         <SignUpStepperButton
           handlePrimaryClicked={handleNextClicked}
           primaryText={
-            confirmationNumber || needToPay === false
+            confirmationNumber || !needToPay
               ? isLast
-                ? 'Finish'
-                : 'Next'
+              ? 'Finish'
+              : 'Next'
               : 'Pay Now'
           }
-          primaryDisabled={!!isSubmitting}
+          primaryDisabled={isSubmitting}
           showPrimary
           handleSecondaryClicked={handleClose}
           secondaryText={'Finish later'}
-          secondaryDisabled={!!isSubmitting}
-          showSecondary={needToPay === true && !confirmationNumber}
+          secondaryDisabled={isSubmitting}
+          showSecondary={needToPay && !confirmationNumber}
         />
-      )}
+      }
     </div>
   )
 }
@@ -281,7 +295,7 @@ SignUpStepPayment.propTypes = {
   history: PropTypes.object.isRequired
 }
 
-const mapStateToProps = ({ currentUser: { currentUser, userData } }) => {
+const mapStateToProps = ({ currentUser: { currentUser, userData } }: CurrentUserStore) => {
   userData = userData ? userData.toJS() : {}
   let membershipExpiresAt = null
   let needToPay = false

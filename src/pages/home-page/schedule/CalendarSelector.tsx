@@ -34,7 +34,7 @@ const YAHOO = 'YAHOO'
 const ICAL_LINK = 'https://www.belmontrunners.com/public/basic.ical'
 
 function CalendarSelector({ fullScreen }: { fullScreen?: boolean }) {
-  const [anchorEl, setAnchorEl] = useState(null)
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
   const [showDialog, setShowDialog] = useState(false)
   const [videoId, setVideoId] = useState('')
   const [copied, setCopied] = useState(false)

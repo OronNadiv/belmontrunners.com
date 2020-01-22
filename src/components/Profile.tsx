@@ -22,18 +22,17 @@ import {
 } from '@material-ui/icons'
 // @ts-ignore
 import initials from 'initials'
-import { withRouter } from 'react-router-dom'
+import { withRouter, RouteComponentProps } from 'react-router-dom'
 import { compose } from 'underscore'
 import { calc, IS_A_MEMBER } from '../utilities/membershipUtils'
 import gravatar from 'gravatar'
 import rp from 'request-promise'
 import { CurrentUserStore, UserOptionalProps } from '../entities/User'
 
-interface Props {
+interface Props extends RouteComponentProps {
   allowUsersPage: boolean
   allowContactsPage: boolean
   userData: any
-  history: any
 }
 
 function Profile({ allowUsersPage, allowContactsPage, userData, history }: Props) {

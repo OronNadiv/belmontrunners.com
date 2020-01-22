@@ -419,9 +419,7 @@ UsersPage.propTypes = {
   currentUser: PropTypes.object.isRequired
 }
 
-const mapStateToProps = (state: CurrentUserStore) => {
-  const permissions = state.currentUser.permissions
-  const currentUser = state.currentUser.currentUser
+const mapStateToProps = ({ currentUser: { permissions, currentUser } }: CurrentUserStore) => {
   if (!currentUser) {
     throw new Error('missing current user')
   }

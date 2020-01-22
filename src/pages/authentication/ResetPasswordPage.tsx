@@ -1,6 +1,6 @@
 import { auth } from '../../firebase'
 import React, { useEffect, useState } from 'react'
-import { withRouter } from 'react-router-dom'
+import { withRouter, RouteComponentProps } from 'react-router-dom'
 import {
   Button,
   Dialog,
@@ -21,21 +21,7 @@ import { minPasswordLength, required, composeValidators } from '../../utilities/
 
 const WEAK_PASSWORD = 'Password is too weak.'
 
-interface Props {
-  location: {
-    hash: string;
-    pathname: string;
-    search: string;
-    state: {
-      query: {
-        oobCode: string
-      }
-    }
-  }
-  history: { push: (arg0: string) => void }
-}
-
-function ResetPasswordPage({ history, location }: Props) {
+function ResetPasswordPage({ history, location }: RouteComponentProps) {
   const [errorMessage, setErrorMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)

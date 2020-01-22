@@ -1,22 +1,32 @@
 import React, { useEffect, useState } from 'react'
-import { Redirect, withRouter } from 'react-router-dom'
+import { Redirect, withRouter, RouteComponentProps } from 'react-router-dom'
 import { SIGN_IN } from '../../urls'
 import { connect } from 'react-redux'
 import * as PropTypes from 'prop-types'
 import { compose } from 'underscore'
+import { CurrentUserStore } from '../../entities/User'
 
-const LoggedInState = (params = {}) => {
+interface Props {
+  name?: string | undefined
+  isRequiredToBeLoggedIn?: boolean | undefined
+  canSwitchToLogin?: boolean | undefined
+}
+
+const LoggedInState = (params: Props = {}) => {
   let { name, isRequiredToBeLoggedIn = true, canSwitchToLogin = true } = params
-  isRequiredToBeLoggedIn = !!isRequiredToBeLoggedIn
-  canSwitchToLogin = !!canSwitchToLogin
 
-  return WrappedComponent => {
-    const Inner = props => {
+  return (WrappedComponent: any) => {
+    interface Props1 extends RouteComponentProps {
+      ___isCurrentUserLoaded___: boolean
+      ___currentUser___: firebase.User
+    }
+
+    const Inner = (props: Props1) => {
       name = name || WrappedComponent.name
       const { ___isCurrentUserLoaded___, ___currentUser___ } = props
-      const [redirectToRoot, setRedirectToRoot] = useState(null)
+      const [redirectToRoot, setRedirectToRoot] = useState<boolean | null>(null)
+      const [initialIsLoggedIn, setInitialIsLoggedIn] = useState<boolean | null>(null)
 
-      const [initialIsLoggedIn, setInitialIsLoggedIn] = useState(null)
       useEffect(() => {
         if (!___isCurrentUserLoaded___) {
           // console.log(`user hasn't been fetched yet.`)
@@ -106,9 +116,7 @@ const LoggedInState = (params = {}) => {
       )
     }
 
-    const mapStateToProps = ({
-                               currentUser: { isCurrentUserLoaded, currentUser }
-                             }) => {
+    const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, currentUser } }: CurrentUserStore) => {
       return {
         ___isCurrentUserLoaded___: isCurrentUserLoaded,
         ___currentUser___: currentUser

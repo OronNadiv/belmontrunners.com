@@ -10,7 +10,7 @@ import {
 import * as PropTypes from 'prop-types'
 import SignUpStepperButton from './SignUpStepperButton'
 import Promise from 'bluebird'
-import s from 'underscore.string'
+import _s from 'underscore.string'
 import LoggedInState from '../../components/HOC/LoggedInState'
 import {
   PRIVACY_POLICY,
@@ -28,7 +28,12 @@ import { goToTop } from 'react-scrollable-anchor'
 import { compose } from 'underscore'
 import { required, isEmail, minPasswordLength, composeValidators } from '../../utilities/formValidators'
 
-function SignUpStepAuth({ onNextClicked, isLast }) {
+interface Props {
+  onNextClicked: () => void
+  isLast: boolean
+}
+
+function SignUpStepAuth({ onNextClicked, isLast }: Props) {
   const [errorMessage, setErrorMessage] = useState('')
   const [isSigningUp, setIsSigningUp] = useState(false)
 
@@ -40,11 +45,9 @@ function SignUpStepAuth({ onNextClicked, isLast }) {
     errorMessage && goToTop()
   }, [errorMessage])
 
-  const signUp = async (providerName, fullName, email, password) => {
-    const displayName = s(fullName)
-      .clean()
-      .words()
-      .map(w => s.capitalize(w))
+  const signUp = async (providerName: string, fullName: string, email: string, password: string) => {
+    const displayName = _s.words(_s.clean(fullName))
+      .map((w) => _s.capitalize(w))
       .join(' ')
 
     setErrorMessage('')
@@ -60,6 +63,9 @@ function SignUpStepAuth({ onNextClicked, isLast }) {
           auth.createUserWithEmailAndPassword(email, password)
         ).tap(user => {
           console.log('calling updateProfile', user)
+          if (!auth.currentUser) {
+            throw new Error('auth.currentUser is falsify')
+          }
           return auth.currentUser.updateProfile({
             [DISPLAY_NAME]: displayName
           })
@@ -77,7 +83,11 @@ function SignUpStepAuth({ onNextClicked, isLast }) {
         break
     }
     try {
+
       await promise
+      if (!auth.currentUser) {
+        throw new Error('auth.currentUser is falsify')
+      }
       const userRef = firestore
         .doc(`users/${auth.currentUser[UID]}`)
       const doc = await userRef.get()
@@ -112,7 +122,7 @@ function SignUpStepAuth({ onNextClicked, isLast }) {
     }
   }
 
-  const handleSignUpError = error => {
+  const handleSignUpError = (error: firebase.auth.Error) => {
     const { code, message } = error
     switch (code) {
       case 'auth/invalid-email':
@@ -131,7 +141,7 @@ function SignUpStepAuth({ onNextClicked, isLast }) {
     }
   }
 
-  const handleSignUpWithEmail = async values => {
+  const handleSignUpWithEmail = async (values: { [DISPLAY_NAME]: string, [EMAIL]: string, [PASSWORD]: string }) => {
     console.log('handleSignUpWithEmail called.  Values:', values)
     await signUp('email', values[DISPLAY_NAME], values[EMAIL], values[PASSWORD])
   }
@@ -162,6 +172,7 @@ function SignUpStepAuth({ onNextClicked, isLast }) {
 
       <Form
         onSubmit={handleSignUpWithEmail}
+        // @ts-ignore
         render={({ handleSubmit, form }) => (
           <form
             onSubmit={handleSubmit}
@@ -232,7 +243,7 @@ function SignUpStepAuth({ onNextClicked, isLast }) {
               handlePrimaryClicked={() => form.submit()}
               primaryText={isLast ? 'Create Account' : 'Next'}
               showPrimary
-              primaryDisabled={!!isSigningUp}
+              primaryDisabled={isSigningUp}
             />
           </form>
         )}

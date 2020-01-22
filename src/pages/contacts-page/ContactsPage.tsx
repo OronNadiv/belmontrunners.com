@@ -23,9 +23,7 @@ import { CopyToClipboard } from 'react-copy-to-clipboard'
 import {
   DISPLAY_NAME,
   EMAIL,
-  IS_MEMBER,
-  SUBSCRIBERS_ARRAY_KEY,
-  UID
+  SUBSCRIBERS_ARRAY_KEY
 } from '../../fields'
 import moment from 'moment'
 import { ROOT } from '../../urls'
@@ -39,6 +37,7 @@ import { compose } from 'underscore'
 import { fromJS, List as IList } from 'immutable'
 import { CurrentUserStore, User } from '../../entities/User'
 import Contact from './Contact'
+import Help from './Help'
 
 interface Props {
   currentUser: User
@@ -87,7 +86,7 @@ function ContactsPage({ currentUser, allowRead }: Props) {
       return
     }
 
-    const run = async () => {
+    ;(async function() {
       try {
         const contactsData = await firestore
           .doc('subscribers/items')
@@ -100,8 +99,7 @@ function ContactsPage({ currentUser, allowRead }: Props) {
         Sentry.captureException(error)
         console.error(error)
       }
-    }
-    run()
+    })()
   }, [currentUser, allowRead])
 
   const applyFilter = useCallback(() => {
@@ -115,11 +113,11 @@ function ContactsPage({ currentUser, allowRead }: Props) {
 
     tmpContacts = tmpContacts.filter(contact => {
       return (
-        (showMembers && contact[IS_MEMBER]) ||
+        (showMembers && contact.isMember) ||
         (showUsers &&
-          ((showMembers && contact[UID]) ||
-            (contact[UID] && !contact[IS_MEMBER]))) ||
-        (showSubscribers && !contact[UID])
+          ((showMembers && contact.uid) ||
+            (contact.uid && !contact.isMember))) ||
+        (showSubscribers && !contact.uid)
       )
     })
     setFilteredContacts(fromJS(tmpContacts))
@@ -208,34 +206,27 @@ function ContactsPage({ currentUser, allowRead }: Props) {
       <SearchBox placeholder="Fuzzy Search" onChange={setSearch} />
 
       <div className="d-flex flex-row flex-wrap justify-content-center mb-4">
-        <div
-          className="d-flex flex-row align-items-center"
-          onClick={() => setShowMembers(!showMembers)}
-        >
-          <Checkbox checked={showMembers} />
-          <Chip label="Members" color="primary" />
+        <div className="d-flex flex-row align-items-center">
+          <span onClick={() => setShowMembers(!showMembers)}>
+            <Checkbox checked={showMembers} />
+            <Chip label="Members" color="primary" />
+          </span>
+          <Help />
         </div>
-        <div
-          className="d-flex flex-row align-items-center mx-4"
-          onClick={() => setShowUsers(!showUsers)}
-        >
-          <Checkbox checked={showUsers} />
-          <Chip label="Users" color="secondary" />
+        <div className="d-flex flex-row align-items-center mx-4">
+          <span onClick={() => setShowUsers(!showUsers)}>
+            <Checkbox checked={showUsers} />
+            <Chip label="Users" color="secondary" />
+          </span>
+          <Help />
         </div>
-        <div
-          className="d-flex flex-row align-items-center"
-          onClick={() => setShowSubscribers(!showSubscribers)}
-        >
-          <Checkbox checked={showSubscribers} />
-          <Chip label="Subscribers" color="default" />
+        <div className="d-flex flex-row align-items-center">
+          <span onClick={() => setShowSubscribers(!showSubscribers)}>
+            <Checkbox checked={showSubscribers} />
+            <Chip label="Subscribers" color="default" />
+          </span>
+          <Help />
         </div>
-      </div>
-      <div className='text-center'>
-        <p>User: someone who created an account on our website.</p>
-        <p>Member: a user who paid annual membership and the membership has not expired.</p>
-        <p>Subscriber: someone who added their email address via the subscribe form on our website.
-        <br/>A subscriber may be converted to a user if they create an account using the same email address.</p>
-        <p>Contact: either a user or a subscriber (basically, everyone is a contact).</p>
       </div>
       <Paper className="px-2 py-3">
         <Typography variant="h5" component="h3" className="ml-3">
@@ -269,7 +260,7 @@ ContactsPage.propTypes = {
 
 const mapStateToProps = ({ currentUser: { permissions, currentUser } }: CurrentUserStore) => {
   return {
-    allowRead: !!currentUser && !!permissions.contactsRead[currentUser[UID]],
+    allowRead: !!currentUser && !!permissions.contactsRead[currentUser.uid],
     currentUser
   }
 }

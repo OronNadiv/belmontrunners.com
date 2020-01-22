@@ -59,7 +59,7 @@ const TOOLBAR_HEIGHT = 72
 const DRAWER_WIDTH = 240
 const BACKGROUND_IMAGE = 'linear-gradient(90deg,#141da2,#9b5cf6)'
 
-interface IHeaderProps extends RouteComponentProps<{}> {
+interface Props extends RouteComponentProps<{}> {
   isCurrentUserLoaded: boolean,
   currentUser: firebase.User,
   allowUsersPage: boolean,
@@ -67,8 +67,7 @@ interface IHeaderProps extends RouteComponentProps<{}> {
   isMember: boolean
 }
 
-function Header(props: IHeaderProps) {
-  const { location: { pathname }, isCurrentUserLoaded, currentUser, allowUsersPage, allowContactsPage, isMember } = props
+function Header({ location: { pathname }, isCurrentUserLoaded, currentUser, allowUsersPage, allowContactsPage, isMember }: Props) {
   const [transparentBackground, setTransparentBackground] = useState(true)
   const [showDrawer, setShowDrawer] = useState(false)
 

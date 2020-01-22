@@ -17,7 +17,6 @@ export const isEmail = (value:string) => !value || !isEmailComponent.validate(va
 
 export const minPasswordLength = (value: string) => {
   const res = value.length < 6 ? INVALID_PASSWORD_LENGTH(6) : undefined
-  console.log('res', value, res)
   return res
 }
 
