@@ -22,7 +22,7 @@ import { ROOT } from '../../urls'
 import { Button } from '@material-ui/core'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 import UpdateUserData from '../../components/HOC/UpdateUserData'
-import { CurrentUserStore, UserOptionalProps } from '../../entities/User'
+import { CurrentUserStore, UserOptionalProps, User } from '../../entities/User'
 
 interface Props extends RouteComponentProps {
   updateUserData: any,
@@ -40,7 +40,7 @@ function MyProfileForm({
                          isSubmitting,
                          onSubmitting
                        }: Props) {
-  const currentUserData: UserOptionalProps = userData.toJS()
+  const userDataJS: User = userData.toJS()
 
   const handleSubmitFunc = async (values: UserOptionalProps) => {
     console.log('submitting values:', JSON.stringify(values, null, 2))
@@ -66,7 +66,7 @@ function MyProfileForm({
   }
 
   const initialValues = pick(
-    currentUserData,
+    userDataJS,
     ADDRESS1,
     ADDRESS2,
     CITY,

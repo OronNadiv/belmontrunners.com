@@ -24,10 +24,10 @@ import {
 import initials from 'initials'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 import { compose } from 'underscore'
-import { calc, IS_A_MEMBER } from '../utilities/membershipUtils'
+import calc from '../utilities/membershipUtils'
 import gravatar from 'gravatar'
 import rp from 'request-promise'
-import { CurrentUserStore, UserOptionalProps } from '../entities/User'
+import { CurrentUserStore, User } from '../entities/User'
 
 interface Props extends RouteComponentProps {
   allowUsersPage: boolean
@@ -66,16 +66,16 @@ function Profile({ allowUsersPage, allowContactsPage, userData, history }: Props
   const [open, setOpen] = React.useState(false)
   const [isGravatarFetched, setIsGravatarFetched] = useState(false)
   const [gravatarUrl, setGravatarUrl] = useState()
-  const currentUserData: UserOptionalProps = userData.toJS()
+  const userDataJS: User = userData.toJS()
 
   useEffect(() => {
     if (!userData || isGravatarFetched) {
       return
     }
     const func = async () => {
-      if (!currentUserData.photoURL && !isGravatarFetched && currentUserData.email) {
-        console.log('userData[EMAIL]:', currentUserData.email)
-        const uri = gravatar.url(currentUserData.email, {
+      if (!userDataJS.photoURL && !isGravatarFetched && userDataJS.email) {
+        console.log('userData[EMAIL]:', userDataJS.email)
+        const uri = gravatar.url(userDataJS.email, {
           protocol: 'https',
           default: '404'
         })
@@ -93,7 +93,7 @@ function Profile({ allowUsersPage, allowContactsPage, userData, history }: Props
     }
 
     func()
-  }, [userData, isGravatarFetched, currentUserData.email, currentUserData.photoURL])
+  }, [userData, isGravatarFetched, userDataJS.email, userDataJS.photoURL])
 
   function handleToggle() {
     setOpen(prevOpen => !prevOpen)
@@ -113,10 +113,10 @@ function Profile({ allowUsersPage, allowContactsPage, userData, history }: Props
   }
 
 
-  if (!currentUserData.photoURL && !isGravatarFetched) {
+  if (!userDataJS.photoURL && !isGravatarFetched) {
     return null
   }
-  const avatarUrl = currentUserData.photoURL || gravatarUrl
+  const avatarUrl = userDataJS.photoURL || gravatarUrl
   return (
     <>
       <div
@@ -125,7 +125,7 @@ function Profile({ allowUsersPage, allowContactsPage, userData, history }: Props
         onClick={handleToggle}
       >
         <Avatar className={classes.avatar} src={avatarUrl}>
-          {!avatarUrl && initials(currentUserData.displayName)}
+          {!avatarUrl && initials(userDataJS.displayName)}
         </Avatar>
         <div>
           {open ? (
@@ -204,6 +204,7 @@ Profile.propTypes = {
 }
 
 const mapStateToProps = ({ currentUser: { permissions, currentUser, userData } }: CurrentUserStore) => {
+  const userDataJS: User = userData.toJS()
   return {
     allowUsersPage:
       !!currentUser &&
@@ -215,7 +216,7 @@ const mapStateToProps = ({ currentUser: { permissions, currentUser, userData } }
         !!permissions.contactsWrite[currentUser.uid]),
     // @ts-ignore
     userData: userData || new IMap(),
-    isMember: userData && calc(userData.toJS())[IS_A_MEMBER]
+    isMember: userData && calc(userDataJS).isAMember
   }
 }
 

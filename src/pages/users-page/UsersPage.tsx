@@ -34,13 +34,7 @@ import { User, CurrentUserStore } from '../../entities/User'
 import { ROOT } from '../../urls'
 import { Redirect } from 'react-router-dom'
 import ConfirmDeletion from './ConfirmDeletion'
-import {
-  calc,
-  IS_A_MEMBER,
-  IS_MEMBERSHIP_EXPIRED,
-  IS_MEMBERSHIP_EXPIRES_SOON,
-  WAS_NEVER_A_MEMBER
-} from '../../utilities/membershipUtils'
+import calc from '../../utilities/membershipUtils'
 import { firestore } from '../../firebase'
 
 const PNF = googleLibPhoneNumber.PhoneNumberFormat
@@ -109,13 +103,13 @@ function UsersPage(props: UsersPageProps) {
 
         try {
           const calc1 = calc(userData)
-          if (calc1[IS_A_MEMBER]) {
+          if (calc1.isAMember) {
             userData[MEMBERSHIP_STATUS] = 'Is a member'
-          } else if (calc1[IS_MEMBERSHIP_EXPIRED]) {
+          } else if (calc1.isMembershipExpired) {
             userData[MEMBERSHIP_STATUS] = 'Was a member'
-          } else if (calc1[WAS_NEVER_A_MEMBER]) {
+          } else if (calc1.wasNeverAMember) {
             userData[MEMBERSHIP_STATUS] = 'Not a member'
-          } else if (calc1[IS_MEMBERSHIP_EXPIRES_SOON]) {
+          } else if (calc1.isMembershipExpiresSoon) {
             userData[MEMBERSHIP_STATUS] = 'Membership expires soon'
           } else {
             throw new Error(`Unknown membership status.  calc: ${JSON.stringify(calc1)}`)
@@ -251,7 +245,7 @@ function UsersPage(props: UsersPageProps) {
             return (
               <Checkbox
                 checked={!!value}
-                disabled={!allowWrite || !!calc(userData)[IS_A_MEMBER]}
+                disabled={!allowWrite || calc(userData).isAMember}
                 onChange={async (event, isChecked) => {
                   try {
                     await handleNotInterested(userData, isChecked)

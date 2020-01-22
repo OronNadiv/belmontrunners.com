@@ -18,7 +18,7 @@ import {
   unlinkFromFacebook
 } from '../../utilities/linkToFacebook'
 import * as Sentry from '@sentry/browser'
-import { CurrentUserStore, UserOptionalProps } from '../../entities/User'
+import { CurrentUserStore, User } from '../../entities/User'
 import { UpdateUserData as UpdateUserDataFunc } from '../../reducers/currentUser'
 
 interface Props {
@@ -34,7 +34,7 @@ function MyProfileFacebook({
                              userData,
                              onSubmitting
                            }: Props) {
-  const currentUserData: UserOptionalProps = userData.toJS()
+  const userDataJS: User = userData.toJS()
 
   const [
     linkWithProviderErrorMessage,
@@ -44,7 +44,7 @@ function MyProfileFacebook({
   const handleLinkToFacebook = async () => {
     try {
       onSubmitting(true)
-      await linkToFacebook(currentUser, currentUserData, updateUserData)
+      await linkToFacebook(currentUser, userDataJS, updateUserData)
     } catch (error) {
       Sentry.captureException(error)
       setLinkWithProviderErrorMessage('Failed to link to your Facebook account')

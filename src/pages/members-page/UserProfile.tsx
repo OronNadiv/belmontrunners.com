@@ -46,7 +46,7 @@ import { Map as IMap } from 'immutable'
 import UpdateUserData from '../../components/HOC/UpdateUserData'
 import { linkToFacebook } from '../../utilities/linkToFacebook'
 import { findWhere } from 'underscore'
-import { CurrentUserStore, UserOptionalProps, VisibilityEnum } from '../../entities/User'
+import { CurrentUserStore, User, UserOptionalProps, VisibilityEnum } from '../../entities/User'
 import { UpdateUserData as UpdateUserDataFunc } from '../../reducers/currentUser'
 
 const defaultVisibility = {
@@ -69,8 +69,8 @@ interface Props {
 }
 
 function UserProfile({ onClose, user, userData, updateUserData, currentUser }: Props) {
-  const currentUserData: UserOptionalProps = userData.toJS()
-  const visibility = currentUserData.visibility || {}
+  const userDataJS: User = userData.toJS()
+  const visibility = userDataJS.visibility || {}
   const theme = useTheme()
   const isSmallDevice = useMediaQuery(theme.breakpoints.down('sm'))
 
@@ -219,7 +219,7 @@ function UserProfile({ onClose, user, userData, updateUserData, currentUser }: P
 
   const handleLinkToFacebook = async () => {
     try {
-      await linkToFacebook(currentUser, currentUserData, updateUserData)
+      await linkToFacebook(currentUser, userDataJS, updateUserData)
     } catch (error) {
       setErrorMessage('Operation failed')
     }

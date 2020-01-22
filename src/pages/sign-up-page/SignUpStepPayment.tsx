@@ -13,11 +13,7 @@ import { withRouter, RouteComponentProps } from 'react-router-dom'
 import UpdateUserData from '../../components/HOC/UpdateUserData'
 import { goToTop } from 'react-scrollable-anchor'
 import { compose } from 'underscore'
-import {
-  calc,
-  IS_A_MEMBER,
-  IS_MEMBERSHIP_EXPIRES_SOON
-} from '../../utilities/membershipUtils'
+import calc from '../../utilities/membershipUtils'
 import { CurrentUserStore, User } from '../../entities/User'
 
 const MEMBERSHIP_FEE_ADULT = 25
@@ -314,8 +310,8 @@ const mapStateToProps = ({ currentUser: { currentUser, userData } }: CurrentUser
     const membershipData = calc(userDataJS)
     membershipExpiresAt = userDataJS.membershipExpiresAt
     if (
-      !membershipData[IS_A_MEMBER] ||
-      membershipData[IS_MEMBERSHIP_EXPIRES_SOON]
+      !membershipData.isAMember ||
+      membershipData.isMembershipExpiresSoon
     ) {
       needToPay = true
     }

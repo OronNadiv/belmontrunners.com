@@ -1,12 +1,5 @@
-import {
-  calc,
-  WAS_NEVER_A_MEMBER,
-  IS_A_MEMBER,
-  IS_MEMBERSHIP_EXPIRED,
-  IS_MEMBERSHIP_EXPIRES_SOON
-} from './membershipUtils'
+import calc from './membershipUtils'
 import moment from 'moment'
-import { MEMBERSHIP_EXPIRES_AT } from '../fields'
 import { each } from 'underscore'
 import { UserOptionalProps } from '../entities/User'
 
@@ -17,36 +10,37 @@ const past = moment().subtract(1)
 it('membershipUtils', () => {
   const data = {
     [inAYear.format()]: {
-      [IS_MEMBERSHIP_EXPIRED]: false,
-      [IS_MEMBERSHIP_EXPIRES_SOON]: false,
-      [IS_A_MEMBER]: true,
-      [WAS_NEVER_A_MEMBER]: false
+      isMembershipExpired: false,
+      isMembershipExpiresSoon: false,
+      isAMember: true,
+      wasNeverAMember: false
     },
     [tomorrow.format()]: {
-      [IS_MEMBERSHIP_EXPIRED]: false,
-      [IS_MEMBERSHIP_EXPIRES_SOON]: true,
-      [IS_A_MEMBER]: true,
-      [WAS_NEVER_A_MEMBER]: false
+      isMembershipExpired: false,
+      isMembershipExpiresSoon: true,
+      isAMember: true,
+      wasNeverAMember: false
     },
     [past.format()]: {
-      [IS_MEMBERSHIP_EXPIRED]: true,
-      [IS_MEMBERSHIP_EXPIRES_SOON]: false,
-      [IS_A_MEMBER]: false,
-      [WAS_NEVER_A_MEMBER]: false
+      isMembershipExpired: true,
+      isMembershipExpiresSoon: false,
+      isAMember: false,
+      wasNeverAMember: false
     },
     null: {
-      [IS_MEMBERSHIP_EXPIRED]: false,
-      [IS_MEMBERSHIP_EXPIRES_SOON]: false,
-      [IS_A_MEMBER]: false,
-      [WAS_NEVER_A_MEMBER]: true
+      isMembershipExpired: false,
+      isMembershipExpiresSoon: false,
+      isAMember: false,
+      wasNeverAMember: true
     }
   }
   each(data, (expects, time) => {
     const userData: UserOptionalProps = {
-      [MEMBERSHIP_EXPIRES_AT]: time
+      membershipExpiresAt: time
     }
     each(expects, (val, key) => {
       console.log(`time: ${time}, key: ${key}, val: ${val}`)
+      // @ts-ignore
       expect(calc(userData)[key]).toEqual(val)
     })
   })

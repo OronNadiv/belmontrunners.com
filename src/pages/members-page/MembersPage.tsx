@@ -21,7 +21,7 @@ import { compose, findWhere, sortBy } from 'underscore'
 import { MEMBERS, ROOT } from '../../urls'
 import SearchBox from '../../components/SearchBox'
 import { Map as IMap } from 'immutable'
-import { CurrentUserStore, UserOptionalProps } from '../../entities/User'
+import { CurrentUserStore, User } from '../../entities/User'
 
 interface Props extends RouteComponentProps {
   currentUser: firebase.User
@@ -34,7 +34,7 @@ function MembersPage({
                        history,
                        userData
                      }: Props) {
-  const currentUserData: UserOptionalProps = userData.toJS()
+  const userDataJS: User = userData.toJS()
   const useStyles = makeStyles(() => ({
     chipAvatar: {
       width: 32,
@@ -45,7 +45,7 @@ function MembersPage({
 
   const [isLoading, setIsLoading] = useState(true)
   const [showError, setShowError] = useState(false)
-  const [users, setUsers] = useState<UserOptionalProps[]>([])
+  const [users, setUsers] = useState<User[]>([])
 
   useEffect(() => {
     if (!currentUser) {
@@ -55,7 +55,7 @@ function MembersPage({
       try {
         // return setUsers(require('./members.json'))
         const resp = await functions.httpsCallable('getMembers')()
-        const data: UserOptionalProps[] = sortBy(resp.data, (user: UserOptionalProps) => {
+        const data: User[] = sortBy(resp.data, (user: User) => {
           if (!user.displayName) {
             return
           }
@@ -103,7 +103,7 @@ function MembersPage({
 
   const [search, setSearch] = useState('')
 
-  const handleChipSelected = (user: UserOptionalProps) => {
+  const handleChipSelected = (user: User) => {
     console.log('user:', user)
     history.push(`${MEMBERS}/${user.uid}`)
   }
@@ -121,7 +121,7 @@ function MembersPage({
       filteredUsers = searcher.search(search)
     }
 
-    return filteredUsers.map((user: UserOptionalProps) => {
+    return filteredUsers.map((user) => {
       const label = user.displayName
 
       function getColor() {
@@ -132,7 +132,7 @@ function MembersPage({
       }
 
       if (user.uid === currentUser.uid) {
-        user.photoURL = currentUserData.photoURL
+        user.photoURL = userDataJS.photoURL
       }
 
       const avatarUrl = user.photoURL || user.gravatarUrl || undefined

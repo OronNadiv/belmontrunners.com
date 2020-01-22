@@ -9,7 +9,7 @@ import UpdateUserData from '../../components/HOC/UpdateUserData'
 // @ts-ignore
 import DownloadButton from 'react-dfb'
 import moment from 'moment'
-import { CurrentUserStore, UserOptionalProps } from '../../entities/User'
+import { CurrentUserStore, User } from '../../entities/User'
 
 interface Props {
   currentUser: firebase.User
@@ -18,7 +18,7 @@ interface Props {
 }
 
 function DownloadAccountInfo({ currentUser, userData, isSubmitting }: Props) {
-  const userDataJS: UserOptionalProps = userData.toJS()
+  const userDataJS: User = userData.toJS()
 
   const [downloadData, setDownloadData] = useState()
 

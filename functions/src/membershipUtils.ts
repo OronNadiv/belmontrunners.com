@@ -1,7 +1,7 @@
 const moment = require('moment')
 
 interface CalcParam {
-  membershipExpiresAt?: string
+  membershipExpiresAt?: string | null
 }
 
 interface CalcRes {
@@ -14,19 +14,19 @@ interface CalcRes {
 export default (userData: CalcParam, duration = moment.duration(1, 'month')): CalcRes => {
   const membershipExpiresAt = userData.membershipExpiresAt
 
-  const isAMember =
-    membershipExpiresAt && moment().isBefore(moment(membershipExpiresAt))
+  const isAMember = membershipExpiresAt && moment().isBefore(moment(membershipExpiresAt))
+
   console.log(
     'isAMember:',
     isAMember,
     'membershipExpiresAt:',
     membershipExpiresAt
   )
-  const isMembershipExpired =
-    membershipExpiresAt && moment(membershipExpiresAt).isBefore(moment())
+
+  const isMembershipExpired = membershipExpiresAt && moment(membershipExpiresAt).isBefore(moment())
   return {
     isAMember: Boolean(isAMember),
-    isMembershipExpiresSoon: (isAMember && moment(membershipExpiresAt).isBefore(moment().add(duration))) || false,
+    isMembershipExpiresSoon: (isAMember && membershipExpiresAt && moment(membershipExpiresAt).isBefore(moment().add(duration))) || false,
     isMembershipExpired: Boolean(isMembershipExpired),
     wasNeverAMember: !isAMember && !isMembershipExpired
   }

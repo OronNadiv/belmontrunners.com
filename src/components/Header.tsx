@@ -49,7 +49,7 @@ import { Link, withRouter } from 'react-router-dom'
 import $ from 'jquery'
 import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { calc, IS_A_MEMBER } from '../utilities/membershipUtils'
+import calc from '../utilities/membershipUtils'
 import firebase from 'firebase/app'
 import { CurrentUserStore, User } from '../entities/User'
 import { compose } from 'underscore'
@@ -59,7 +59,7 @@ const TOOLBAR_HEIGHT = 72
 const DRAWER_WIDTH = 240
 const BACKGROUND_IMAGE = 'linear-gradient(90deg,#141da2,#9b5cf6)'
 
-interface Props extends RouteComponentProps<{}> {
+interface Props extends RouteComponentProps {
   isCurrentUserLoaded: boolean,
   currentUser: firebase.User,
   allowUsersPage: boolean,
@@ -409,10 +409,11 @@ Header.propTypes = {
 }
 
 const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, currentUser, permissions, userData } }: CurrentUserStore) => {
+  const userDataJS: User = userData ? userData.toJS() : undefined
   return {
     allowUsersPage: !currentUser ? false : !!(permissions.usersRead[currentUser.uid] || permissions.usersWrite[currentUser.uid]),
     allowContactsPage: !currentUser ? false : !!(permissions.contactsRead[currentUser.uid] || permissions.contactsWrite[currentUser.uid]),
-    isMember: userData && calc(userData.toJS() as User)[IS_A_MEMBER],
+    isMember: userData && calc(userDataJS).isAMember,
     isCurrentUserLoaded,
     currentUser
   }

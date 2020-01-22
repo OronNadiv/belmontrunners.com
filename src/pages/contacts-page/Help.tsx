@@ -29,7 +29,7 @@ export default function Help() {
   const id = open ? 'simple-popover' : undefined
 
   return (
-    <div>
+    <span>
       <IconButton aria-describedby={id} color="primary" onClick={handleClick}>
         <HelpOutlineIcon />
         {/*Glossary*/}
@@ -61,6 +61,6 @@ export default function Help() {
           </p>
         </Typography>
       </Popover>
-    </div>
+    </span>
   )
 }

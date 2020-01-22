@@ -1,15 +1,14 @@
 import firebase from 'firebase/app'
 
 import { PHOTO_URL } from '../fields'
-import { UserOptionalProps } from '../entities/User'
+import { User } from '../entities/User'
 import { UpdateUserData } from '../reducers/currentUser'
 
-export const linkToFacebook = async (currentUser: firebase.User, userData: UserOptionalProps, updateUserData: UpdateUserData) => {
+export const linkToFacebook = async (currentUser: firebase.User, userData: User, updateUserData: UpdateUserData) => {
   try {
-    console.log('handleLinkToFacebook called.')
     await currentUser.linkWithPopup(new firebase.auth.FacebookAuthProvider())
 
-    let photoUrl = userData[PHOTO_URL]
+    let photoUrl = userData.photoURL
     if (!photoUrl) {
       const foundProviderData = currentUser.providerData.find(
         (userInfo) => {
@@ -37,7 +36,7 @@ export const unlinkFromFacebook = async (currentUser: firebase.User, updateUserD
         return userInfo && Boolean(userInfo.photoURL)
       }
     )
-    const photoUrl = foundProviderData ? foundProviderData[PHOTO_URL] : null
+    const photoUrl = foundProviderData ? foundProviderData.photoURL : null
     console.log('foundProviderData :', foundProviderData)
     console.log('photoUrl :', photoUrl)
     // doing this in order to trigger an update.

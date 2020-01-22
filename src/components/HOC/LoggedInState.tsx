@@ -6,22 +6,22 @@ import * as PropTypes from 'prop-types'
 import { compose } from 'underscore'
 import { CurrentUserStore } from '../../entities/User'
 
-interface Props {
+interface Params {
   name?: string | undefined
   isRequiredToBeLoggedIn?: boolean | undefined
   canSwitchToLogin?: boolean | undefined
 }
 
-const LoggedInState = (params: Props = {}) => {
+const LoggedInState = (params: Params = {}) => {
   let { name, isRequiredToBeLoggedIn = true, canSwitchToLogin = true } = params
 
   return (WrappedComponent: any) => {
-    interface Props1 extends RouteComponentProps {
+    interface Props extends RouteComponentProps {
       ___isCurrentUserLoaded___: boolean
       ___currentUser___: firebase.User
     }
 
-    const Inner = (props: Props1) => {
+    const Inner = (props: Props) => {
       name = name || WrappedComponent.name
       const { ___isCurrentUserLoaded___, ___currentUser___ } = props
       const [redirectToRoot, setRedirectToRoot] = useState<boolean | null>(null)

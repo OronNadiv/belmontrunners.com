@@ -9,12 +9,7 @@ import * as Sentry from '@sentry/browser'
 import UpdateUserDataHOC from '../../components/HOC/UpdateUserData'
 import { Map as IMap } from 'immutable'
 import { compose } from 'underscore'
-import {
-  calc,
-  IS_MEMBERSHIP_EXPIRED,
-  IS_MEMBERSHIP_EXPIRES_SOON,
-  WAS_NEVER_A_MEMBER
-} from '../../utilities/membershipUtils'
+import calc from '../../utilities/membershipUtils'
 import { JOIN } from '../../urls'
 import { Link } from 'react-router-dom'
 import { CurrentUserStore, User } from '../../entities/User'
@@ -110,11 +105,11 @@ function Notifications({ currentUser, userData, updateUserData }: Props) {
     const membershipStatus = calc(userDataJS)
 
     let message
-    if (membershipStatus[WAS_NEVER_A_MEMBER]) {
+    if (membershipStatus.wasNeverAMember) {
       message = 'become a member'
     } else if (
-      membershipStatus[IS_MEMBERSHIP_EXPIRES_SOON] ||
-      membershipStatus[IS_MEMBERSHIP_EXPIRED]
+      membershipStatus.isMembershipExpiresSoon ||
+      membershipStatus.isMembershipExpired
     ) {
       message = 'renew your membership'
     } else {
@@ -160,8 +155,8 @@ function Notifications({ currentUser, userData, updateUserData }: Props) {
 
     if (
       wasPopupDismissed({ key: POPUP_RECEIVED_SHIRT_AT }) ||
-      membershipStatus[WAS_NEVER_A_MEMBER] ||
-      membershipStatus[IS_MEMBERSHIP_EXPIRED]
+      membershipStatus.wasNeverAMember ||
+      membershipStatus.isMembershipExpired
     ) {
       return false
     }
