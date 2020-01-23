@@ -102,7 +102,8 @@ function SignUpStepPayment({
           if (error && error.message) {
             const stripeError = JSON.parse(error.message)
             console.warn('stripeError:', stripeError)
-            setErrorMessage(stripeError.message)
+            const message = stripeError.message || (stripeError.raw && stripeError.raw.message) || stripeError.code || 'Failed for unknown reason.\nPlease contact support.'
+            setErrorMessage(message)
             return
           }
           // todo: handle case where it's not stripe error.
