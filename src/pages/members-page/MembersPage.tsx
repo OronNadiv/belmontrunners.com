@@ -21,20 +21,20 @@ import { compose, findWhere, sortBy } from 'underscore'
 import { MEMBERS, ROOT } from '../../urls'
 import SearchBox from '../../components/SearchBox'
 import { Map as IMap } from 'immutable'
-import { CurrentUserStore, User } from '../../entities/User'
+import { IRedisState, IUser } from '../../entities/User'
 
 interface Props extends RouteComponentProps {
-  currentUser: firebase.User
+  firebaseUser: firebase.User
   userData: any
 }
 
 function MembersPage({
-                       currentUser,
+                       firebaseUser,
                        location: { pathname },
                        history,
                        userData
                      }: Props) {
-  const userDataJS: User = userData.toJS()
+  const userDataJS: IUser = userData.toJS()
   const useStyles = makeStyles(() => ({
     chipAvatar: {
       width: 32,
@@ -45,21 +45,21 @@ function MembersPage({
 
   const [isLoading, setIsLoading] = useState(true)
   const [showError, setShowError] = useState(false)
-  const [users, setUsers] = useState<User[]>([])
+  const [users, setUsers] = useState<IUser[]>([])
 
   useEffect(() => {
-    if (!currentUser) {
+    if (!firebaseUser) {
       return
     }
     ;(async function() {
       try {
         // return setUsers(require('./members.json'))
         const resp = await functions.httpsCallable('getMembers')()
-        const data: User[] = sortBy(resp.data, (user: User) => {
+        const data: IUser[] = sortBy(resp.data, (user: IUser) => {
           if (!user.displayName) {
             return
           }
-          return user.uid === currentUser.uid
+          return user.uid === firebaseUser.uid
             ? '_'
             : user.displayName.toLowerCase()
         })
@@ -80,7 +80,7 @@ function MembersPage({
       }
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser])
+  }, [firebaseUser])
 
   const [selected, setSelected] = useState()
   useEffect(() => {
@@ -103,8 +103,7 @@ function MembersPage({
 
   const [search, setSearch] = useState('')
 
-  const handleChipSelected = (user: User) => {
-    console.log('user:', user)
+  const handleChipSelected = (user: IUser) => {
     history.push(`${MEMBERS}/${user.uid}`)
   }
 
@@ -125,13 +124,13 @@ function MembersPage({
       const label = user.displayName
 
       function getColor() {
-        if (user.uid === currentUser.uid) {
+        if (user.uid === firebaseUser.uid) {
           return 'primary'
         }
         return 'default'
       }
 
-      if (user.uid === currentUser.uid) {
+      if (user.uid === firebaseUser.uid) {
         user.photoURL = userDataJS.photoURL
       }
 
@@ -153,7 +152,7 @@ function MembersPage({
     })
   }
 
-  if (!currentUser) {
+  if (!firebaseUser) {
     // todo: show loading
     return <></>
   }
@@ -184,15 +183,15 @@ function MembersPage({
 }
 
 MembersPage.propTypes = {
-  currentUser: PropTypes.object.isRequired,
+  firebaseUser: PropTypes.object.isRequired,
   userData: PropTypes.object.isRequired,
   location: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired
 }
 
-const mapStateToProps = ({ currentUser: { currentUser, userData } }: CurrentUserStore) => {
+const mapStateToProps = ({ currentUser: { firebaseUser, userData } }: IRedisState) => {
   return {
-    currentUser,
+    firebaseUser,
     // @ts-ignore
     userData: userData || new IMap()
   }

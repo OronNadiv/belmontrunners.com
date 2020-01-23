@@ -30,7 +30,7 @@ import _, { compose } from 'underscore'
 import { connect } from 'react-redux'
 import { Avatar, Checkbox, IconButton } from '@material-ui/core'
 import * as Sentry from '@sentry/browser'
-import { User, CurrentUserStore } from '../../entities/User'
+import { IUser, IRedisState } from '../../entities/User'
 import { ROOT } from '../../urls'
 import { Redirect } from 'react-router-dom'
 import ConfirmDeletion from './ConfirmDeletion'
@@ -44,24 +44,22 @@ const DATE_OF_BIRTH_FORMAT = 'MM/DD'
 const MEMBERSHIP_EXPIRES_AT_FORMAT = 'YYYY-MM-DD HH:mm'
 const MEMBERSHIP_STATUS = 'MEMBERSHIP_STATUS'
 
-interface UsersPageProps {
-  currentUser: any,
+interface Props {
+  firebaseUser: firebase.User,
   allowRead: boolean,
   allowWrite: boolean
   allowDelete: boolean
 }
 
-interface UserDataExtended extends User {
-  MEMBERSHIP_STATUS: string
+interface IUserWithMembershipStatus extends IUser {
+  [MEMBERSHIP_STATUS]: string
 }
 
 
-function UsersPage(props: UsersPageProps) {
-  const { currentUser, allowDelete, allowRead, allowWrite } = props
-
-  const [rows, setRows] = useState<UserDataExtended[]>([])
-  const [rowToDelete, setRowToDelete] = useState<UserDataExtended | undefined>(undefined)
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+function UsersPage({ firebaseUser, allowDelete, allowRead, allowWrite }: Props) {
+  const [rows, setRows] = useState<IUserWithMembershipStatus[]>([])
+  const [rowToDelete, setRowToDelete] = useState<IUserWithMembershipStatus | undefined>()
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const loadMembers = useCallback(async () => {
     const usersRef = firestore.collection('users')
@@ -70,35 +68,35 @@ function UsersPage(props: UsersPageProps) {
     const res: any = []
     doc.forEach((docData) => {
       try {
-        const data = docData.data()
-        if (data[PHONE]) {
-          const number = phoneUtil.parseAndKeepRawInput(data[PHONE], 'US')
-          data[PHONE] = phoneUtil.format(number, PNF.NATIONAL)
+        const data: IUser = docData.data() as IUser
+        if (data.phone) {
+          const number = phoneUtil.parseAndKeepRawInput(data.phone, 'US')
+          data.phone = phoneUtil.format(number, PNF.NATIONAL)
         } else {
-          data[PHONE] = ''
+          data.phone = ''
         }
 
-        const userData: UserDataExtended = {
+        const userData: IUserWithMembershipStatus = {
           [UID]: docData.id,
-          [PHOTO_URL]: data[PHOTO_URL] || '',
-          [DISPLAY_NAME]: data[DISPLAY_NAME],
-          [EMAIL]: data[EMAIL],
-          [DID_RECEIVED_SHIRT]: !!data[DID_RECEIVED_SHIRT],
-          [ADDRESS1]: data[ADDRESS1] || '',
-          [ADDRESS2]: data[ADDRESS2] || '',
-          [CITY]: (data[CITY] || '').toLowerCase().trim()
+          [PHOTO_URL]: data.photoURL || '',
+          [DISPLAY_NAME]: data.displayName,
+          [EMAIL]: data.email,
+          [DID_RECEIVED_SHIRT]: !!data.didReceivedShirt,
+          [ADDRESS1]: data.address1 || '',
+          [ADDRESS2]: data.address2 || '',
+          [CITY]: (data.city || '').toLowerCase().trim()
             .split(' ')
             .map((s: string) => s.charAt(0).toUpperCase() + s.substring(1))
             .join(' '),
-          [STATE]: data[STATE] || '',
-          [ZIP]: data[ZIP] || '',
-          [GENDER]: data[GENDER] || '',
-          [DATE_OF_BIRTH]: data[DATE_OF_BIRTH] ? moment(data[DATE_OF_BIRTH]).format(DATE_OF_BIRTH_FORMAT) : '',
-          [CREATED_AT]: moment(data[CREATED_AT]).format(MEMBERSHIP_EXPIRES_AT_FORMAT),
-          [MEMBERSHIP_EXPIRES_AT]: data[MEMBERSHIP_EXPIRES_AT] ? moment(data[MEMBERSHIP_EXPIRES_AT]).format(MEMBERSHIP_EXPIRES_AT_FORMAT) : '',
+          [STATE]: data.state || '',
+          [ZIP]: data.zip || '',
+          [GENDER]: data.gender || '',
+          [DATE_OF_BIRTH]: data.dateOfBirth ? moment(data.dateOfBirth).format(DATE_OF_BIRTH_FORMAT) : '',
+          [CREATED_AT]: data.createdAt ? moment(data.createdAt).format(MEMBERSHIP_EXPIRES_AT_FORMAT) : '',
+          [MEMBERSHIP_EXPIRES_AT]: data.membershipExpiresAt ? moment(data.membershipExpiresAt).format(MEMBERSHIP_EXPIRES_AT_FORMAT) : '',
           [MEMBERSHIP_STATUS]: '',
-          [EMAIL_VERIFIED]: !!data[EMAIL_VERIFIED],
-          [NOT_INTERESTED_IN_BECOMING_A_MEMBER]: !!data[NOT_INTERESTED_IN_BECOMING_A_MEMBER]
+          [EMAIL_VERIFIED]: !!data.emailVerified,
+          [NOT_INTERESTED_IN_BECOMING_A_MEMBER]: !!data.notInterestedInBecomingAMember
         }
 
         try {
@@ -128,19 +126,19 @@ function UsersPage(props: UsersPageProps) {
     setRows(res)
   }, [])
 
-  useEffect(goToTop, [currentUser])
+  useEffect(goToTop, [firebaseUser])
 
   useEffect(() => {
     allowRead && loadMembers()
   }, [allowRead, loadMembers])
 
-  const handleToggleReceivedShirt = async (userData: UserDataExtended, isChecked: boolean) => {
-    const userRef = firestore.doc(`users/${userData[UID]}`)
+  const handleToggleReceivedShirt = async (userData: IUserWithMembershipStatus, isChecked: boolean) => {
+    const userRef = firestore.doc(`users/${userData.uid}`)
     await userRef.set({ [DID_RECEIVED_SHIRT]: isChecked }, { merge: true })
   }
 
-  const handleNotInterested = async (userData: UserDataExtended, isChecked: boolean) => {
-    const userRef = firestore.doc(`users/${userData[UID]}`)
+  const handleNotInterested = async (userData: IUserWithMembershipStatus, isChecked: boolean) => {
+    const userRef = firestore.doc(`users/${userData.uid}`)
     await userRef.set({ [NOT_INTERESTED_IN_BECOMING_A_MEMBER]: isChecked }, { merge: true })
   }
 
@@ -237,7 +235,7 @@ function UsersPage(props: UsersPageProps) {
             if (!tableMeta.rowData) {
               return value
             }
-            const userData = _.findWhere(rows, { [UID]: tableMeta.rowData[0] }) as UserDataExtended
+            const userData = _.findWhere(rows, { [UID]: tableMeta.rowData[0] }) as IUserWithMembershipStatus
             if (!userData) {
               return value
             }
@@ -294,7 +292,7 @@ function UsersPage(props: UsersPageProps) {
               disabled={!allowWrite}
               onChange={async (event, isChecked) => {
                 try {
-                  const userData = _.findWhere(rows, { [UID]: tableMeta.rowData[0] }) as UserDataExtended
+                  const userData = _.findWhere(rows, { [UID]: tableMeta.rowData[0] }) as IUserWithMembershipStatus
                   await handleToggleReceivedShirt(userData, isChecked)
                   updateValue(isChecked, undefined, undefined)
                 } catch (error) {
@@ -343,7 +341,7 @@ function UsersPage(props: UsersPageProps) {
     }
   })
 
-  if (currentUser && !allowRead) {
+  if (firebaseUser && !allowRead) {
     return <Redirect to={ROOT} />
   }
 
@@ -410,19 +408,19 @@ UsersPage.propTypes = {
   allowRead: PropTypes.bool.isRequired,
   allowWrite: PropTypes.bool.isRequired,
   allowDelete: PropTypes.bool.isRequired,
-  currentUser: PropTypes.object.isRequired
+  firebaseUser: PropTypes.object.isRequired
 }
 
-const mapStateToProps = ({ currentUser: { permissions, currentUser } }: CurrentUserStore) => {
-  if (!currentUser) {
+const mapStateToProps = ({ currentUser: { permissions, firebaseUser } }: IRedisState) => {
+  if (!firebaseUser) {
     throw new Error('missing current user')
   }
-  const uid = currentUser.uid
+  const uid = firebaseUser.uid
   return {
     allowRead: permissions && permissions.usersRead[uid],
     allowWrite: permissions && permissions.usersWrite[uid],
     allowDelete: permissions && permissions.usersDelete[uid],
-    currentUser: currentUser || {}
+    firebaseUser: firebaseUser || {}
   }
 }
 

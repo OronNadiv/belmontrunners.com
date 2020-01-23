@@ -9,7 +9,7 @@ import { findWhere } from 'underscore'
 function UpdateUserData(WrappedComponent) {
   function Inner(props) {
     const {
-      ___currentUser___,
+      ___firebaseUser___,
       ___userDataUpdating___,
       ___userDataUpdateError___,
       updateUserData,
@@ -39,7 +39,7 @@ function UpdateUserData(WrappedComponent) {
     ])
 
     const updateUserDataWrapper = async (vals, options) => {
-      if (!___currentUser___) {
+      if (!___firebaseUser___) {
         throw new Error('user was not loaded yet or unauthenticated.')
       }
       const context = uuid()
@@ -53,7 +53,7 @@ function UpdateUserData(WrappedComponent) {
     }
     const newProps = { ...props }
 
-    delete newProps.___currentUser___
+    delete newProps.___firebaseUser___
     delete newProps.___userDataUpdating___
     delete newProps.___userDataUpdateError___
     delete newProps.___userDataUpdateContext___
@@ -65,14 +65,14 @@ function UpdateUserData(WrappedComponent) {
 
   const mapStateToProps = ({
     currentUser: {
-      currentUser,
+      firebaseUser,
       userDataUpdating,
       userDataUpdateError,
       userDataUpdateContext
     }
   }) => {
     return {
-      ___currentUser___: currentUser,
+      ___firebaseUser___: firebaseUser,
       ___userDataUpdating___: userDataUpdating,
       ___userDataUpdateError___: userDataUpdateError,
       ___userDataUpdateContext___: userDataUpdateContext
@@ -83,7 +83,7 @@ function UpdateUserData(WrappedComponent) {
   }
 
   Inner.propTypes = {
-    ___currentUser___: PropTypes.object,
+    ___firebaseUser___: PropTypes.object,
     ___userDataUpdating___: PropTypes.bool.isRequired,
     ___userDataUpdateError___: PropTypes.object,
     ___userDataUpdateContext___: PropTypes.any,

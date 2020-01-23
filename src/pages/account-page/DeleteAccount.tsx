@@ -10,15 +10,15 @@ import { UID } from '../../fields'
 import { ROOT } from '../../urls'
 import * as Sentry from '@sentry/browser'
 import { Snackbar } from '../../components/Snackbar'
-import { CurrentUserStore } from '../../entities/User'
+import { IRedisState } from '../../entities/User'
 
 interface Props {
-  currentUser: firebase.User
+  firebaseUser: firebase.User
   onSubmitting: (arg0: boolean) => void
   isSubmitting: boolean
 }
 
-function DeleteAccount({ currentUser, onSubmitting, isSubmitting }: Props) {
+function DeleteAccount({ firebaseUser, onSubmitting, isSubmitting }: Props) {
   const [showAccountDeletionDialog, setShowAccountDeletionDialog] = useState(false)
   const [error, setError] = useState('')
 
@@ -32,7 +32,7 @@ function DeleteAccount({ currentUser, onSubmitting, isSubmitting }: Props) {
       try {
         onSubmitting(true)
         await functions.httpsCallable('deleteUser')({
-          [UID]: currentUser[UID]
+          [UID]: firebaseUser.uid
         })
         onSubmitting(false)
         window.location.href = ROOT
@@ -50,7 +50,7 @@ function DeleteAccount({ currentUser, onSubmitting, isSubmitting }: Props) {
   }
 
   return (
-    currentUser && (
+    firebaseUser && (
       <>
         {error && <Snackbar message={error} onClose={handleSnackbarClosed} />}
         <DeleteAccountDialog
@@ -85,14 +85,14 @@ function DeleteAccount({ currentUser, onSubmitting, isSubmitting }: Props) {
 }
 
 DeleteAccount.propTypes = {
-  currentUser: PropTypes.object.isRequired,
+  firebaseUser: PropTypes.object.isRequired,
   onSubmitting: PropTypes.func.isRequired,
   isSubmitting: PropTypes.bool.isRequired
 }
 
-const mapStateToProps = ({ currentUser: { currentUser } }: CurrentUserStore) => {
+const mapStateToProps = ({ currentUser: { firebaseUser } }: IRedisState) => {
   return {
-    currentUser
+    firebaseUser
   }
 }
 

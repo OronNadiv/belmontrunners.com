@@ -19,20 +19,20 @@ import { connect } from 'react-redux'
 import * as Sentry from '@sentry/browser'
 import { Field, Form } from 'react-final-form'
 import { PASSWORD } from '../../fields'
-import { SendEmailVerification, sendEmailVerification as sendEmailVerificationAction } from '../../reducers/currentUser'
+import { ISendEmailVerification, sendEmailVerification as sendEmailVerificationAction } from '../../reducers/currentUser'
 import { required, isEmail, composeValidators, minPasswordLength } from '../../utilities/formValidators'
-import { CurrentUserStore } from '../../entities/User'
+import { IRedisState } from '../../entities/User'
 
 const EMAIL1 = 'email1'
 const EMAIL2 = 'email2'
 
 interface Props {
-  currentUser: firebase.User
-  sendEmailVerification: SendEmailVerification
+  firebaseUser: firebase.User
+  sendEmailVerification: ISendEmailVerification
   onClose: () => void
 }
 
-function ChangeEmailDialog({ currentUser, sendEmailVerification, onClose }: Props) {
+function ChangeEmailDialog({ firebaseUser, sendEmailVerification, onClose }: Props) {
   const [errorMessage, setErrorMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
@@ -59,9 +59,9 @@ function ChangeEmailDialog({ currentUser, sendEmailVerification, onClose }: Prop
         currentUser.email,
         password
       )
-      await currentUser.reauthenticateWithCredential(credentials)
+      await firebaseUser.reauthenticateWithCredential(credentials)
       try {
-        await currentUser.updateEmail(email1)
+        await firebaseUser.updateEmail(email1)
         // todo: use same mechanism as in UpdateUserData
         await sendEmailVerification()
 
@@ -120,7 +120,7 @@ function ChangeEmailDialog({ currentUser, sendEmailVerification, onClose }: Prop
 
             <DialogContent>
               Current email address:{' '}
-              <span className="font-weight-bold">{currentUser.email}</span>
+              <span className="font-weight-bold">{firebaseUser.email}</span>
               {errorMessage && (
                 <div className="mt-2 text-danger text-center">
                   {errorMessage}
@@ -197,7 +197,7 @@ function ChangeEmailDialog({ currentUser, sendEmailVerification, onClose }: Prop
 }
 
 ChangeEmailDialog.propTypes = {
-  currentUser: PropTypes.object.isRequired,
+  firebaseUser: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
   sendEmailVerification: PropTypes.func.isRequired
 }
@@ -206,9 +206,9 @@ const mapDispatchToProps = {
   sendEmailVerification: sendEmailVerificationAction
 }
 
-const mapStateToProps = ({ currentUser: { currentUser } }: CurrentUserStore) => {
+const mapStateToProps = ({ currentUser: { firebaseUser } }: IRedisState) => {
   return {
-    currentUser
+    firebaseUser
   }
 }
 

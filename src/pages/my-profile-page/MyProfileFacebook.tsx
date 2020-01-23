@@ -18,23 +18,23 @@ import {
   unlinkFromFacebook
 } from '../../utilities/linkToFacebook'
 import * as Sentry from '@sentry/browser'
-import { CurrentUserStore, User } from '../../entities/User'
-import { UpdateUserData as UpdateUserDataFunc } from '../../reducers/currentUser'
+import { IRedisState, IUser } from '../../entities/User'
+import { IUpdateUserData } from '../../reducers/currentUser'
 
 interface Props {
-  currentUser: firebase.User
+  firebaseUser: firebase.User
   userData: any
-  updateUserData: UpdateUserDataFunc
+  updateUserData: IUpdateUserData
   onSubmitting: (arg0: boolean) => void
 }
 
 function MyProfileFacebook({
                              updateUserData,
-                             currentUser,
+                             firebaseUser,
                              userData,
                              onSubmitting
                            }: Props) {
-  const userDataJS: User = userData.toJS()
+  const userDataJS: IUser = userData.toJS()
 
   const [
     linkWithProviderErrorMessage,
@@ -44,7 +44,7 @@ function MyProfileFacebook({
   const handleLinkToFacebook = async () => {
     try {
       onSubmitting(true)
-      await linkToFacebook(currentUser, userDataJS, updateUserData)
+      await linkToFacebook(firebaseUser, userDataJS, updateUserData)
     } catch (error) {
       Sentry.captureException(error)
       setLinkWithProviderErrorMessage('Failed to link to your Facebook account')
@@ -56,7 +56,7 @@ function MyProfileFacebook({
   const handleUnlinkToFacebook = async () => {
     try {
       onSubmitting(true)
-      await unlinkFromFacebook(currentUser, updateUserData)
+      await unlinkFromFacebook(firebaseUser, updateUserData)
     } catch (error) {
       Sentry.captureException(error)
       setLinkWithProviderErrorMessage(
@@ -68,11 +68,11 @@ function MyProfileFacebook({
   }
 
   const connectedToFacebook = Boolean(
-    findWhere(currentUser.providerData, { providerId: 'facebook.com' })
+    findWhere(firebaseUser.providerData, { providerId: 'facebook.com' })
   )
 
   return (
-    currentUser && (
+    firebaseUser && (
       <div id="my-profile-facebook">
         <Card className="d-flex flex-row align-content-center my-4">
           <div className="mr-auto">
@@ -116,7 +116,6 @@ function MyProfileFacebook({
             open
             autoHideDuration={6000}
             onClose={() => {
-              console.log('onClose')
               setLinkWithProviderErrorMessage('')
             }}
             message={linkWithProviderErrorMessage}
@@ -126,7 +125,6 @@ function MyProfileFacebook({
                 aria-label="Close"
                 color="inherit"
                 onClick={() => {
-                  console.log('onClick')
                   setLinkWithProviderErrorMessage('')
                 }}
               >
@@ -144,16 +142,16 @@ MyProfileFacebook.propTypes = {
   // from HOC
   updateUserData: PropTypes.func.isRequired,
 
-  currentUser: PropTypes.object.isRequired,
+  firebaseUser: PropTypes.object.isRequired,
   userData: PropTypes.object.isRequired,
 
   onSubmitting: PropTypes.func.isRequired,
   isSubmitting: PropTypes.bool.isRequired
 }
 
-const mapStateToProps = ({ currentUser: { currentUser, userData } }: CurrentUserStore) => {
+const mapStateToProps = ({ currentUser: { firebaseUser, userData } }: IRedisState) => {
   return {
-    currentUser,
+    firebaseUser,
     // @ts-ignore
     userData: userData || new IMap()
   }

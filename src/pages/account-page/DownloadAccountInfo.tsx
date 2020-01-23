@@ -9,16 +9,16 @@ import UpdateUserData from '../../components/HOC/UpdateUserData'
 // @ts-ignore
 import DownloadButton from 'react-dfb'
 import moment from 'moment'
-import { CurrentUserStore, User } from '../../entities/User'
+import { IRedisState, IUser } from '../../entities/User'
 
 interface Props {
-  currentUser: firebase.User
+  firebaseUser: firebase.User
   userData: any,
   isSubmitting: boolean
 }
 
-function DownloadAccountInfo({ currentUser, userData, isSubmitting }: Props) {
-  const userDataJS: User = userData.toJS()
+function DownloadAccountInfo({ firebaseUser, userData, isSubmitting }: Props) {
+  const userDataJS: IUser = userData.toJS()
 
   const [downloadData, setDownloadData] = useState()
 
@@ -31,7 +31,7 @@ function DownloadAccountInfo({ currentUser, userData, isSubmitting }: Props) {
   }
 
   return (
-    currentUser && (
+    firebaseUser && (
       <Card className="d-flex flex-row align-content-center my-4">
         <div className="mr-auto">
           <CardContent>
@@ -68,16 +68,16 @@ DownloadAccountInfo.propTypes = {
   // from HOC
   updateUserData: PropTypes.func.isRequired,
 
-  currentUser: PropTypes.object.isRequired,
+  firebaseUser: PropTypes.object.isRequired,
   userData: PropTypes.object.isRequired,
 
   onSubmitting: PropTypes.func.isRequired,
   isSubmitting: PropTypes.bool.isRequired
 }
 
-const mapStateToProps = ({ currentUser: { currentUser, userData } }: CurrentUserStore) => {
+const mapStateToProps = ({ currentUser: { firebaseUser, userData } }: IRedisState) => {
   return {
-    currentUser,
+    firebaseUser,
     // @ts-ignore
     userData: userData || new IMap()
   }

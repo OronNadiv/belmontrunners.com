@@ -17,7 +17,7 @@ import { connect } from 'react-redux'
 import * as Sentry from '@sentry/browser'
 import { PASSWORD } from '../../fields'
 import { Field, Form } from 'react-final-form'
-import { CurrentUserStore } from '../../entities/User'
+import { IRedisState } from '../../entities/User'
 import { required, minPasswordLength, composeValidators } from '../../utilities/formValidators'
 
 const PASSWORD1 = 'password1'
@@ -25,16 +25,16 @@ const PASSWORD2 = 'password2'
 
 interface Props {
   onClose: () => void
-  currentUser: firebase.User
+  firebaseUser: firebase.User
 }
 
-function ChangePasswordDialog({ onClose, currentUser }: Props) {
+function ChangePasswordDialog({ onClose, firebaseUser }: Props) {
   const [errorMessage, setErrorMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
 
   const handleSubmitFunc = async (values: { [key: string]: any }) => {
-    if (!currentUser.email) {
+    if (!firebaseUser.email) {
       console.error('current user does not have an email.')
       return
     }
@@ -50,13 +50,13 @@ function ChangePasswordDialog({ onClose, currentUser }: Props) {
     setIsSubmitting(true)
 
     const credentials = firebase.auth.EmailAuthProvider.credential(
-      currentUser.email,
+      firebaseUser.email,
       password0
     )
     try {
-      await currentUser.reauthenticateWithCredential(credentials)
+      await firebaseUser.reauthenticateWithCredential(credentials)
       try {
-        await currentUser.updatePassword(password1)
+        await firebaseUser.updatePassword(password1)
         setIsSuccess(true)
       } catch (error) {
         const { code, message } = error
@@ -190,13 +190,13 @@ function ChangePasswordDialog({ onClose, currentUser }: Props) {
 }
 
 ChangePasswordDialog.propTypes = {
-  currentUser: PropTypes.object.isRequired,
+  firebaseUser: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired
 }
 
-const mapStateToProps = ({ currentUser: { currentUser } }: CurrentUserStore) => {
+const mapStateToProps = ({ currentUser: { firebaseUser } }: IRedisState) => {
   return {
-    currentUser
+    firebaseUser
   }
 }
 

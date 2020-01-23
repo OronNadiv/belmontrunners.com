@@ -22,11 +22,11 @@ import { ROOT } from '../../urls'
 import { Button } from '@material-ui/core'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 import UpdateUserData from '../../components/HOC/UpdateUserData'
-import { CurrentUserStore, UserOptionalProps, User } from '../../entities/User'
+import { IRedisState, IUserOptionalProps, IUser } from '../../entities/User'
 
 interface Props extends RouteComponentProps {
   updateUserData: any,
-  currentUser: firebase.User,
+  firebaseUser: firebase.User,
   userData: any,
   isSubmitting: boolean,
   onSubmitting: (arg0: boolean) => void
@@ -34,20 +34,20 @@ interface Props extends RouteComponentProps {
 
 function MyProfileForm({
                          updateUserData,
-                         currentUser,
+                         firebaseUser,
                          userData,
                          history,
                          isSubmitting,
                          onSubmitting
                        }: Props) {
-  const userDataJS: User = userData.toJS()
+  const userDataJS: IUser = userData.toJS()
 
-  const handleSubmitFunc = async (values: UserOptionalProps) => {
+  const handleSubmitFunc = async (values: IUserOptionalProps) => {
     console.log('submitting values:', JSON.stringify(values, null, 2))
     try {
       onSubmitting(true)
       await Promise.all([
-        currentUser.updateProfile({ [DISPLAY_NAME]: values.displayName }),
+        firebaseUser.updateProfile({ [DISPLAY_NAME]: values.displayName }),
         updateUserData(values, { merge: true })
       ])
 
@@ -80,7 +80,7 @@ function MyProfileForm({
 
   // @ts-ignore
   return (
-    currentUser && (
+    firebaseUser && (
       <>
         <Form
           onSubmit={values => handleSubmitFunc(values)}
@@ -124,7 +124,7 @@ function MyProfileForm({
 }
 
 MyProfileForm.propTypes = {
-  currentUser: PropTypes.object.isRequired,
+  firebaseUser: PropTypes.object.isRequired,
   userData: PropTypes.object.isRequired,
 
 // from HOC
@@ -141,9 +141,9 @@ const mapDispatchToProps = {
   sendEmailVerification: sendEmailVerificationAction
 }
 
-const mapStateToProps = ({ currentUser: { currentUser, userData } }: CurrentUserStore) => {
+const mapStateToProps = ({ currentUser: { firebaseUser, userData } }: IRedisState) => {
   return {
-    currentUser,
+    firebaseUser,
     // @ts-ignore
     userData: userData || new IMap()
   }

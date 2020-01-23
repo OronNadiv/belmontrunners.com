@@ -49,15 +49,15 @@ export default function Help() {
         }}
       >
         <Typography className={classes.typography}>
-          <p><b>Member:</b> someone with a valid membership (paid membership fee in the last 12 months).</p>
-          <p><b>User:</b> someone who created an account on our website but is not a member.</p>
-          <p><b>Subscriber:</b> someone who added their email address via the subscribe form on our website.</p>
+          <p><b>Member:</b> someone with a valid membership (paid membership fee in the last 12 months)</p>
+          <p><b>User:</b> someone who created an account on our website but is not a member</p>
+          <p><b>Subscriber:</b> someone who added their email address via the subscribe form on our website</p>
           <p>
-            A subscriber may be later "promoted" to a user if they create an account using the same email address.
+            A subscriber may later be "promoted" to a user if s/he creates an account using the same email address.
             <br />
-            A user may be "promoted" to a member if they pay club membership fee.
+            A user may later be "promoted" to a member if s/he pays the club membership fee.
             <br />
-            A member may be "demoted" to a user if their membership expires.
+            A member may later be "demoted" to a user if his/her membership expires.
           </p>
         </Typography>
       </Popover>

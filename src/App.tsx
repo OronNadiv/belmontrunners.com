@@ -4,7 +4,7 @@ import Footer from './components/Footer'
 import './App.css'
 import './scss/style.scss'
 import * as PropTypes from 'prop-types'
-import { FetchCurrentUser, fetchCurrentUser as fetchCurrentUserAction } from './reducers/currentUser'
+import { IFetchCurrentUser, fetchCurrentUser as fetchCurrentUserAction } from './reducers/currentUser'
 import { connect } from 'react-redux'
 import { Route, Switch } from 'react-router-dom'
 import SignIn from './pages/sign-in-page/SignInPage'
@@ -39,11 +39,10 @@ import MyProfilePage from './pages/my-profile-page/MyProfilePage'
 import VerifyEmailPage from './pages/authentication/VerifyEmailPage'
 import MembersPage from './pages/members-page/MembersPage'
 import usePrevious from './components/usePrevious'
-import { DISPLAY_NAME, EMAIL, PHOTO_URL, UID } from './fields'
 import AccountPage from './pages/account-page/AccountPage'
 import LogRocket from 'logrocket'
 import FaqPage from './pages/faq-page/FaqPage'
-import { CurrentUserStore } from './entities/User'
+import { IRedisState } from './entities/User'
 import ErrorBoundary from './components/ErrorBoundary'
 
 const setupLogRocketReact = require('logrocket-react')
@@ -73,13 +72,13 @@ Wrapper.propTypes = {
   children: PropTypes.element
 }
 
-interface AppProps {
-  fetchCurrentUser: FetchCurrentUser
+interface Props {
+  fetchCurrentUser: IFetchCurrentUser
   isCurrentUserLoaded: boolean
-  currentUser: firebase.User
+  firebaseUser: firebase.User
 }
 
-function App({ fetchCurrentUser, isCurrentUserLoaded, currentUser }: AppProps) {
+function App({ fetchCurrentUser, isCurrentUserLoaded, firebaseUser }: Props) {
   useEffect(() => {
     LogRocket.init('qv4xmc/belmont-runners')
     setupLogRocketReact(LogRocket)
@@ -87,23 +86,23 @@ function App({ fetchCurrentUser, isCurrentUserLoaded, currentUser }: AppProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const prevCurrentUser = usePrevious(currentUser)
+  const prevFirebaseUser = usePrevious(firebaseUser)
   useEffect(() => {
-    if (prevCurrentUser !== currentUser) {
-      console.log('currentUser is different:', currentUser)
-      if (currentUser) {
+    if (prevFirebaseUser !== firebaseUser) {
+      console.log('currentUser is different:', firebaseUser)
+      if (firebaseUser) {
         const userTraits = {
-          email: currentUser.email || '',
-          name: currentUser.displayName || ''
+          email: firebaseUser.email || '',
+          name: firebaseUser.displayName || ''
         }
-        LogRocket.identify(currentUser.uid, userTraits)
+        LogRocket.identify(firebaseUser.uid, userTraits)
 
         LogRocket.getSessionURL(sessionURL => {
           Sentry.configureScope(scope => {
             const user: Sentry.User = {
-              id: currentUser.uid,
-              email: currentUser.email || undefined,
-              displayName: currentUser.displayName
+              id: firebaseUser.uid,
+              email: firebaseUser.email || undefined,
+              displayName: firebaseUser.displayName
             }
             scope.setUser(user)
             scope.setExtra('sessionURL', sessionURL)
@@ -123,7 +122,7 @@ function App({ fetchCurrentUser, isCurrentUserLoaded, currentUser }: AppProps) {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser])
+  }, [firebaseUser])
 
   const enableCampaigns = window.innerHeight >= 600
   console.log(
@@ -272,11 +271,11 @@ function App({ fetchCurrentUser, isCurrentUserLoaded, currentUser }: AppProps) {
       {isCurrentUserLoaded && (
         <Drift
           appId="fxagpvvrufk4"
-          userId={currentUser ? currentUser[UID] : ''}
+          userId={firebaseUser ? firebaseUser.uid : ''}
           attributes={{
-            email: currentUser && currentUser[EMAIL],
-            avatar_url: currentUser && currentUser[PHOTO_URL],
-            displayName: currentUser && currentUser[DISPLAY_NAME]
+            email: firebaseUser && firebaseUser.email,
+            avatar_url: firebaseUser && firebaseUser.photoURL,
+            displayName: firebaseUser && firebaseUser.displayName
           }}
           config={{
             enableCampaigns
@@ -289,7 +288,7 @@ function App({ fetchCurrentUser, isCurrentUserLoaded, currentUser }: AppProps) {
 
 App.propTypes = {
   fetchCurrentUser: PropTypes.func.isRequired,
-  currentUser: PropTypes.object,
+  firebaseUser: PropTypes.object,
   isCurrentUserLoaded: PropTypes.bool.isRequired
 }
 
@@ -297,10 +296,10 @@ const mapDispatchToProps = {
   fetchCurrentUser: fetchCurrentUserAction
 }
 
-const mapStateToProps = ({ currentUser: { currentUser, isCurrentUserLoaded } }: CurrentUserStore) => {
+const mapStateToProps = ({ currentUser: { firebaseUser, isCurrentUserLoaded } }: IRedisState) => {
   return {
     isCurrentUserLoaded,
-    currentUser
+    firebaseUser
   }
 }
 

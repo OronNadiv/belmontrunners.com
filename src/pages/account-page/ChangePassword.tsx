@@ -3,20 +3,20 @@ import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Button, Card, CardContent, Typography } from '@material-ui/core'
 import ChangePasswordDialog from './ChangePasswordDialog'
-import { CurrentUserStore } from '../../entities/User'
+import { IRedisState } from '../../entities/User'
 
 interface Props {
-  currentUser: firebase.User
+  firebaseUser: firebase.User
   isSubmitting: boolean
 }
 
-function ChangeEmail({ currentUser, isSubmitting }: Props) {
+function ChangeEmail({ firebaseUser, isSubmitting }: Props) {
   const [showChangePasswordDialog, setShowChangePasswordDialog] = useState(
     false
   )
 
   return (
-    currentUser && (
+    firebaseUser && (
       <>
         <Card className="d-flex flex-row align-content-center my-4">
           <div className="mr-auto">
@@ -52,14 +52,14 @@ function ChangeEmail({ currentUser, isSubmitting }: Props) {
 }
 
 ChangeEmail.propTypes = {
-  currentUser: PropTypes.object.isRequired,
+  firebaseUser: PropTypes.object.isRequired,
   onSubmitting: PropTypes.func.isRequired,
   isSubmitting: PropTypes.bool.isRequired
 }
 
-const mapStateToProps = ({ currentUser: { currentUser } }: CurrentUserStore) => {
+const mapStateToProps = ({ currentUser: { firebaseUser } }: IRedisState) => {
   return {
-    currentUser
+    firebaseUser
   }
 }
 

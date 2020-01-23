@@ -37,7 +37,7 @@ export default (admin: Admin.app.App, config: StripeConfig) => {
     }
     const { uid } = context.auth
 
-    const currentUserRef = firestore.doc(`users/${uid}`)
+    const userDataRef = firestore.doc(`users/${uid}`)
     const transactionsRef = firestore.doc(`users/${uid}/transactions/${moment().utc().format()}`)
     const transactionsLastRef = firestore.doc(`users/${uid}/transactions/latest`)
 
@@ -50,15 +50,15 @@ export default (admin: Admin.app.App, config: StripeConfig) => {
 
     const { id } = token
 
-    const userDoc = await currentUserRef.get()
+    const userDoc = await userDataRef.get()
     if (!userDoc.data()) {
       throw new https.HttpsError(
         'internal',
         'Something went wrong...'
       )
     }
-    const currentUser: User = userDoc.data() as User
-    const { membershipExpiresAt } = currentUser
+    const userDataJS: User = userDoc.data() as User
+    const { membershipExpiresAt } = userDataJS
 
     let charge
     const amount: number = amountInCents || parseInt(config.membershipFeeInCents)
@@ -109,14 +109,14 @@ export default (admin: Admin.app.App, config: StripeConfig) => {
       paidAmount: amount / 100,
       confirmationNumber: confirmationNumber
     }
-    currentUser.notInterestedInBecomingAMember = false
-    currentUser.membershipExpiresAt = newMembershipExpiresAt.utc().format()
+    userDataJS.notInterestedInBecomingAMember = false
+    userDataJS.membershipExpiresAt = newMembershipExpiresAt.utc().format()
     await Promise.all([
       transactionsRef.set(values),
       transactionsLastRef.set(values),
-      currentUserRef.set({
-        notInterestedInBecomingAMember: currentUser.notInterestedInBecomingAMember,
-        membershipExpiresAt: currentUser.membershipExpiresAt
+      userDataRef.set({
+        notInterestedInBecomingAMember: userDataJS.notInterestedInBecomingAMember,
+        membershipExpiresAt: userDataJS.membershipExpiresAt
       }, { merge: true })
     ])
     return charge

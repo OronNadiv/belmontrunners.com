@@ -1,4 +1,4 @@
-interface Contact {
+export default interface IContact {
   uid?: string;
   addedAt?: string;
   addedBy?: string;
@@ -14,5 +14,3 @@ interface Contact {
   isMember: boolean;
   membershipExpiresAt?: string;
 }
-
-export default Contact

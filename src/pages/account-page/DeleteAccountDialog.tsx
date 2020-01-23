@@ -2,12 +2,12 @@ import React from 'react'
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core'
 import * as PropTypes from 'prop-types'
 
-interface DeleteAccountDialogProps {
+interface Props {
   onClose: (shouldDelete: boolean) => Promise<void>,
   open: boolean
 }
 
-function DeleteAccountDialog ({ onClose, open }: DeleteAccountDialogProps) {
+function DeleteAccountDialog ({ onClose, open }: Props) {
   const handleClose = (val: boolean) => () => onClose(val)
 
   return (

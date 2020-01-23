@@ -25,16 +25,13 @@ import { goToTop } from 'react-scrollable-anchor'
 import { compose } from 'underscore'
 import { connect } from 'react-redux'
 import { required, isEmail, minPasswordLength, composeValidators } from '../../utilities/formValidators'
-import { CurrentUserStore } from '../../entities/User'
-
-// const providerGoogle = new firebase.auth.GoogleAuthProvider()
-// const providerFacebook = new firebase.auth.FacebookAuthProvider()
+import { IRedisState } from '../../entities/User'
 
 interface Props extends RouteComponentProps {
-  currentUser: firebase.User
+  firebaseUser: firebase.User
 }
 
-function SignInPage({ history, location, currentUser }: Props) {
+function SignInPage({ history, location, firebaseUser }: Props) {
   const [errorMessage, setErrorMessage] = useState('')
   const [isSigningIn, setIsSigningIn] = useState(false)
 
@@ -71,58 +68,37 @@ function SignInPage({ history, location, currentUser }: Props) {
     password: string
   }
 
-  const signIn = async (providerName: string, params: IEmailPassword) => {
-    let promise
-    switch (providerName.toLowerCase()) {
-      // case 'facebook':
-      //   promise = auth.signInWithPopup(providerFacebook)
-      //   break
-      // case 'google':
-      //   promise = auth.signInWithPopup(providerGoogle)
-      //   break
-      case 'email':
-      default:
-        promise = auth.signInWithEmailAndPassword(params.email, params.password)
-        break
-    }
-
+  const signIn = async (params: IEmailPassword) => {
     try {
       setIsSigningIn(true)
-      await promise
+      await auth.signInWithEmailAndPassword(params.email, params.password)
+
     } catch (error) {
       setIsSigningIn(false)
-      console.log('error while signing in', error)
       handleSignInError(error)
     }
-    // todo: when sign-in is done via provider, redirect to user details and then maybe to payments
   }
 
   const handleSignInWithEmail = async (values: IEmailPassword) => {
     setErrorMessage('')
 
-    await signIn('email', values)
+    await signIn(values)
   }
-
-  // const handleSignInWithProvider = (providerName) => {
-  //   signIn(providerName)
-  // }
 
   const handleClose = () => {
     history.push(ROOT)
   }
 
   useEffect(() => {
-    if (!currentUser) {
+    if (!firebaseUser) {
       return
     }
     let targetUrl = ROOT
     if (location && location.state && location.state.redirectUrl) {
       targetUrl = location.state.redirectUrl
     }
-    currentUser && history.push(targetUrl)
-  }, [currentUser, history, location])
-
-  console.log('SignIn render called')
+    firebaseUser && history.push(targetUrl)
+  }, [firebaseUser, history, location])
 
   return (
     <Form
@@ -140,20 +116,6 @@ function SignInPage({ history, location, currentUser }: Props) {
             <DialogTitle>Sign In</DialogTitle>
 
             <DialogContent>
-              {/*
-          // TODO: enable providers
-          <div className="btn btn-block btn-social btn-twitter"
-               onClick={() => handleSignInWithProvider('facebook')}>
-            <span className="fab fa-facebook" /> Sign in with Facebook
-          </div>
-          <div className="btn btn-block btn-social btn-google"
-               onClick={() => handleSignInWithProvider('google')}>
-            <span className="fab fa-google" /> Sign in with Google
-          </div>
-
-          <div className="mt-4 text-center text-dark">Or sign in with email</div>
-*/}
-
               {errorMessage && (
                 <div className="mt-2 text-danger text-center">
                   {errorMessage}
@@ -208,7 +170,7 @@ function SignInPage({ history, location, currentUser }: Props) {
 }
 
 SignInPage.propTypes = {
-  currentUser: PropTypes.object,
+  firebaseUser: PropTypes.object,
   history: PropTypes.object.isRequired,
   location: PropTypes.shape({
     state: PropTypes.shape({
@@ -217,9 +179,9 @@ SignInPage.propTypes = {
   }).isRequired
 }
 
-const mapStateToProps = ({ currentUser: { currentUser } }: CurrentUserStore) => {
+const mapStateToProps = ({ currentUser: { firebaseUser } }: IRedisState) => {
   return {
-    currentUser
+    firebaseUser
   }
 }
 

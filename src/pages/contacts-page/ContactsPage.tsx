@@ -35,17 +35,17 @@ import { parseFullName } from 'parse-full-name'
 import SearchBox from '../../components/SearchBox'
 import { compose } from 'underscore'
 import { fromJS, List as IList } from 'immutable'
-import { CurrentUserStore, User } from '../../entities/User'
-import Contact from './Contact'
+import { IRedisState, IUser } from '../../entities/User'
+import IContact from '../../entities/Contact'
 import Help from './Help'
 
 interface Props {
-  currentUser: User
+  firebaseUser: firebase.User
   allowRead: boolean
 }
 
-function ContactsPage({ currentUser, allowRead }: Props) {
-  const [contacts, setContacts] = useState<Contact[]>([])
+function ContactsPage({ firebaseUser, allowRead }: Props) {
+  const [contacts, setContacts] = useState<IContact[]>([])
   // @ts-ignore
   const [filteredContacts, setFilteredContacts] = useState(new IList())
   const [search, setSearch] = useState('')
@@ -68,7 +68,7 @@ function ContactsPage({ currentUser, allowRead }: Props) {
 
     const csvExporter = new ExportToCsv(options)
     const items = filteredContacts.map((item: any) => {
-      const itemJS: User = item.toJS()
+      const itemJS: IUser = item.toJS()
       const displayName = itemJS.displayName
       const email = itemJS.email
       const name = parseFullName(displayName)
@@ -82,7 +82,7 @@ function ContactsPage({ currentUser, allowRead }: Props) {
   }
 
   useEffect(() => {
-    if (!currentUser || !allowRead) {
+    if (!firebaseUser || !allowRead) {
       return
     }
 
@@ -92,7 +92,7 @@ function ContactsPage({ currentUser, allowRead }: Props) {
           .doc('subscribers/items')
           .get()
         const data: any = contactsData.data()
-        const contactsTmp: Contact[] = data[SUBSCRIBERS_ARRAY_KEY]
+        const contactsTmp: IContact[] = data[SUBSCRIBERS_ARRAY_KEY]
 
         setContacts(contactsTmp)
       } catch (error) {
@@ -100,7 +100,7 @@ function ContactsPage({ currentUser, allowRead }: Props) {
         console.error(error)
       }
     })()
-  }, [currentUser, allowRead])
+  }, [firebaseUser, allowRead])
 
   const applyFilter = useCallback(() => {
     let tmpContacts = contacts
@@ -129,7 +129,7 @@ function ContactsPage({ currentUser, allowRead }: Props) {
 
   const copyToClipboard = useCallback(() => {
     const items = filteredContacts.map((item: any) => {
-      const itemJS: User = item.toJS()
+      const itemJS: IUser = item.toJS()
 
       const displayName = itemJS.displayName
       const email = itemJS.email
@@ -147,7 +147,7 @@ function ContactsPage({ currentUser, allowRead }: Props) {
   }, [copyToClipboard])
 
   const getChips = () => {
-    return filteredContacts.toJS().map((contact: Contact) => {
+    return filteredContacts.toJS().map((contact: IContact) => {
       let label
       if (contact.displayName) {
         label = `${contact.displayName || ''} (${contact.email})`
@@ -176,7 +176,7 @@ function ContactsPage({ currentUser, allowRead }: Props) {
     })
   }
 
-  if (currentUser && !allowRead) {
+  if (firebaseUser && !allowRead) {
     return <Redirect to={ROOT} />
   }
 
@@ -255,13 +255,13 @@ function ContactsPage({ currentUser, allowRead }: Props) {
 
 ContactsPage.propTypes = {
   allowRead: PropTypes.bool.isRequired,
-  currentUser: PropTypes.object.isRequired
+  firebaseUser: PropTypes.object.isRequired
 }
 
-const mapStateToProps = ({ currentUser: { permissions, currentUser } }: CurrentUserStore) => {
+const mapStateToProps = ({ currentUser: { permissions, firebaseUser } }: IRedisState) => {
   return {
-    allowRead: !!currentUser && !!permissions.contactsRead[currentUser.uid],
-    currentUser
+    allowRead: !!firebaseUser && !!permissions.contactsRead[firebaseUser.uid],
+    firebaseUser
   }
 }
 

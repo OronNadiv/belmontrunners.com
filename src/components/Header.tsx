@@ -51,7 +51,7 @@ import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import calc from '../utilities/membershipUtils'
 import firebase from 'firebase/app'
-import { CurrentUserStore, User } from '../entities/User'
+import { IRedisState, IUser } from '../entities/User'
 import { compose } from 'underscore'
 import { auth } from '../firebase'
 
@@ -61,13 +61,13 @@ const BACKGROUND_IMAGE = 'linear-gradient(90deg,#141da2,#9b5cf6)'
 
 interface Props extends RouteComponentProps {
   isCurrentUserLoaded: boolean,
-  currentUser: firebase.User,
+  firebaseUser: firebase.User,
   allowUsersPage: boolean,
   allowContactsPage: boolean,
   isMember: boolean
 }
 
-function Header({ location: { pathname }, isCurrentUserLoaded, currentUser, allowUsersPage, allowContactsPage, isMember }: Props) {
+function Header({ location: { pathname }, isCurrentUserLoaded, firebaseUser, allowUsersPage, allowContactsPage, isMember }: Props) {
   const [transparentBackground, setTransparentBackground] = useState(true)
   const [showDrawer, setShowDrawer] = useState(false)
 
@@ -186,8 +186,8 @@ function Header({ location: { pathname }, isCurrentUserLoaded, currentUser, allo
     setShowDrawer(false)
   }
 
-  const isSignedOut: boolean = isCurrentUserLoaded && !currentUser
-  const isSignedIn: boolean = isCurrentUserLoaded && !!currentUser
+  const isSignedOut: boolean = isCurrentUserLoaded && !firebaseUser
+  const isSignedIn: boolean = isCurrentUserLoaded && !!firebaseUser
 
   return (
     <div className={classes.root}>
@@ -365,13 +365,12 @@ function Header({ location: { pathname }, isCurrentUserLoaded, currentUser, allo
               <MenuIcon fontSize="large" />
             </IconButton>
           }
-
           {
-            !isSmallDevice && isCurrentUserLoaded && currentUser &&
+            !isSmallDevice && isSignedIn &&
             <Profile />
           }
           {
-            !isSmallDevice && isCurrentUserLoaded && !currentUser &&
+            !isSmallDevice && isSignedOut &&
             <Link to={SIGN_IN} className='signin-btn text-white'>
               <Button className='text-white'>
                 Sign in
@@ -379,7 +378,7 @@ function Header({ location: { pathname }, isCurrentUserLoaded, currentUser, allo
             </Link>
           }
           {
-            !isSmallDevice && isCurrentUserLoaded && !currentUser && pathname.trim() !== JOIN &&
+            !isSmallDevice && isSignedOut && pathname.trim() !== JOIN &&
             <Link to={{
               pathname: JOIN
             }}>
@@ -401,21 +400,21 @@ Header.propTypes = {
   allowUsersPage: PropTypes.bool.isRequired,
   allowContactsPage: PropTypes.bool.isRequired,
   isCurrentUserLoaded: PropTypes.bool.isRequired,
-  currentUser: PropTypes.object,
+  firebaseUser: PropTypes.object,
   location: PropTypes.shape({
     pathname: PropTypes.string.isRequired
   }).isRequired,
   isMember: PropTypes.bool.isRequired
 }
 
-const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, currentUser, permissions, userData } }: CurrentUserStore) => {
-  const userDataJS: User = userData ? userData.toJS() : undefined
+const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, firebaseUser, permissions, userData } }: IRedisState) => {
+  const userDataJS: IUser = userData ? userData.toJS() : undefined
   return {
-    allowUsersPage: !currentUser ? false : !!(permissions.usersRead[currentUser.uid] || permissions.usersWrite[currentUser.uid]),
-    allowContactsPage: !currentUser ? false : !!(permissions.contactsRead[currentUser.uid] || permissions.contactsWrite[currentUser.uid]),
+    allowUsersPage: !firebaseUser ? false : !!(permissions.usersRead[firebaseUser.uid] || permissions.usersWrite[firebaseUser.uid]),
+    allowContactsPage: !firebaseUser ? false : !!(permissions.contactsRead[firebaseUser.uid] || permissions.contactsWrite[firebaseUser.uid]),
     isMember: userData && calc(userDataJS).isAMember,
     isCurrentUserLoaded,
-    currentUser
+    firebaseUser
   }
 }
 

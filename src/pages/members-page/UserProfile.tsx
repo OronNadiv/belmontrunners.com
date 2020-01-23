@@ -46,8 +46,8 @@ import { Map as IMap } from 'immutable'
 import UpdateUserData from '../../components/HOC/UpdateUserData'
 import { linkToFacebook } from '../../utilities/linkToFacebook'
 import { findWhere } from 'underscore'
-import { CurrentUserStore, User, UserOptionalProps, VisibilityEnum } from '../../entities/User'
-import { UpdateUserData as UpdateUserDataFunc } from '../../reducers/currentUser'
+import { IRedisState, IUser, IUserOptionalProps, VisibilityEnum } from '../../entities/User'
+import { IUpdateUserData } from '../../reducers/currentUser'
 
 const defaultVisibility = {
   [EMAIL]: ONLY_ME,
@@ -62,14 +62,14 @@ const DRAWER_WIDTH = 270
 
 interface Props {
   onClose: () => void
-  currentUser: firebase.User
+  firebaseUser: firebase.User
   userData: any
-  user: UserOptionalProps
-  updateUserData: UpdateUserDataFunc
+  user: IUserOptionalProps
+  updateUserData: IUpdateUserData
 }
 
-function UserProfile({ onClose, user, userData, updateUserData, currentUser }: Props) {
-  const userDataJS: User = userData.toJS()
+function UserProfile({ onClose, user, userData, updateUserData, firebaseUser }: Props) {
+  const userDataJS: IUser = userData.toJS()
   const visibility = userDataJS.visibility || {}
   const theme = useTheme()
   const isSmallDevice = useMediaQuery(theme.breakpoints.down('sm'))
@@ -161,7 +161,7 @@ function UserProfile({ onClose, user, userData, updateUserData, currentUser }: P
           {/*<div className='mr-1 text-secondary' style={{ width: 90 }}>{label}:</div>*/}
           <div>{value || 'Not sharing'}</div>
         </div>
-        {currentUser.uid === user.uid && (
+        {firebaseUser.uid === user.uid && (
           <div className="mt-2">
             <small onClick={handleOpen} ref={handleRef}>
               <span className="text-muted">Visible to: </span>
@@ -219,14 +219,14 @@ function UserProfile({ onClose, user, userData, updateUserData, currentUser }: P
 
   const handleLinkToFacebook = async () => {
     try {
-      await linkToFacebook(currentUser, userDataJS, updateUserData)
+      await linkToFacebook(firebaseUser, userDataJS, updateUserData)
     } catch (error) {
       setErrorMessage('Operation failed')
     }
   }
 
   const connectedToFacebook = Boolean(
-    findWhere(currentUser.providerData, { providerId: 'facebook.com' })
+    findWhere(firebaseUser.providerData, { providerId: 'facebook.com' })
   )
 
   const avatarUrl =
@@ -285,7 +285,7 @@ function UserProfile({ onClose, user, userData, updateUserData, currentUser }: P
             {!avatarUrl && initials(user[DISPLAY_NAME])}
           </Avatar>
           <div className="mt-3">{user[DISPLAY_NAME]}</div>
-          {currentUser.uid === user.uid && !connectedToFacebook && (
+          {firebaseUser.uid === user.uid && !connectedToFacebook && (
             <div className="mt-2">
               <small>
                 <span className="text-muted font-weight-bold">
@@ -342,19 +342,19 @@ UserProfile.propTypes = {
   user: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
   updateUserData: PropTypes.func.isRequired,
-  currentUser: PropTypes.object.isRequired,
+  firebaseUser: PropTypes.object.isRequired,
   userData: PropTypes.object.isRequired
 }
 
 const mapStateToProps = ({
                            currentUser: {
-                             currentUser,
+                             firebaseUser,
                              userData
                            }
-                         }: CurrentUserStore) => {
+                         }: IRedisState) => {
 
   return {
-    currentUser,
+    firebaseUser,
     // @ts-ignore
     userData: userData || new IMap()
   }

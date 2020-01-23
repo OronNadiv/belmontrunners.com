@@ -4,7 +4,7 @@ import { SIGN_IN } from '../../urls'
 import { connect } from 'react-redux'
 import * as PropTypes from 'prop-types'
 import { compose } from 'underscore'
-import { CurrentUserStore } from '../../entities/User'
+import { IRedisState } from '../../entities/User'
 
 interface Params {
   name?: string | undefined
@@ -13,7 +13,8 @@ interface Params {
 }
 
 const LoggedInState = (params: Params = {}) => {
-  let { name, isRequiredToBeLoggedIn = true, canSwitchToLogin = true } = params
+  const { isRequiredToBeLoggedIn = true, canSwitchToLogin = true } = params
+  let { name } = params
 
   return (WrappedComponent: any) => {
     interface Props extends RouteComponentProps {
@@ -116,10 +117,10 @@ const LoggedInState = (params: Params = {}) => {
       )
     }
 
-    const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, currentUser } }: CurrentUserStore) => {
+    const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, firebaseUser } }: IRedisState) => {
       return {
         ___isCurrentUserLoaded___: isCurrentUserLoaded,
-        ___currentUser___: currentUser
+        ___currentUser___: firebaseUser
       }
     }
     Inner.propTypes = {

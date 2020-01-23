@@ -19,8 +19,8 @@ import { compose, pick } from 'underscore'
 import UserDetails from '../../components/UserDetails'
 import UpdateUserData from '../../components/HOC/UpdateUserData'
 import { goToTop } from 'react-scrollable-anchor'
-import { CurrentUserStore, User, UserOptionalProps } from '../../entities/User'
-import { UpdateUserData as IUpdateUserData } from '../../reducers/currentUser'
+import { IRedisState, IUser, IUserOptionalProps } from '../../entities/User'
+import { IUpdateUserData } from '../../reducers/currentUser'
 
 interface Props {
   onNextClicked: () => void
@@ -37,10 +37,10 @@ const SignUpStepUserProfile = ({
                                  isCurrentUserLoaded,
                                  updateUserData
                                }: Props) => {
-  const userDataJS: User = userData.toJS()
+  const userDataJS: IUser = userData.toJS()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmitFunc = async (values: UserOptionalProps) => {
+  const handleSubmitFunc = async (values: IUserOptionalProps) => {
     console.log('submitting values:', JSON.stringify(values, null, 2))
 
     setIsSubmitting(true)
@@ -102,7 +102,7 @@ SignUpStepUserProfile.propTypes = {
   onNextClicked: PropTypes.func.isRequired
 }
 
-const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, userData } }: CurrentUserStore) => {
+const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, userData } }: IRedisState) => {
   return {
     isCurrentUserLoaded,
     // @ts-ignore

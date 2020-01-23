@@ -8,22 +8,22 @@ import DownloadAccountInfo from './DownloadAccountInfo'
 import ChangeEmail from './ChangeEmail'
 import DeleteAccount from './DeleteAccount'
 import ChangePassword from './ChangePassword'
-import { CurrentUserStore } from '../../entities/User'
+import { IRedisState } from '../../entities/User'
 
 interface Props {
-  currentUser: firebase.User
+  firebaseUser: firebase.User
 }
 
-function AccountPage({ currentUser }: Props) {
+function AccountPage({ firebaseUser }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  useEffect(goToTop, [currentUser])
+  useEffect(goToTop, [firebaseUser])
 
   const handleSubmissionChanged = (value: boolean) => {
     setIsSubmitting(value)
   }
 
-  return !currentUser ? null : (
+  return !firebaseUser ? null : (
     <div className="mx-auto py-5 px-3" style={{ maxWidth: 600 }}>
       {/*
   // @ts-ignore */}
@@ -50,12 +50,12 @@ function AccountPage({ currentUser }: Props) {
 }
 
 AccountPage.propTypes = {
-  currentUser: PropTypes.object.isRequired
+  firebaseUser: PropTypes.object.isRequired
 }
 
-const mapStateToProps = ({ currentUser: { currentUser } }: CurrentUserStore) => {
+const mapStateToProps = ({ currentUser: { firebaseUser } }: IRedisState) => {
   return {
-    currentUser
+    firebaseUser
   }
 }
 

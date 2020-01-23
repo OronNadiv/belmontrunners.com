@@ -5,11 +5,11 @@ export enum VisibilityEnum {
   MEMBERS = 'MEMBERS'
 }
 
-export interface Visibility {
+export interface IUserPropsVisibility {
   [key: string]: VisibilityEnum
 }
 
-export interface UserOptionalProps {
+export interface IUserOptionalProps {
   notifications?: { [key: string]: string }
   address1?: string | null
   address2?: string | null
@@ -31,17 +31,16 @@ export interface UserOptionalProps {
   emailVerificationSentAt?: string | null
   notInterestedInBecomingAMember?: boolean | null
   gravatarUrl?: string | null
-  visibility?: Visibility | null
+  visibility?: IUserPropsVisibility | null
 
 }
 
-export interface User extends UserOptionalProps {
+export interface IUser extends IUserOptionalProps {
   uid: string
   email: string
 }
 
-
-export interface CurrentUserPermissions {
+export interface IUserPermissions {
   contactsRead: { [key: string]: boolean },
   contactsWrite: { [key: string]: boolean },
   usersRead: { [key: string]: boolean },
@@ -50,18 +49,18 @@ export interface CurrentUserPermissions {
 }
 
 
-export interface CurrentUserData {
+export interface ICurrentUser {
   isCurrentUserLoading: boolean
   isCurrentUserLoaded: boolean
-  permissions: CurrentUserPermissions
-  currentUser?: firebase.User
+  permissions: IUserPermissions
+  firebaseUser?: firebase.User
   userData: any
   userDataUpdateContext?: any
   userDataUpdating: boolean
   userDataUpdateError?: any
 }
 
-export interface CurrentUserStore {
-  currentUser: CurrentUserData
+export interface IRedisState {
+  currentUser: ICurrentUser
 }
 

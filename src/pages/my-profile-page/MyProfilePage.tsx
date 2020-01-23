@@ -7,23 +7,23 @@ import MyProfileForm from './MyProfileForm'
 import MyProfileFacebook from './MyProfileFacebook'
 import { goToTop } from 'react-scrollable-anchor'
 import { compose } from 'underscore'
-import { CurrentUserStore } from '../../entities/User'
+import { IRedisState } from '../../entities/User'
 
 interface Props {
-  currentUser: firebase.User
+  firebaseUser: firebase.User
 }
 
-function MyProfilePage({ currentUser }: Props) {
+function MyProfilePage({ firebaseUser }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  useEffect(goToTop, [currentUser])
+  useEffect(goToTop, [firebaseUser])
 
   const handleSubmissionChanged = (value: boolean) => {
     setIsSubmitting(value)
   }
 
   return (
-    currentUser && (
+    firebaseUser && (
       <div className="mx-auto py-5 px-3" style={{ maxWidth: 500 }}>
         <MyProfileFacebook
           onSubmitting={handleSubmissionChanged}
@@ -39,16 +39,16 @@ function MyProfilePage({ currentUser }: Props) {
 }
 
 MyProfilePage.propTypes = {
-  currentUser: PropTypes.object.isRequired
+  firebaseUser: PropTypes.object.isRequired
 }
 
 const mapDispatchToProps = {
   sendEmailVerification: sendEmailVerificationAction
 }
 
-const mapStateToProps = ({ currentUser: { currentUser } }: CurrentUserStore) => {
+const mapStateToProps = ({ currentUser: { firebaseUser } }: IRedisState) => {
   return {
-    currentUser
+    firebaseUser
   }
 }
 

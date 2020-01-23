@@ -14,7 +14,8 @@ import UpdateUserData from '../../components/HOC/UpdateUserData'
 import { goToTop } from 'react-scrollable-anchor'
 import { compose } from 'underscore'
 import calc from '../../utilities/membershipUtils'
-import { CurrentUserStore, User } from '../../entities/User'
+import { IRedisState, IUser } from '../../entities/User'
+import { IUpdateUserData } from '../../reducers/currentUser'
 
 const MEMBERSHIP_FEE_ADULT = 25
 const MEMBERSHIP_FEE_KID = 15
@@ -24,7 +25,7 @@ interface StripeResponse {
 }
 
 interface Props extends RouteComponentProps {
-  currentUser: firebase.User
+  firebaseUser: firebase.User
   needToPay: boolean
   totalAmount: number
   isLast: boolean
@@ -32,10 +33,11 @@ interface Props extends RouteComponentProps {
   youngerThan13: boolean
   membershipExpiresAt?: string
   stripe: { createToken: (arg0: { type: string }) => StripeResponse }
+  updateUserData: IUpdateUserData
 }
 
 function SignUpStepPayment({
-                             currentUser: { displayName, uid, email },
+                             firebaseUser: { displayName, uid, email },
                              history,
                              stripe,
                              isLast,
@@ -43,7 +45,8 @@ function SignUpStepPayment({
                              totalAmount,
                              membershipExpiresAt,
                              onNextClicked,
-                             youngerThan13
+                             youngerThan13,
+                             updateUserData
                            }: Props) {
   useEffect(() => {
     goToTop()
@@ -115,6 +118,18 @@ function SignUpStepPayment({
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSubmitting])
+
+  // we want to refresh UserData in case the confirmation number has changed.
+  // This would let the components know the user became a member.
+  useEffect(() => {
+    if (!confirmationNumber) {
+      return
+    }
+    ;(async function() {
+      await updateUserData({}, { merge: true })
+    })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [confirmationNumber])
 
   const getBody = () => {
     if (confirmationNumber) {
@@ -267,7 +282,7 @@ function SignUpStepPayment({
 
 SignUpStepPayment.propTypes = {
   // from redux
-  currentUser: PropTypes.object.isRequired,
+  firebaseUser: PropTypes.object.isRequired,
   updateUserData: PropTypes.func.isRequired,
   needToPay: PropTypes.bool,
   membershipExpiresAt: PropTypes.string,
@@ -287,14 +302,14 @@ SignUpStepPayment.propTypes = {
   history: PropTypes.object.isRequired
 }
 
-const mapStateToProps = ({ currentUser: { currentUser, userData } }: CurrentUserStore) => {
-  const userDataJS: User = userData ? userData.toJS() : {}
+const mapStateToProps = ({ currentUser: { firebaseUser, userData } }: IRedisState) => {
+  const userDataJS: IUser = userData ? userData.toJS() : {}
   let membershipExpiresAt = null
   let needToPay = false
   let totalAmount = -1
   let youngerThan13 = false
 
-  if (currentUser) {
+  if (firebaseUser) {
     if (!userDataJS.dateOfBirth) {
       console.error('missing userDataJS.dateOfBirth')
       totalAmount = MEMBERSHIP_FEE_ADULT
@@ -325,7 +340,7 @@ const mapStateToProps = ({ currentUser: { currentUser, userData } }: CurrentUser
   }
 
   return {
-    currentUser,
+    firebaseUser,
 
     needToPay,
     membershipExpiresAt,

@@ -2,10 +2,14 @@ import React from 'react'
 import { Button, Snackbar } from '@material-ui/core'
 import * as PropTypes from 'prop-types'
 import { DISPLAY_NAME, EMAIL, UID } from '../../fields'
-import { User } from "../../entities/User";
+import { IUser } from '../../entities/User'
 
-const confirmDeletion = (props: confirmDeletionProps) => {
-  const { row, onClose } = props
+interface Props {
+  onClose: (shouldDelete: boolean) => any,
+  row: IUser
+}
+
+const confirmDeletion = ({ row, onClose }: Props) => {
   return (
     <Snackbar
       anchorOrigin={{
@@ -30,11 +34,6 @@ const confirmDeletion = (props: confirmDeletionProps) => {
       ]}
     />
   )
-}
-
-interface confirmDeletionProps {
-  onClose: (shouldDelete: boolean) => any,
-  row: User
 }
 
 confirmDeletion.propTypes = {

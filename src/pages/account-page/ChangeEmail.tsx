@@ -4,15 +4,15 @@ import { connect } from 'react-redux'
 import { sendEmailVerification as sendEmailVerificationAction } from '../../reducers/currentUser'
 import { Button, Card, CardContent, Typography } from '@material-ui/core'
 import ChangeEmailDialog from './ChangeEmailDialog'
-import { CurrentUserStore } from '../../entities/User'
+import { IRedisState } from '../../entities/User'
 
 interface Props {
   sendEmailVerification: () => void
-  currentUser: firebase.User
+  firebaseUser: firebase.User
   isSubmitting: boolean
 }
 
-function ChangeEmail({ sendEmailVerification, currentUser, isSubmitting }: Props) {
+function ChangeEmail({ sendEmailVerification, firebaseUser, isSubmitting }: Props) {
   const [showChangeEmailDialog, setShowChangeEmailDialog] = useState()
   const [emailVerificationSent, setEmailVerificationSent] = useState()
 
@@ -23,7 +23,7 @@ function ChangeEmail({ sendEmailVerification, currentUser, isSubmitting }: Props
   }
 
   return (
-    currentUser && (
+    firebaseUser && (
       <>
         <Card className="d-flex flex-row align-content-center my-4">
           <div className="mr-auto">
@@ -32,8 +32,8 @@ function ChangeEmail({ sendEmailVerification, currentUser, isSubmitting }: Props
                 Email Address
               </Typography>
               <Typography color="textSecondary">
-                {currentUser.email} (
-                {currentUser.emailVerified === false ? (
+                {firebaseUser.email} (
+                {firebaseUser.emailVerified === false ? (
                   <span className="text-danger text-center">not verified</span>
                 ) : (
                   <span className="text-success text-center">verified</span>
@@ -41,7 +41,7 @@ function ChangeEmail({ sendEmailVerification, currentUser, isSubmitting }: Props
                 )
                 <br />
                 <small>
-                  {!currentUser.emailVerified && !emailVerificationSent && (
+                  {!firebaseUser.emailVerified && !emailVerificationSent && (
                     <span>
                         Click{' '}
                       <span
@@ -53,7 +53,7 @@ function ChangeEmail({ sendEmailVerification, currentUser, isSubmitting }: Props
                       to send me a verification email
                       </span>
                   )}
-                  {!currentUser.emailVerified && emailVerificationSent && (
+                  {!firebaseUser.emailVerified && emailVerificationSent && (
                     <span className="text-success text-center">Sent</span>
                   )}
                 </small>
@@ -82,7 +82,8 @@ function ChangeEmail({ sendEmailVerification, currentUser, isSubmitting }: Props
 
 ChangeEmail.propTypes = {
   sendEmailVerification: PropTypes.func.isRequired,
-  currentUser: PropTypes.object.isRequired,
+  firebaseUser: PropTypes.object.isRequired,
+  onSubmitting: PropTypes.func.isRequired,
   isSubmitting: PropTypes.bool.isRequired
 }
 
@@ -90,9 +91,9 @@ const mapDispatchToProps = {
   sendEmailVerification: sendEmailVerificationAction
 }
 
-const mapStateToProps = ({ currentUser: { currentUser } }: CurrentUserStore) => {
+const mapStateToProps = ({ currentUser: { firebaseUser } }: IRedisState) => {
   return {
-    currentUser
+    firebaseUser
   }
 }
 

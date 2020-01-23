@@ -24,10 +24,9 @@ import {
 import initials from 'initials'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 import { compose } from 'underscore'
-import calc from '../utilities/membershipUtils'
 import gravatar from 'gravatar'
 import rp from 'request-promise'
-import { CurrentUserStore, User } from '../entities/User'
+import { IRedisState, IUser } from '../entities/User'
 
 interface Props extends RouteComponentProps {
   allowUsersPage: boolean
@@ -66,7 +65,7 @@ function Profile({ allowUsersPage, allowContactsPage, userData, history }: Props
   const [open, setOpen] = React.useState(false)
   const [isGravatarFetched, setIsGravatarFetched] = useState(false)
   const [gravatarUrl, setGravatarUrl] = useState()
-  const userDataJS: User = userData.toJS()
+  const userDataJS: IUser = userData.toJS()
 
   useEffect(() => {
     if (!userData || isGravatarFetched) {
@@ -197,26 +196,22 @@ function Profile({ allowUsersPage, allowContactsPage, userData, history }: Props
 Profile.propTypes = {
   allowUsersPage: PropTypes.bool.isRequired,
   allowContactsPage: PropTypes.bool.isRequired,
-  currentUser: PropTypes.object,
   userData: PropTypes.object.isRequired,
-  history: PropTypes.object.isRequired,
-  isMember: PropTypes.bool.isRequired
+  history: PropTypes.object.isRequired
 }
 
-const mapStateToProps = ({ currentUser: { permissions, currentUser, userData } }: CurrentUserStore) => {
-  const userDataJS: User = userData.toJS()
+const mapStateToProps = ({ currentUser: { permissions, firebaseUser, userData } }: IRedisState) => {
   return {
     allowUsersPage:
-      !!currentUser &&
-      (!!permissions.usersRead[currentUser.uid] ||
-        !!permissions.usersWrite[currentUser.uid]),
+      !!firebaseUser &&
+      (!!permissions.usersRead[firebaseUser.uid] ||
+        !!permissions.usersWrite[firebaseUser.uid]),
     allowContactsPage:
-      !!currentUser &&
-      (!!permissions.contactsRead[currentUser.uid] ||
-        !!permissions.contactsWrite[currentUser.uid]),
+      !!firebaseUser &&
+      (!!permissions.contactsRead[firebaseUser.uid] ||
+        !!permissions.contactsWrite[firebaseUser.uid]),
     // @ts-ignore
-    userData: userData || new IMap(),
-    isMember: userData && calc(userDataJS).isAMember
+    userData: userData || new IMap()
   }
 }
 

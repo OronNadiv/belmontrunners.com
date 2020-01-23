@@ -12,20 +12,20 @@ import { compose } from 'underscore'
 import calc from '../../utilities/membershipUtils'
 import { JOIN } from '../../urls'
 import { Link } from 'react-router-dom'
-import { CurrentUserStore, User } from '../../entities/User'
-import { UpdateUserData } from '../../reducers/currentUser'
+import { IRedisState, IUser } from '../../entities/User'
+import { IUpdateUserData } from '../../reducers/currentUser'
 
 const POPUP_PAY_MEMBERSHIP_SNOOZED_AT = 'popupPayMembershipSnoozedAt'
 const POPUP_RECEIVED_SHIRT_AT = 'popupReceivedShirtSnoozedAt'
 
 interface Props {
-  currentUser: firebase.User
+  firebaseUser: firebase.User
   userData: any
-  updateUserData: UpdateUserData
+  updateUserData: IUpdateUserData
 }
 
-function Notifications({ currentUser, userData, updateUserData }: Props) {
-  const userDataJS: User = userData.toJS()
+function Notifications({ firebaseUser, userData, updateUserData }: Props) {
+  const userDataJS: IUser = userData.toJS()
 
   const [notification, setNotification] = useState()
 
@@ -226,7 +226,7 @@ function Notifications({ currentUser, userData, updateUserData }: Props) {
   }
 
   useEffect(() => {
-    if (!currentUser) {
+    if (!firebaseUser) {
       setNotification(undefined)
       return
     }
@@ -234,20 +234,20 @@ function Notifications({ currentUser, userData, updateUserData }: Props) {
     processReceivedShirt() ||
     setNotification(undefined)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser])
+  }, [firebaseUser, userData])
 
   return <>{notification}</>
 }
 
 Notifications.propTypes = {
-  currentUser: PropTypes.object,
+  firebaseUser: PropTypes.object,
   updateUserData: PropTypes.func.isRequired,
   userData: PropTypes.object.isRequired
 }
 
-const mapStateToProps = ({ currentUser: { currentUser, userData } }: CurrentUserStore) => {
+const mapStateToProps = ({ currentUser: { firebaseUser, userData } }: IRedisState) => {
   return {
-    currentUser,
+    firebaseUser,
     // @ts-ignore
     userData: userData || new IMap()
   }

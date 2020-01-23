@@ -6,14 +6,14 @@ import SignUpStepper, {
 } from './SignUpStepper'
 import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { CurrentUserStore } from '../../entities/User'
+import { IRedisState } from '../../entities/User'
 
 interface Props {
   isCurrentUserLoaded: boolean
-  currentUser: firebase.User
+  firebaseUser: firebase.User
 }
 
-function SignUpPage({ isCurrentUserLoaded, currentUser }: Props) {
+function SignUpPage({ isCurrentUserLoaded, firebaseUser }: Props) {
   const [steps, setSteps] = useState()
   useEffect(() => {
     if (!isCurrentUserLoaded) {
@@ -23,18 +23,17 @@ function SignUpPage({ isCurrentUserLoaded, currentUser }: Props) {
       // num of steps already decided based on the user's state.
       return
     }
-    if (currentUser) {
+    if (firebaseUser) {
       setSteps([STEP_USER_DETAILS, STEP_MEMBERSHIP])
     } else {
       setSteps([STEP_AUTHENTICATION, STEP_USER_DETAILS, STEP_MEMBERSHIP])
     }
-  }, [isCurrentUserLoaded, currentUser, steps])
+  }, [isCurrentUserLoaded, firebaseUser, steps])
 
   if (!isCurrentUserLoaded || !steps) {
     // todo: show loading
     return <></>
   }
-  console.log('steps:', steps)
   return (
     <div style={{ maxWidth: 350 }} className="mx-auto">
       <SignUpStepper steps={steps} />
@@ -44,13 +43,13 @@ function SignUpPage({ isCurrentUserLoaded, currentUser }: Props) {
 
 SignUpPage.propTypes = {
   isCurrentUserLoaded: PropTypes.bool.isRequired,
-  currentUser: PropTypes.object
+  firebaseUser: PropTypes.object
 }
 
-const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, currentUser } }: CurrentUserStore) => {
+const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, firebaseUser } }: IRedisState) => {
   return {
     isCurrentUserLoaded,
-    currentUser
+    firebaseUser
   }
 }
 
