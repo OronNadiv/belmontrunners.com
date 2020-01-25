@@ -12,7 +12,7 @@ import { compose } from 'underscore'
 import calc from '../../utilities/membershipUtils'
 import { JOIN } from '../../urls'
 import { Link } from 'react-router-dom'
-import { IRedisState, IUser } from '../../entities/User'
+import { IRedisState, IUser, IUserOptionalProps } from '../../entities/User'
 import { IUpdateUserData } from '../../reducers/currentUser'
 
 const POPUP_PAY_MEMBERSHIP_SNOOZED_AT = 'popupPayMembershipSnoozedAt'
@@ -75,15 +75,8 @@ function Notifications({ firebaseUser, userData, updateUserData }: Props) {
   const dismissNotification = async ({ key }: { key: string }) => {
     try {
       setNotification(undefined)
-      await updateUserData(
-        {
-          notifications: {
-            [key]: moment()
-              .utc()
-              .format()
-          }
-        },
-        { merge: true }
+      const values: IUserOptionalProps = { notifications: { [key]: moment().utc().format() } }
+      await updateUserData(values, { merge: true }
       )
     } catch (error) {
       Sentry.captureException(error)
@@ -195,10 +188,8 @@ function Notifications({ firebaseUser, userData, updateUserData }: Props) {
             size="small"
             onClick={async () => {
               try {
-                await updateUserData(
-                  { [DID_RECEIVED_SHIRT]: true },
-                  { merge: true }
-                )
+                const values: IUserOptionalProps = { [DID_RECEIVED_SHIRT]: true }
+                await updateUserData(values, { merge: true })
                 setNotification(undefined)
               } catch (error) {
                 Sentry.captureException(error)

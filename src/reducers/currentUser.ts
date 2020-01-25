@@ -139,14 +139,8 @@ export const fetchCurrentUser: IFetchCurrentUser = () => {
             const lastSignedInAt: string = moment(lastSignInTime)
               .utc()
               .format()
-            await updateUserData(
-              {
-                createdAt,
-                lastSignedInAt,
-                emailVerified
-              },
-              { merge: true }
-            )(dispatch, getState)
+            const values: IUserOptionalProps = { createdAt, lastSignedInAt, emailVerified }
+            await updateUserData(values, { merge: true })(dispatch, getState)
           } catch (error) {
             Sentry.captureException(error)
             console.error(error)

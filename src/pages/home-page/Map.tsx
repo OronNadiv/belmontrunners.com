@@ -38,9 +38,7 @@ function Map({ google }: { google: any }) {
               </div>
               <div className="media-body">
                 <h4>
-                  belmontrunners@gmail.com
-                  {/*<a style="color: #222222;" href="mailto:belmontrunners@gmail.com"*/}
-                  {/*target="_top">belmontrunners@gmail.com</a>*/}
+                  info@belmontrunners.com
                 </h4>
                 <p>Send us your query anytime!</p>
               </div>

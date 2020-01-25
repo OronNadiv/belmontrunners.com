@@ -1,7 +1,7 @@
 import firebase from 'firebase/app'
 
 import { PHOTO_URL } from '../fields'
-import { IUser } from '../entities/User'
+import { IUser, IUserOptionalProps } from '../entities/User'
 import { IUpdateUserData } from '../reducers/currentUser'
 
 export const linkToFacebook = async (firebaseUser: firebase.User, userData: IUser, updateUserData: IUpdateUserData) => {
@@ -19,8 +19,9 @@ export const linkToFacebook = async (firebaseUser: firebase.User, userData: IUse
         photoUrl = foundProviderData.photoURL
       }
     }
+    const values: IUserOptionalProps = { [PHOTO_URL]: photoUrl }
     // doing this in order to trigger an update.
-    await updateUserData({ [PHOTO_URL]: photoUrl }, { merge: true })
+    await updateUserData(values, { merge: true })
   } catch (err) {
     console.log('err:', err)
     throw new Error('Connection failed')
@@ -39,8 +40,9 @@ export const unlinkFromFacebook = async (firebaseUser: firebase.User, updateUser
     const photoUrl = foundProviderData ? foundProviderData.photoURL : null
     console.log('foundProviderData :', foundProviderData)
     console.log('photoUrl :', photoUrl)
+    const values: IUserOptionalProps = { [PHOTO_URL]: null }
     // doing this in order to trigger an update.
-    await updateUserData({ [PHOTO_URL]: null }, { merge: true })
+    await updateUserData(values, { merge: true })
   } catch (err) {
     console.log('err:', err)
     throw new Error('Disconnection failed')

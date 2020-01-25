@@ -9,7 +9,6 @@ import {
 } from '../../messages'
 import * as PropTypes from 'prop-types'
 import SignUpStepperButton from './SignUpStepperButton'
-import Promise from 'bluebird'
 import _s from 'underscore.string'
 import LoggedInState from '../../components/HOC/LoggedInState'
 import {
@@ -23,10 +22,11 @@ import {
 import moment from 'moment'
 import * as Sentry from '@sentry/browser'
 import { Field, Form } from 'react-final-form'
-import { DISPLAY_NAME, EMAIL, PASSWORD, UID } from '../../fields'
+import { DISPLAY_NAME, EMAIL, PASSWORD } from '../../fields'
 import { goToTop } from 'react-scrollable-anchor'
 import { compose } from 'underscore'
 import { required, isEmail, minPasswordLength, composeValidators } from '../../utilities/formValidators'
+import { IUserOptionalProps } from '../../entities/User'
 
 interface Props {
   onNextClicked: () => void
@@ -45,7 +45,7 @@ function SignUpStepAuth({ onNextClicked, isLast }: Props) {
     errorMessage && goToTop()
   }, [errorMessage])
 
-  const signUp = async (providerName: string, fullName: string, email: string, password: string) => {
+  const signUp = async (fullName: string, email: string, password: string) => {
     const displayName = _s.words(_s.clean(fullName))
       .map((w) => _s.capitalize(w))
       .join(' ')
@@ -53,65 +53,23 @@ function SignUpStepAuth({ onNextClicked, isLast }: Props) {
     setErrorMessage('')
     setIsSigningUp(true)
 
-    const providerGoogle = new firebase.auth.GoogleAuthProvider()
-    const providerFacebook = new firebase.auth.FacebookAuthProvider()
-
-    let promise
-    switch (providerName.toLowerCase()) {
-      case 'email':
-        promise = Promise.resolve(
-          auth.createUserWithEmailAndPassword(email, password)
-        ).tap(user => {
-          console.log('calling updateProfile', user)
-          if (!auth.currentUser) {
-            throw new Error('auth.currentUser is falsify')
-          }
-          return auth.currentUser.updateProfile({
-            [DISPLAY_NAME]: displayName
-          })
-        })
-        break
-      case 'facebook':
-        promise = auth.signInWithPopup(providerFacebook)
-        break
-      case 'google':
-        promise = auth.signInWithPopup(providerGoogle)
-        break
-      default:
-        console.error('missing default provider. returning facebook.')
-        promise = auth.signInWithPopup(providerFacebook)
-        break
-    }
     try {
-
-      await promise
+      const user = await auth.createUserWithEmailAndPassword(email, password)
+      console.log('calling updateProfile', user)
       if (!auth.currentUser) {
         throw new Error('auth.currentUser is falsify')
       }
+      await auth.currentUser.updateProfile({ displayName })
       const userRef = firestore
-        .doc(`users/${auth.currentUser[UID]}`)
-      const doc = await userRef.get()
-      let values = {}
-      if (!doc.exists) {
-        values = {
-          ...values,
-          tosUrl: TOS_FILE_NAME,
-          tosAcceptedAt: moment().format(),
-          waverUrl: WAVER_FILE_NAME,
-          waverAcceptedAt: moment()
-            .utc()
-            .format(),
-          privacyPolicyUrl: PRIVACY_POLICY_FILE_NAME,
-          privacyPolicyAcceptedAt: moment()
-            .utc()
-            .format()
-        }
-      }
-      values = {
-        ...values,
-        email: auth.currentUser.email,
-        displayName: auth.currentUser.displayName,
-        photoURL: auth.currentUser.photoURL
+        .doc(`users/${auth.currentUser.uid}`)
+      const values: IUserOptionalProps = {
+        displayName,
+        tosUrl: TOS_FILE_NAME,
+        tosAcceptedAt: moment().format(),
+        waverUrl: WAVER_FILE_NAME,
+        waverAcceptedAt: moment().utc().format(),
+        privacyPolicyUrl: PRIVACY_POLICY_FILE_NAME,
+        privacyPolicyAcceptedAt: moment().utc().format()
       }
       await userRef.set(values, { merge: true })
       onNextClicked()
@@ -142,29 +100,11 @@ function SignUpStepAuth({ onNextClicked, isLast }: Props) {
 
   const handleSignUpWithEmail = async (values: { [DISPLAY_NAME]: string, [EMAIL]: string, [PASSWORD]: string }) => {
     console.log('handleSignUpWithEmail called.  Values:', values)
-    await signUp('email', values[DISPLAY_NAME], values[EMAIL], values[PASSWORD])
+    await signUp(values[DISPLAY_NAME], values[EMAIL], values[PASSWORD])
   }
-
-  // const handleSignInWithProvider = (providerName) => {
-  //   signUp(providerName)
-  // }
 
   return (
     <div style={{ maxWidth: 400 }}>
-      {/*
-        // TODO: enable providers.  Need to redirect to details and payment if seeing for the first time
-        <div className='btn btn-block btn-social btn-twitter'
-             onClick={() => handleSignInWithProvider('facebook')}>
-          <span className='fab fa-facebook' /> Connect with Facebook
-        </div>
-        <div className='btn btn-block btn-social btn-google'
-             onClick={() => handleSignInWithProvider('google')}>
-          <span className='fab fa-google' /> Connect with Google
-        </div>
-
-        <div className='mt-4 text-center text-dark'>Or sign up with email</div>
-*/}
-
       {errorMessage && (
         <div className="mt-2 text-danger text-center">{errorMessage}</div>
       )}

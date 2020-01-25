@@ -32,7 +32,12 @@ export interface IUserOptionalProps {
   notInterestedInBecomingAMember?: boolean | null
   gravatarUrl?: string | null
   visibility?: IUserPropsVisibility | null
-
+  tosUrl?: string | null
+  tosAcceptedAt?: string | null
+  waverUrl?: string | null
+  waverAcceptedAt?: string | null
+  privacyPolicyUrl?: string | null
+  privacyPolicyAcceptedAt?: string | null
 }
 
 export interface IUser extends IUserOptionalProps {

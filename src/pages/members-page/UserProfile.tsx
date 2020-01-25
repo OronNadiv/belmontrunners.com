@@ -46,7 +46,7 @@ import { Map as IMap } from 'immutable'
 import UpdateUserData from '../../components/HOC/UpdateUserData'
 import { linkToFacebook } from '../../utilities/linkToFacebook'
 import { findWhere } from 'underscore'
-import { IRedisState, IUser, IUserOptionalProps, VisibilityEnum } from '../../entities/User'
+import { IRedisState, IUser, IUserOptionalProps, IUserPropsVisibility, VisibilityEnum } from '../../entities/User'
 import { IUpdateUserData } from '../../reducers/currentUser'
 
 const defaultVisibility = {
@@ -70,7 +70,7 @@ interface Props {
 
 function UserProfile({ onClose, user, userData, updateUserData, firebaseUser }: Props) {
   const userDataJS: IUser = userData.toJS()
-  const visibility = userDataJS.visibility || {}
+  const visibility : IUserPropsVisibility = userDataJS.visibility || {}
   const theme = useTheme()
   const isSmallDevice = useMediaQuery(theme.breakpoints.down('sm'))
 
