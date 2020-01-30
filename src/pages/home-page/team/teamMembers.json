@@ -3,7 +3,7 @@
     "name": "Oron Nadiv",
     "title": "Webmaster",
     "image": "oron.jpg",
-    "facebook": "oronnadiv",
+    "email": "oron@belmontrunners.com",
     "linkedin": "oronnadiv",
     "website": "www.oronnadiv.com"
   },
@@ -11,25 +11,28 @@
     "name": "Doug Kim",
     "title": "President",
     "image": "doug.png",
+    "email": "doug@belmontrunners.com",
     "facebook": "dougebob",
     "twitter": "douglasckim"
   },
   {
     "name": "Kelsey Homyk",
     "title": "Vice-President & Activities Director",
-    "image": "kelsey.png"
+    "image": "kelsey.png",
+    "email": "kelsey@belmontrunners.com"
   },
   {
     "name": "Shelly Kim",
     "title": "Treasurer",
     "image": "shelly.png",
-    "facebook": "shelly.b.kim",
-    "email": "shellybkim@gmail.com"
+    "email": "shelly@belmontrunners.com",
+    "facebook": "shelly.b.kim"
   },
   {
     "name": "Jon VanHorn",
     "title": "Run Coordinator and Social Media Manager",
     "image": "jon.png",
+    "email": "jon@belmontrunners.com",
     "facebook": "jon.vanhorn",
     "instagram": "thisisjvh"
   }

@@ -1,4 +1,5 @@
 import React from 'react'
+import { BLOG } from '../../urls'
 
 function HomeBanner() {
   return (
@@ -14,9 +15,9 @@ function HomeBanner() {
             </p>
             <a
               className="banner_btn bounce"
-              href="https://blog.belmontrunners.com"
+              href={BLOG}
             >
-              Read our blog
+              Latest news
             </a>
           </div>
         </div>

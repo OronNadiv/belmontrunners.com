@@ -16,7 +16,7 @@ import {
 } from '@material-ui/core'
 import {
   AccountCircle as ProfileIcon,
-  Chat as BlogIcon,
+  Announcement as BlogIcon,
   Close as CloseIcon,
   Contacts as ContactsIcon,
   ExitToApp as SignInIcon,
@@ -270,7 +270,7 @@ function Header({ location: { pathname }, isCurrentUserLoaded, firebaseUser, all
               <a href={BLOG} onClick={handleDrawerClose}>
                 <ListItem button>
                   <ListItemIcon><BlogIcon color='primary' /></ListItemIcon>
-                  <ListItemText primary='Blog' className={classes.drawerLink} />
+                  <ListItemText primary='Latest news' className={classes.drawerLink} />
                 </ListItem>
               </a>
 
@@ -344,7 +344,7 @@ function Header({ location: { pathname }, isCurrentUserLoaded, firebaseUser, all
             <a href={BLOG} className={classes.menuItem} style={{ marginLeft: '7em' }}>
               <div className='text-white d-flex align-items-center'>
                 <BlogIcon />
-                <span className='mx-2'>Blog</span>
+                <span className='mx-2'>Latest news</span>
               </div>
             </a>
           }
