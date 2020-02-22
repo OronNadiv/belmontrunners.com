@@ -20,7 +20,7 @@ interface Props {
 function DownloadAccountInfo({ firebaseUser, userData, isSubmitting }: Props) {
   const userDataJS: IUser = userData.toJS()
 
-  const [downloadData, setDownloadData] = useState()
+  const [downloadData, setDownloadData] = useState<object>()
 
   const handleDownloadPI = () => {
     setDownloadData({

@@ -39,7 +39,7 @@ function MyProfileFacebook({
   const [
     linkWithProviderErrorMessage,
     setLinkWithProviderErrorMessage
-  ] = useState()
+  ] = useState('')
 
   const handleLinkToFacebook = async () => {
     try {

@@ -82,7 +82,7 @@ function MembersPage({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [firebaseUser])
 
-  const [selected, setSelected] = useState()
+  const [selected, setSelected] = useState<IUser>()
   useEffect(() => {
     if (users.length === 0) {
       return

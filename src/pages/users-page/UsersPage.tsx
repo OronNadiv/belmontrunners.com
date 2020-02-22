@@ -335,8 +335,8 @@ function UsersPage({ firebaseUser, allowDelete, allowRead, allowWrite }: Props) 
   columns.unshift({
     name: UID,
     options: {
-      // @ts-ignore
       display: false,
+      // @ts-ignore
       filter: false
     }
   })

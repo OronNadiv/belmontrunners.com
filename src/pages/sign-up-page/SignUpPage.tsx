@@ -14,7 +14,7 @@ interface Props {
 }
 
 function SignUpPage({ isCurrentUserLoaded, firebaseUser }: Props) {
-  const [steps, setSteps] = useState()
+  const [steps, setSteps] = useState<string[]>()
   useEffect(() => {
     if (!isCurrentUserLoaded) {
       return

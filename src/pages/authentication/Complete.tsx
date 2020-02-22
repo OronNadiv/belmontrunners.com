@@ -23,7 +23,7 @@ import * as Sentry from '@sentry/browser'
 const Complete = ({ location: { search } }: RouteComponentProps) => {
 
   const [errorMessage, setErrorMessage] = useState('')
-  const [redirect, setRedirect] = useState()
+  const [redirect, setRedirect] = useState<JSX.Element>()
 
   const processError = (error: firebase.auth.Error) => {
     const { code, message } = error

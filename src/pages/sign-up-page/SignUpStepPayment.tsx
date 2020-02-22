@@ -52,9 +52,9 @@ function SignUpStepPayment({
     goToTop()
   }, [])
 
-  const [errorMessage, setErrorMessage] = useState()
+  const [errorMessage, setErrorMessage] = useState<string>()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [confirmationNumber, setConfirmationNumber] = useState()
+  const [confirmationNumber, setConfirmationNumber] = useState('')
 
   const createToken = async () => {
     try {

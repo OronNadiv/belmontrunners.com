@@ -27,7 +27,7 @@ interface Props {
 function Notifications({ firebaseUser, userData, updateUserData }: Props) {
   const userDataJS: IUser = userData.toJS()
 
-  const [notification, setNotification] = useState()
+  const [notification, setNotification] = useState<JSX.Element>()
 
   interface Props1 {
     key: string,

@@ -13,8 +13,8 @@ interface Props {
 }
 
 function ChangeEmail({ sendEmailVerification, firebaseUser, isSubmitting }: Props) {
-  const [showChangeEmailDialog, setShowChangeEmailDialog] = useState()
-  const [emailVerificationSent, setEmailVerificationSent] = useState()
+  const [showChangeEmailDialog, setShowChangeEmailDialog] = useState(false)
+  const [emailVerificationSent, setEmailVerificationSent] = useState(false)
 
   const sendVerificationEmail = async () => {
     // todo wait for confimation the way we do with updateUserData

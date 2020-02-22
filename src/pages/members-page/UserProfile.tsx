@@ -70,7 +70,7 @@ interface Props {
 
 function UserProfile({ onClose, user, userData, updateUserData, firebaseUser }: Props) {
   const userDataJS: IUser = userData.toJS()
-  const visibility : IUserPropsVisibility = userDataJS.visibility || {}
+  const visibility: IUserPropsVisibility = userDataJS.visibility || {}
   const theme = useTheme()
   const isSmallDevice = useMediaQuery(theme.breakpoints.down('sm'))
 
@@ -97,11 +97,9 @@ function UserProfile({ onClose, user, userData, updateUserData, firebaseUser }: 
   })
   const classes = useStyles()
 
-  const [refs, setRefs] = useState()
-  const [openMenus, setOpenMenus] = useState()
+  const [refs, setRefs] = useState<{ [key: string]: HTMLElement | null }>({})
+  const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({})
   const [errorMessage, setErrorMessage] = useState('')
-  !!refs || setRefs({})
-  !!openMenus || setOpenMenus({})
 
   function getPhone() {
     if (!user.phone) {
@@ -149,7 +147,7 @@ function UserProfile({ onClose, user, userData, updateUserData, firebaseUser }: 
       setOpenMenus({ ...openMenus })
     }
 
-    const handleRef = (ref: any) => {
+    const handleRef = (ref: HTMLElement) => {
       refs[label] = ref
       setRefs(refs)
     }
@@ -178,7 +176,7 @@ function UserProfile({ onClose, user, userData, updateUserData, firebaseUser }: 
           id="customized-menu"
           anchorEl={refs && refs[label]}
           keepMounted
-          open={openMenus && !!openMenus[label]}
+          open={openMenus && openMenus[label]}
           onClose={handleClose}
         >
           <MenuItem

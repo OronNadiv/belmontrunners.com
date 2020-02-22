@@ -64,7 +64,7 @@ function Profile({ allowUsersPage, allowContactsPage, userData, history }: Props
   const anchorRef: any = React.useRef(null)
   const [open, setOpen] = React.useState(false)
   const [isGravatarFetched, setIsGravatarFetched] = useState(false)
-  const [gravatarUrl, setGravatarUrl] = useState()
+  const [gravatarUrl, setGravatarUrl] = useState('')
   const userDataJS: IUser = userData.toJS()
 
   useEffect(() => {

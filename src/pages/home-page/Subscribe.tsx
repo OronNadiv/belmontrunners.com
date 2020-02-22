@@ -15,8 +15,8 @@ const Subscribe = () => {
   const [message, setMessage] = useState('')
   const [messageLevel, setMessageLevel] = useState('')
   const [placeholder, setPlaceholder] = useState(DEFAULT_PLACE_HOLDER)
-  const [recaptchaWidgetId, setRecaptchaWidgetId] = useState('')
-  const [recaptchaVerifier, setRecaptchaVerifier] = useState()
+  const [recaptchaWidgetId, setRecaptchaWidgetId] = useState<number>()
+  const [recaptchaVerifier, setRecaptchaVerifier] = useState<firebase.auth.RecaptchaVerifier>()
   const [captchaFailed, setCaptchaFailed] = useState(false)
   const [notRobot, setNotRobot] = useState(true) // NOTE: setting to true disables the captcha verification.
 
@@ -87,15 +87,15 @@ My email address is: ${email}`
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSubmitting, notRobot])
 
-  const [recaptcha, setRecaptcha] = useState()
+  const [recaptcha, setRecaptcha] = useState<HTMLButtonElement | null>(null)
   useEffect(() => {
     const unsubscribe = () => {
       console.log('unsubscribe called.')
       if (recaptchaVerifier) {
         recaptchaVerifier.clear()
-        setRecaptchaVerifier(null)
+        setRecaptchaVerifier(undefined)
       }
-      setRecaptchaWidgetId('')
+      setRecaptchaWidgetId(undefined)
     }
     if (!recaptcha || !!recaptchaWidgetId || notRobot) {
       console.log(
@@ -119,7 +119,7 @@ My email address is: ${email}`
       notRobot
     )
 
-    const tempRecaptchaVerifier  = new firebase.auth.RecaptchaVerifier(recaptcha, {
+    const tempRecaptchaVerifier = new firebase.auth.RecaptchaVerifier(recaptcha, {
       size: 'invisible',
       callback: (response: any) => {
         console.log('captcha succeeded.', response)
@@ -136,7 +136,7 @@ My email address is: ${email}`
 
   useEffect(() => {
     recaptchaVerifier && recaptchaVerifier.render()
-      .then((widgetId: string) => {
+      .then((widgetId: number) => {
         setRecaptchaWidgetId(widgetId)
       })
   }, [recaptchaVerifier])
