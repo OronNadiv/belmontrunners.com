@@ -6,6 +6,7 @@ import CalendarSelector from './CalendarSelector'
 import ExpendMoreIcon from '@material-ui/icons/ExpandMore'
 import { IconButton } from '@material-ui/core'
 import rp from 'request-promise'
+import { useMediaQuery, useTheme } from '@material-ui/core'
 
 const CITY_ID = 5392423
 const SPREADSHEET_URL =
@@ -191,6 +192,9 @@ function EventSchedule() {
     setRandom(Math.random())
   }, [filteredEvents, rawWeather])
 
+  const theme = useTheme()
+  const isSmallDevice = useMediaQuery(theme.breakpoints.down('sm'))
+
   return (
     <section className="event_schedule_area pad_btm">
       <div className="container">
@@ -212,10 +216,12 @@ function EventSchedule() {
                 filteredEvents.map(
                   (filteredEvent: CSVEvent, index) => {
                     return (
-                      <div key={index} className="media">
-                        <div className="d-flex">
-                          <img src="img/schedule/schedule-3.png" alt="" />
-                        </div>
+                      <div key={index} className="media align-items-center" >
+                        {
+                          !isSmallDevice && <div className="d-flex">
+                            <img src="img/schedule/schedule-3.png" alt="" />
+                          </div>
+                        }
                         <div className="media-body">
                           <h5>{filteredEvent.moment.format('MMMM D h:mm a')}</h5>
                           <h4
