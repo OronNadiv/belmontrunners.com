@@ -6,6 +6,7 @@ import GenerateICal from './generateICal'
 import GetMembers from './getMembers'
 import PurgeUsersUnder13 from './purgeUsersUnder13'
 import Stripe from './stripe'
+import UpdateEvents from './updateEvents'
 import Users2Contacts from './users2Contacts'
 import * as functions from 'firebase-functions'
 import * as Admin from 'firebase-admin'
@@ -29,6 +30,7 @@ const getMembersImpl = GetMembers(admin)
 const purgeUsersUnder13 = PurgeUsersUnder13(admin, apiKey, false)
 const stripeImpl = Stripe(admin, { membershipFeeInCents: membership_fee_in_cents, secretKeys: { live, test } })
 const users2Contacts = Users2Contacts(admin)
+const updateEvents = UpdateEvents(admin)
 
 const Promise = require('bluebird')
 
@@ -77,6 +79,10 @@ export const contacts2MailChimpCronJob = functions
       process.exit(1)
     }
   })
+
+export const updateEventsCronJob = functions.pubsub
+  .schedule('*/5 * * * *')
+  .onRun(async () => await updateEvents())
 
 export const ical = functions
   .runWith({ memory: '512MB' })

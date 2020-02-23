@@ -12,7 +12,8 @@
     "auth2UsersCMD": "npm run build && node lib/auth2UsersCMD.js",
     "contacts2MailChimpCMD": "npm run build && node lib/contacts2MailChimpCMD.js",
     "getMembersCMD": "npm run build && node lib/getMembersCMD.js",
-    "users2ContactsCMD": "npm run build && node lib/users2ContactsCMD.js"
+    "users2ContactsCMD": "npm run build && node lib/users2ContactsCMD.js",
+    "updateEventsCMD": "npm run build && node lib/updateEventsCMD.js"
   },
   "main": "lib/index.js",
   "engines": {
@@ -22,7 +23,7 @@
     "bluebird": "^3.7.2",
     "csvtojson": "^2.0.10",
     "exif-parser": "^0.1.12",
-    "firebase-admin": "^8.8.0",
+    "firebase-admin": "^8.9.2",
     "firebase-functions": "^3.3.0",
     "gravatar": "^1.8.0",
     "ical-generator": "^1.9.2",
@@ -31,20 +32,20 @@
     "md5": "^2.2.1",
     "md5-file": "^4.0.0",
     "moment": "^2.24.0",
-    "moment-timezone": "^0.5.27",
+    "moment-timezone": "^0.5.28",
     "normalize-email": "^1.1.1",
     "parse-full-name": "^1.2.4",
-    "request": "^2.88.0",
+    "request": "^2.88.2",
     "request-promise": "^4.2.5",
-    "stripe": "^7.14.0",
-    "underscore": "^1.9.1"
+    "stripe": "^7.15.0",
+    "underscore": "^1.9.2"
   },
   "devDependencies": {
-    "@types/node": "^12.12.17",
+    "@types/node": "^12.12.28",
     "firebase-functions-test": "^0.1.7",
     "json-to-ts": "^1.6.0",
     "tslint": "^5.12.0",
-    "typescript": "^3.2.2"
+    "typescript": "^3.8.2"
   },
   "private": true
 }
