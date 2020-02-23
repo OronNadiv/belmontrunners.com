@@ -23,7 +23,7 @@ import moment from 'moment'
 import * as Sentry from '@sentry/browser'
 import { Field, Form } from 'react-final-form'
 import { DISPLAY_NAME, EMAIL, PASSWORD } from '../../fields'
-import { goToTop } from 'react-scrollable-anchor'
+import { animateScroll } from 'react-scroll'
 import { compose } from 'underscore'
 import { required, isEmail, minPasswordLength, composeValidators } from '../../utilities/formValidators'
 import { IUserOptionalProps } from '../../entities/User'
@@ -38,11 +38,11 @@ function SignUpStepAuth({ onNextClicked, isLast }: Props) {
   const [isSigningUp, setIsSigningUp] = useState(false)
 
   useEffect(() => {
-    goToTop()
+    animateScroll.scrollToTop({ duration: 0 })
   }, [])
 
   useEffect(() => {
-    errorMessage && goToTop()
+    errorMessage && animateScroll.scrollToTop({ duration: 0 })
   }, [errorMessage])
 
   const signUp = async (fullName: string, email: string, password: string) => {

@@ -79,9 +79,7 @@ function Profile({ allowUsersPage, allowContactsPage, userData, history }: Props
           default: '404'
         })
         try {
-          console.log('before RP')
           await rp(uri)
-          console.log('after RP')
           setGravatarUrl(uri)
         } catch (error) {
           console.log('after RP-EXCEPTION', error)

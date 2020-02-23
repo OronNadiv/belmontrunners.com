@@ -21,7 +21,7 @@ import LoggedInState from '../../components/HOC/LoggedInState'
 import * as Sentry from '@sentry/browser'
 import { Field, Form } from 'react-final-form'
 import { EMAIL, PASSWORD } from '../../fields'
-import { goToTop } from 'react-scrollable-anchor'
+import { animateScroll } from 'react-scroll'
 import { compose } from 'underscore'
 import { connect } from 'react-redux'
 import { required, isEmail, minPasswordLength, composeValidators } from '../../utilities/formValidators'
@@ -35,10 +35,12 @@ function SignInPage({ history, location, firebaseUser }: Props) {
   const [errorMessage, setErrorMessage] = useState('')
   const [isSigningIn, setIsSigningIn] = useState(false)
 
-  useEffect(goToTop, [])
+  useEffect(() => {
+    animateScroll.scrollToTop({ duration: 0 })
+  }, [])
 
   useEffect(() => {
-    errorMessage && goToTop()
+    animateScroll.scrollToTop({ duration: 0 })
   }, [errorMessage])
 
   const handleSignInError = (error: firebase.auth.Error) => {

@@ -11,7 +11,7 @@ import { connect } from 'react-redux'
 import * as Sentry from '@sentry/browser'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 import UpdateUserData from '../../components/HOC/UpdateUserData'
-import { goToTop } from 'react-scrollable-anchor'
+import { animateScroll } from 'react-scroll'
 import { compose } from 'underscore'
 import calc from '../../utilities/membershipUtils'
 import { IRedisState, IUser } from '../../entities/User'
@@ -49,7 +49,7 @@ function SignUpStepPayment({
                              updateUserData
                            }: Props) {
   useEffect(() => {
-    goToTop()
+    animateScroll.scrollToTop({ duration: 0 })
   }, [])
 
   const [errorMessage, setErrorMessage] = useState<string>()

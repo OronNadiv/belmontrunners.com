@@ -24,7 +24,7 @@ import {
 } from '../../fields'
 import moment from 'moment'
 import LoggedInState from '../../components/HOC/LoggedInState'
-import { goToTop } from 'react-scrollable-anchor'
+import { animateScroll } from 'react-scroll'
 import googleLibPhoneNumber from 'google-libphonenumber'
 import _, { compose } from 'underscore'
 import { connect } from 'react-redux'
@@ -126,7 +126,9 @@ function UsersPage({ firebaseUser, allowDelete, allowRead, allowWrite }: Props) 
     setRows(res)
   }, [])
 
-  useEffect(goToTop, [firebaseUser])
+  useEffect(() => {
+    animateScroll.scrollToTop({ duration: 0 })
+  }, [firebaseUser])
 
   useEffect(() => {
     allowRead && loadMembers()

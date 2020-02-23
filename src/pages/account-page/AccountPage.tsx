@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import * as PropTypes from 'prop-types'
 import LoggedInState from '../../components/HOC/LoggedInState'
 import { connect } from 'react-redux'
-import { goToTop } from 'react-scrollable-anchor'
+import { animateScroll } from 'react-scroll'
 import { compose } from 'underscore'
 import DownloadAccountInfo from './DownloadAccountInfo'
 import ChangeEmail from './ChangeEmail'
@@ -17,7 +17,9 @@ interface Props {
 function AccountPage({ firebaseUser }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  useEffect(goToTop, [firebaseUser])
+  useEffect(() => {
+    animateScroll.scrollToTop({ duration: 0 })
+  }, [firebaseUser])
 
   const handleSubmissionChanged = (value: boolean) => {
     setIsSubmitting(value)

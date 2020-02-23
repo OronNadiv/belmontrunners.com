@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import { sendEmailVerification as sendEmailVerificationAction } from '../../reducers/currentUser'
 import MyProfileForm from './MyProfileForm'
 import MyProfileFacebook from './MyProfileFacebook'
-import { goToTop } from 'react-scrollable-anchor'
+import { animateScroll } from 'react-scroll'
 import { compose } from 'underscore'
 import { IRedisState } from '../../entities/User'
 
@@ -16,7 +16,9 @@ interface Props {
 function MyProfilePage({ firebaseUser }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  useEffect(goToTop, [firebaseUser])
+  useEffect(() => {
+    animateScroll.scrollToTop({ duration: 0 })
+  }, [firebaseUser])
 
   const handleSubmissionChanged = (value: boolean) => {
     setIsSubmitting(value)

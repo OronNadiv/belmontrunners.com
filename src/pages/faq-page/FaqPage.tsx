@@ -4,7 +4,7 @@ import ExpansionPanel from '@material-ui/core/ExpansionPanel'
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary'
 import Typography from '@material-ui/core/Typography'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
-import { goToTop } from 'react-scrollable-anchor'
+import { animateScroll } from 'react-scroll'
 import { ExpansionPanelDetails } from '@material-ui/core'
 import { Link } from 'react-router-dom'
 import { ROOT } from '../../urls'
@@ -63,7 +63,9 @@ export default function FaqPage() {
   const classesExpansionPanelDetails = useStylesExpansionPanelDetails()
 
 
-  useEffect(goToTop, [])
+  useEffect(() => {
+    animateScroll.scrollToTop({ duration: 0 })
+  }, [])
 
   const [expanded, setExpanded] = useState<string | false>('')
 

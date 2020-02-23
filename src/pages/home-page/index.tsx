@@ -5,18 +5,23 @@ import EventSchedule from './schedule/EventSchedule'
 import Subscribe from './Subscribe'
 import Map from './Map'
 import Notifications from './Notifications'
-import { configureAnchors, goToTop } from 'react-scrollable-anchor'
+import { Element, scroller, animateScroll } from 'react-scroll'
 import Promotion from './Promotion'
 import moment from 'moment'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
-import ScrollableAnchor from 'react-scrollable-anchor'
 
 function Home({ location: { hash } }: RouteComponentProps) {
 
   useEffect(() => {
-    configureAnchors({ offset: -120, scrollDuration: 600 })
     if (!hash) {
-      goToTop()
+      animateScroll.scrollToTop({ duration: 0 })
+    } else if (hash === '#events') {
+      scroller.scrollTo('events', {
+        duration: 500,
+        delay: 500,
+        smooth: true,
+        offset: -120
+      })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -26,11 +31,11 @@ function Home({ location: { hash } }: RouteComponentProps) {
       <HomeBanner />
       <Welcome />
       {moment().isBefore('2019-12-24') && <Promotion />}
-      <ScrollableAnchor id='events'>
+      <Element name="events">
         <div>
           <EventSchedule />
         </div>
-      </ScrollableAnchor>
+      </Element>
       <Subscribe />
       <Map />
       <Notifications />

@@ -18,7 +18,7 @@ import {
 import { compose, pick } from 'underscore'
 import UserDetails from '../../components/UserDetails'
 import UpdateUserData from '../../components/HOC/UpdateUserData'
-import { goToTop } from 'react-scrollable-anchor'
+import { animateScroll } from 'react-scroll'
 import { IRedisState, IUser, IUserOptionalProps } from '../../entities/User'
 import { IUpdateUserData } from '../../reducers/currentUser'
 
@@ -54,8 +54,8 @@ const SignUpStepUserProfile = ({
   }
 
   useEffect(() => {
-    goToTop()
-  })
+    animateScroll.scrollToTop({ duration: 0 })
+  }, [])
 
   const initialValues = pick(
     userDataJS,

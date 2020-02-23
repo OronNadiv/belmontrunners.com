@@ -2,11 +2,11 @@ import React, { useEffect } from 'react'
 import Board from './Board'
 // import RunLeaders from './RunLeaders'
 
-import { goToTop } from 'react-scrollable-anchor'
+import { animateScroll } from 'react-scroll'
 
 function Leadership() {
   useEffect(() => {
-    goToTop()
+    animateScroll.scrollToTop({ duration: 0 })
   }, [])
 
   return (

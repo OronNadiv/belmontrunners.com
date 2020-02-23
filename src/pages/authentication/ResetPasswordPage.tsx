@@ -16,7 +16,7 @@ import { RESET_PASSWORD_SUCCESS } from '../../messages'
 import * as Sentry from '@sentry/browser'
 import { PASSWORD } from '../../fields'
 import { Field, Form } from 'react-final-form'
-import { goToTop } from 'react-scrollable-anchor'
+import { animateScroll } from 'react-scroll'
 import { minPasswordLength, required, composeValidators } from '../../utilities/formValidators'
 
 const WEAK_PASSWORD = 'Password is too weak.'
@@ -27,11 +27,11 @@ function ResetPasswordPage({ history, location }: RouteComponentProps) {
   const [isSuccess, setIsSuccess] = useState(false)
 
   useEffect(() => {
-    goToTop()
+    animateScroll.scrollToTop({ duration: 0 })
   }, [])
 
   useEffect(() => {
-    errorMessage && goToTop()
+    errorMessage && animateScroll.scrollToTop({ duration: 0 })
   }, [errorMessage])
 
   const handleError = (error: any) => {
