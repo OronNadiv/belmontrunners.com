@@ -81,7 +81,7 @@ export const contacts2MailChimpCronJob = functions
   })
 
 export const updateEventsCronJob = functions.pubsub
-  .schedule('*/5 * * * *')
+  .schedule('*/20 * * * *')
   .onRun(async () => await updateEvents())
 
 export const ical = functions
