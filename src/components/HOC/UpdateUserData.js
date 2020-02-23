@@ -89,10 +89,7 @@ function UpdateUserData(WrappedComponent) {
     ___userDataUpdateContext___: PropTypes.any,
     updateUserData: PropTypes.func.isRequired
   }
-  return connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )(Inner)
+  return connect(mapStateToProps, mapDispatchToProps)(Inner)
 }
 
 export default UpdateUserData

@@ -26,6 +26,7 @@ import {
   PeopleOutline as UsersIcon,
   PersonAdd as JoinUsIcon,
   PowerSettingsNew as SignOutIcon,
+  SupervisedUserCircle as LeadershipIcon,
   QuestionAnswer as FAQIcon,
   Settings as AccountIcon
 } from '@material-ui/icons'
@@ -37,6 +38,7 @@ import {
   FAQ,
   FORGOT_PASSWORD,
   JOIN,
+  LEADERSHIP,
   MEMBERS,
   PROFILE,
   RESET_PASSWORD,
@@ -136,11 +138,6 @@ function Header({ location: { pathname }, isCurrentUserLoaded, firebaseUser, all
       height: TOOLBAR_HEIGHT,
       margin: isSmallDevice ? 0 : '0 3em'
     },
-    growLeft: {},
-    growMiddle: {
-      flexGrow: 1
-    },
-    growRight: {},
     menuItem: {
       font: '500 12px/80px "Roboto", sans-serif',
       textTransform: 'uppercase',
@@ -260,6 +257,13 @@ function Header({ location: { pathname }, isCurrentUserLoaded, firebaseUser, all
                 </>
               }
 
+              <Link to={LEADERSHIP} onClick={handleDrawerClose}>
+                <ListItem button>
+                  <ListItemIcon><LeadershipIcon color='primary' /></ListItemIcon>
+                  <ListItemText primary='Leadership' className={classes.drawerLink} />
+                </ListItem>
+              </Link>
+
               <Link to={FAQ} onClick={handleDrawerClose}>
                 <ListItem button>
                   <ListItemIcon><FAQIcon color='primary' /></ListItemIcon>
@@ -323,73 +327,82 @@ function Header({ location: { pathname }, isCurrentUserLoaded, firebaseUser, all
         }
 
         <Toolbar className={classes.toolbar}>
-
-          <div className={classes.growLeft} />
-
-          <Link to={ROOT}>
-            <img src="img/logo.png" alt='' />
-          </Link>
-          {
-            !isSmallDevice &&
-            <Link to={FAQ} className={classes.menuItem} style={{ marginLeft: '13em' }}>
-              <div className='text-white d-flex align-items-center'>
-                <FAQIcon />
-                <span className='mx-2'>FAQ</span>
-              </div>
+          <div className='d-flex w-100 align-items-center'>
+            <Link to={ROOT}>
+              <img src="img/logo.png" alt='' style={{ verticalAlign: 'initial' }} />
             </Link>
-          }
 
-          {
-            !isSmallDevice &&
-            <a href={BLOG} className={classes.menuItem} style={{ marginLeft: '7em' }}>
-              <div className='text-white d-flex align-items-center'>
-                <BlogIcon />
-                <span className='mx-2'>Latest news</span>
-              </div>
-            </a>
-          }
-          {
-            !isSmallDevice && isMember &&
-            <Link to={MEMBERS} className={classes.menuItem} style={{ marginLeft: '7em' }}>
-              <div className='text-white d-flex align-items-center'>
-                <MembersIcon />
-                <span className='mx-2'>Members</span>
-              </div>
-            </Link>
-          }
-          <div className={classes.growMiddle} />
+            <div style={{ flexGrow: 1 }} />
 
-          {
-            isSmallDevice &&
-            <IconButton edge="start" color="inherit" aria-label="Menu" onClick={() => setShowDrawer(!showDrawer)}>
-              <MenuIcon fontSize="large" />
-            </IconButton>
-          }
-          {
-            !isSmallDevice && isSignedIn &&
-            <Profile />
-          }
-          {
-            !isSmallDevice && isSignedOut &&
-            <Link to={SIGN_IN} className='signin-btn text-white'>
-              <Button className='text-white'>
-                Sign in
-              </Button>
-            </Link>
-          }
-          {
-            !isSmallDevice && isSignedOut && pathname.trim() !== JOIN &&
-            <Link to={{
-              pathname: JOIN
-            }}>
-              <Button variant='contained' color='primary' className='ml-5'>
-                Join Us
-              </Button>
-            </Link>
-          }
+            <div className='d-flex justify-content-around' style={{ flexGrow: 3 }}>
+              {
+                !isSmallDevice &&
+                <Link to={FAQ} className={classes.menuItem} /*style={{ marginLeft: '7em' }}*/>
+                  <div className='text-white d-flex align-items-center'>
+                    <span className='mx-2'>FAQ</span>
+                  </div>
+                </Link>
+              }
+              {
+                !isSmallDevice &&
+                <Link to={LEADERSHIP} className={classes.menuItem} /*style={{ marginLeft: '2em' }}*/>
+                  <div className='text-white d-flex align-items-center'>
+                    <span className='mx-2'>Leadership</span>
+                  </div>
+                </Link>
+              }
 
-          <div className={classes.growRight} />
+              {
+                !isSmallDevice &&
+                <a href={BLOG} className={classes.menuItem} /*style={{ marginLeft: '2em' }}*/>
+                  <div className='text-white d-flex align-items-center'>
+                    <span className='mx-2'>Latest news</span>
+                  </div>
+                </a>
+              }
+              {
+                !isSmallDevice && isMember &&
+                <Link to={MEMBERS} className={classes.menuItem} /*style={{ marginLeft: '2em' }}*/>
+                  <div className='text-white d-flex align-items-center'>
+                    <span className='mx-2'>Members</span>
+                  </div>
+                </Link>
+              }
+            </div>
 
+            <div style={{ flexGrow: 1.5 }} />
+          </div>
+          <div style={{ width: !isSignedOut ? '10em' : '20em' }}
+               className='d-flex flex-row-reverse justify-content-between'>
+            {
+              isSmallDevice &&
+              <IconButton edge="start" color="inherit" aria-label="Menu" onClick={() => setShowDrawer(!showDrawer)}>
+                <MenuIcon fontSize="large" />
+              </IconButton>
+            }
+            {
+              !isSmallDevice && isSignedIn &&
+              <Profile />
+            }
+            {
+              !isSmallDevice && isSignedOut && pathname.trim() !== JOIN &&
+              <Link to={{
+                pathname: JOIN
+              }}>
+                <Button variant='contained' color='primary' className='ml-5'>
+                  Join Us
+                </Button>
+              </Link>
+            }
+            {
+              !isSmallDevice && isSignedOut &&
+              <Link to={SIGN_IN} className='signin-btn text-white'>
+                <Button className='text-white'>
+                  Sign in
+                </Button>
+              </Link>
+            }
+          </div>
         </Toolbar>
       </AppBar>
     </div>

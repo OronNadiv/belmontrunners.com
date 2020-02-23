@@ -73,7 +73,6 @@ function EventSchedule() {
   const [loadMoreClicked, setLoadMoreClicked] = useState(0)
 
   useEffect(() => {
-    console.log('1')
     ;(async function() {
       const res = await rp({
         url: `https://openweathermap.org/data/2.5/forecast?id=${CITY_ID}&appid=b6907d289e10d714a6e88b30761fae22&units=imperial`,
@@ -84,7 +83,6 @@ function EventSchedule() {
   }, [])
 
   useEffect(() => {
-    console.log('2')
     ;(async function() {
       // @ts-ignore
       const res = await csv().fromStream(request.get(SPREADSHEET_URL))
@@ -93,7 +91,6 @@ function EventSchedule() {
   }, [])
 
   useEffect(() => {
-    console.log('3 rawEvents.length:', rawEvents.length)
     if (!rawEvents.length) {
       return
     }
@@ -216,7 +213,7 @@ function EventSchedule() {
                 filteredEvents.map(
                   (filteredEvent: CSVEvent, index) => {
                     return (
-                      <div key={index} className="media align-items-center" >
+                      <div key={index} className="media align-items-center">
                         {
                           !isSmallDevice && <div className="d-flex">
                             <img src="img/schedule/schedule-3.png" alt="" />

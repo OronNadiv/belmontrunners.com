@@ -9,6 +9,7 @@ import { connect } from 'react-redux'
 import { Route, Switch } from 'react-router-dom'
 import SignIn from './pages/sign-in-page/SignInPage'
 import ForgotPasswordPage from './pages/authentication/ForgotPasswordPage'
+import LeadershipPage from './pages/leadership-page/Leadership'
 import HomePage from './pages/home-page'
 import Header from './components/Header'
 import SignUpPage from './pages/sign-up-page/SignUpPage'
@@ -19,6 +20,7 @@ import {
   FAQ,
   FORGOT_PASSWORD,
   JOIN,
+  LEADERSHIP,
   MEMBERS,
   PROFILE,
   RECOVER_EMAIL,
@@ -164,6 +166,14 @@ function App({ fetchCurrentUser, isCurrentUserLoaded, firebaseUser }: Props) {
           render={() => (
             <Wrapper>
               <AccountPage />
+            </Wrapper>
+          )}
+        />
+        <Route
+          path={LEADERSHIP}
+          render={() => (
+            <Wrapper>
+              <LeadershipPage />
             </Wrapper>
           )}
         />

@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react'
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import ExpansionPanel from '@material-ui/core/ExpansionPanel';
-import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
-import Typography from '@material-ui/core/Typography';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles'
+import ExpansionPanel from '@material-ui/core/ExpansionPanel'
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary'
+import Typography from '@material-ui/core/Typography'
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import { goToTop } from 'react-scrollable-anchor'
-import { ExpansionPanelDetails } from '@material-ui/core';
+import { ExpansionPanelDetails } from '@material-ui/core'
+import { Link } from 'react-router-dom'
+import { ROOT } from '../../urls'
 
-export default function FaqPage () {
+export default function FaqPage() {
   const useStylesExpansionPanel = makeStyles((theme: Theme) =>
     createStyles({
       root: {
@@ -37,15 +39,15 @@ export default function FaqPage () {
         marginBottom: -1,
         minHeight: 56,
         '&$expanded': {
-          minHeight: 56,
-        },
+          minHeight: 56
+        }
       },
       content: {
         '&$expanded': {
-          margin: '12px 0',
-        },
+          margin: '12px 0'
+        }
       },
-      expanded: {},
+      expanded: {}
     })
   )
   const classesExpansionPanelSummary = useStylesExpansionPanelSummary()
@@ -54,8 +56,8 @@ export default function FaqPage () {
     createStyles({
       root: {
         padding: theme.spacing(2),
-        backgroundColor: 'rgba(0, 0, 0, .03)',
-      },
+        backgroundColor: 'rgba(0, 0, 0, .03)'
+      }
     })
   )
   const classesExpansionPanelDetails = useStylesExpansionPanelDetails()
@@ -63,11 +65,11 @@ export default function FaqPage () {
 
   useEffect(goToTop, [])
 
-  const [expanded, setExpanded] = useState<string | false>('');
+  const [expanded, setExpanded] = useState<string | false>('')
 
   const handleChange = (panel: string) => (event: React.ChangeEvent<{}>, newExpanded: boolean) => {
-    setExpanded(newExpanded ? panel : false);
-  };
+    setExpanded(newExpanded ? panel : false)
+  }
 
   return (
     <div className='mx-lg-5 mx-3 my-3'>
@@ -99,8 +101,8 @@ export default function FaqPage () {
         </ExpansionPanelSummary>
         <ExpansionPanelDetails classes={classesExpansionPanelDetails}>
           <Typography>
-            We typically run twice a week, including Saturday mornings at 8:30 am and Tuesday evenings at 6:00 pm.
-            During the summer, we run at 6:00 pm on Thursdays, often at a local track.
+            We meet several times a week at different locations around the area. Click <Link
+            to={`${ROOT}#events`}>here</Link> to learn about our upcoming runs.
           </Typography>
         </ExpansionPanelDetails>
       </ExpansionPanel>
@@ -235,5 +237,5 @@ export default function FaqPage () {
         </ExpansionPanelDetails>
       </ExpansionPanel>
     </div>
-  );
+  )
 }

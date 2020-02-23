@@ -13,10 +13,10 @@ interface ITeamMember {
   website: string
 }
 
-const team: ITeamMember[] = _.shuffle(require('./teamMembers.json'))
+const board: ITeamMember[] = _.shuffle(require('./teamMembers.json'))
 
 const getTeam = () => {
-  return team.map((member, index) => {
+  return board.map((member, index) => {
     return (
       <div className="col-4 col-sm-4 col-md-3 col-lg-2 mx-auto" key={index}>
         <div className="team_item">

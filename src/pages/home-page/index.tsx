@@ -3,16 +3,22 @@ import HomeBanner from './HomeBanner'
 import Welcome from './Welcome'
 import EventSchedule from './schedule/EventSchedule'
 import Subscribe from './Subscribe'
-import Team from './team/Team'
 import Map from './Map'
 import Notifications from './Notifications'
-import { goToTop } from 'react-scrollable-anchor'
-import Promotion from "./Promotion";
+import { configureAnchors, goToTop } from 'react-scrollable-anchor'
+import Promotion from './Promotion'
 import moment from 'moment'
+import { withRouter, RouteComponentProps } from 'react-router-dom'
+import ScrollableAnchor from 'react-scrollable-anchor'
 
-function Home() {
+function Home({ location: { hash } }: RouteComponentProps) {
+
   useEffect(() => {
-    goToTop()
+    configureAnchors({ offset: -120, scrollDuration: 600 })
+    if (!hash) {
+      goToTop()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
@@ -20,14 +26,16 @@ function Home() {
       <HomeBanner />
       <Welcome />
       {moment().isBefore('2019-12-24') && <Promotion />}
-      <EventSchedule />
+      <ScrollableAnchor id='events'>
+        <div>
+          <EventSchedule />
+        </div>
+      </ScrollableAnchor>
       <Subscribe />
-      <Team />
-      {/*<Partners />*/}
       <Map />
       <Notifications />
     </div>
   )
 }
 
-export default Home
+export default withRouter(Home)
