@@ -1,16 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import request from 'request'
-import csv from 'csvtojson'
 import moment, { Moment } from 'moment'
 import CalendarSelector from './CalendarSelector'
 import ExpendMoreIcon from '@material-ui/icons/ExpandMore'
 import { IconButton } from '@material-ui/core'
-import rp from 'request-promise'
 import { useMediaQuery, useTheme } from '@material-ui/core'
+import { firestore } from '../../../firebase'
 
 const CITY_ID = 5392423
-const SPREADSHEET_URL =
-  'https://docs.google.com/spreadsheets/d/1FZOB291KWLoutpr0s6VeK5EtvuiQ8uhe497nOmWoqPA/export?format=csv&usp=sharing'
 
 const getMapLink = (eventElement: string) => {
   return (
@@ -64,54 +60,21 @@ interface CSVEvent {
 
 function EventSchedule() {
   // eslint-disable-next-line
-  const [random, setRandom] = useState(Math.random())
-  const [rawEvents, setRawEvents] = useState([])
-  const [rawWeather, setRawWeather] = useState([])
-  const [events, setEvents] = useState([])
-  const [filteredEvents, setFilteredEvents] = useState([])
+  const [events, setEvents] = useState<CSVEvent[]>([])
+  const [filteredEvents, setFilteredEvents] = useState<CSVEvent[]>([])
   const [daysAhead, setDaysAhead] = useState(15)
   const [loadMoreClicked, setLoadMoreClicked] = useState(0)
 
   useEffect(() => {
     ;(async function() {
-      const res = await rp({
-        url: `https://openweathermap.org/data/2.5/forecast?id=${CITY_ID}&appid=b6907d289e10d714a6e88b30761fae22&units=imperial`,
-        json: true
-      })
-      setRawWeather(res.list)
-    })()
-  }, [])
-
-  useEffect(() => {
-    ;(async function() {
-      // @ts-ignore
-      const res = await csv().fromStream(request.get(SPREADSHEET_URL))
-      setRawEvents(res)
-    })()
-  }, [])
-
-  useEffect(() => {
-    if (!rawEvents.length) {
-      return
-    }
-    const res = rawEvents
-      .map((event: CSVEvent) => {
-        event.month--
+      const eventsDoc = await firestore.collection('events').doc('items').get()
+      const items = eventsDoc.data() as { values: CSVEvent[] }
+      items.values.forEach((event: CSVEvent) => {
         event.moment = moment(event)
-        return event
       })
-      .filter((event: CSVEvent) => {
-        return (
-          event.moment.isValid() &&
-          event.moment.isAfter(moment().subtract(1, 'day'))
-        )
-      })
-      .sort((a: { moment: Moment }, b: { moment: Moment }) => {
-        return a.moment.valueOf() - b.moment.valueOf()
-      })
-    // @ts-ignore
-    setEvents(res)
-  }, [rawEvents])
+      setEvents(items.values)
+    })()
+  }, [])
 
   useEffect(() => {
     console.log('4 events.length:', events.length, 'daysAhead:', daysAhead)
@@ -123,71 +86,6 @@ function EventSchedule() {
     })
     setFilteredEvents(res)
   }, [events, daysAhead])
-
-  interface RawWeather {
-    dt: number
-    main: {
-      temp: number
-    }
-    weather: [
-      {
-        description: string
-        icon: string
-      }
-    ]
-    wind: {
-      speed: number
-    }
-  }
-
-  useEffect(() => {
-    console.log(
-      '5 rawWeather.length:',
-      rawWeather.length,
-      'filteredEvents.length:',
-      filteredEvents.length
-    )
-    if (!rawWeather.length || !filteredEvents.length) {
-      return
-    }
-
-    filteredEvents.forEach((filteredEvent: CSVEvent) => {
-      rawWeather.find((currEntry: RawWeather, index) => {
-        const currDT = moment.unix(currEntry.dt)
-        const currTemp = currEntry.main.temp
-        let nextDT
-        let nextTemp
-        const nextEntry: RawWeather = rawWeather[index + 1]
-        if (nextEntry) {
-          nextDT = moment.unix(nextEntry.dt)
-          nextTemp = nextEntry.main.temp
-        } else {
-          nextDT = moment(currDT).add(3, 'h')
-          nextTemp = currTemp
-        }
-        const isBetween = filteredEvent.moment.isBetween(
-          currDT,
-          nextDT,
-          undefined,
-          '[)'
-        )
-        if (isBetween) {
-          filteredEvent.weather = {
-            description: currEntry.weather[0].description,
-            icon: currEntry.weather[0].icon,
-            temp:
-              currTemp +
-              ((nextTemp - currTemp) / (nextDT.unix() - currDT.unix())) *
-              (filteredEvent.moment.unix() - currDT.unix()),
-            wind: currEntry.wind.speed
-          }
-          return true
-        }
-        return false
-      })
-    })
-    setRandom(Math.random())
-  }, [filteredEvents, rawWeather])
 
   const theme = useTheme()
   const isSmallDevice = useMediaQuery(theme.breakpoints.down('sm'))
