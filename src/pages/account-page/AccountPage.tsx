@@ -9,6 +9,7 @@ import ChangeEmail from './ChangeEmail'
 import DeleteAccount from './DeleteAccount'
 import ChangePassword from './ChangePassword'
 import { IRedisState } from '../../entities/User'
+import Membership from './Membership'
 
 interface Props {
   firebaseUser: firebase.User
@@ -27,6 +28,7 @@ function AccountPage({ firebaseUser }: Props) {
 
   return !firebaseUser ? null : (
     <div className="mx-auto py-5 px-3" style={{ maxWidth: 600 }}>
+      <Membership />
       {/*
   // @ts-ignore */}
       <ChangeEmail
