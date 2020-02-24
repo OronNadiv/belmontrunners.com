@@ -97,14 +97,10 @@ function Profile({ allowUsersPage, allowContactsPage, userData, history }: Props
   }
 
   const handleClose = (url: string) => (event: any) => {
-    if (
-      anchorRef.current &&
-      event &&
-      anchorRef.current.contains(event.target)
-    ) {
+    if (anchorRef.current && event && anchorRef.current.contains(event.target)) {
       return
     }
-    history.push(url)
+    url && history.push(url)
 
     setOpen(false)
   }
