@@ -229,7 +229,6 @@ function Header({ location: { pathname }, isCurrentUserLoaded, firebaseUser, all
                   </ListItem>
                 </Link>
               }
-
               {
                 isSignedIn &&
                 <Link to={ROOT} onClick={handleDrawerClose}>
@@ -337,28 +336,23 @@ function Header({ location: { pathname }, isCurrentUserLoaded, firebaseUser, all
             <div className='d-flex justify-content-around' style={{ flexGrow: 3 }}>
               {
                 !isSmallDevice &&
-                <Link to={FAQ} className={classes.menuItem} /*style={{ marginLeft: '7em' }}*/>
-                  <div className='text-white d-flex align-items-center'>
-                    <span className='mx-2'>FAQ</span>
-                  </div>
-                </Link>
-              }
-              {
-                !isSmallDevice &&
-                <Link to={LEADERSHIP} className={classes.menuItem} /*style={{ marginLeft: '2em' }}*/>
-                  <div className='text-white d-flex align-items-center'>
-                    <span className='mx-2'>Leadership</span>
-                  </div>
-                </Link>
-              }
-
-              {
-                !isSmallDevice &&
-                <a href={BLOG} className={classes.menuItem} /*style={{ marginLeft: '2em' }}*/>
-                  <div className='text-white d-flex align-items-center'>
-                    <span className='mx-2'>Latest news</span>
-                  </div>
-                </a>
+                <>
+                  <Link to={LEADERSHIP} className={classes.menuItem}>
+                    <div className='text-white d-flex align-items-center'>
+                      <span className='mx-2'>Leadership</span>
+                    </div>
+                  </Link>
+                  <Link to={FAQ} className={classes.menuItem}>
+                    <div className='text-white d-flex align-items-center'>
+                      <span className='mx-2'>FAQ</span>
+                    </div>
+                  </Link>
+                  <a href={BLOG} className={classes.menuItem}>
+                    <div className='text-white d-flex align-items-center'>
+                      <span className='mx-2'>Latest news</span>
+                    </div>
+                  </a>
+                </>
               }
               {
                 !isSmallDevice && isMember &&
