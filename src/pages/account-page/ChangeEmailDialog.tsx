@@ -19,7 +19,10 @@ import { connect } from 'react-redux'
 import * as Sentry from '@sentry/browser'
 import { Field, Form } from 'react-final-form'
 import { PASSWORD } from '../../fields'
-import { ISendEmailVerification, sendEmailVerification as sendEmailVerificationAction } from '../../reducers/currentUser'
+import {
+  ISendEmailVerification,
+  sendEmailVerification as sendEmailVerificationAction
+} from '../../reducers/currentUser'
 import { required, isEmail, composeValidators, minPasswordLength } from '../../utilities/formValidators'
 import { IRedisState } from '../../entities/User'
 
@@ -53,10 +56,17 @@ function ChangeEmailDialog({ firebaseUser, sendEmailVerification, onClose }: Pro
     setErrorMessage('')
     setIsSubmitting(true)
 
+    if (!firebaseUser.email) {
+      const message = 'current user does not have an email.'
+      Sentry.captureException(message)
+      console.error(message)
+      return
+    }
+
+
     try {
       const credentials = firebase.auth.EmailAuthProvider.credential(
-        // @ts-ignore At this point, we only support login with email.
-        currentUser.email,
+        firebaseUser.email,
         password
       )
       await firebaseUser.reauthenticateWithCredential(credentials)
