@@ -66,8 +66,9 @@ Membership.propTypes = {
 
 const mapStateToProps = ({ currentUser: { userData } }: IRedisState) => {
   return {
-    // @ts-ignore
-    userData: userData || new IMap()
+    userData: userData ||
+      // @ts-ignore
+      new IMap()
   }
 }
 

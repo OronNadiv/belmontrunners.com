@@ -353,8 +353,9 @@ const mapStateToProps = ({
 
   return {
     firebaseUser,
-    // @ts-ignore
-    userData: userData || new IMap()
+    userData: userData ||
+      // @ts-ignore
+      new IMap()
   }
 }
 

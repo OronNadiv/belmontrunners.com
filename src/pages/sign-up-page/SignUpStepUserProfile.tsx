@@ -105,8 +105,9 @@ SignUpStepUserProfile.propTypes = {
 const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, userData } }: IRedisState) => {
   return {
     isCurrentUserLoaded,
-    // @ts-ignore
-    userData: userData || new IMap()
+    userData: userData ||
+      // @ts-ignore
+      new IMap()
   }
 }
 

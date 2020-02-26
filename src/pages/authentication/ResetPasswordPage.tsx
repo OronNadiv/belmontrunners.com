@@ -21,7 +21,7 @@ import { minPasswordLength, required, composeValidators } from '../../utilities/
 
 const WEAK_PASSWORD = 'Password is too weak.'
 
-function ResetPasswordPage({ history, location }: RouteComponentProps) {
+function ResetPasswordPage({ history, location: { state: { query: { oobCode } } } }: RouteComponentProps) {
   const [errorMessage, setErrorMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
@@ -52,7 +52,6 @@ function ResetPasswordPage({ history, location }: RouteComponentProps) {
   const handleSubmitFunc = async (values: SubmitValues) => {
     const newPassword = values[PASSWORD]
 
-    const oobCode = location.state.query.oobCode
 
     setErrorMessage('')
     setIsSubmitting(true)
@@ -140,11 +139,6 @@ ResetPasswordPage.propTypes = {
   history: PropTypes.object.isRequired,
   location: PropTypes.shape({
     state: PropTypes.shape({
-      info: PropTypes.shape({
-        data: PropTypes.shape({
-          email: PropTypes.string.isRequired
-        }).isRequired
-      }).isRequired,
       query: PropTypes.shape({
         oobCode: PropTypes.string.isRequired
       }).isRequired

@@ -101,11 +101,6 @@ const VerifyEmailPage = ({ location: { state: { query: { oobCode } } } }: RouteC
 VerifyEmailPage.propTypes = {
   location: PropTypes.shape({
     state: PropTypes.shape({
-      info: PropTypes.shape({
-        data: PropTypes.shape({
-          email: PropTypes.string.isRequired
-        }).isRequired
-      }).isRequired,
       query: PropTypes.shape({
         oobCode: PropTypes.string.isRequired
       }).isRequired

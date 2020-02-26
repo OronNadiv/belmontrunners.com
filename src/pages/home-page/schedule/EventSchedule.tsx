@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react'
 import moment, { Moment } from 'moment'
 import CalendarSelector from './CalendarSelector'
 import ExpendMoreIcon from '@material-ui/icons/ExpandMore'
-import { IconButton } from '@material-ui/core'
-import { useMediaQuery, useTheme } from '@material-ui/core'
+import { useMediaQuery, useTheme, IconButton } from '@material-ui/core'
 import { firestore } from '../../../firebase'
 
 const CITY_ID = 5392423

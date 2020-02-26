@@ -205,7 +205,9 @@ const mapStateToProps = ({ currentUser: { permissions, firebaseUser, userData } 
       (!!permissions.contactsRead[firebaseUser.uid] ||
         !!permissions.contactsWrite[firebaseUser.uid]),
     // @ts-ignore
-    userData: userData || new IMap()
+    userData: userData ||
+      // @ts-ignore
+      new IMap()
   }
 }
 
