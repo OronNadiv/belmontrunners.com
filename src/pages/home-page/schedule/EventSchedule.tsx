@@ -84,11 +84,12 @@ function EventSchedule() {
     return items
   }
 
-  const notCovid19 = async () => {
-    const eventsDoc = await firestore.collection('events').doc('items').get()
-    const items = eventsDoc.data() as { values: CSVEvent[] }
-    return items
-  }
+  // const notCovid19 = async () => {
+  //   const eventsDoc = await firestore.collection('events').doc('items').get()
+  //   const items = eventsDoc.data() as { values: CSVEvent[] }
+  //   return items
+  // }
+
   useEffect(() => {
     ;(async function () {
       // const items = notCovid19()
