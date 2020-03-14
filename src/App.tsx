@@ -46,6 +46,7 @@ import LogRocket from 'logrocket'
 import FaqPage from './pages/faq-page/FaqPage'
 import { IRedisState } from './entities/User'
 import ErrorBoundary from './components/ErrorBoundary'
+import Disclaimer from './components/Disclaimer'
 
 const setupLogRocketReact = require('logrocket-react')
 
@@ -135,6 +136,7 @@ function App({ fetchCurrentUser, isCurrentUserLoaded, firebaseUser }: Props) {
   )
   return (
     <>
+      <Disclaimer />
       <Switch>
         <Route
           exact
