@@ -3,7 +3,8 @@ import moment, { Moment } from 'moment'
 import CalendarSelector from './CalendarSelector'
 import ExpendMoreIcon from '@material-ui/icons/ExpandMore'
 import { useMediaQuery, useTheme, IconButton } from '@material-ui/core'
-import { firestore } from '../../../firebase'
+
+//import { firestore } from '../../../firebase'
 
 const CITY_ID = 5392423
 
