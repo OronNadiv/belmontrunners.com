@@ -64,10 +64,35 @@ function EventSchedule() {
   const [daysAhead, setDaysAhead] = useState(15)
   const [loadMoreClicked, setLoadMoreClicked] = useState(0)
 
+  const covid19 = () => {
+    const now = moment()
+
+    // @ts-ignore
+    const ev = {
+      minute: now.minute(),
+      hour: now.hour(),
+      day: now.date(),
+      month: now.month(),
+      year: now.year(),
+      moment: now,
+      "is-special-event": 'TRUE',
+      subject: 'All Official Group Runs Suspended due to COVID-19 Concerns',
+      what: '',
+      where: ''
+    } as CSVEvent
+    const items = {values: [ev]}
+    return items
+  }
+
+  const notCovid19 = async () => {
+    const eventsDoc = await firestore.collection('events').doc('items').get()
+    const items = eventsDoc.data() as { values: CSVEvent[] }
+    return items
+  }
   useEffect(() => {
-    ;(async function() {
-      const eventsDoc = await firestore.collection('events').doc('items').get()
-      const items = eventsDoc.data() as { values: CSVEvent[] }
+    ;(async function () {
+      // const items = notCovid19()
+      const items = covid19()
       items.values.forEach((event: CSVEvent) => {
         event.moment = moment(event)
       })
