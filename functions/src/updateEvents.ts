@@ -82,7 +82,12 @@ export default (admin: Admin.app.App) => {
 
   return async () => {
     const events = await getEvents()
-    const rawWeather = await getRawWeather()
+    let rawWeather: RawWeather[] = []
+    try {
+      rawWeather = await getRawWeather()
+    } catch (err) {
+      console.error('while fetching weather.  err:', err)
+    }
 
     events.forEach((event: CSVEvent) => {
       rawWeather.find((currEntry: RawWeather, index: number) => {

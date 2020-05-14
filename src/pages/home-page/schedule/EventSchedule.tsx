@@ -4,7 +4,7 @@ import CalendarSelector from './CalendarSelector'
 import ExpendMoreIcon from '@material-ui/icons/ExpandMore'
 import { useMediaQuery, useTheme, IconButton } from '@material-ui/core'
 
-//import { firestore } from '../../../firebase'
+import { firestore } from '../../../firebase'
 
 const CITY_ID = 5392423
 
@@ -76,8 +76,8 @@ function EventSchedule() {
       month: now.month(),
       year: now.year(),
       moment: now,
-      "is-special-event": 'TRUE',
-      subject: 'All Official Group Runs Suspended due to COVID-19 Concerns',
+      "is-special-event": 'FALSE',
+      subject: 'All Physical Group Runs Suspended due to COVID-19 Concerns',
       what: '',
       where: ''
     } as CSVEvent
@@ -85,16 +85,19 @@ function EventSchedule() {
     return items
   }
 
-  // const notCovid19 = async () => {
-  //   const eventsDoc = await firestore.collection('events').doc('items').get()
-  //   const items = eventsDoc.data() as { values: CSVEvent[] }
-  //   return items
-  // }
+  const notCovid19 = async () => {
+    const eventsDoc = await firestore.collection('events').doc('items').get()
+    const items = eventsDoc.data() as { values: CSVEvent[] }
+    return items
+  }
 
   useEffect(() => {
     ;(async function () {
-      // const items = notCovid19()
-      const items = covid19()
+      const itemsNotCovid19 = await notCovid19()
+      const itemsCovid19 = covid19()
+      const items = {
+        values: [...itemsCovid19.values, ...itemsNotCovid19.values]
+      }
       items.values.forEach((event: CSVEvent) => {
         event.moment = moment(event)
       })
