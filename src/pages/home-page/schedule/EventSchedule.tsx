@@ -174,8 +174,8 @@ function EventSchedule() {
                             <span />
                           )}
                         </div>
-                        <div>
-                          <div>
+                        <div style={{ minWidth:90 }}>
+                          <div className='text-center'>
                             {filteredEvent['is-members-only-event'] === 'TRUE' && (
                               <img
                                 src="img/schedule/members-only-t.png"
