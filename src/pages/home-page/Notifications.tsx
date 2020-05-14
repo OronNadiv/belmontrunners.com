@@ -1,3 +1,4 @@
+/*eslint no-unreachable: 0*/
 import React, { useEffect, useState } from 'react'
 import { Button } from '@material-ui/core'
 import { ACTION_COLOR, LINK_COLOR, Snackbar } from '../../components/Snackbar'
@@ -217,6 +218,8 @@ function Notifications({ firebaseUser, userData, updateUserData }: Props) {
   }
 
   useEffect(() => {
+    // NOTE: Disabling registration.
+    return
     if (!firebaseUser) {
       setNotification(undefined)
       return
