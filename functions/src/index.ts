@@ -16,6 +16,7 @@ const admin: Admin.app.App = Admin.initializeApp()
 const firestore = admin.firestore()
 
 const apiKey = functions.config().mailchimp.apikey
+const {app_id, city_id} = functions.config().openweathermap
 const {
   membership_fee_in_cents,
   secret_keys: { live, test }
@@ -30,7 +31,7 @@ const getMembersImpl = GetMembers(admin)
 const purgeUsersUnder13 = PurgeUsersUnder13(admin, apiKey, false)
 const stripeImpl = Stripe(admin, { membershipFeeInCents: membership_fee_in_cents, secretKeys: { live, test } })
 const users2Contacts = Users2Contacts(admin)
-const updateEvents = UpdateEvents(admin)
+const updateEvents = UpdateEvents(admin, app_id, city_id)
 
 const Promise = require('bluebird')
 

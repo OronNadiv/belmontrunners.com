@@ -6,7 +6,6 @@ const request = require('request')
 const rp = require('request-promise')
 const moment = require('moment')
 
-const CITY_ID = 5392423
 const SPREADSHEET_URL =
   'https://docs.google.com/spreadsheets/d/1FZOB291KWLoutpr0s6VeK5EtvuiQ8uhe497nOmWoqPA/export?format=csv&usp=sharing'
 
@@ -69,22 +68,22 @@ const getEvents = async (): Promise<CSVEvent[]> => {
     })
 }
 
-const getRawWeather = async (): Promise<RawWeather[]> => {
+const getRawWeather = async (appId: string, cityId: string): Promise<RawWeather[]> => {
   const res = await rp({
-    url: `https://openweathermap.org/data/2.5/forecast?id=${CITY_ID}&appid=b6907d289e10d714a6e88b30761fae22&units=imperial`,
+    url: `https://api.openweathermap.org/data/2.5/forecast?id=${cityId}&appid=${appId}&units=imperial`,
     json: true
   })
   return res.list
 }
 
-export default (admin: Admin.app.App) => {
+export default (admin: Admin.app.App, appId: string, cityId: string) => {
   const firestore = admin.firestore()
 
   return async () => {
     const events = await getEvents()
     let rawWeather: RawWeather[] = []
     try {
-      rawWeather = await getRawWeather()
+      rawWeather = await getRawWeather(appId, cityId)
     } catch (err) {
       console.error('while fetching weather.  err:', err)
     }
