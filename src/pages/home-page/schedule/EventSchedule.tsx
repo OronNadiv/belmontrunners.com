@@ -65,43 +65,42 @@ function EventSchedule() {
   const [daysAhead, setDaysAhead] = useState(15)
   const [loadMoreClicked, setLoadMoreClicked] = useState(0)
 
-  const covid19 = () => {
-    const now = moment()
-
+  // const covid19 = () => {
+  //   const now = moment()
+  //
     // @ts-ignore
-    const ev = {
-      minute: now.minute(),
-      hour: now.hour(),
-      day: now.date(),
-      month: now.month(),
-      year: now.year(),
-      moment: now,
-      "is-special-event": 'FALSE',
-      subject: 'All Physical Group Runs Suspended due to COVID-19 Concerns',
-      what: '',
-      where: ''
-    } as CSVEvent
-    const items = {values: [ev]}
-    return items
-  }
+    // const ev = {
+    //   minute: now.minute(),
+    //   hour: now.hour(),
+    //   day: now.date(),
+    //   month: now.month(),
+    //   year: now.year(),
+    //   moment: now,
+    //   "is-special-event": 'FALSE',
+    //   subject: 'All Physical Group Runs Suspended due to COVID-19 Concerns',
+    //   what: '',
+    //   where: ''
+    // } as CSVEvent
+    // const items = {values: [ev]}
+    // return items
+  // }
 
   const notCovid19 = async () => {
     const eventsDoc = await firestore.collection('events').doc('items').get()
-    const items = eventsDoc.data() as { values: CSVEvent[] }
-    return items
+    return eventsDoc.data() as { values: CSVEvent[] }
   }
 
   useEffect(() => {
     ;(async function () {
       const itemsNotCovid19 = await notCovid19()
-      const itemsCovid19 = covid19()
-      const items = {
-        values: [...itemsCovid19.values, ...itemsNotCovid19.values]
-      }
-      items.values.forEach((event: CSVEvent) => {
+      // const itemsCovid19 = covid19()
+      // const items = {
+      //   values: [...itemsCovid19.values, ...itemsNotCovid19.values]
+      // }
+      itemsNotCovid19.values.forEach((event: CSVEvent) => {
         event.moment = moment(event)
       })
-      setEvents(items.values)
+      setEvents(itemsNotCovid19.values)
     })()
   }, [])
 
