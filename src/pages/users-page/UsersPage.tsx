@@ -386,7 +386,6 @@ function UsersPage({ firebaseUser, allowDelete, allowRead, allowWrite }: Props) 
             options={{
               selectableRows: allowDelete ? 'single' : 'none',
               print: false,
-              responsive: 'stacked',
               rowsPerPage: 100,
               // eslint-disable-next-line react/display-name
               customToolbarSelect: (selectedRows) => {
