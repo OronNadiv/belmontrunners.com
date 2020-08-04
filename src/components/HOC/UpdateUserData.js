@@ -3,7 +3,7 @@ import usePrevious from '../usePrevious'
 import { connect } from 'react-redux'
 import { updateUserData as updateUserDataAction } from '../../reducers/currentUser'
 import * as PropTypes from 'prop-types'
-import {v4 as uuid} from 'uuid'
+import { v4 as uuid } from 'uuid'
 import { findWhere } from 'underscore'
 
 function UpdateUserData(WrappedComponent) {
@@ -43,7 +43,7 @@ function UpdateUserData(WrappedComponent) {
         throw new Error('user was not loaded yet or unauthenticated.')
       }
       const context = uuid()
-      var promise = new Promise(function(resolve, reject) {
+      var promise = new Promise(function (resolve, reject) {
         deferreds.push({ resolve: resolve, reject: reject, context })
       })
 
