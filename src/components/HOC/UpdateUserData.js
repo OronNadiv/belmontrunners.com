@@ -3,7 +3,7 @@ import usePrevious from '../usePrevious'
 import { connect } from 'react-redux'
 import { updateUserData as updateUserDataAction } from '../../reducers/currentUser'
 import * as PropTypes from 'prop-types'
-import uuid from 'uuid/v4'
+import {v4 as uuid} from 'uuid'
 import { findWhere } from 'underscore'
 
 function UpdateUserData(WrappedComponent) {

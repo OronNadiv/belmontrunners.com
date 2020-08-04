@@ -72,9 +72,13 @@ function ChangeEmail({ sendEmailVerification, firebaseUser, isSubmitting }: Prop
             </Button>
           </span>
         </Card>
-        {/*
-  // @ts-ignore */}
-        {showChangeEmailDialog && (<ChangeEmailDialog onClose={() => setShowChangeEmailDialog(false)} />)}
+
+        {showChangeEmailDialog && (
+          <ChangeEmailDialog
+            // @ts-ignore
+            onClose={() => setShowChangeEmailDialog(false)}
+          />
+        )}
       </>
     )
   )

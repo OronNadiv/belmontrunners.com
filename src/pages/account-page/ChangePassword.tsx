@@ -43,6 +43,7 @@ function ChangeEmail({ firebaseUser, isSubmitting }: Props) {
         </Card>
         {showChangePasswordDialog && (
           <ChangePasswordDialog
+            // @ts-ignore
             onClose={() => setShowChangePasswordDialog(false)}
           />
         )}

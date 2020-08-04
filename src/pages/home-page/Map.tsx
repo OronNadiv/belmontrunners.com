@@ -13,6 +13,7 @@ function Map({ google }: { google: any }) {
         {/*data-mlon="-122.26">*/}
         <GoogleMap
           google={google}
+          // @ts-ignore
           zoom={14}
           initialCenter={{
             lat: 37.5214784,

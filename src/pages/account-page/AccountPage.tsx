@@ -32,16 +32,16 @@ function AccountPage({ firebaseUser }: Props) {
       NOTE: Disabling registration.
       */}
       { false && <Membership />}
-      {/*
-  // @ts-ignore */}
       <ChangeEmail
+        // @ts-ignore
         onSubmitting={handleSubmissionChanged}
+        // @ts-ignore
         isSubmitting={isSubmitting}
       />
-      {/*
-  // @ts-ignore */}
       <ChangePassword
+        // @ts-ignore
         onSubmitting={handleSubmissionChanged}
+        // @ts-ignore
         isSubmitting={isSubmitting}
       />
       <DownloadAccountInfo

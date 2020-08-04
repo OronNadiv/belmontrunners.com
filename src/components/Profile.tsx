@@ -20,8 +20,7 @@ import {
   KeyboardArrowDown as ArrowDropDownIcon,
   KeyboardArrowUp as ArrowDropUpIcon
 } from '@material-ui/icons'
-// @ts-ignore
-import { initials } from 'initials'
+import initials  from 'initials'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 import { compose } from 'underscore'
 import gravatar from 'gravatar'
@@ -118,7 +117,11 @@ function Profile({allowUsersPage, allowContactsPage, userData, history}: Props) 
         onClick={handleToggle}
       >
         <Avatar className={classes.avatar} src={avatarUrl}>
-          {!avatarUrl && initials(userDataJS.displayName)}
+          {
+            !avatarUrl &&
+            // @ts-ignore
+            initials(userDataJS.displayName)
+          }
         </Avatar>
         <div>
           {open ? (

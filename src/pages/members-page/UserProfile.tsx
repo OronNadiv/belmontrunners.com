@@ -1,6 +1,5 @@
 import * as PropTypes from 'prop-types'
 import React, { useState } from 'react'
-// @ts-ignore
 import initials from 'initials'
 import moment from 'moment'
 import {
@@ -280,7 +279,11 @@ function UserProfile({ onClose, user, userData, updateUserData, firebaseUser }: 
       <div className={`mx-5 ${classes.root}`}>
         <div className="d-flex flex-column align-items-center">
           <Avatar className={` ${classes.avatar}`} src={avatarUrl || undefined}>
-            {!avatarUrl && initials(user[DISPLAY_NAME])}
+            {
+              !avatarUrl &&
+              // @ts-ignore
+              initials(user[DISPLAY_NAME])
+            }
           </Avatar>
           <div className="mt-3">{user[DISPLAY_NAME]}</div>
           {firebaseUser.uid === user.uid && !connectedToFacebook && (

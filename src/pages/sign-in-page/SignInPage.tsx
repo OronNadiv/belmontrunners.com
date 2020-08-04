@@ -96,7 +96,9 @@ function SignInPage({ history, location, firebaseUser }: Props) {
       return
     }
     let targetUrl = ROOT
+    // @ts-ignore
     if (location && location.state && location.state.redirectUrl) {
+      // @ts-ignore
       targetUrl = location.state.redirectUrl
     }
     firebaseUser && history.push(targetUrl)

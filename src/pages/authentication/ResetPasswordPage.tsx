@@ -21,6 +21,7 @@ import { minPasswordLength, required, composeValidators } from '../../utilities/
 
 const WEAK_PASSWORD = 'Password is too weak.'
 
+// @ts-ignore
 function ResetPasswordPage({ history, location: { state: { query: { oobCode } } } }: RouteComponentProps) {
   const [errorMessage, setErrorMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)

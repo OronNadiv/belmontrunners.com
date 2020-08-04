@@ -19,6 +19,7 @@ import {
 } from '@material-ui/core'
 import * as Sentry from '@sentry/browser'
 
+// @ts-ignore
 const VerifyEmailPage = ({ location: { state: { query: { oobCode } } } }: RouteComponentProps) => {
   const [close, setClose] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')

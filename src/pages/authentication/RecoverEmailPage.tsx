@@ -19,6 +19,7 @@ import {
 import * as Sentry from '@sentry/browser'
 import { auth } from '../../firebase'
 
+// @ts-ignore
 const RecoverEmailPage = ({ location: { state: { info: { data: { email } }, query: { oobCode } } } }: RouteComponentProps) => {
   const [close, setClose] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
