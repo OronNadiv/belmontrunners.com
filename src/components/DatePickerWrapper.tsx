@@ -1,4 +1,5 @@
 import { DatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers'
+// NOTE: Compatibility issue with @date-io/moment v2.x.  See https://github.com/mui-org/material-ui-pickers/issues/1471 for more info.
 import MomentUtils from '@date-io/moment'
 import * as PropTypes from 'prop-types'
 import React from 'react'
