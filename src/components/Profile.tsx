@@ -21,7 +21,7 @@ import {
   KeyboardArrowUp as ArrowDropUpIcon
 } from '@material-ui/icons'
 // @ts-ignore
-import initials from 'initials'
+import { initials } from 'initials'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 import { compose } from 'underscore'
 import gravatar from 'gravatar'
@@ -34,7 +34,7 @@ interface Props extends RouteComponentProps {
   userData: any
 }
 
-function Profile({ allowUsersPage, allowContactsPage, userData, history }: Props) {
+function Profile({allowUsersPage, allowContactsPage, userData, history}: Props) {
   const useStyles = makeStyles({
     avatarWrapper: {
       alignItems: 'center',
@@ -135,8 +135,8 @@ function Profile({ allowUsersPage, allowContactsPage, userData, history }: Props
         placement="bottom-end"
         className={classes.popper}
       >
-        {({ TransitionProps }) => (
-          <Grow {...TransitionProps} style={{ transformOrigin: 'center top' }}>
+        {({TransitionProps}) => (
+          <Grow {...TransitionProps} style={{transformOrigin: 'center top'}}>
             <Paper id="menu-list-grow">
               <ClickAwayListener onClickAway={handleClose('')}>
                 <MenuList>
@@ -194,7 +194,7 @@ Profile.propTypes = {
   history: PropTypes.object.isRequired
 }
 
-const mapStateToProps = ({ currentUser: { permissions, firebaseUser, userData } }: IRedisState) => {
+const mapStateToProps = ({currentUser: {permissions, firebaseUser, userData}}: IRedisState) => {
   return {
     allowUsersPage:
       !!firebaseUser &&
@@ -213,6 +213,6 @@ const mapStateToProps = ({ currentUser: { permissions, firebaseUser, userData } 
 
 export default compose(
   withRouter,
-  LoggedInState({ name: 'Profile' }),
+  LoggedInState({name: 'Profile'}),
   connect(mapStateToProps)
 )(Profile)
