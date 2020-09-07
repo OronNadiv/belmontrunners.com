@@ -8,10 +8,12 @@ import SignUpStepUserProfile from './SignUpStepUserProfile'
 import { Redirect } from 'react-router-dom'
 import { ROOT } from '../../urls'
 import * as PropTypes from 'prop-types'
+import SignUpStepFreeMembership from "./SignUpStepFreeMembership";
 
 export const STEP_AUTHENTICATION = 'STEP_AUTHENTICATION'
 export const STEP_USER_DETAILS = 'STEP_USER_DETAILS'
 export const STEP_MEMBERSHIP = 'STEP_MEMBERSHIP'
+export const STEP_FREE_MEMBERSHIP = 'STEP_FREE_MEMBERSHIP'
 
 interface Props {
   steps: string[]
@@ -47,6 +49,13 @@ function SignUpStepper({ steps }: Props) {
               <StepLabel>Membership</StepLabel>
             </Step>
           )
+
+        case STEP_FREE_MEMBERSHIP:
+          return (
+            <Step key={2}>
+              <StepLabel>Membership (FREE until summer 2021)</StepLabel>
+            </Step>
+          )
         default:
           throw new Error('Unknown step.  step: ' + step)
       }
@@ -72,6 +81,13 @@ function SignUpStepper({ steps }: Props) {
       case STEP_MEMBERSHIP:
         return (
           <SignUpStepPayment
+            isLast={activeStep === steps.length - 1}
+            onNextClicked={handleNext}
+          />
+        )
+      case STEP_FREE_MEMBERSHIP:
+        return (
+          <SignUpStepFreeMembership
             isLast={activeStep === steps.length - 1}
             onNextClicked={handleNext}
           />

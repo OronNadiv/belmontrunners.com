@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import SignUpStepper, {
   STEP_AUTHENTICATION,
   // STEP_MEMBERSHIP,
+  STEP_FREE_MEMBERSHIP,
   STEP_USER_DETAILS
 } from './SignUpStepper'
 import * as PropTypes from 'prop-types'
@@ -26,11 +27,11 @@ function SignUpPage({ isCurrentUserLoaded, firebaseUser }: Props) {
     if (firebaseUser) {
       // NOTE: Disabling registration.
       // setSteps([STEP_USER_DETAILS, STEP_MEMBERSHIP])
-      setSteps([STEP_USER_DETAILS])
+      setSteps([STEP_USER_DETAILS, STEP_FREE_MEMBERSHIP])
     } else {
       // NOTE: Disabling registration.
       // setSteps([STEP_AUTHENTICATION, STEP_USER_DETAILS, STEP_MEMBERSHIP])
-      setSteps([STEP_AUTHENTICATION, STEP_USER_DETAILS])
+      setSteps([STEP_AUTHENTICATION, STEP_USER_DETAILS, STEP_FREE_MEMBERSHIP])
     }
   }, [isCurrentUserLoaded, firebaseUser, steps])
 
