@@ -28,10 +28,7 @@ function AccountPage({ firebaseUser }: Props) {
 
   return !firebaseUser ? null : (
     <div className="mx-auto py-5 px-3" style={{ maxWidth: 600 }}>
-      {/*
-      NOTE: Disabling registration.
-      */}
-      { false && <Membership />}
+      <Membership />
       <ChangeEmail
         // @ts-ignore
         onSubmitting={handleSubmissionChanged}

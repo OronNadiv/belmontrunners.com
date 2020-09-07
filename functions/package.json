@@ -13,7 +13,8 @@
     "contacts2MailChimpCMD": "npm run build && node lib/contacts2MailChimpCMD.js",
     "getMembersCMD": "npm run build && node lib/getMembersCMD.js",
     "users2ContactsCMD": "npm run build && node lib/users2ContactsCMD.js",
-    "updateEventsCMD": "npm run build && node lib/updateEventsCMD.js"
+    "updateEventsCMD": "npm run build && node lib/updateEventsCMD.js",
+    "extendMembershipCMD": "npm run build && node lib/extendMembershipCMD.js"
   },
   "main": "lib/index.js",
   "engines": {
