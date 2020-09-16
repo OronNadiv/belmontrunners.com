@@ -152,7 +152,7 @@ export default function FaqPage() {
               events, and supporting the club’s programs and events.</s></p>
 
             <b>Due to COVID-19, all membership fees are waived until summer 2021. New members of the club should still
-              create an account and accept the terms of service, waver, and privacy policy</b>
+              create an account and accept the terms of service, waiver, and privacy policy</b>
           </Typography>
         </ExpansionPanelDetails>
       </ExpansionPanel>
