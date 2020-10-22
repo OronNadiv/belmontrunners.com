@@ -7,15 +7,19 @@ interface Props {
   appId: string
   config: any // IMap
   userId: string
-  attributes: any // IMap
+  attributes: {
+    email: string
+    avatar_url: string
+    displayName: string
+  }
 }
 
-const Drift = ({ appId, config, userId, attributes }: Props) => {
-  userId = userId || ''
+const Drift = ({appId, config, userId = '', attributes}: Props) => {
   // @ts-ignore
+  // tslint:disable-next-line:no-parameter-reassignment
   config = new IMap(config)
   // @ts-ignore
-  attributes = new IMap(attributes)
+  const attributesMap = new IMap(attributes)
   const insertScript = (scriptText: string) => {
     const element = document.createElement('script')
     element.innerText = scriptText
@@ -59,10 +63,10 @@ const Drift = ({ appId, config, userId, attributes }: Props) => {
 
   const addIdentityVariables = useCallback(() => {
     const scriptText = `
-        drift.identify('${userId}', ${JSON.stringify(attributes.toJS())});
+        drift.identify('${userId}', ${JSON.stringify(attributesMap.toJS())});
       `
     return insertScript(scriptText)
-  }, [userId, attributes])
+  }, [userId, attributesMap])
 
   useEffect(() => {
     let elem: HTMLScriptElement
@@ -85,7 +89,7 @@ const Drift = ({ appId, config, userId, attributes }: Props) => {
       // @ts-ignore
       drift && drift.reset()
     }
-  }, [userId, attributes, addIdentityVariables])
+  }, [userId, attributesMap, addIdentityVariables])
 
   return <></>
 }

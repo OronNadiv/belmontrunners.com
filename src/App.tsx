@@ -285,9 +285,9 @@ function App({ fetchCurrentUser, isCurrentUserLoaded, firebaseUser }: Props) {
           appId="fxagpvvrufk4"
           userId={firebaseUser ? firebaseUser.uid : ''}
           attributes={{
-            email: firebaseUser && firebaseUser.email,
-            avatar_url: firebaseUser && firebaseUser.photoURL,
-            displayName: firebaseUser && firebaseUser.displayName
+            email: firebaseUser && firebaseUser.email ? firebaseUser.email : '',
+            avatar_url: firebaseUser && firebaseUser.photoURL ? firebaseUser.photoURL : '',
+            displayName: firebaseUser && firebaseUser.displayName ? firebaseUser.displayName : ''
           }}
           config={{
             enableCampaigns
