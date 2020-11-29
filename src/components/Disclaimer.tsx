@@ -17,12 +17,16 @@ const Disclaimer = () => {
 
       <Modal.Body className='text-justify'>
         <p className='mb-2'>
-          Effective Friday, March 13, Belmont Runners is canceling our group runs and events until further notice due to
-          the Coronavirus pandemic (COVID-19). Our club promotes public wellness and we want to do our part to support
-          public health advisories, including social distance guidelines.
+          Effective Sunday, November 29, 2020, Belmont Runners is canceling all group runs and events until further
+          notice following the <a target="_blank"
+          rel="noopener noreferrer"
+          href='https://www.smcgov.org/press-release/nov-28-2020-indoor-dining-closes-outdoor-gatherings-only-state-moves-san-mateo-county'>guidelines</a> from
+          the San Mateo country that prohibits outdoor gathering of more than three households.
+          Our club promotes public wellness and we want to do our part to support public health advisories, including
+          social distance guidelines.
         </p>
         <p className='mb-2 text-primary'>
-          We will continue to monitor the fluid situation and provide updates as needed.
+          We will continue to monitor the situation and provide updates as needed.
         </p>
       </Modal.Body>
 
