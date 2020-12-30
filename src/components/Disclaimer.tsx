@@ -21,7 +21,7 @@ const Disclaimer = () => {
           notice following the <a target="_blank"
           rel="noopener noreferrer"
           href='https://www.smcgov.org/press-release/nov-28-2020-indoor-dining-closes-outdoor-gatherings-only-state-moves-san-mateo-county'>guidelines</a> from
-          the San Mateo country that prohibits outdoor gathering of more than three households.
+          the San Mateo country that prohibits outdoor gatherings of more than three households.
           Our club promotes public wellness and we want to do our part to support public health advisories, including
           social distance guidelines.
         </p>

@@ -56,7 +56,7 @@ interface IUserWithMembershipStatus extends IUser {
 }
 
 
-function UsersPage({ firebaseUser, allowDelete, allowRead, allowWrite }: Props) {
+function UsersPage({firebaseUser, allowDelete, allowRead, allowWrite}: Props) {
   const [rows, setRows] = useState<IUserWithMembershipStatus[]>([])
   const [rowToDelete, setRowToDelete] = useState<IUserWithMembershipStatus | undefined>()
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -127,7 +127,7 @@ function UsersPage({ firebaseUser, allowDelete, allowRead, allowWrite }: Props) 
   }, [])
 
   useEffect(() => {
-    animateScroll.scrollToTop({ duration: 0 })
+    animateScroll.scrollToTop({duration: 0})
   }, [firebaseUser])
 
   useEffect(() => {
@@ -136,12 +136,12 @@ function UsersPage({ firebaseUser, allowDelete, allowRead, allowWrite }: Props) 
 
   const handleToggleReceivedShirt = async (userData: IUserWithMembershipStatus, isChecked: boolean) => {
     const userRef = firestore.doc(`users/${userData.uid}`)
-    await userRef.set({ [DID_RECEIVED_SHIRT]: isChecked }, { merge: true })
+    await userRef.set({[DID_RECEIVED_SHIRT]: isChecked}, {merge: true})
   }
 
   const handleNotInterested = async (userData: IUserWithMembershipStatus, isChecked: boolean) => {
     const userRef = firestore.doc(`users/${userData.uid}`)
-    await userRef.set({ [NOT_INTERESTED_IN_BECOMING_A_MEMBER]: isChecked }, { merge: true })
+    await userRef.set({[NOT_INTERESTED_IN_BECOMING_A_MEMBER]: isChecked}, {merge: true})
   }
 
   const columns = [
@@ -155,8 +155,8 @@ function UsersPage({ firebaseUser, allowDelete, allowRead, allowWrite }: Props) 
         customBodyRender: (value: any, tableMeta: any, updateValue: (s: any, c: any, p: any) => any) => {
           // console.log(tableMeta)
           return value ?
-            <Avatar style={{ width: 40, height: 40, backgroundColor: 'rgb(98, 71, 234)', fontSize: 13.33333 }}
-                    src={value} />
+            <Avatar style={{width: 40, height: 40, backgroundColor: 'rgb(98, 71, 234)', fontSize: 13.33333}}
+              src={value} />
             : ''
         }
       }
@@ -237,7 +237,7 @@ function UsersPage({ firebaseUser, allowDelete, allowRead, allowWrite }: Props) 
             if (!tableMeta.rowData) {
               return value
             }
-            const userData = _.findWhere(rows, { [UID]: tableMeta.rowData[0] }) as IUserWithMembershipStatus
+            const userData = _.findWhere(rows, {[UID]: tableMeta.rowData[0]}) as IUserWithMembershipStatus
             if (!userData) {
               return value
             }
@@ -294,7 +294,7 @@ function UsersPage({ firebaseUser, allowDelete, allowRead, allowWrite }: Props) 
               disabled={!allowWrite}
               onChange={async (event, isChecked) => {
                 try {
-                  const userData = _.findWhere(rows, { [UID]: tableMeta.rowData[0] }) as IUserWithMembershipStatus
+                  const userData = _.findWhere(rows, {[UID]: tableMeta.rowData[0]}) as IUserWithMembershipStatus
                   await handleToggleReceivedShirt(userData, isChecked)
                   updateValue(isChecked, undefined, undefined)
                 } catch (error) {
@@ -362,7 +362,7 @@ function UsersPage({ firebaseUser, allowDelete, allowRead, allowWrite }: Props) 
               }
               console.log(`Deleting: ${JSON.stringify(row)}`)
               setIsSubmitting(true)
-              await firebase.functions().httpsCallable('deleteUser')({ [UID]: row[UID] })
+              await firebase.functions().httpsCallable('deleteUser')({[UID]: row[UID]})
               console.log('Deleted successfully')
               setRowToDelete(undefined)
               await loadMembers()
@@ -391,7 +391,7 @@ function UsersPage({ firebaseUser, allowDelete, allowRead, allowWrite }: Props) 
               customToolbarSelect: (selectedRows) => {
                 return allowDelete &&
                   <IconButton aria-label="Delete" disabled={isSubmitting} onClick={() => {
-                    const { dataIndex } = selectedRows.data[0]
+                    const {dataIndex} = selectedRows.data[0]
                     const row = rows[dataIndex]
                     row && setRowToDelete(row)
                   }}>
@@ -412,7 +412,7 @@ UsersPage.propTypes = {
   firebaseUser: PropTypes.object.isRequired
 }
 
-const mapStateToProps = ({ currentUser: { permissions, firebaseUser } }: IRedisState) => {
+const mapStateToProps = ({currentUser: {permissions, firebaseUser}}: IRedisState) => {
   if (!firebaseUser) {
     throw new Error('missing current user')
   }
