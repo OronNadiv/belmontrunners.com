@@ -102,7 +102,9 @@ const LoggedInState = (params: Params = {}) => {
         return '' // todo: better to show loading spinner
       }
       const filteredProps = { ...props }
+      // @ts-ignore
       delete filteredProps.___currentUser___
+      // @ts-ignore
       delete filteredProps.___isCurrentUserLoaded___
 
       return redirectToRoot ? (

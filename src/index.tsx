@@ -35,6 +35,7 @@ if (!process.env.REACT_APP_STRIPE_PUBLIC_KEY) {
           <MuiThemeProvider theme={theme}>
             <StripeProvider apiKey={process.env.REACT_APP_STRIPE_PUBLIC_KEY}>
               <Elements>
+                {/*@ts-ignore*/}
                 <App />
               </Elements>
             </StripeProvider>
