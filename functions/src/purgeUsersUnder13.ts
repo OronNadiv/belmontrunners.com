@@ -5,7 +5,7 @@ import { User } from './User'
 const BPromise = require('bluebird')
 const moment = require('moment')
 
-export default (admin: Admin.app.App, apiKey: string, shouldDelete: boolean) => {
+const PurgeUsersUnder13 = (admin: Admin.app.App, apiKey: string, shouldDelete: boolean) => {
   const firestore = admin.firestore()
   const deleteUser = DeleteUser(admin, apiKey)
   return async () => {
@@ -30,3 +30,5 @@ export default (admin: Admin.app.App, apiKey: string, shouldDelete: boolean) => 
     }))
   }
 }
+
+export default PurgeUsersUnder13

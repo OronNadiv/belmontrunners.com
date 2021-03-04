@@ -20,7 +20,7 @@ interface StripeConfig {
   }
 }
 
-export default (admin: Admin.app.App, config: StripeConfig) => {
+const Stripe = (admin: Admin.app.App, config: StripeConfig) => {
   const stripeLive = require('stripe')(config.secretKeys.live)
   const stripeTest = require('stripe')(config.secretKeys.test)
   const firestore = admin.firestore()
@@ -122,3 +122,5 @@ export default (admin: Admin.app.App, config: StripeConfig) => {
     return charge
   }
 }
+
+export default Stripe

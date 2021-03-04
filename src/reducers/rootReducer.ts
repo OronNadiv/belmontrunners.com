@@ -3,8 +3,9 @@ import currentUser from './currentUser'
 import { connectRouter } from 'connected-react-router'
 import { History } from 'history'
 
-export default (history: History) =>
+const rootReducer = (history: History) =>
   combineReducers({
     currentUser,
     router: connectRouter(history)
   })
+export default rootReducer

@@ -76,7 +76,7 @@ const getRawWeather = async (appId: string, cityId: string): Promise<RawWeather[
   return res.list
 }
 
-export default (admin: Admin.app.App, appId: string, cityId: string) => {
+const UpdateEvents = (admin: Admin.app.App, appId: string, cityId: string) => {
   const firestore = admin.firestore()
 
   return async () => {
@@ -130,3 +130,5 @@ export default (admin: Admin.app.App, appId: string, cityId: string) => {
     await firestore.collection('events').doc('items').set({ values: events })
   }
 }
+
+export default UpdateEvents

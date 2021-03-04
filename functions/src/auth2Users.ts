@@ -7,7 +7,7 @@ const BPromise = require('bluebird')
 const gravatar = require('gravatar')
 const rp = require('request-promise')
 
-export default (admin: Admin.app.App) => {
+const Auth2Users = (admin: Admin.app.App) => {
   const firestore = admin.firestore()
   const auth = admin.auth()
 
@@ -76,3 +76,5 @@ export default (admin: Admin.app.App) => {
 
   return listAllUsers
 }
+
+export default Auth2Users

@@ -53,11 +53,11 @@ export default function Help() {
           <p><b>User:</b> someone who created an account on our website but is not a member</p>
           <p><b>Subscriber:</b> someone who added their email address via the subscribe form on our website</p>
           <p>
-            A subscriber may later be "promoted" to a user if s/he creates an account using the same email address.
+            A subscriber may later be &quot;promoted&quot; to a user if s/he creates an account using the same email address.
             <br />
-            A user may later be "promoted" to a member if s/he pays the club membership fee.
+            A user may later be &quot;promoted&quot; to a member if s/he pays the club membership fee.
             <br />
-            A member may later be "demoted" to a user if his/her membership expires.
+            A member may later be &quot;demoted&quot; to a user if his/her membership expires.
           </p>
         </Typography>
       </Popover>

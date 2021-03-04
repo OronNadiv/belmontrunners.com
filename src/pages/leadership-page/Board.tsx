@@ -100,7 +100,7 @@ function Team() {
     <section className="team_area p_120">
       <div className="container">
         <div className="main_title">
-          <h2>Board members</h2>
+          <h2>Key members</h2>
         </div>
         <div className="row team_inner">{getTeam()}</div>
       </div>

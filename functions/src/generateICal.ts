@@ -31,7 +31,7 @@ Meeting point: https://goo.gl/maps/${googleMapId}`
   return `${description}${facebookEvent || ''}${googleMap || ''}`
 }
 
-export default () =>
+const GenerateICal = () =>
   async () => {
     try {
       const cal = ical({
@@ -79,3 +79,5 @@ export default () =>
       throw err
     }
   }
+
+export default GenerateICal

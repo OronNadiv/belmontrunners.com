@@ -2,7 +2,7 @@ import * as Admin from 'firebase-admin'
 
 const BPromise = require('bluebird')
 
-export default (admin: Admin.app.App) => {
+const GetPhotoUrl = (admin: Admin.app.App) => {
   const auth = admin.auth()
 
   const listAllUsers = async (nextPageToken?: string) => {
@@ -39,3 +39,5 @@ foundProviderData.photoURL: ${foundProviderData.photoURL}
 
   return listAllUsers
 }
+
+export default GetPhotoUrl

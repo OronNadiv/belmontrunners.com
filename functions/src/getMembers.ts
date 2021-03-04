@@ -35,7 +35,7 @@ const defaultVisibility: Visibility = {
   [GRAVATAR_URL]: VisibilityEnum.MEMBERS
 }
 
-export default (admin: Admin.app.App) => {
+const GetMembers = (admin: Admin.app.App) => {
   const firestore = admin.firestore()
   return async (data: any, context?: https.CallableContext) => {
     if (!context || !context.auth || !context.auth.uid) {
@@ -103,3 +103,5 @@ export default (admin: Admin.app.App) => {
     return users
   }
 }
+
+export default GetMembers

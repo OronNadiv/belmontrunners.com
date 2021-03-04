@@ -8,7 +8,7 @@ const BPromise = require('bluebird')
 const normalizeEmail = require('normalize-email')
 const _ = require('underscore')
 
-export default (admin: Admin.app.App) => {
+const Users2Contacts = (admin: Admin.app.App) => {
   const firestore: FirebaseFirestore.Firestore = admin.firestore()
   return async () => {
     const docRef = firestore.doc('subscribers/items')
@@ -87,3 +87,4 @@ export default (admin: Admin.app.App) => {
     await docRef.set({ [ARRAY_KEY]: contacts })
   }
 }
+export default Users2Contacts

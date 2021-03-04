@@ -6,7 +6,7 @@ import { EMAIL, SUBSCRIBERS_ARRAY_KEY } from './fields'
 const moment = require('moment')
 const _ = require('underscore')
 
-export default (admin: Admin.app.App) => {
+const AddContact = (admin: Admin.app.App) => {
   const firestore = admin.firestore()
 
   return async (data: any, context?: https.CallableContext) => {
@@ -51,3 +51,5 @@ export default (admin: Admin.app.App) => {
     }
   }
 }
+
+export default AddContact

@@ -11,7 +11,7 @@ interface DeleteUserParam {
   email: string
 }
 
-export default (admin: Admin.app.App, apiKey: string) => {
+const DeleteUser =(admin: Admin.app.App, apiKey: string) => {
   const firestore = admin.firestore()
   const auth = admin.auth()
   const contactsDoc = firestore.doc('subscribers/items')
@@ -68,3 +68,5 @@ export default (admin: Admin.app.App, apiKey: string) => {
     await deleteFromMailChimp()
   }
 }
+
+export default DeleteUser

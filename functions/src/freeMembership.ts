@@ -5,7 +5,7 @@ import { UserRecord } from "firebase-functions/lib/providers/auth";
 
 const moment = require("moment");
 
-export default (admin: Admin.app.App) => {
+const FreeMembership = (admin: Admin.app.App) => {
   const firestore = admin.firestore();
 
   return async (user: UserRecord) => {
@@ -29,3 +29,5 @@ export default (admin: Admin.app.App) => {
     }, { merge: true });
   };
 }
+
+export default FreeMembership

@@ -3,7 +3,7 @@ import { User } from './User'
 import calc from './membershipUtils'
 const moment = require('moment')
 
-export default (admin: Admin.app.App) => {
+const ExtendMembership = (admin: Admin.app.App) => {
   const firestore = admin.firestore()
   return async () => {
 
@@ -25,3 +25,5 @@ export default (admin: Admin.app.App) => {
     return await Promise.all(promises)
   }
 }
+
+export default ExtendMembership
