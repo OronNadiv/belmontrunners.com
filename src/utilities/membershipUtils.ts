@@ -11,7 +11,7 @@ interface CalcRes {
   isMembershipExpiresSoon: boolean
 }
 
-export default (userData: CalcParam, duration = moment.duration(1, 'month')): CalcRes => {
+const MembershipUtils = (userData: CalcParam, duration = moment.duration(1, 'month')): CalcRes => {
   const membershipExpiresAt = userData.membershipExpiresAt
 
   const isAMember = membershipExpiresAt && moment().isBefore(moment(membershipExpiresAt))
@@ -31,3 +31,5 @@ export default (userData: CalcParam, duration = moment.duration(1, 'month')): Ca
     wasNeverAMember: !isAMember && !isMembershipExpired
   }
 }
+
+export default MembershipUtils

@@ -1,5 +1,5 @@
 /* global drift */
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useMemo } from "react";
 import * as PropTypes from 'prop-types'
 import { Map as IMap } from 'immutable'
 
@@ -18,8 +18,11 @@ const Drift = ({appId, config, userId = '', attributes}: Props) => {
   // @ts-ignore
   // tslint:disable-next-line:no-parameter-reassignment
   config = new IMap(config)
-  // @ts-ignore
-  const attributesMap = new IMap(attributes)
+  const attributesMap = useMemo(() => {
+    // @ts-ignore
+    return new IMap(attributes);
+  }, [attributes]);
+
   const insertScript = (scriptText: string) => {
     const element = document.createElement('script')
     element.innerText = scriptText
