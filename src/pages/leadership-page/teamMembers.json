@@ -8,32 +8,39 @@
     "website": "www.oronnadiv.com"
   },
   {
-    "name": "Doug Kim",
+    "name": "Jon VanHorn",
     "title": "President",
-    "image": "doug.png",
-    "email": "doug@belmontrunners.com",
-    "facebook": "dougebob",
-    "twitter": "douglasckim"
+    "image": "jon2.png",
+    "email": "jon@belmontrunners.com",
+    "facebook": "jon.vanhorn",
+    "instagram": "thisisjvh"
   },
   {
     "name": "Kelsey Homyk",
-    "title": "Vice-President & Activities Director",
+    "title": "Vice President",
     "image": "kelsey.png",
     "email": "kelsey@belmontrunners.com"
   },
   {
-    "name": "Shelly Kim",
+    "name": "David Haimes",
     "title": "Treasurer",
-    "image": "shelly.png",
-    "email": "shelly@belmontrunners.com",
-    "facebook": "shelly.b.kim"
+    "image": "profile1.png",
+    "email": "david@belmontrunners.com"
   },
   {
-    "name": "Jon VanHorn",
-    "title": "Run Coordinator and Social Media Manager",
-    "image": "jon.png",
-    "email": "jon@belmontrunners.com",
-    "facebook": "jon.vanhorn",
-    "instagram": "thisisjvh"
+    "name": "Erica VanHorn",
+    "title": "Events Coordinator",
+    "image": "erica.png",
+    "email": "erica@belmontrunners.com",
+    "strava": "14346197",
+    "instagram": "ericagreer1"
+  },
+  {
+    "name": "Raimond Galicia",
+    "title": "Social Media",
+    "image": "raimond.png",
+    "email": "raimond@belmontrunners.com",
+    "strava": "48787944",
+    "instagram": "rairuns"
   }
 ]

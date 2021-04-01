@@ -7,6 +7,7 @@ interface ITeamMember {
   email: string
   image: string
   instagram?: string
+  strava?: string
   twitter?: string
   linkedin?: string
   facebook?: string
@@ -83,6 +84,15 @@ const getTeam = () => {
                   <i className="fab fa-instagram" />
                 </a>
               )}
+              {member.strava && (
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={`https://www.strava.com/athletes/${member.strava}`}
+                >
+                  <i className="fab fa-strava" />
+                </a>
+              )}
             </div>
           </div>
           <div className="team_name">
@@ -100,7 +110,7 @@ function Team() {
     <section className="team_area p_120">
       <div className="container">
         <div className="main_title">
-          <h2>Key members</h2>
+          <h2>Leadership</h2>
         </div>
         <div className="row team_inner">{getTeam()}</div>
       </div>
