@@ -50,6 +50,7 @@ const getTeam = () => {
               )}
               {member.facebook && (
                 <a
+                  className='d-none d-sm-inline'
                   target="_blank"
                   rel="noopener noreferrer"
                   href={`https://www.facebook.com/${member.facebook}`}
@@ -59,6 +60,7 @@ const getTeam = () => {
               )}
               {member.linkedin && (
                 <a
+                  className='d-none d-sm-inline'
                   target="_blank"
                   rel="noopener noreferrer"
                   href={`https://www.linkedin.com/in/${member.linkedin}`}
@@ -68,6 +70,7 @@ const getTeam = () => {
               )}
               {member.twitter && (
                 <a
+                  className='d-none d-sm-inline'
                   target="_blank"
                   rel="noopener noreferrer"
                   href={`https://twitter.com/${member.twitter}`}

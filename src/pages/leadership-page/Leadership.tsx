@@ -10,10 +10,10 @@ function Leadership() {
   }, [])
 
   return (
-    <div>
+    <>
       <Board />
       {/*<RunLeaders />*/}
-    </div>
+    </>
   )
 }
 
