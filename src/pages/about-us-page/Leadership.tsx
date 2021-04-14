@@ -14,13 +14,13 @@ interface ITeamMember {
   website: string
 }
 
-const board: ITeamMember[] = _.shuffle(require('./teamMembers.json'))
+const leadership: ITeamMember[] = _.shuffle(require('./teamMembers.json'))
 
 const getTeam = () => {
-  return board.map((member, index) => {
+  return leadership.map((member, index) => {
     return (
-      <div className="col-4 col-sm-4 col-md-3 col-lg-2 mx-auto" key={index}>
-        <div className="team_item">
+      <div className="col-3 mx-auto" key={index}>
+        <div className="team_item  mx-lg-5">
           <div className="team_img">
             {
               <img
@@ -50,7 +50,6 @@ const getTeam = () => {
               )}
               {member.facebook && (
                 <a
-                  className='d-none d-sm-inline'
                   target="_blank"
                   rel="noopener noreferrer"
                   href={`https://www.facebook.com/${member.facebook}`}
@@ -60,7 +59,6 @@ const getTeam = () => {
               )}
               {member.linkedin && (
                 <a
-                  className='d-none d-sm-inline'
                   target="_blank"
                   rel="noopener noreferrer"
                   href={`https://www.linkedin.com/in/${member.linkedin}`}
@@ -70,7 +68,6 @@ const getTeam = () => {
               )}
               {member.twitter && (
                 <a
-                  className='d-none d-sm-inline'
                   target="_blank"
                   rel="noopener noreferrer"
                   href={`https://twitter.com/${member.twitter}`}

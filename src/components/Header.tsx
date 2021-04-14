@@ -38,7 +38,7 @@ import {
   FAQ,
   FORGOT_PASSWORD,
   JOIN,
-  LEADERSHIP,
+  ABOUT_US,
   MEMBERS,
   PROFILE,
   RESET_PASSWORD,
@@ -256,10 +256,10 @@ function Header({ location: { pathname }, isCurrentUserLoaded, firebaseUser, all
                 </>
               }
 
-              <Link to={LEADERSHIP} onClick={handleDrawerClose}>
+              <Link to={ABOUT_US} onClick={handleDrawerClose}>
                 <ListItem button>
                   <ListItemIcon><LeadershipIcon color='primary' /></ListItemIcon>
-                  <ListItemText primary='Leadership' className={classes.drawerLink} />
+                  <ListItemText primary='About Us' className={classes.drawerLink} />
                 </ListItem>
               </Link>
 
@@ -337,9 +337,9 @@ function Header({ location: { pathname }, isCurrentUserLoaded, firebaseUser, all
               {
                 !isSmallDevice &&
                 <>
-                  <Link to={LEADERSHIP} className={classes.menuItem}>
+                  <Link to={ABOUT_US} className={classes.menuItem}>
                     <div className='text-white d-flex align-items-center'>
-                      <span className='mx-2'>Leadership</span>
+                      <span className='mx-2'>About Us</span>
                     </div>
                   </Link>
                   <Link to={FAQ} className={classes.menuItem}>

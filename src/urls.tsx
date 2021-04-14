@@ -13,7 +13,7 @@ export const CONTACTS = '/contacts'
 export const FAQ = '/faq'
 export const PROFILE = '/profile'
 export const ACCOUNT = '/account'
-export const LEADERSHIP = '/leadership'
+export const ABOUT_US = '/about-us'
 export const MEMBERS = '/members'
 
 // documents
