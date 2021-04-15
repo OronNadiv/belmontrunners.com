@@ -11,9 +11,9 @@ function AboutUsPage() {
 
   return (
     <>
-      <History />
       <MissionStatement />
       <Leadership />
+      <History />
       {/*<RunLeaders />*/}
     </>
   )
