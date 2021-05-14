@@ -21,5 +21,5 @@ export const TOS_FILE_NAME = '2019-04-01_tos.pdf'
 export const TOS = `https://www.belmontrunners.com/documents/${TOS_FILE_NAME}`
 export const PRIVACY_POLICY_FILE_NAME = '2019-05-18_privacy_policy.pdf'
 export const PRIVACY_POLICY = `https://www.belmontrunners.com/documents/${PRIVACY_POLICY_FILE_NAME}`
-export const WAVER_FILE_NAME = '2019-05-18_waver.pdf'
+export const WAVER_FILE_NAME = '2001-05-14_waver_rev_3.0.pdf'
 export const WAVER = `https://www.belmontrunners.com/documents/${WAVER_FILE_NAME}`
