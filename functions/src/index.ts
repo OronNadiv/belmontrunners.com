@@ -11,7 +11,6 @@ import Users2Contacts from './users2Contacts'
 import * as functions from 'firebase-functions'
 import * as Admin from 'firebase-admin'
 import { EMAIL } from './fields'
-import FreeMembership from './freeMembership'
 
 const admin: Admin.app.App = Admin.initializeApp()
 const firestore = admin.firestore()
@@ -29,7 +28,6 @@ const contacts2MailChimp = Contacts2MailChimp(admin, apiKey)
 const deleteUserImpl = DeleteUser(admin, apiKey)
 const generateICal = GenerateICal()
 const getMembersImpl = GetMembers(admin)
-const freeMembershipImpl = FreeMembership(admin)
 const purgeUsersUnder13 = PurgeUsersUnder13(admin, apiKey, false)
 const stripeImpl = Stripe(admin, { membershipFeeInCents: membership_fee_in_cents, secretKeys: { live, test } })
 const users2Contacts = Users2Contacts(admin)
@@ -122,9 +120,6 @@ export const addContact = functions
 export const getMembers = functions
   .runWith({ timeoutSeconds: 30, memory: '512MB' })
   .https.onCall(getMembersImpl)
-
-export const freeMembership = functions
-  .auth.user().onCreate(freeMembershipImpl)
 
 export const deleteUser = functions
   .runWith({ timeoutSeconds: 30, memory: '512MB' })

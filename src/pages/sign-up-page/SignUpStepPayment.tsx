@@ -17,7 +17,7 @@ import calc from '../../utilities/membershipUtils'
 import { IRedisState, IUser } from '../../entities/User'
 import { IUpdateUserData } from '../../reducers/currentUser'
 
-const MEMBERSHIP_FEE_ADULT = 25
+const MEMBERSHIP_FEE_ADULT = 20
 const MEMBERSHIP_FEE_KID = 15
 
 interface StripeResponse {
@@ -182,7 +182,7 @@ function SignUpStepPayment({
     return (
       <>
         <h6 className="mt-3">Membership fees</h6>
-        &bull; Adult (18 and over): $25
+        &bull; Adult (18 and over): $20
         <br />
         &bull; Kids: $15.
         <br />
@@ -190,12 +190,12 @@ function SignUpStepPayment({
           Total amount: ${totalAmount > 0 ? totalAmount : ''}
         </h4>
         {membershipExpiresAt && (
-          <div className="text-warning mb-2 text-center">
+          <div className="text-success mb-3 text-center">
             {moment(membershipExpiresAt).isAfter(moment())
-              ? `Membership will expire on ${moment(membershipExpiresAt).format(
+              ? `Your current membership expires on ${moment(membershipExpiresAt).format(
                 'MMMM Do YYYY'
               )}`
-              : `Membership expired on ${moment(membershipExpiresAt).format(
+              : `Your membership expired on ${moment(membershipExpiresAt).format(
                 'MMMM Do YYYY'
               )}`}
           </div>

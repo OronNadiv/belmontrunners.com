@@ -90,7 +90,8 @@ const LoggedInState = (params: Params = {}) => {
         // console.log(
         //   "user switched state to not logged in and it's not allowed."
         // )
-        return setRedirectToRoot(true)
+        setRedirectToRoot(true)
+        return
       }, [
         ___currentUser___,
         initialIsLoggedIn,

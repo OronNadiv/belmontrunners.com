@@ -218,8 +218,6 @@ function Notifications({ firebaseUser, userData, updateUserData }: Props) {
   }
 
   useEffect(() => {
-    // NOTE: Disabling registration.
-    return
     if (!firebaseUser) {
       setNotification(undefined)
       return

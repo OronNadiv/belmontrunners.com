@@ -146,48 +146,45 @@ export default function FaqPage() {
         </ExpansionPanelSummary>
         <ExpansionPanelDetails classes={classesExpansionPanelDetails}>
           <Typography>
-            <p><s>Annual membership in Belmont Runners is $25. This includes the official club t-shirt. This also helps to
+            Annual membership in Belmont Runners is $20. This includes the official club t-shirt. This also helps to
             cover the costs of running the club as a non-profit organization, managing the website, club membership in
             the Road Runners Club of America, providing general liability insurance that covers accidental medical
-              events, and supporting the club’s programs and events.</s></p>
-
-            <b>Due to COVID-19, all membership fees are waived until summer 2021. New members of the club should still
-              create an account and accept the terms of service, waiver, and privacy policy</b>
+              events, and supporting the club’s programs and events.
           </Typography>
         </ExpansionPanelDetails>
       </ExpansionPanel>
 
-      {/*<ExpansionPanel classes={classesExpansionPanel} expanded={expanded === 'panel6'}*/}
-      {/*  onChange={handleChange('panel6')}>*/}
-      {/*  <ExpansionPanelSummary classes={classesExpansionPanelSummary} aria-controls='panel6d-content'*/}
-      {/*    id='panel6d-header' expandIcon={<ExpandMoreIcon />}>*/}
-      {/*    <Typography>May I try out running with your group before becoming a member?</Typography>*/}
-      {/*  </ExpansionPanelSummary>*/}
-      {/*  <ExpansionPanelDetails classes={classesExpansionPanelDetails}>*/}
-      {/*    <Typography>*/}
-      {/*      Yes! Join us for up to two runs. If you like us, we ask that you join our community of runners and*/}
-      {/*      participate in promoting health and fitness.*/}
-      {/*    </Typography>*/}
-      {/*  </ExpansionPanelDetails>*/}
-      {/*</ExpansionPanel>*/}
+      <ExpansionPanel classes={classesExpansionPanel} expanded={expanded === 'panel6'}
+        onChange={handleChange('panel6')}>
+        <ExpansionPanelSummary classes={classesExpansionPanelSummary} aria-controls='panel6d-content'
+          id='panel6d-header' expandIcon={<ExpandMoreIcon />}>
+          <Typography>May I try out running with your group before becoming a member?</Typography>
+        </ExpansionPanelSummary>
+        <ExpansionPanelDetails classes={classesExpansionPanelDetails}>
+          <Typography>
+            Yes! Join us for up to two runs. If you like us, we ask that you join our community of runners and
+            participate in promoting health and fitness.
+          </Typography>
+        </ExpansionPanelDetails>
+      </ExpansionPanel>
 
-      {/*<ExpansionPanel classes={classesExpansionPanel} expanded={expanded === 'panel7'}*/}
-      {/*  onChange={handleChange('panel7')}>*/}
-      {/*  <ExpansionPanelSummary classes={classesExpansionPanelSummary} aria-controls='panel7d-content'*/}
-      {/*    id='panel7d-header' expandIcon={<ExpandMoreIcon />}>*/}
-      {/*    <Typography>What are some of the benefits of joining Belmont Runners?</Typography>*/}
-      {/*  </ExpansionPanelSummary>*/}
-      {/*  <ExpansionPanelDetails classes={classesExpansionPanelDetails}>*/}
-      {/*    <Typography>*/}
-      {/*      First and foremost, you can be part of a local community of runners who enjoy social connections with other*/}
-      {/*      runners and can support your fitness goals. Membership includes an official club t-shirt, access to free or*/}
-      {/*      heavily discounted workshops and events. Recent or planned events include a foam roller workshop for*/}
-      {/*      runners, yoga for runners, nutritional classes, and visits to local breweries. Members also get great*/}
-      {/*      discounts on registering for local races and have health insurance coverage should they be injured during*/}
-      {/*      group events.*/}
-      {/*    </Typography>*/}
-      {/*  </ExpansionPanelDetails>*/}
-      {/*</ExpansionPanel>*/}
+      <ExpansionPanel classes={classesExpansionPanel} expanded={expanded === 'panel7'}
+        onChange={handleChange('panel7')}>
+        <ExpansionPanelSummary classes={classesExpansionPanelSummary} aria-controls='panel7d-content'
+          id='panel7d-header' expandIcon={<ExpandMoreIcon />}>
+          <Typography>What are some of the benefits of joining Belmont Runners?</Typography>
+        </ExpansionPanelSummary>
+        <ExpansionPanelDetails classes={classesExpansionPanelDetails}>
+          <Typography>
+            First and foremost, you can be part of a local community of runners who enjoy social connections with other
+            runners and can support your fitness goals. Membership includes an official club t-shirt, access to free or
+            heavily discounted workshops and events. Recent or planned events include a foam roller workshop for
+            runners, yoga for runners, nutritional classes, and visits to local breweries. Members also get great
+            discounts on registering for local races and have health insurance coverage should they be injured during
+            group events.
+          </Typography>
+        </ExpansionPanelDetails>
+      </ExpansionPanel>
 
       <ExpansionPanel classes={classesExpansionPanel} expanded={expanded === 'panel8'}
         onChange={handleChange('panel8')}>
