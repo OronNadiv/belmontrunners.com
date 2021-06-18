@@ -184,7 +184,7 @@ function SignUpStepPayment({
         <h6 className="mt-3">Membership fees</h6>
         &bull; Adult (18 and over): $20
         <br />
-        &bull; Kids: $15.
+        &bull; Kids: $10.
         <br />
         <h4 className="my-4">
           Total amount: ${totalAmount > 0 ? totalAmount : ''}
@@ -224,28 +224,15 @@ function SignUpStepPayment({
   return (
     <div className="justify-content-center">
       <h5 className="mt-5">Benefits to being part of Belmont Runners</h5>
-      &bull; Each member receives the Belmont Runners official&nbsp;
-      <a
-        target="_blank"
-        rel="noopener noreferrer"
-        href={`https://www.belmontrunners.com/documents/running-shirt.png`}
-      >
-        Running Shirt
-      </a>
-      <br />
       &bull; Training at group runs and walks
       <br />
       &bull; Free or discounted workshops, clinics, and classes
-      <br />
-      &bull; Discounted entry to the Belmont Water Dog Run
       <br />
       &bull; Discounted entry to other local races
       <br />
       &bull; Membership with the Road Runners Club of America
       <br />
       &bull; Liability insurance coverage
-      <br />
-      &bull; Discounts at local restaurants
       <br />
       &bull; Social events with fun, active local runners and walkers
       <br />
