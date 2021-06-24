@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react'
 import { Button } from '@material-ui/core'
 import { ACTION_COLOR, LINK_COLOR, Snackbar } from '../../components/Snackbar'
-import { DID_RECEIVED_SHIRT } from '../../fields'
 import moment from 'moment/moment'
 import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -17,7 +16,6 @@ import { IRedisState, IUser, IUserOptionalProps } from '../../entities/User'
 import { IUpdateUserData } from '../../reducers/currentUser'
 
 const POPUP_PAY_MEMBERSHIP_SNOOZED_AT = 'popupPayMembershipSnoozedAt'
-const POPUP_RECEIVED_SHIRT_AT = 'popupReceivedShirtSnoozedAt'
 
 interface Props {
   firebaseUser: firebase.User
@@ -143,87 +141,12 @@ function Notifications({ firebaseUser, userData, updateUserData }: Props) {
     return true
   }
 
-  const processReceivedShirt = () => {
-    console.log('processReceivedShirt called.', userDataJS)
-    const membershipStatus = calc(userDataJS)
-
-    if (
-      wasPopupDismissed({ key: POPUP_RECEIVED_SHIRT_AT }) ||
-      membershipStatus.wasNeverAMember ||
-      membershipStatus.isMembershipExpired
-    ) {
-      return false
-    }
-
-    if (userDataJS[DID_RECEIVED_SHIRT]) {
-      return false
-    }
-
-    // ok, we can show the popup.
-
-    const showDougShelly = () => {
-      showNotification({
-        message:
-          'No problem. Please reach out to Doug or Shelly on the next Saturday run.',
-        action: (
-          <Button
-            style={{ color: ACTION_COLOR }}
-            size="small"
-            onClick={async () =>
-              await dismissNotification({
-                key: POPUP_RECEIVED_SHIRT_AT
-              })
-            }
-          >
-            Remind me later
-          </Button>
-        )
-      })
-    }
-    showNotification({
-      message: 'Did you receive a running shirt',
-      action: (
-        <>
-          <Button
-            color="secondary"
-            size="small"
-            onClick={async () => {
-              try {
-                const values: IUserOptionalProps = { [DID_RECEIVED_SHIRT]: true }
-                await updateUserData(values, { merge: true })
-                setNotification(undefined)
-              } catch (error) {
-                Sentry.captureException(error)
-                console.error(
-                  'error while updating [DID_RECEIVED_SHIRT] to true.  error:',
-                  error
-                )
-              }
-            }}
-          >
-            YES
-          </Button>{' '}
-          /{' '}
-          <Button
-            color="secondary"
-            size="small"
-            onClick={() => showDougShelly()}
-          >
-            NO
-          </Button>
-        </>
-      )
-    })
-    return true
-  }
-
   useEffect(() => {
     if (!firebaseUser) {
       setNotification(undefined)
       return
     }
     processPayMembershipNotification() ||
-    processReceivedShirt() ||
     setNotification(undefined)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [firebaseUser, userData])

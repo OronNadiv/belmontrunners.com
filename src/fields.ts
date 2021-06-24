@@ -14,7 +14,6 @@ export const GENDER = 'gender'
 export const CREATED_AT = 'createdAt'
 export const EMAIL_VERIFIED = 'emailVerified'
 export const MEMBERSHIP_EXPIRES_AT = 'membershipExpiresAt'
-export const DID_RECEIVED_SHIRT = 'didReceivedShirt'
 export const NOT_INTERESTED_IN_BECOMING_A_MEMBER =
   'notInterestedInBecomingAMember'
 export const GRAVATAR_URL = 'gravatarUrl'

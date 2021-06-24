@@ -9,7 +9,6 @@ import {
   CITY,
   CREATED_AT,
   DATE_OF_BIRTH,
-  DID_RECEIVED_SHIRT,
   DISPLAY_NAME,
   EMAIL,
   EMAIL_VERIFIED,
@@ -81,7 +80,6 @@ function UsersPage({ firebaseUser, allowDelete, allowRead, allowWrite }: Props) 
           [PHOTO_URL]: data.photoURL || '',
           [DISPLAY_NAME]: data.displayName,
           [EMAIL]: data.email,
-          [DID_RECEIVED_SHIRT]: !!data.didReceivedShirt,
           [ADDRESS1]: data.address1 || '',
           [ADDRESS2]: data.address2 || '',
           [CITY]: (data.city || '').toLowerCase().trim()
@@ -133,11 +131,6 @@ function UsersPage({ firebaseUser, allowDelete, allowRead, allowWrite }: Props) 
   useEffect(() => {
     allowRead && loadMembers()
   }, [allowRead, loadMembers])
-
-  const handleToggleReceivedShirt = async (userData: IUserWithMembershipStatus, isChecked: boolean) => {
-    const userRef = firestore.doc(`users/${userData.uid}`)
-    await userRef.set({ [DID_RECEIVED_SHIRT]: isChecked }, { merge: true })
-  }
 
   const handleNotInterested = async (userData: IUserWithMembershipStatus, isChecked: boolean) => {
     const userRef = firestore.doc(`users/${userData.uid}`)
@@ -277,35 +270,6 @@ function UsersPage({ firebaseUser, allowDelete, allowRead, allowWrite }: Props) 
       name: MEMBERSHIP_STATUS,
       label: 'Membership Status',
       options: {}
-    },
-    {
-      name: DID_RECEIVED_SHIRT,
-      label: 'Received Shirt',
-      options: {
-        searchable: false,
-
-        // eslint-disable-next-line react/display-name
-        customBodyRender: (value: any, tableMeta: any, updateValue: (s: any, c: any, p: any) => any) => {
-          // console.log(tableMeta)
-
-          return (
-            <Checkbox
-              checked={!!value}
-              disabled={!allowWrite}
-              onChange={async (event, isChecked) => {
-                try {
-                  const userData = _.findWhere(rows, { [UID]: tableMeta.rowData[0] }) as IUserWithMembershipStatus
-                  await handleToggleReceivedShirt(userData, isChecked)
-                  updateValue(isChecked, undefined, undefined)
-                } catch (error) {
-                  Sentry.captureException(error)
-                  console.error(error)
-                }
-              }}
-            />
-          )
-        }
-      }
     },
     {
       name: CREATED_AT,
