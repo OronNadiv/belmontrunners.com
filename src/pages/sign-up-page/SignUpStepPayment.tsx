@@ -18,7 +18,7 @@ import { IRedisState, IUser } from '../../entities/User'
 import { IUpdateUserData } from '../../reducers/currentUser'
 
 const MEMBERSHIP_FEE_ADULT = 20
-const MEMBERSHIP_FEE_KID = 15
+const MEMBERSHIP_FEE_KID = 10
 
 interface StripeResponse {
   error?: { message: string }
@@ -147,18 +147,31 @@ function SignUpStepPayment({
     if (!needToPay) {
       if (youngerThan13) {
         return (
-          <>
-            <div className="text-warning text-justify mt-4">
-              Kids 12 and under are welcome to join the club, but cannot
-              register online. For more information, please talk to one of the
-              board members during your next run
-            </div>
-            <div className="text-justify mt-4">
-              Due to the California Consumer Privacy Act (CCPA) and the
-              Children&#39;s Online Privacy Protection Act (COPPA), this account
-              will be automatically disabled within 24 hours.
-            </div>
-          </>
+            <>
+              <div className="text-justify mt-4">
+                <p className="text-danger">
+                  Kids 12 and under are welcome to join the club, as long as
+                  they are accompanied by an Adult or Legal Guardian. However,
+                  due to the California CCPA and COPPA, the club cannot allow
+                  minors under 13 to register with our website.
+                </p>
+                <p>
+                  If you and your child would like to join us on a run, please
+                  talk to one of the Board Members or Run Leaders at a group run
+                  in order to sign the liability waiver in person.
+                </p>
+                <p>
+                  In order to keep your child&apos;s information safe, this account
+                  will be automatically disabled within 24 hours.
+                </p>
+                <p>
+                  Any questions, don&apos;t hesitate to contact us at <a
+                    href='mailto://info@belmontrunners.com'
+                    target='_blank'
+                    rel='noreferrer noopener'>info@belmontrunners.com</a>.
+                </p>
+              </div>
+            </>
         )
       }
 
