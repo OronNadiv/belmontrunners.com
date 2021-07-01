@@ -258,6 +258,27 @@ export default function FaqPage() {
         </ExpansionPanel>
 
         <ExpansionPanel classes={classesExpansionPanel}
+                        expanded={expanded === 'panel80'}
+                        onChange={handleChange('panel80')}>
+          <ExpansionPanelSummary classes={classesExpansionPanelSummary}
+                                 aria-controls="panel80d-content"
+                                 id="panel80d-header"
+                                 expandIcon={<ExpandMoreIcon/>}>
+            <Typography>Can my child join the club?</Typography>
+          </ExpansionPanelSummary>
+          <ExpansionPanelDetails classes={classesExpansionPanelDetails}>
+            <Typography>
+              Of course! For children between the ages of 13 and 17, create an
+              account and pay the $10 youth membership fee. Children under 13
+              are welcome to join us as long as they are accompanied by a
+              parent/guardian. For children under 13, there is no need to
+              register an online account. Talk to a run leader or board member
+              at the next run to sign the liability waiver for your child.
+            </Typography>
+          </ExpansionPanelDetails>
+        </ExpansionPanel>
+
+        <ExpansionPanel classes={classesExpansionPanel}
                         expanded={expanded === 'panel9'}
                         onChange={handleChange('panel9')}>
           <ExpansionPanelSummary classes={classesExpansionPanelSummary}
