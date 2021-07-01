@@ -28,7 +28,8 @@ import {
   PowerSettingsNew as SignOutIcon,
   SupervisedUserCircle as LeadershipIcon,
   QuestionAnswer as FAQIcon,
-  Settings as AccountIcon
+  Settings as AccountIcon,
+  ShoppingCart as StoreIcon
 } from '@material-ui/icons'
 import Profile from './Profile'
 import {
@@ -44,6 +45,7 @@ import {
   RESET_PASSWORD,
   ROOT,
   SIGN_IN,
+  STORE,
   USERS
 } from '../urls'
 import { RouteComponentProps } from 'react-router'
@@ -277,6 +279,13 @@ function Header({ location: { pathname }, isCurrentUserLoaded, firebaseUser, all
                 </ListItem>
               </a>
 
+              <a href={STORE} onClick={handleDrawerClose}>
+                <ListItem button>
+                  <ListItemIcon><StoreIcon color='primary' /></ListItemIcon>
+                  <ListItemText primary='Store' className={classes.drawerLink} />
+                </ListItem>
+              </a>
+
               {
                 isMember &&
                 <Link to={MEMBERS} onClick={handleDrawerClose}>
@@ -350,6 +359,11 @@ function Header({ location: { pathname }, isCurrentUserLoaded, firebaseUser, all
                   <a href={BLOG} className={classes.menuItem}>
                     <div className='text-white d-flex align-items-center'>
                       <span className='mx-2'>Latest news</span>
+                    </div>
+                  </a>
+                  <a href={STORE} className={classes.menuItem}>
+                    <div className='text-white d-flex align-items-center'>
+                      <span className='mx-2'>Store</span>
                     </div>
                   </a>
                 </>
