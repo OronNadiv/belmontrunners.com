@@ -28,6 +28,7 @@ import {
   PersonAdd as JoinUsIcon,
   PowerSettingsNew as SignOutIcon,
   SupervisedUserCircle as LeadershipIcon,
+  Schedule as ScheduleIcon,
   QuestionAnswer as FAQIcon,
   Settings as AccountIcon,
   ShoppingCart as StoreIcon
@@ -275,12 +276,12 @@ function Header({ location: { pathname }, isCurrentUserLoaded, firebaseUser, all
                 </ListItem>
               </Link>
 
-              <a onClick={() => {handleDrawerClose(); handleScheduleClicked();}} className={classes.menuItem}>
+              <div onClick={() => {handleDrawerClose(); handleScheduleClicked();}}>
                 <ListItem button>
-                  <ListItemIcon><LeadershipIcon color='primary' /></ListItemIcon>
+                  <ListItemIcon><ScheduleIcon color='primary' /></ListItemIcon>
                   <ListItemText primary='Schedule' className={classes.drawerLink} />
                 </ListItem>
-              </a>
+              </div>
 
               <Link to={FAQ} onClick={handleDrawerClose}>
                 <ListItem button>
@@ -368,11 +369,11 @@ function Header({ location: { pathname }, isCurrentUserLoaded, firebaseUser, all
                       <span className='mx-2'>About Us</span>
                     </div>
                   </Link>
-                  <a onClick={handleScheduleClicked} className={classes.menuItem}>
+                  <div onClick={handleScheduleClicked} className={classes.menuItem}>
                     <div className='text-white d-flex align-items-center'>
                       <span className='mx-2'>SCHEDULE</span>
                     </div>
-                  </a>
+                  </div>
                   <Link to={FAQ} className={classes.menuItem}>
                     <div className='text-white d-flex align-items-center'>
                       <span className='mx-2'>FAQ</span>
