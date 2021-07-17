@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
+import { scroller } from 'react-scroll'
 import {
   AppBar,
   Button,
@@ -143,7 +144,8 @@ function Header({ location: { pathname }, isCurrentUserLoaded, firebaseUser, all
     menuItem: {
       font: '500 12px/80px "Roboto", sans-serif',
       textTransform: 'uppercase',
-      color: 'white'
+      color: 'white',
+      cursor: 'pointer'
     },
     drawer: {
       width: DRAWER_WIDTH,
@@ -183,6 +185,14 @@ function Header({ location: { pathname }, isCurrentUserLoaded, firebaseUser, all
       return
     }
     setShowDrawer(false)
+  }
+
+  const handleScheduleClicked = () => {
+    scroller.scrollTo('events', {
+      duration: 500,
+      smooth: true,
+      offset: -120
+    })
   }
 
   const isSignedOut: boolean = isCurrentUserLoaded && !firebaseUser
@@ -264,6 +274,13 @@ function Header({ location: { pathname }, isCurrentUserLoaded, firebaseUser, all
                   <ListItemText primary='About Us' className={classes.drawerLink} />
                 </ListItem>
               </Link>
+
+              <a onClick={() => {handleDrawerClose(); handleScheduleClicked();}} className={classes.menuItem}>
+                <ListItem button>
+                  <ListItemIcon><LeadershipIcon color='primary' /></ListItemIcon>
+                  <ListItemText primary='Schedule' className={classes.drawerLink} />
+                </ListItem>
+              </a>
 
               <Link to={FAQ} onClick={handleDrawerClose}>
                 <ListItem button>
@@ -351,6 +368,11 @@ function Header({ location: { pathname }, isCurrentUserLoaded, firebaseUser, all
                       <span className='mx-2'>About Us</span>
                     </div>
                   </Link>
+                  <a onClick={handleScheduleClicked} className={classes.menuItem}>
+                    <div className='text-white d-flex align-items-center'>
+                      <span className='mx-2'>SCHEDULE</span>
+                    </div>
+                  </a>
                   <Link to={FAQ} className={classes.menuItem}>
                     <div className='text-white d-flex align-items-center'>
                       <span className='mx-2'>FAQ</span>
