@@ -309,13 +309,11 @@ export default function FaqPage() {
           <ExpansionPanelDetails classes={classesExpansionPanelDetails}>
             <Typography>
               If you have general questions, we have a chat on the bottom right
-              of this page. You can
-              also call us <a href='tel:650-239-6300' target='_blank'
-                              rel='noreferrer noopener'>(650) 239-6300</a> or
-              email us (<a href='mailto://info@belmontrunners.com'
-                           target='_blank'
-                           rel='noreferrer noopener'>info@belmontrunners.com</a>)
-              and we can answer your questions.
+              of this page. You can email us at <a
+                href='mailto://info@belmontrunners.com'
+                target='_blank'
+                rel='noreferrer noopener'>info@belmontrunners.com</a> and we can
+              answer your questions.
             </Typography>
           </ExpansionPanelDetails>
         </ExpansionPanel>

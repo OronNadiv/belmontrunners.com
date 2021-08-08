@@ -4,7 +4,7 @@ import LoggedInState from '../../components/HOC/LoggedInState'
 import { connect } from 'react-redux'
 import { sendEmailVerification as sendEmailVerificationAction } from '../../reducers/currentUser'
 import MyProfileForm from './MyProfileForm'
-import MyProfileFacebook from './MyProfileFacebook'
+// import MyProfileFacebook from './MyProfileFacebook'
 import { animateScroll } from 'react-scroll'
 import { compose } from 'underscore'
 import { IRedisState } from '../../entities/User'
@@ -27,10 +27,10 @@ function MyProfilePage({ firebaseUser }: Props) {
   return (
     firebaseUser && (
       <div className="mx-auto py-5 px-3" style={{ maxWidth: 500 }}>
-        <MyProfileFacebook
-          onSubmitting={handleSubmissionChanged}
-          isSubmitting={isSubmitting}
-        />
+        {/*<MyProfileFacebook*/}
+        {/*  onSubmitting={handleSubmissionChanged}*/}
+        {/*  isSubmitting={isSubmitting}*/}
+        {/*/>*/}
         <MyProfileForm
           onSubmitting={handleSubmissionChanged}
           isSubmitting={isSubmitting}

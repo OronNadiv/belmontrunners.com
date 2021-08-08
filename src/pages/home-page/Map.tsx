@@ -44,15 +44,15 @@ function Map({ google }: { google: any }) {
                 <p>Send us your query anytime!</p>
               </div>
             </div>
-            <div className="media">
-              <div className="d-flex">
-                <i className="lnr lnr-phone-handset" />
-              </div>
-              <div className="media-body">
-                <h4>Phone number</h4>
-                <p>(650) 239-6300</p>
-              </div>
-            </div>
+            {/*<div className="media">*/}
+            {/*  <div className="d-flex">*/}
+            {/*    <i className="lnr lnr-phone-handset" />*/}
+            {/*  </div>*/}
+            {/*  <div className="media-body">*/}
+            {/*    <h4>Phone number</h4>*/}
+            {/*    <p>(650) 123-4567</p>*/}
+            {/*  </div>*/}
+            {/*</div>*/}
           </div>
         </div>
       </div>
