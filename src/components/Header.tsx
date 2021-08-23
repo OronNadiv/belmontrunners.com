@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
-import { scroller } from 'react-scroll'
 import {
   AppBar,
   Button,
@@ -48,7 +47,7 @@ import {
   ROOT,
   SIGN_IN,
   STORE,
-  USERS
+  USERS, SCHEDULE
 } from '../urls'
 import { RouteComponentProps } from 'react-router'
 import { Link, withRouter } from 'react-router-dom'
@@ -188,14 +187,6 @@ function Header({ location: { pathname }, isCurrentUserLoaded, firebaseUser, all
     setShowDrawer(false)
   }
 
-  const handleScheduleClicked = () => {
-    scroller.scrollTo('events', {
-      duration: 500,
-      smooth: true,
-      offset: -120
-    })
-  }
-
   const isSignedOut: boolean = isCurrentUserLoaded && !firebaseUser
   const isSignedIn: boolean = isCurrentUserLoaded && !!firebaseUser
 
@@ -276,12 +267,12 @@ function Header({ location: { pathname }, isCurrentUserLoaded, firebaseUser, all
                 </ListItem>
               </Link>
 
-              <div onClick={() => {handleDrawerClose(); handleScheduleClicked();}}>
+              <a href={SCHEDULE} onClick={handleDrawerClose}>
                 <ListItem button>
                   <ListItemIcon><ScheduleIcon color='primary' /></ListItemIcon>
                   <ListItemText primary='Schedule' className={classes.drawerLink} />
                 </ListItem>
-              </div>
+              </a>
 
               <Link to={FAQ} onClick={handleDrawerClose}>
                 <ListItem button>
@@ -364,16 +355,17 @@ function Header({ location: { pathname }, isCurrentUserLoaded, firebaseUser, all
               {
                 !isSmallDevice &&
                 <>
+
+                  <a href={SCHEDULE} className={classes.menuItem}>
+                    <div className='text-white d-flex align-items-center'>
+                      <span className='mx-2'>SCHEDULE</span>
+                    </div>
+                  </a>
                   <Link to={ABOUT_US} className={classes.menuItem}>
                     <div className='text-white d-flex align-items-center'>
                       <span className='mx-2'>About Us</span>
                     </div>
                   </Link>
-                  <div onClick={handleScheduleClicked} className={classes.menuItem}>
-                    <div className='text-white d-flex align-items-center'>
-                      <span className='mx-2'>SCHEDULE</span>
-                    </div>
-                  </div>
                   <Link to={FAQ} className={classes.menuItem}>
                     <div className='text-white d-flex align-items-center'>
                       <span className='mx-2'>FAQ</span>
