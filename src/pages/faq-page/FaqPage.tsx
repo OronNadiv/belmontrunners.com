@@ -86,16 +86,19 @@ export default function FaqPage() {
                                  aria-controls="panel1d-content"
                                  id="panel1d-header"
                                  expandIcon={<ExpandMoreIcon/>}>
-            <Typography>Do I have to be a fast runner?</Typography>
+            <Typography>I don&apos;t consider myself a
+              very &quot;fast&quot; runner. Will I be
+              left behind?</Typography>
           </ExpansionPanelSummary>
 
           <ExpansionPanelDetails classes={classesExpansionPanelDetails}>
             <Typography>
-              No. Our club is meant for runners of all abilities. We want to
-              support anyone who likes running as a way of
-              keeping healthy and fit. Our group runs can accommodate fast and
-              slow runners and always offers at least two
-              distances.
+              Absolutely not. Our club is open to any runner of any ability. Our
+              group runs are meant to be more casual and at a conversational
+              pace. We do generally split off into natural pace groups depending
+              on the size of the group. Also during group runs, we have several
+              stops built in to allow everyone to catch up. We support anyone
+              who likes running as a way of keeping healthy and fit.
             </Typography>
           </ExpansionPanelDetails>
         </ExpansionPanel>
@@ -258,11 +261,75 @@ export default function FaqPage() {
         </ExpansionPanel>
 
         <ExpansionPanel classes={classesExpansionPanel}
-                        expanded={expanded === 'panel80'}
-                        onChange={handleChange('panel80')}>
+                        expanded={expanded === 'panel82'}
+                        onChange={handleChange('panel82')}>
           <ExpansionPanelSummary classes={classesExpansionPanelSummary}
-                                 aria-controls="panel80d-content"
-                                 id="panel80d-header"
+                                 aria-controls="panel82d-content"
+                                 id="panel82d-header"
+                                 expandIcon={<ExpandMoreIcon/>}>
+            <Typography>Do you cancel your runs for wildfire smoke?</Typography>
+          </ExpansionPanelSummary>
+          <ExpansionPanelDetails classes={classesExpansionPanelDetails}>
+            <Typography>
+              We take our runner’s health very seriously. If the local Air
+              Quality Index is over 80 we will call off our group runs. The
+              closest official government reading can be found at the <a
+                target="_blank" rel="noopener noreferrer"
+                href="https://baaqmdmapsprod.azurewebsites.net/map-air-quality-home.html">BAAQMD</a> website
+              (check the Redwood City sensor). If you use a resource
+              like <a target="_blank" rel="noopener noreferrer"
+                      href="https://www.purpleair.com/map?opt=1/mAQI/a10/cC0#13.25/37.51397/-122.30054">Purple
+              Air</a>, don’t forget to apply the US EPA filter, and to turn off
+              indoor sensors.
+            </Typography>
+          </ExpansionPanelDetails>
+        </ExpansionPanel>
+
+        <ExpansionPanel classes={classesExpansionPanel}
+                        expanded={expanded === 'panel83'}
+                        onChange={handleChange('panel83')}>
+          <ExpansionPanelSummary classes={classesExpansionPanelSummary}
+                                 aria-controls="panel83d-content"
+                                 id="panel83d-header"
+                                 expandIcon={<ExpandMoreIcon/>}>
+            <Typography>Do you cancel your group runs for heat?</Typography>
+          </ExpansionPanelSummary>
+          <ExpansionPanelDetails classes={classesExpansionPanelDetails}>
+            <Typography>
+              Yes, if temperatures are over 90°F (32°C) we will cancel our group
+              runs. For runs over 80°F (26.6°C), we will advise our runners to
+              take proper precautions (bring water, slow down paces, etc).
+            </Typography>
+          </ExpansionPanelDetails>
+        </ExpansionPanel>
+
+        <ExpansionPanel classes={classesExpansionPanel}
+                        expanded={expanded === 'panel84'}
+                        onChange={handleChange('panel84')}>
+          <ExpansionPanelSummary classes={classesExpansionPanelSummary}
+                                 aria-controls="panel84d-content"
+                                 id="panel84d-header"
+                                 expandIcon={<ExpandMoreIcon/>}>
+            <Typography>How do I get a Club Member Shirt?</Typography>
+          </ExpansionPanelSummary>
+          <ExpansionPanelDetails classes={classesExpansionPanelDetails}>
+            <Typography>
+              We place periodic group orders (2-3x a year) through CustomInk for
+              the official performance fabric shirts. We also have a variety of
+              club apparel available at our <a target="_blank"
+                                               rel="noopener noreferrer"
+                                               href="https://forms.gle/Gyphn2XyzEG9pkyK6">online
+              store</a>.
+            </Typography>
+          </ExpansionPanelDetails>
+        </ExpansionPanel>
+
+        <ExpansionPanel classes={classesExpansionPanel}
+                        expanded={expanded === 'panel85'}
+                        onChange={handleChange('panel85')}>
+          <ExpansionPanelSummary classes={classesExpansionPanelSummary}
+                                 aria-controls="panel85d-content"
+                                 id="panel85d-header"
                                  expandIcon={<ExpandMoreIcon/>}>
             <Typography>Can my child join the club?</Typography>
           </ExpansionPanelSummary>
