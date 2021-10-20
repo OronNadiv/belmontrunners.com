@@ -13,6 +13,7 @@ import { IRedisState } from '../../entities/User'
 import { connect } from 'react-redux'
 import { compose } from 'underscore'
 import * as PropTypes from 'prop-types'
+import {EVENTS_HASH, SUBSCRIBE_HASH} from '../../urls';
 
 interface Props extends RouteComponentProps {
   isCurrentUserLoaded: boolean
@@ -23,15 +24,25 @@ function Home({ location: { hash }, isCurrentUserLoaded }: Props) {
   useEffect(() => {
     if (!hash) {
       animateScroll.scrollToTop({ duration: 0 })
-    } else if (hash === '#events' && isCurrentUserLoaded) {
-      scroller.scrollTo('events', {
-        duration: 500,
-        smooth: true,
-        offset: -120
-      })
+    } else if (isCurrentUserLoaded) {
+      const hashLowerCase = hash.toLowerCase();
+      switch (hashLowerCase) {
+        case EVENTS_HASH:
+        case SUBSCRIBE_HASH:
+          scroller.scrollTo(hashLowerCase.substr(1), {
+            duration: 500,
+            smooth: true,
+            offset: -120
+          })
+          break;
+        default:
+          // do nothing
+          break;
+
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isCurrentUserLoaded])
+  }, [isCurrentUserLoaded, hash])
 
   return (
     <div>
@@ -43,7 +54,11 @@ function Home({ location: { hash }, isCurrentUserLoaded }: Props) {
           <EventSchedule />
         </div>
       </Element>
-      <Subscribe />
+      <Element name="subscribe">
+        <div>
+          <Subscribe />
+        </div>
+      </Element>
       <Map />
       <Notifications />
     </div>

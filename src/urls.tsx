@@ -1,3 +1,6 @@
+export const EVENTS_HASH = '#events'
+export const SUBSCRIBE_HASH = '#subscribe'
+
 // urls
 export const JOIN = '/join'
 export const SIGN_IN = '/signin'
@@ -12,7 +15,7 @@ export const ROOT = '/'
 export const USERS = '/users'
 export const CONTACTS = '/contacts'
 export const FAQ = '/faq'
-export const SCHEDULE = 'https://belmontrunners.com/#events'
+export const SCHEDULE = `https://belmontrunners.com/${EVENTS_HASH}`
 export const PROFILE = '/profile'
 export const ACCOUNT = '/account'
 export const ABOUT_US = '/about-us'

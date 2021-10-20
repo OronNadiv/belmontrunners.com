@@ -1,4 +1,6 @@
 import React from 'react'
+import {EVENTS_HASH, ROOT, SUBSCRIBE_HASH} from '../../urls';
+import {Link} from 'react-router-dom'
 
 function Welcome() {
   return (
@@ -8,9 +10,9 @@ function Welcome() {
           <div className="col-lg-5">
             <div className="welcome_img">
               <img
-                className="img-fluid rounded"
-                src="img/runners-on-trail.png"
-                alt=""
+                  className="img-fluid rounded shadow"
+                  src="img/welcome.png"
+                  alt=""
               />
             </div>
           </div>
@@ -18,25 +20,25 @@ function Welcome() {
             <div className="welcome_text">
               <h3>Welcome to Belmont Runners</h3>
               <p>
-                We are a casual group of runners looking to build a community of
-                friendly, active locals who enjoy fitness and the great
-                outdoors. Join us for regular group events as we take advantage
-                of our great local trails and roads.
+                The Belmont Runners are a casual group of runners looking to
+                build a community of friendly, active locals who enjoy fitness
+                and the great outdoors. Join us for regular group events as we
+                take advantage of our great local trails and roads.
               </p>
               <p>
-                We welcome runners of all abilities by hosting training events
-                ranging from 5k to 10k and beyond.
+                We welcome runners of any ability to join our <Link
+                  to={`${ROOT}${EVENTS_HASH}`}>events</Link>, which usually
+                range between 5k to 10k.
               </p>
               <p>
-                Our events are usually held in Belmont every Saturday morning at
-                8:30 am, with a special “Run of the Month” held in a neighboring
-                community (San Carlos, San Mateo, Redwood City, and even
-                beyond). We also host weekday night events in Belmont at 6 pm on
-                Tuesdays and Thursdays.
+                Our club offers multiple runs per week in various locations on
+                the Peninsula. We will also have special &quotmembers only&quot
+                events throughout the year.
               </p>
               <p className="font-weight-bold">
-                Stay tuned for more information by signing up for our email
-                updates!
+                Stay tuned for more information by <Link
+                  to={`${ROOT}${SUBSCRIBE_HASH}`}>signing up</Link> for our
+                email updates!
               </p>
             </div>
           </div>

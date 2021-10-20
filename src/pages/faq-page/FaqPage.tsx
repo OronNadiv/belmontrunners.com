@@ -7,7 +7,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import { animateScroll } from 'react-scroll'
 import { ExpansionPanelDetails } from '@material-ui/core'
 import { Link } from 'react-router-dom'
-import { ROOT } from '../../urls'
+import { EVENTS_HASH, ROOT } from '../../urls'
 
 export default function FaqPage() {
   const useStylesExpansionPanel = makeStyles((theme: Theme) =>
@@ -116,7 +116,7 @@ export default function FaqPage() {
             <Typography>
               We meet several times a week at different locations around the
               area. Click <Link
-                to={`${ROOT}#events`}>here</Link> to learn about our upcoming
+                to={`${ROOT}${EVENTS_HASH}`}>here</Link> to learn about our upcoming
               runs.
             </Typography>
           </ExpansionPanelDetails>
