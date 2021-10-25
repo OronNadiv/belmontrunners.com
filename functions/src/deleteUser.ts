@@ -46,11 +46,10 @@ const DeleteUser =(admin: Admin.app.App, apiKey: string) => {
     const deleteFromMailChimp = async () => {
       try {
         console.info(`deleteFromMailChimp called.  email: ${email}`)
+        const emailMD5 = md5(email.toLowerCase());
         await rp({
-          method: 'DELETE',
-          uri: `https://username:${apiKey}@us3.api.mailchimp.com/3.0/lists/7cffd16da0/members/${md5(
-            email.toLowerCase()
-          )}`
+          method: 'POST',
+          uri: `https://username:${apiKey}@us3.api.mailchimp.com/3.0/lists/7cffd16da0/members/${emailMD5}/actions/delete-permanent`
         })
         console.info('deleteFromMailChimp complete successfully.')
       } catch (err:any) {
