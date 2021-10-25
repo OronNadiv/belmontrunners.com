@@ -8,5 +8,5 @@ GenerateICal()()
     return
   })
   .catch((err) => {
-    console.info('err', err)
+    console.error('err', err)
   })

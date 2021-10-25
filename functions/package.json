@@ -14,7 +14,8 @@
     "getMembersCMD": "npm run build && node lib/getMembersCMD.js",
     "users2ContactsCMD": "npm run build && node lib/users2ContactsCMD.js",
     "updateEventsCMD": "npm run build && node lib/updateEventsCMD.js",
-    "extendMembershipCMD": "npm run build && node lib/extendMembershipCMD.js"
+    "extendMembershipCMD": "npm run build && node lib/extendMembershipCMD.js",
+    "generateICalCMD": "npm run build && node lib/generateICal.js"
   },
   "main": "lib/index.js",
   "engines": {
@@ -27,7 +28,7 @@
     "firebase-admin": "^10.0.0",
     "firebase-functions": "^3.15.7",
     "gravatar": "^1.8.2",
-    "ical-generator": "^1.15.4",
+    "ical-generator": "^3.0.1",
     "md5": "^2.3.0",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.33",
