@@ -18,7 +18,7 @@
   },
   "main": "lib/index.js",
   "engines": {
-    "node": "10"
+    "node": "14"
   },
   "dependencies": {
     "bluebird": "^3.7.2",

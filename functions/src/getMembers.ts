@@ -36,6 +36,8 @@ const defaultVisibility: Visibility = {
 }
 
 const GetMembers = (admin: Admin.app.App) => {
+  let foundCurrentUser = false
+
   const firestore = admin.firestore()
   return async (data: any, context?: https.CallableContext) => {
     if (!context || !context.auth || !context.auth.uid) {
@@ -56,6 +58,7 @@ const GetMembers = (admin: Admin.app.App) => {
         )
       }
       if (context.auth.uid === user.uid) {
+        foundCurrentUser = true
         if (!calc(user).isAMember) {
           throw new https.HttpsError(
             'permission-denied',
@@ -89,10 +92,21 @@ const GetMembers = (admin: Admin.app.App) => {
 
     const usersCollection: FirebaseFirestore.QuerySnapshot = await firestore.collection('users').get()
     let users: any[] = []
+
     usersCollection.forEach((userDoc: FirebaseFirestore.QueryDocumentSnapshot) => {
       const user = userDoc.data()
       users.push(user)
     })
+
+    if(!foundCurrentUser){
+      throw new https.HttpsError(
+          'permission-denied',
+          JSON.stringify({
+            status: 403,
+            message: 'user is not a member.'
+          })
+      )
+    }
 
     users = _.chain(users)
       .filter((user: User) => {
