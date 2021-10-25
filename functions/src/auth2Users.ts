@@ -49,20 +49,21 @@ const Auth2Users = (admin: Admin.app.App) => {
           createdAt,
           email: email || '',
           emailVerified,
-          displayName,
+          displayName: displayName || '',
           lastSignedInAt,
           gravatarUrl: hasGravatar ? gravatarUrl : null
         }
         await userRef.set(data, { merge: true })
         console.info(`Updated ${uid} ${createdAt} ${lastSignedInAt}`)
       } catch (err) {
-        console.error(err)
+        console.error('Error while syncing auth2user.',
+            'uid:', userRecord.uid,
+            'error:',err);
       }
     })
     console.info(
-      'checking listUsersResult.pageToken',
-      listUsersResult.pageToken
-    )
+      'checking listUsersResult.pageToken:', listUsersResult.pageToken,
+        'num of results previously found:', listUsersResult.users.length)
     if (listUsersResult.pageToken) {
       // List next batch of users.
       await listAllUsers(listUsersResult.pageToken)

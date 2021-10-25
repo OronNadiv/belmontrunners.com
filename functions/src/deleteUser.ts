@@ -53,7 +53,7 @@ const DeleteUser =(admin: Admin.app.App, apiKey: string) => {
           )}`
         })
         console.info('deleteFromMailChimp complete successfully.')
-      } catch (err) {
+      } catch (err:any) {
         if (err.statusCode === 404) {
           console.warn('MailChimp returned 404.  message:', err.message)
         } else {

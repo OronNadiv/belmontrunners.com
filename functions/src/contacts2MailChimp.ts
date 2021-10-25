@@ -56,7 +56,7 @@ const Contacts2MailChimp = (admin: Admin.app.App, apiKey: string) => {
           json: true
         })
         console.info('done PUT:', mailChimpContact.email_address)
-      } catch (err) {
+      } catch (err: any) {
         console.error(
           'error PUT:',
           err && err.error ? err.error : err

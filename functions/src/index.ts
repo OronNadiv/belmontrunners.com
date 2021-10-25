@@ -39,11 +39,15 @@ const auth2UsersExec = async () => {
   try {
     await auth2Users()
     console.info('Calling process.exit(0)')
-    process.exit(0)
+    setTimeout(function () {
+      process.exit(0)
+    }, 5000)
   } catch (err) {
     console.error(err)
     console.info('Calling process.exit(1)')
-    process.exit(1)
+    setTimeout(function () {
+      process.exit(1)
+    }, 5000)
   }
 }
 
@@ -73,11 +77,15 @@ export const contacts2MailChimpCronJob = functions
     try {
       await contacts2MailChimp()
       console.info('Calling process.exit(0)')
-      process.exit(0)
+      setTimeout(function () {
+        process.exit(0)
+      }, 5000)
     } catch (err) {
       console.error(err)
       console.info('Calling process.exit(1)')
-      process.exit(1)
+      setTimeout(function () {
+        process.exit(1)
+      }, 5000)
     }
   })
 

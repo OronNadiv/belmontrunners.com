@@ -29,3 +29,5 @@ eventure
 .firebase
 **/*.log
 videos
+
+serviceAccountKey.json
