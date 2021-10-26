@@ -7,10 +7,11 @@ import SignUpStepper, {
 import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { IRedisState } from '../../entities/User'
+import { User } from '../../../functions/src/User';
 
 interface Props {
   isCurrentUserLoaded: boolean
-  firebaseUser: firebase.User
+  firebaseUser: User
 }
 
 function SignUpPage({ isCurrentUserLoaded, firebaseUser }: Props) {

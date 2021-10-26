@@ -38,9 +38,11 @@ import { fromJS, List as IList } from 'immutable'
 import { IRedisState, IUser } from '../../entities/User'
 import IContact from '../../entities/Contact'
 import Help from './Help'
+import { User } from 'firebase/auth'
+import { doc, getDoc } from 'firebase/firestore'
 
 interface Props {
-  firebaseUser: firebase.User
+  firebaseUser: User
   allowRead: boolean
 }
 
@@ -88,10 +90,9 @@ function ContactsPage({ firebaseUser, allowRead }: Props) {
 
     ;(async function() {
       try {
-        const contactsData = await firestore
-          .doc('subscribers/items')
-          .get()
-        const data: any = contactsData.data()
+        const contactsData = doc(firestore, 'subscribers/items')
+        const document = await getDoc(contactsData)
+        const data: any = document.data()
         const contactsTmp: IContact[] = data[SUBSCRIBERS_ARRAY_KEY]
 
         setContacts(contactsTmp)

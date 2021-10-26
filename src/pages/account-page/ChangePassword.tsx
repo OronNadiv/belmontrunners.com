@@ -4,9 +4,10 @@ import { connect } from 'react-redux'
 import { Button, Card, CardContent, Typography } from '@material-ui/core'
 import ChangePasswordDialog from './ChangePasswordDialog'
 import { IRedisState } from '../../entities/User'
+import { User } from 'firebase/auth'
 
 interface Props {
-  firebaseUser: firebase.User
+  firebaseUser: User
   isSubmitting: boolean
 }
 

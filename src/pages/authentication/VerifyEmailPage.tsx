@@ -18,6 +18,7 @@ import {
   DialogTitle
 } from '@material-ui/core'
 import * as Sentry from '@sentry/browser'
+import {applyActionCode, AuthError } from 'firebase/auth'
 
 // @ts-ignore
 const VerifyEmailPage = ({ location: { state: { query: { oobCode } } } }: RouteComponentProps) => {
@@ -25,7 +26,7 @@ const VerifyEmailPage = ({ location: { state: { query: { oobCode } } } }: RouteC
   const [errorMessage, setErrorMessage] = useState('')
   const [isSuccess, setIsSuccess] = useState(false)
 
-  const processError = (error: firebase.auth.Error) => {
+  const processError = (error: AuthError) => {
     const { code, message } = error
     switch (code) {
       case 'auth/expired-action-code':
@@ -53,10 +54,10 @@ const VerifyEmailPage = ({ location: { state: { query: { oobCode } } } }: RouteC
 
       console.log('calling applyActionCode')
       try {
-        await auth.applyActionCode(oobCode)
+        await applyActionCode(auth, oobCode)
         setIsSuccess(true)
       } catch (error) {
-        processError(error)
+        processError(error as AuthError)
       }
     })()
   }, [oobCode])

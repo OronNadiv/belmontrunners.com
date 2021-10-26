@@ -1,4 +1,4 @@
-import firebase from 'firebase/app'
+import { User } from 'firebase/auth'
 import React, { useEffect } from 'react'
 import Footer from './components/Footer'
 import './App.css'
@@ -78,7 +78,7 @@ Wrapper.propTypes = {
 interface Props {
   fetchCurrentUser: IFetchCurrentUser
   isCurrentUserLoaded: boolean
-  firebaseUser: firebase.User
+  firebaseUser: User
 }
 
 function App({ fetchCurrentUser, isCurrentUserLoaded, firebaseUser }: Props) {

@@ -10,9 +10,10 @@ import DeleteAccount from './DeleteAccount'
 import ChangePassword from './ChangePassword'
 import { IRedisState } from '../../entities/User'
 import Membership from './Membership'
+import { User } from 'firebase/auth'
 
 interface Props {
-  firebaseUser: firebase.User
+  firebaseUser: User
 }
 
 function AccountPage({ firebaseUser }: Props) {

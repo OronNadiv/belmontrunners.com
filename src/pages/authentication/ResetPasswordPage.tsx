@@ -18,6 +18,7 @@ import { PASSWORD } from '../../fields'
 import { Field, Form } from 'react-final-form'
 import { animateScroll } from 'react-scroll'
 import { minPasswordLength, required, composeValidators } from '../../utilities/formValidators'
+import { confirmPasswordReset } from 'firebase/auth'
 
 const WEAK_PASSWORD = 'Password is too weak.'
 
@@ -58,7 +59,7 @@ function ResetPasswordPage({ history, location: { state: { query: { oobCode } } 
     setIsSubmitting(true)
 
     try {
-      await auth.confirmPasswordReset(oobCode, newPassword)
+      await confirmPasswordReset(auth, oobCode, newPassword)
       setIsSuccess(true)
     } catch (error) {
       handleError(error)

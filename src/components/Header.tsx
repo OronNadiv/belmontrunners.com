@@ -55,7 +55,7 @@ import $ from 'jquery'
 import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import calc from '../utilities/membershipUtils'
-import firebase from 'firebase/app'
+import { User } from 'firebase/auth'
 import { IRedisState, IUser } from '../entities/User'
 import { compose } from 'underscore'
 import { auth } from '../firebase'
@@ -66,7 +66,7 @@ const BACKGROUND_IMAGE = 'linear-gradient(90deg,#141da2,#9b5cf6)'
 
 interface Props extends RouteComponentProps {
   isCurrentUserLoaded: boolean,
-  firebaseUser: firebase.User,
+  firebaseUser: User,
   allowUsersPage: boolean,
   allowContactsPage: boolean,
   isMember: boolean

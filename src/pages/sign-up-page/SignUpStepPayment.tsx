@@ -16,23 +16,29 @@ import { compose } from 'underscore'
 import calc from '../../utilities/membershipUtils'
 import { IRedisState, IUser } from '../../entities/User'
 import { IUpdateUserData } from '../../reducers/currentUser'
+import { User } from '../../../functions/src/User';
+import {FunctionsError, httpsCallable } from 'firebase/functions'
 
 const MEMBERSHIP_FEE_ADULT = 20
 const MEMBERSHIP_FEE_KID = 10
 
-interface StripeResponse {
+interface StripeTokenResponse {
   error?: { message: string }
 }
 
+interface StripeTransactionResponse {
+  id: string
+}
+
 interface Props extends RouteComponentProps {
-  firebaseUser: firebase.User
+  firebaseUser: User
   needToPay: boolean
   totalAmount: number
   isLast: boolean
   onNextClicked: () => void
   youngerThan13: boolean
   membershipExpiresAt?: string
-  stripe: { createToken: (arg0: { type: string }) => StripeResponse }
+  stripe: { createToken: (arg0: { type: string }) => StripeTokenResponse }
   updateUserData: IUpdateUserData
 }
 
@@ -58,13 +64,13 @@ function SignUpStepPayment({
 
   const createToken = async () => {
     try {
-      const stripeResponse: StripeResponse = await stripe.createToken({ type: 'card' })
-      console.log('stripeResponse1:', JSON.stringify(stripeResponse, null, 2))
-      if (stripeResponse.error) {
-        setErrorMessage(stripeResponse.error.message)
+      const stripeTokenResponse: StripeTokenResponse = await stripe.createToken({ type: 'card' })
+      console.log('stripeTokenResponse:', JSON.stringify(stripeTokenResponse, null, 2))
+      if (stripeTokenResponse.error) {
+        setErrorMessage(stripeTokenResponse.error.message)
         return
       }
-      return stripeResponse
+      return stripeTokenResponse
     } catch (error) {
       throw new Error(
         `unknown stripe response.  response: ${JSON.stringify(error)}`
@@ -90,21 +96,24 @@ function SignUpStepPayment({
           description: `Annual membership for Belmont Runners. name: ${displayName} email: ${email}  uid: ${uid}`,
           amountInCents: totalAmount * 100
         }
-        const stripeFunction = functions.httpsCallable('stripe')
+        const stripeFunction = httpsCallable(functions, 'stripe')
 
         try {
           const response = await stripeFunction(body)
-
-          const stripeConfirmationId = response.data.id
+          const data : StripeTransactionResponse = response.data as StripeTransactionResponse
+          const stripeConfirmationId = data.id
           setConfirmationNumber(stripeConfirmationId)
         } catch (error) {
           console.warn('Error from stripe.  error:', error)
-          if (error && error.message) {
-            const stripeError = JSON.parse(error.message)
-            console.warn('stripeError:', stripeError)
-            const message = stripeError.message || (stripeError.raw && stripeError.raw.message) || stripeError.code || 'Failed for unknown reason.\nPlease contact support.'
-            setErrorMessage(message)
-            return
+          if (error) {
+            const funcError = error as FunctionsError
+            if (funcError.message) {
+              const stripeError = JSON.parse(funcError.message)
+              console.warn('stripeError:', stripeError)
+              const message = stripeError.message || (stripeError.raw && stripeError.raw.message) || stripeError.code || 'Failed for unknown reason.\nPlease contact support.'
+              setErrorMessage(message)
+              return
+            }
           }
           // todo: handle case where it's not stripe error.
           throw stripeResponse

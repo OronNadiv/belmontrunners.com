@@ -1,12 +1,12 @@
-import firebase from 'firebase/app'
+import {FacebookAuthProvider, linkWithPopup, unlink, User } from 'firebase/auth'
 
 import { PHOTO_URL } from '../fields'
 import { IUser, IUserOptionalProps } from '../entities/User'
 import { IUpdateUserData } from '../reducers/currentUser'
 
-export const linkToFacebook = async (firebaseUser: firebase.User, userData: IUser, updateUserData: IUpdateUserData) => {
+export const linkToFacebook = async (firebaseUser: User, userData: IUser, updateUserData: IUpdateUserData) => {
   try {
-    await firebaseUser.linkWithPopup(new firebase.auth.FacebookAuthProvider())
+    await linkWithPopup(firebaseUser, new FacebookAuthProvider())
 
     let photoUrl = userData.photoURL
     if (!photoUrl) {
@@ -28,10 +28,10 @@ export const linkToFacebook = async (firebaseUser: firebase.User, userData: IUse
   }
 }
 
-export const unlinkFromFacebook = async (firebaseUser: firebase.User, updateUserData: IUpdateUserData) => {
+export const unlinkFromFacebook = async (firebaseUser: User, updateUserData: IUpdateUserData) => {
   try {
     console.log('UnlinkFromFacebook called.')
-    await firebaseUser.unlink('facebook.com')
+    await unlink(firebaseUser, 'facebook.com')
     const foundProviderData = firebaseUser.providerData.find(
       (userInfo) => {
         return userInfo && Boolean(userInfo.photoURL)

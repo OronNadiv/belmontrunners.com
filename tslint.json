@@ -90,7 +90,7 @@
     "triple-equals": { "severity": "warning" },
 
     // Warn when using deprecated APIs.
-    "deprecation": { "severity": "warning" },
+    "deprecation": { "severity": "off" },
 
     // -- Light Warnings --
     // These rules are intended to help developers use better style. Simpler code has fewer bugs. These would be "info"

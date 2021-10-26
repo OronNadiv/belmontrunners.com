@@ -1,4 +1,4 @@
-import firebase from 'firebase/app'
+import { User, reauthenticateWithCredential, AuthError, updatePassword, EmailAuthProvider } from 'firebase/auth'
 import React, { useState } from 'react'
 import {
   Button,
@@ -25,7 +25,7 @@ const PASSWORD2 = 'password2'
 
 interface Props {
   onClose: () => void
-  firebaseUser: firebase.User
+  firebaseUser: User
 }
 
 function ChangePasswordDialog({ onClose, firebaseUser }: Props) {
@@ -49,17 +49,17 @@ function ChangePasswordDialog({ onClose, firebaseUser }: Props) {
     setErrorMessage('')
     setIsSubmitting(true)
 
-    const credentials = firebase.auth.EmailAuthProvider.credential(
+    const credentials = EmailAuthProvider.credential(
       firebaseUser.email,
       password0
     )
     try {
-      await firebaseUser.reauthenticateWithCredential(credentials)
+      await reauthenticateWithCredential(firebaseUser, credentials)
       try {
-        await firebaseUser.updatePassword(password1)
+        await updatePassword(firebaseUser, password1)
         setIsSuccess(true)
       } catch (error) {
-        const { code, message } = error
+        const { code, message } = error as AuthError
         Sentry.captureException(error)
         console.error(
           'currentUser.updatePassword.',
@@ -71,7 +71,7 @@ function ChangePasswordDialog({ onClose, firebaseUser }: Props) {
         setErrorMessage(message)
       }
     } catch (error) {
-      const { code, message } = error
+      const { code, message } = error as AuthError
       if (code === 'auth/wrong-password') {
         setErrorMessage(WRONG_PASSWORD)
       } else {

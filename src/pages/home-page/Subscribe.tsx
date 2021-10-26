@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import isEmail from 'isemail'
 import * as Sentry from '@sentry/browser'
-import { functions } from '../../firebase'
-import firebase from 'firebase/app'
+import { httpsCallable } from 'firebase/functions'
 import { IconButton, Snackbar } from '@material-ui/core'
 import { Close as CloseIcon } from '@material-ui/icons'
 import rp from 'request-promise'
+import { functions, auth } from '../../firebase';
+import { RecaptchaVerifier } from 'firebase/auth'
 
 const DEFAULT_PLACE_HOLDER = 'Your email address'
 
@@ -16,7 +17,7 @@ const Subscribe = () => {
   const [messageLevel, setMessageLevel] = useState('')
   const [placeholder, setPlaceholder] = useState(DEFAULT_PLACE_HOLDER)
   const [recaptchaWidgetId, setRecaptchaWidgetId] = useState<number>()
-  const [recaptchaVerifier, setRecaptchaVerifier] = useState<firebase.auth.RecaptchaVerifier>()
+  const [recaptchaVerifier, setRecaptchaVerifier] = useState<RecaptchaVerifier>()
   const [captchaFailed, setCaptchaFailed] = useState(false)
   const [notRobot, setNotRobot] = useState(true) // NOTE: setting to true disables the captcha verification.
 
@@ -61,7 +62,7 @@ My email address is: ${email}`
           },
           json: true
         })
-        const addContact = functions.httpsCallable('addContact')
+        const addContact = httpsCallable(functions, 'addContact')
 
         console.log('calling addContact')
         const response = await addContact({ email })
@@ -119,7 +120,7 @@ My email address is: ${email}`
       notRobot
     )
 
-    const tempRecaptchaVerifier = new firebase.auth.RecaptchaVerifier(recaptcha, {
+    const tempRecaptchaVerifier = new RecaptchaVerifier(recaptcha, {
       size: 'invisible',
       callback: (response: any) => {
         console.log('captcha succeeded.', response)
@@ -129,7 +130,7 @@ My email address is: ${email}`
         console.log('captcha failed.')
         setCaptchaFailed(true)
       }
-    })
+    }, auth)
     setRecaptchaVerifier(tempRecaptchaVerifier)
     return unsubscribe
   }, [recaptcha, notRobot, recaptchaWidgetId, recaptchaVerifier])

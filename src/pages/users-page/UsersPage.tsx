@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import MUIDataTable from 'mui-datatables'
-import firebase from 'firebase/app'
+import { User } from 'firebase/auth'
+import { doc, collection, setDoc, getDocs } from 'firebase/firestore'
+import { httpsCallable } from 'firebase/functions'
 import DeleteIcon from '@material-ui/icons/Delete'
 import * as PropTypes from 'prop-types'
 import {
@@ -34,7 +36,7 @@ import { ROOT } from '../../urls'
 import { Redirect } from 'react-router-dom'
 import ConfirmDeletion from './ConfirmDeletion'
 import calc from '../../utilities/membershipUtils'
-import { firestore } from '../../firebase'
+import { firestore, functions } from '../../firebase'
 
 const PNF = googleLibPhoneNumber.PhoneNumberFormat
 const phoneUtil = googleLibPhoneNumber.PhoneNumberUtil.getInstance()
@@ -44,7 +46,7 @@ const MEMBERSHIP_EXPIRES_AT_FORMAT = 'YYYY-MM-DD HH:mm'
 const MEMBERSHIP_STATUS = 'MEMBERSHIP_STATUS'
 
 interface Props {
-  firebaseUser: firebase.User,
+  firebaseUser: User,
   allowRead: boolean,
   allowWrite: boolean
   allowDelete: boolean
@@ -61,11 +63,12 @@ function UsersPage({ firebaseUser, allowDelete, allowRead, allowWrite }: Props) 
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const loadMembers = useCallback(async () => {
-    const usersRef = firestore.collection('users')
-    const doc = await usersRef.get()
+    const usersRef = collection(firestore, 'users')
+
+    const docs = await getDocs(usersRef)
     // exception will be handled by ErrorBoundary
     const res: any = []
-    doc.forEach((docData) => {
+    docs.forEach((docData) => {
       try {
         const data: IUser = docData.data() as IUser
         if (data.phone) {
@@ -133,8 +136,8 @@ function UsersPage({ firebaseUser, allowDelete, allowRead, allowWrite }: Props) 
   }, [allowRead, loadMembers])
 
   const handleNotInterested = async (userData: IUserWithMembershipStatus, isChecked: boolean) => {
-    const userRef = firestore.doc(`users/${userData.uid}`)
-    await userRef.set({ [NOT_INTERESTED_IN_BECOMING_A_MEMBER]: isChecked }, { merge: true })
+    const userRef = doc(firestore, `users/${userData.uid}`)
+    await setDoc(userRef, { [NOT_INTERESTED_IN_BECOMING_A_MEMBER]: isChecked }, { merge: true })
   }
 
   const columns = [
@@ -326,7 +329,7 @@ function UsersPage({ firebaseUser, allowDelete, allowRead, allowWrite }: Props) 
               }
               console.log(`Deleting: ${JSON.stringify(row)}`)
               setIsSubmitting(true)
-              await firebase.functions().httpsCallable('deleteUser')({ [UID]: row[UID] })
+              await httpsCallable(functions, 'deleteUser')({ [UID]: row[UID] })
               console.log('Deleted successfully')
               setRowToDelete(undefined)
               await loadMembers()

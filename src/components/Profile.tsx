@@ -26,6 +26,7 @@ import { compose } from 'underscore'
 import gravatar from 'gravatar'
 import rp from 'request-promise'
 import { IRedisState, IUser } from '../entities/User'
+import { signOut } from 'firebase/auth'
 
 interface Props extends RouteComponentProps {
   allowUsersPage: boolean
@@ -173,9 +174,11 @@ function Profile({allowUsersPage, allowContactsPage, userData, history}: Props) 
                   )}
                   <Divider />
                   <MenuItem
-                    onClick={event =>
-                      auth.signOut() && handleClose(ROOT)(event)
-                    }
+                    onClick={event => signOut(auth).then(
+                      function (){
+                        handleClose(ROOT)(event)
+                      }
+                    )}
                     className={classes.menuItem}
                   >
                     Sign out

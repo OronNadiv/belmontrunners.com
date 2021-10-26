@@ -14,11 +14,12 @@ import { JOIN } from '../../urls'
 import { Link } from 'react-router-dom'
 import { IRedisState, IUser, IUserOptionalProps } from '../../entities/User'
 import { IUpdateUserData } from '../../reducers/currentUser'
+import { User } from 'firebase/auth'
 
 const POPUP_PAY_MEMBERSHIP_SNOOZED_AT = 'popupPayMembershipSnoozedAt'
 
 interface Props {
-  firebaseUser: firebase.User
+  firebaseUser: User
   userData: any
   updateUserData: IUpdateUserData
 }

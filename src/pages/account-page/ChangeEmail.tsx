@@ -5,10 +5,11 @@ import { sendEmailVerification as sendEmailVerificationAction } from '../../redu
 import { Button, Card, CardContent, Typography } from '@material-ui/core'
 import ChangeEmailDialog from './ChangeEmailDialog'
 import { IRedisState } from '../../entities/User'
+import { User } from 'firebase/auth'
 
 interface Props {
   sendEmailVerification: () => void
-  firebaseUser: firebase.User
+  firebaseUser: User
   isSubmitting: boolean
 }
 

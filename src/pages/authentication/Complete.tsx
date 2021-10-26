@@ -19,13 +19,15 @@ import {
   DialogTitle
 } from '@material-ui/core'
 import * as Sentry from '@sentry/browser'
+import { AuthError, checkActionCode } from 'firebase/auth'
+import { FirebaseError } from 'firebase/app'
 
 const Complete = ({ location: { search } }: RouteComponentProps) => {
 
   const [errorMessage, setErrorMessage] = useState('')
   const [redirect, setRedirect] = useState<JSX.Element>()
 
-  const processError = (error: firebase.auth.Error) => {
+  const processError = (error: FirebaseError) => {
     const { code, message } = error
     console.log('code:', code, 'message:', message)
     switch (code) {
@@ -55,10 +57,10 @@ const Complete = ({ location: { search } }: RouteComponentProps) => {
     ;(async function() {
       try {
         if (!oobCode) {
-          processError({ code: 'auth/invalid-action-code', message: INVALID_ACTION_CODE_INVALID_URL })
+          processError(new FirebaseError('auth/invalid-action-code', INVALID_ACTION_CODE_INVALID_URL ))
           return
         }
-        const info = await auth.checkActionCode(oobCode)
+        const info = await checkActionCode(auth, oobCode)
         let tmpRedirect
         if (mode) {
           tmpRedirect = (
@@ -78,7 +80,7 @@ const Complete = ({ location: { search } }: RouteComponentProps) => {
 
         setRedirect(tmpRedirect)
       } catch (error) {
-        processError(error)
+        processError(error as AuthError)
       }
     })()
   }, [search])
