@@ -11,9 +11,11 @@ import { ROOT } from '../../urls'
 import * as Sentry from '@sentry/browser'
 import { Snackbar } from '../../components/Snackbar'
 import { IRedisState } from '../../entities/User'
+import { User } from 'firebase/auth'
+import { httpsCallable } from 'firebase/functions'
 
 interface Props {
-  firebaseUser: firebase.User
+  firebaseUser: User
   onSubmitting: (arg0: boolean) => void
   isSubmitting: boolean
 }
@@ -31,7 +33,7 @@ function DeleteAccount({ firebaseUser, onSubmitting, isSubmitting }: Props) {
     if (shouldDeleteAccount) {
       try {
         onSubmitting(true)
-        await functions.httpsCallable('deleteUser')({
+        await httpsCallable(functions, 'deleteUser')({
           [UID]: firebaseUser.uid
         })
         onSubmitting(false)

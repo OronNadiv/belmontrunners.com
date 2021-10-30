@@ -23,10 +23,11 @@ import { Button } from '@material-ui/core'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 import UpdateUserData from '../../components/HOC/UpdateUserData'
 import { IRedisState, IUserOptionalProps, IUser } from '../../entities/User'
+import { User, updateProfile } from 'firebase/auth';
 
 interface Props extends RouteComponentProps {
   updateUserData: any,
-  firebaseUser: firebase.User,
+  firebaseUser: User,
   userData: any,
   isSubmitting: boolean,
   onSubmitting: (arg0: boolean) => void
@@ -47,7 +48,7 @@ function MyProfileForm({
     try {
       onSubmitting(true)
       await Promise.all([
-        firebaseUser.updateProfile({ [DISPLAY_NAME]: values.displayName }),
+        updateProfile(firebaseUser, { [DISPLAY_NAME]: values.displayName }),
         updateUserData(values, { merge: true })
       ])
 

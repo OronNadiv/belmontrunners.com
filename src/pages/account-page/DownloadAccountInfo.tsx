@@ -1,4 +1,3 @@
-import 'firebase/auth'
 import { Map as IMap } from 'immutable'
 import React, { useState } from 'react'
 import * as PropTypes from 'prop-types'
@@ -10,9 +9,10 @@ import UpdateUserData from '../../components/HOC/UpdateUserData'
 import DownloadButton from 'react-dfb'
 import moment from 'moment'
 import { IRedisState, IUser } from '../../entities/User'
+import { User } from 'firebase/auth'
 
 interface Props {
-  firebaseUser: firebase.User
+  firebaseUser: User
   userData: any,
   isSubmitting: boolean
 }

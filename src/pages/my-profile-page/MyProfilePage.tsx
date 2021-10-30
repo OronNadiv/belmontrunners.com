@@ -8,9 +8,10 @@ import MyProfileForm from './MyProfileForm'
 import { animateScroll } from 'react-scroll'
 import { compose } from 'underscore'
 import { IRedisState } from '../../entities/User'
+import { User } from 'firebase/auth'
 
 interface Props {
-  firebaseUser: firebase.User
+  firebaseUser: User
 }
 
 function MyProfilePage({ firebaseUser }: Props) {

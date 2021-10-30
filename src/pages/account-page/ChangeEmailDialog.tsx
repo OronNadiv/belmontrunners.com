@@ -1,4 +1,10 @@
-import firebase from 'firebase/app'
+import {
+  User,
+  updateEmail,
+  reauthenticateWithCredential,
+  AuthError,
+  EmailAuthProvider
+} from 'firebase/auth'
 import React, { useState } from 'react'
 import {
   Button,
@@ -30,7 +36,7 @@ const EMAIL1 = 'email1'
 const EMAIL2 = 'email2'
 
 interface Props {
-  firebaseUser: firebase.User
+  firebaseUser: User
   sendEmailVerification: ISendEmailVerification
   onClose: () => void
 }
@@ -65,13 +71,13 @@ function ChangeEmailDialog({ firebaseUser, sendEmailVerification, onClose }: Pro
 
 
     try {
-      const credentials = firebase.auth.EmailAuthProvider.credential(
+      const credentials = EmailAuthProvider.credential(
         firebaseUser.email,
         password
       )
-      await firebaseUser.reauthenticateWithCredential(credentials)
+      await reauthenticateWithCredential(firebaseUser, credentials)
       try {
-        await firebaseUser.updateEmail(email1)
+        await updateEmail(firebaseUser, email1)
         // todo: use same mechanism as in UpdateUserData
         await sendEmailVerification()
 
@@ -80,7 +86,7 @@ function ChangeEmailDialog({ firebaseUser, sendEmailVerification, onClose }: Pro
         Sentry.captureException(error)
         console.error(error)
 
-        const { code, message } = error
+        const { code, message } = error as AuthError
         switch (code) {
           case 'auth/invalid-email':
             setErrorMessage(INVALID_EMAIL)
@@ -94,8 +100,8 @@ function ChangeEmailDialog({ firebaseUser, sendEmailVerification, onClose }: Pro
             setErrorMessage(message)
         }
       }
-    } catch (error) {
-      const { code, message } = error
+    } catch (error ) {
+      const { code, message } = error as AuthError
       if (code === 'auth/wrong-password') {
         setErrorMessage(WRONG_PASSWORD)
       } else {

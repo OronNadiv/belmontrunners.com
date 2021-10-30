@@ -18,6 +18,7 @@ import {
 } from '@material-ui/core'
 import * as Sentry from '@sentry/browser'
 import { auth } from '../../firebase'
+import {applyActionCode, AuthError, sendPasswordResetEmail } from 'firebase/auth'
 
 // @ts-ignore
 const RecoverEmailPage = ({ location: { state: { info: { data: { email } }, query: { oobCode } } } }: RouteComponentProps) => {
@@ -25,7 +26,7 @@ const RecoverEmailPage = ({ location: { state: { info: { data: { email } }, quer
   const [errorMessage, setErrorMessage] = useState('')
   const [isSuccess, setIsSuccess] = useState(false)
 
-  const processError = (error: firebase.auth.Error) => {
+  const processError = (error: AuthError) => {
     const { code, message } = error
     switch (code) {
       case 'auth/expired-action-code':
@@ -53,20 +54,20 @@ const RecoverEmailPage = ({ location: { state: { info: { data: { email } }, quer
 
       console.log('calling applyActionCode')
       try {
-        await auth.applyActionCode(oobCode)
+        await applyActionCode(auth, oobCode)
         console.log('calling sendPasswordResetEmail')
         try {
-          await auth.sendPasswordResetEmail(email)
+          await sendPasswordResetEmail(auth, email)
           setIsSuccess(true)
           setErrorMessage('')
         } catch (error) {
-          const { code, message } = error
+          const { code, message } = error as AuthError
           Sentry.captureException(error)
           console.error('RecoverEmailPage', 'code:', code, 'message:', message)
           setErrorMessage(message)
         }
       } catch (error) {
-        processError(error)
+        processError(error as AuthError)
       }
     })()
   }, [oobCode, email])

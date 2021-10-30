@@ -1,5 +1,9 @@
-import { auth, firestore } from '../../firebase'
-import firebase from 'firebase/app'
+import { doc, setDoc } from 'firebase/firestore'
+import {
+  AuthError,
+  createUserWithEmailAndPassword,
+  updateProfile
+} from 'firebase/auth'
 import React, { useEffect, useState } from 'react'
 import { TextField } from 'final-form-material-ui'
 import {
@@ -27,6 +31,7 @@ import { animateScroll } from 'react-scroll'
 import { compose } from 'underscore'
 import { required, isEmail, minPasswordLength, composeValidators } from '../../utilities/formValidators'
 import { IUserOptionalProps } from '../../entities/User'
+import {auth, firestore} from '../../firebase';
 
 interface Props {
   onNextClicked: () => void
@@ -54,14 +59,13 @@ function SignUpStepAuth({ onNextClicked, isLast }: Props) {
     setIsSigningUp(true)
 
     try {
-      const user = await auth.createUserWithEmailAndPassword(email, password)
+      const user = await createUserWithEmailAndPassword(auth, email, password)
       console.log('calling updateProfile', user)
       if (!auth.currentUser) {
         throw new Error('auth.currentUser is falsify')
       }
-      await auth.currentUser.updateProfile({ displayName })
-      const userRef = firestore
-        .doc(`users/${auth.currentUser.uid}`)
+      await updateProfile(auth.currentUser, { displayName })
+      const userRef = await doc(firestore, `users/${auth.currentUser.uid}`)
       const values: IUserOptionalProps = {
         displayName,
         tosUrl: TOS_FILE_NAME,
@@ -71,15 +75,15 @@ function SignUpStepAuth({ onNextClicked, isLast }: Props) {
         privacyPolicyUrl: PRIVACY_POLICY_FILE_NAME,
         privacyPolicyAcceptedAt: moment().utc().format()
       }
-      await userRef.set(values, { merge: true })
+      await setDoc(userRef, values, { merge: true })
       onNextClicked()
     } catch (error) {
       setIsSigningUp(false)
-      handleSignUpError(error)
+      handleSignUpError(error as AuthError)
     }
   }
 
-  const handleSignUpError = (error: firebase.auth.Error) => {
+  const handleSignUpError = (error: AuthError) => {
     const { code, message } = error
     switch (code) {
       case 'auth/invalid-email':

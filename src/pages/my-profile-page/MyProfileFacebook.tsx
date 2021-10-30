@@ -20,9 +20,10 @@ import {
 import * as Sentry from '@sentry/browser'
 import { IRedisState, IUser } from '../../entities/User'
 import { IUpdateUserData } from '../../reducers/currentUser'
+import { User } from 'firebase/auth'
 
 interface Props {
-  firebaseUser: firebase.User
+  firebaseUser: User
   userData: any
   updateUserData: IUpdateUserData
   onSubmitting: (arg0: boolean) => void

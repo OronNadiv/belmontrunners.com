@@ -26,9 +26,10 @@ import { compose } from 'underscore'
 import { connect } from 'react-redux'
 import { required, isEmail, minPasswordLength, composeValidators } from '../../utilities/formValidators'
 import { IRedisState } from '../../entities/User'
+import {AuthError, signInWithEmailAndPassword, User } from 'firebase/auth'
 
 interface Props extends RouteComponentProps {
-  firebaseUser: firebase.User
+  firebaseUser: User
 }
 
 function SignInPage({ history, location, firebaseUser }: Props) {
@@ -43,7 +44,7 @@ function SignInPage({ history, location, firebaseUser }: Props) {
     animateScroll.scrollToTop({ duration: 0 })
   }, [errorMessage])
 
-  const handleSignInError = (error: firebase.auth.Error) => {
+  const handleSignInError = (error: AuthError) => {
     const { code, message } = error
     switch (code) {
       case 'auth/invalid-email':
@@ -73,11 +74,10 @@ function SignInPage({ history, location, firebaseUser }: Props) {
   const signIn = async (params: IEmailPassword) => {
     try {
       setIsSigningIn(true)
-      await auth.signInWithEmailAndPassword(params.email, params.password)
-
+      await signInWithEmailAndPassword(auth, params.email, params.password)
     } catch (error) {
       setIsSigningIn(false)
-      handleSignInError(error)
+      handleSignInError(error as AuthError)
     }
   }
 

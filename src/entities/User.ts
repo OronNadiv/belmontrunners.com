@@ -1,4 +1,4 @@
-import firebase from 'firebase/app'
+import { User } from 'firebase/auth'
 
 export enum VisibilityEnum {
   ONLY_ME = 'ONLY_ME',
@@ -58,7 +58,7 @@ export interface ICurrentUser {
   isCurrentUserLoading: boolean
   isCurrentUserLoaded: boolean
   permissions: IUserPermissions
-  firebaseUser?: firebase.User
+  firebaseUser?: User
   userData: any
   userDataUpdateContext?: any
   userDataUpdating: boolean

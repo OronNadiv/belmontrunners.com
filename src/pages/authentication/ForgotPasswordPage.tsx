@@ -17,6 +17,7 @@ import { EMAIL } from '../../fields'
 import * as Sentry from '@sentry/browser'
 import { auth } from '../../firebase'
 import { required, isEmail, composeValidators } from '../../utilities/formValidators'
+import { AuthError, sendPasswordResetEmail } from 'firebase/auth'
 
 const ForgotPasswordPage = () => {
   const [close, setClose] = useState(false)
@@ -24,7 +25,7 @@ const ForgotPasswordPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
 
-  const handleError = (error: firebase.auth.Error) => {
+  const handleError = (error: AuthError) => {
     const { code, message } = error
     switch (code) {
       case 'auth/user-not-found':
@@ -46,10 +47,10 @@ const ForgotPasswordPage = () => {
     setErrorMessage('')
     setIsSubmitting(true)
     try {
-      await auth.sendPasswordResetEmail(email)
+      await sendPasswordResetEmail(auth, email)
       setIsSuccess(true)
     } catch (error) {
-      handleError(error)
+      handleError(error as AuthError)
     } finally {
       setIsSubmitting(false)
     }

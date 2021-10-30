@@ -1,8 +1,8 @@
-import * as firebase from 'firebase/app'
-import 'firebase/auth'
-import 'firebase/firestore'
-import 'firebase/functions'
-import 'firebase/analytics'
+import {initializeApp} from 'firebase/app'
+import {getAuth} from 'firebase/auth';
+import {Firestore, initializeFirestore} from 'firebase/firestore';
+import {getFunctions} from 'firebase/functions';
+import {getAnalytics} from 'firebase/analytics';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyCQBAUE701EBXnT-OBnEPq7Zuft4qyC4tc',
@@ -15,11 +15,8 @@ const firebaseConfig = {
   measurementId: 'G-XMHNXZ9JDK'
 }
 
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig)
-}
-
-export const analytics = firebase.analytics()
-export const auth = firebase.auth()
-export const firestore = firebase.firestore()
-export const functions = firebase.functions()
+const firebaseApp = initializeApp(firebaseConfig)
+export const analytics = getAnalytics(firebaseApp)
+export const auth = getAuth(firebaseApp)
+export const firestore: Firestore = initializeFirestore(firebaseApp, { experimentalForceLongPolling: true })
+export const functions = getFunctions(firebaseApp)

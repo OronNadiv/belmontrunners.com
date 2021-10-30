@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import * as PropTypes from 'prop-types'
 import { compose } from 'underscore'
 import { IRedisState } from '../../entities/User'
+import { User } from 'firebase/auth'
 
 interface Params {
   name?: string | undefined
@@ -19,7 +20,7 @@ const LoggedInState = (params: Params = {}) => {
   return (WrappedComponent: any) => {
     interface Props extends RouteComponentProps {
       ___isCurrentUserLoaded___: boolean
-      ___currentUser___: firebase.User
+      ___currentUser___: User
     }
 
     const Inner = (props: Props) => {

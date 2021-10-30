@@ -5,6 +5,7 @@ import ExpendMoreIcon from '@material-ui/icons/ExpandMore'
 import { useMediaQuery, useTheme, IconButton } from '@material-ui/core'
 
 import { firestore } from '../../../firebase'
+import { doc, getDoc } from 'firebase/firestore'
 
 const CITY_ID = 5392423
 
@@ -86,7 +87,8 @@ function EventSchedule() {
   // }
 
   const notCovid19 = async () => {
-    const eventsDoc = await firestore.collection('events').doc('items').get()
+    const eventsRef = doc(firestore, 'events/items')
+    const eventsDoc = await getDoc(eventsRef)
     return eventsDoc.data() as { values: CSVEvent[] }
   }
 

@@ -47,6 +47,8 @@ import { linkToFacebook } from '../../utilities/linkToFacebook'
 import { findWhere } from 'underscore'
 import { IRedisState, IUser, IUserOptionalProps, IUserPropsVisibility, VisibilityEnum } from '../../entities/User'
 import { IUpdateUserData } from '../../reducers/currentUser'
+import { User } from 'firebase/auth'
+import { compose } from 'redux'
 
 const defaultVisibility = {
   [EMAIL]: ONLY_ME,
@@ -61,7 +63,7 @@ const DRAWER_WIDTH = 270
 
 interface Props {
   onClose: () => void
-  firebaseUser: firebase.User
+  firebaseUser: User
   userData: any
   user: IUserOptionalProps
   updateUserData: IUpdateUserData
@@ -239,7 +241,7 @@ function UserProfile({ onClose, user, userData, updateUserData, firebaseUser }: 
       onOpen={() => {
         // nothing to do here but this prop is still set as required.
       }}
-      onClose={onClose}
+      onClose={function() {onClose()}}
       className={classes.drawer}
       classes={{
         paper: classes.drawerPaper
@@ -362,4 +364,7 @@ const mapStateToProps = ({
   }
 }
 
-export default connect(mapStateToProps)(UpdateUserData(UserProfile))
+export default compose(
+    UpdateUserData,
+    connect(mapStateToProps)
+)(UserProfile)

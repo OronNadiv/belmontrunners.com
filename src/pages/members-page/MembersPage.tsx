@@ -22,9 +22,11 @@ import { MEMBERS, ROOT } from '../../urls'
 import SearchBox from '../../components/SearchBox'
 import { Map as IMap } from 'immutable'
 import { IRedisState, IUser } from '../../entities/User'
+import { User } from 'firebase/auth'
+import {FunctionsError, httpsCallable } from 'firebase/functions'
 
 interface Props extends RouteComponentProps {
-  firebaseUser: firebase.User
+  firebaseUser: User
   userData: any
 }
 
@@ -54,7 +56,8 @@ function MembersPage({
     ;(async function() {
       try {
         // return setUsers(require('./members.json'))
-        const resp = await functions.httpsCallable('getMembers')()
+        const getMembers = httpsCallable(functions, 'getMembers')
+        const resp : {data: IUser[]} = await getMembers() as {data: IUser[]}
         const data: IUser[] = sortBy(resp.data, (user: IUser) => {
           if (!user.displayName) {
             return
@@ -66,11 +69,14 @@ function MembersPage({
         setUsers(data)
       } catch (err) {
         console.warn('error from getMembers:', err)
-        if (err && err.message) {
-          const error = JSON.parse(err.message)
-          if (error.status === 403) {
-            history.push(ROOT)
-            return
+        if (err) {
+          const funcErr = err as FunctionsError
+          if (funcErr.message) {
+            const error = JSON.parse(funcErr.message)
+            if (error.status === 403) {
+              history.push(ROOT)
+              return
+            }
           }
         }
         Sentry.captureException(err)
@@ -167,6 +173,7 @@ function MembersPage({
       )}
       {!!selected && (
         <UserProfile
+          // @ts-ignore
           user={selected}
           style={{ width: 250 }}
           onClose={handleDrawerClosed}
