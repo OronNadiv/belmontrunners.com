@@ -11,6 +11,7 @@ import Users2Contacts from './users2Contacts'
 import * as functions from 'firebase-functions'
 import * as Admin from 'firebase-admin'
 import { EMAIL } from './fields'
+import { props } from 'bluebird'
 
 const admin: Admin.app.App = Admin.initializeApp()
 const firestore = admin.firestore()
@@ -32,8 +33,6 @@ const purgeUsersUnder13 = PurgeUsersUnder13(admin, apiKey, false)
 const stripeImpl = Stripe(admin, { membershipFeeInCents: membership_fee_in_cents, secretKeys: { live, test } })
 const users2Contacts = Users2Contacts(admin)
 const updateEvents = UpdateEvents(admin, app_id, city_id)
-
-const Promise = require('bluebird')
 
 const auth2UsersExec = async () => {
   try {
@@ -142,7 +141,7 @@ export const deleteUser = functions
     const targetUID = data.uid
     let targetEmail
     if (targetUID !== currentUID) {
-      const { docUsersDelete, docUser } = await Promise.props({
+      const { docUsersDelete, docUser } = await props({
         docUsersDelete: firestore.doc('permissions/usersDelete').get(),
         docUser: firestore.doc(`users/${targetUID}`).get()
       })
@@ -154,6 +153,7 @@ export const deleteUser = functions
           'permission-denied.'
         )
       }
+      // @ts-ignore
       targetEmail = docUser.data() && docUser.data()[EMAIL]
       if (!targetEmail) {
         throw new functions.https.HttpsError('not-found', 'not-found.')
