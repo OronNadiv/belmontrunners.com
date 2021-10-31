@@ -1,9 +1,9 @@
 import * as Admin from 'firebase-admin'
 import { UserRecord } from 'firebase-functions/lib/providers/auth'
 import { User } from './User'
+import { each } from 'bluebird'
 
 const moment = require('moment')
-const BPromise = require('bluebird')
 const gravatar = require('gravatar')
 const rp = require('request-promise')
 
@@ -14,14 +14,14 @@ const Auth2Users = (admin: Admin.app.App) => {
   const listAllUsers = async (nextPageToken?: string) => {
     // List batch of users, 1000 at a time.
     const listUsersResult = await auth.listUsers(1000, nextPageToken)
-    await BPromise.each(listUsersResult.users, async (userRecord: UserRecord) => {
+    await each(listUsersResult.users, async (userRecord: UserRecord) => {
       try {
         const {
           uid,
           email,
           emailVerified,
           displayName,
-          metadata: { creationTime, lastSignInTime }
+          metadata: { creationTime, lastSignInTime },
         } = userRecord
         const gravatarUrl = gravatar.url(email, {
           protocol: 'https',

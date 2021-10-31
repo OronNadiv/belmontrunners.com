@@ -31,7 +31,7 @@ import _, { compose } from 'underscore'
 import { connect } from 'react-redux'
 import { Avatar, Checkbox, IconButton } from '@material-ui/core'
 import * as Sentry from '@sentry/browser'
-import { IUser, IRedisState } from '../../entities/User'
+import { getAvatar, IRedisState, IUser } from '../../entities/User'
 import { ROOT } from '../../urls'
 import { Redirect } from 'react-router-dom'
 import ConfirmDeletion from './ConfirmDeletion'
@@ -64,7 +64,6 @@ function UsersPage({ firebaseUser, allowDelete, allowRead, allowWrite }: Props) 
 
   const loadMembers = useCallback(async () => {
     const usersRef = collection(firestore, 'users')
-
     const docs = await getDocs(usersRef)
     // exception will be handled by ErrorBoundary
     const res: any = []
@@ -77,6 +76,7 @@ function UsersPage({ firebaseUser, allowDelete, allowRead, allowWrite }: Props) 
         } else {
           data.phone = ''
         }
+        data.photoURL = getAvatar(data)
 
         const userData: IUserWithMembershipStatus = {
           [UID]: docData.id,

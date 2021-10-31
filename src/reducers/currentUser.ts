@@ -89,16 +89,14 @@ export const fetchCurrentUser: IFetchCurrentUser = () => {
           })
         } else {
           console.log('current user is not null')
-          const firebaseUser = auth.currentUser
-          console.log('firebaseUser:', firebaseUser)
           try {
             const [permissions, userData] = await Promise.all([
               fetchPermissions(),
               fetchUserData()
             ])
-
+            const firebaseUser = auth.currentUser
             console.log('permissions', permissions)
-            console.log('userData',  userData)
+            console.log('userData', userData)
             const data: IFetchedCurrentUserData = {
               firebaseUser,
               permissions : permissions as IUserPermissions,

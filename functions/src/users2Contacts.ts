@@ -3,8 +3,8 @@ import * as Admin from 'firebase-admin'
 import { User } from './User'
 import calc from './membershipUtils'
 import { ARRAY_KEY, UID } from './fields'
+import { props } from 'bluebird'
 
-const BPromise = require('bluebird')
 const normalizeEmail = require('normalize-email')
 const _ = require('underscore')
 
@@ -13,13 +13,13 @@ const Users2Contacts = (admin: Admin.app.App) => {
   return async () => {
     const docRef = firestore.doc('subscribers/items')
 
-    const res = await BPromise.props({
+    const res = await props({
       usersCollection: firestore.collection('users').get(),
       contactsDoc: docRef.get()
     })
     const usersCollection: FirebaseFirestore.QuerySnapshot = res.usersCollection
-    const contactsDoc: FirebaseFirestore.QueryDocumentSnapshot = res.contactsDoc
-    let data: FirebaseFirestore.DocumentData = contactsDoc.data()
+    const contactsDoc: FirebaseFirestore.DocumentSnapshot = res.contactsDoc
+    let data: FirebaseFirestore.DocumentData | undefined = contactsDoc.data()
 
     if (!data || !data[ARRAY_KEY]) {
       data = { [ARRAY_KEY]: [] }

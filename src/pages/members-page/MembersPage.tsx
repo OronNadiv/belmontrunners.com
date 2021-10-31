@@ -21,7 +21,7 @@ import { compose, findWhere, sortBy } from 'underscore'
 import { MEMBERS, ROOT } from '../../urls'
 import SearchBox from '../../components/SearchBox'
 import { Map as IMap } from 'immutable'
-import { IRedisState, IUser } from '../../entities/User'
+import { getAvatar, IRedisState, IUser } from '../../entities/User'
 import { User } from 'firebase/auth'
 import {FunctionsError, httpsCallable } from 'firebase/functions'
 
@@ -140,7 +140,7 @@ function MembersPage({
         user.photoURL = userDataJS.photoURL
       }
 
-      const avatarUrl = user.photoURL || user.gravatarUrl || undefined
+      const avatarUrl = getAvatar(user)
       return (
         <Chip
           className="my-1 mx-1"

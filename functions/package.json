@@ -11,6 +11,7 @@
     "logs": "firebase functions:log",
     "auth2UsersCMD": "npm run build && node lib/auth2UsersCMD.js",
     "contacts2MailChimpCMD": "npm run build && node lib/contacts2MailChimpCMD.js",
+    "getPhotoURLCMD": "npm run build && node lib/getPhotoURLCMD.js",
     "getMembersCMD": "npm run build && node lib/getMembersCMD.js",
     "users2ContactsCMD": "npm run build && node lib/users2ContactsCMD.js",
     "updateEventsCMD": "npm run build && node lib/updateEventsCMD.js",
@@ -25,7 +26,7 @@
     "csvtojson": "^2.0.10",
     "exif-parser": "^0.1.12",
     "firebase-admin": "^10.0.0",
-    "firebase-functions": "^3.15.7",
+    "firebase-functions": "^3.16.0",
     "gravatar": "^1.8.2",
     "ical-generator": "^1.15.4",
     "md5": "^2.3.0",
@@ -39,7 +40,7 @@
     "underscore": "^1.12.0"
   },
   "devDependencies": {
-    "@types/node": "^14.17.29",
+    "@types/node": "^14.17.32",
     "firebase-functions-test": "^0.3.3",
     "json-to-ts": "^1.7.0",
     "tslint": "^6.1.3",

@@ -25,7 +25,7 @@ import { withRouter, RouteComponentProps } from 'react-router-dom'
 import { compose } from 'underscore'
 import gravatar from 'gravatar'
 import rp from 'request-promise'
-import { IRedisState, IUser } from '../entities/User'
+import { getAvatar, IRedisState, IUser } from '../entities/User'
 import { signOut } from 'firebase/auth'
 
 interface Props extends RouteComponentProps {
@@ -109,7 +109,11 @@ function Profile({allowUsersPage, allowContactsPage, userData, history}: Props) 
   if (!userDataJS.photoURL && !isGravatarFetched) {
     return null
   }
-  const avatarUrl = userDataJS.photoURL || gravatarUrl
+  // Here we may set it to gravatarUrl.
+  // It takes care of new users who just created an account
+  // but hadn't had the function job that checks whether they have
+  // Gravatar or not.
+  const avatarUrl = getAvatar(userDataJS) || gravatarUrl
   return (
     <>
       <div
