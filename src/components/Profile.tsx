@@ -109,7 +109,11 @@ function Profile({allowUsersPage, allowContactsPage, userData, history}: Props) 
   if (!userDataJS.photoURL && !isGravatarFetched) {
     return null
   }
-  const avatarUrl = getAvatar(userDataJS)
+  // Here we may set it to gravatarUrl.
+  // It takes care of new users who just created an account
+  // but hadn't had the function job that checks whether they have
+  // Gravatar or not.
+  const avatarUrl = getAvatar(userDataJS) || gravatarUrl
   return (
     <>
       <div
