@@ -17,13 +17,13 @@ import FuzzySearch from 'fuzzy-search'
 import LoggedInState from '../../components/HOC/LoggedInState'
 import UserProfile from './UserProfile'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
-import { compose, findWhere, sortBy } from 'underscore'
+import { compose, findWhere, isString, sortBy } from 'underscore'
 import { MEMBERS, ROOT } from '../../urls'
 import SearchBox from '../../components/SearchBox'
 import { Map as IMap } from 'immutable'
 import { getAvatar, IRedisState, IUser } from '../../entities/User'
 import { User } from 'firebase/auth'
-import {FunctionsError, httpsCallable } from 'firebase/functions'
+import { FunctionsError, httpsCallable } from 'firebase/functions'
 
 interface Props extends RouteComponentProps {
   firebaseUser: User
@@ -63,8 +63,8 @@ function MembersPage({
             return
           }
           return user.uid === firebaseUser.uid
-            ? '_'
-            : user.displayName.toLowerCase()
+              ? '_'
+              : user.displayName.toLowerCase()
         })
         setUsers(data)
       } catch (err) {
@@ -90,7 +90,7 @@ function MembersPage({
 
   const [selected, setSelected] = useState<IUser>()
   useEffect(() => {
-    if (users.length === 0) {
+    if (users.length === 0 || !isString(pathname)) {
       return
     }
     const pathnames = pathname.split('/').filter(val => !!val)
@@ -142,18 +142,18 @@ function MembersPage({
 
       const avatarUrl = getAvatar(user)
       return (
-        <Chip
-          className="my-1 mx-1"
-          avatar={
-            <Avatar className={classes.chipAvatar} src={avatarUrl}>
-              {!avatarUrl && <DirectionsRun />}
-            </Avatar>
-          }
-          onClick={() => handleChipSelected(user)}
-          key={user.uid}
-          label={label}
-          color={getColor()}
-        />
+          <Chip
+              className="my-1 mx-1"
+              avatar={
+                <Avatar className={classes.chipAvatar} src={avatarUrl}>
+                  {!avatarUrl && <DirectionsRun />}
+                </Avatar>
+              }
+              onClick={() => handleChipSelected(user)}
+              key={user.uid}
+              label={label}
+              color={getColor()}
+          />
       )
     })
   }
@@ -163,29 +163,29 @@ function MembersPage({
     return <></>
   }
   return (
-    <>
-      {showError && (
-        <Snackbar
-          open
-          autoHideDuration={6000}
-          message={'Oops! Something went wrong.'}
-        />
-      )}
-      {!!selected && (
-        <UserProfile
-          // @ts-ignore
-          user={selected}
-          style={{ width: 250 }}
-          onClose={handleDrawerClosed}
-        />
-      )}
-      <SearchBox onChange={setSearch} />
-      <Paper className="px-2 py-3">
-        <div className="d-flex justify-content-between flex-wrap">
-          {isLoading ? <CircularProgress className="mx-auto" /> : getChips()}
-        </div>
-      </Paper>
-    </>
+      <>
+        {showError && (
+            <Snackbar
+                open
+                autoHideDuration={6000}
+                message={'Oops! Something went wrong.'}
+            />
+        )}
+        {!!selected && (
+            <UserProfile
+                // @ts-ignore
+                user={selected}
+                style={{ width: 250 }}
+                onClose={handleDrawerClosed}
+            />
+        )}
+        <SearchBox onChange={setSearch} />
+        <Paper className="px-2 py-3">
+          <div className="d-flex justify-content-between flex-wrap">
+            {isLoading ? <CircularProgress className="mx-auto" /> : getChips()}
+          </div>
+        </Paper>
+      </>
   )
 }
 
@@ -200,13 +200,13 @@ const mapStateToProps = ({ currentUser: { firebaseUser, userData } }: IRedisStat
   return {
     firebaseUser,
     userData: userData ||
-      // @ts-ignore
-      new IMap()
+        // @ts-ignore
+        new IMap()
   }
 }
 
 export default compose(
-  withRouter,
-  LoggedInState(),
-  connect(mapStateToProps)
+    withRouter,
+    LoggedInState(),
+    connect(mapStateToProps)
 )(MembersPage)
