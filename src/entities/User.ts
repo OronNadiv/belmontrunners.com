@@ -69,3 +69,6 @@ export interface IRedisState {
   currentUser: ICurrentUser
 }
 
+export const getAvatar = (user: IUser) => {
+  return /*user.photoURL || */user.gravatarUrl || undefined
+}

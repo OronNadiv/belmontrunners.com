@@ -1,8 +1,8 @@
 import * as Admin from 'firebase-admin'
 import DeleteUser from './deleteUser'
 import { User } from './User'
+import { each } from 'bluebird'
 
-const BPromise = require('bluebird')
 const moment = require('moment')
 
 const PurgeUsersUnder13 = (admin: Admin.app.App, apiKey: string, shouldDelete: boolean) => {
@@ -23,7 +23,7 @@ const PurgeUsersUnder13 = (admin: Admin.app.App, apiKey: string, shouldDelete: b
       }
     })
 
-    await BPromise.each(usersToDelete, (async (user: User) => {
+    await each(usersToDelete, (async (user: User) => {
       console.error('Will be deleted:', JSON.stringify(user))
       // see which one were about to be deleted.  you may need to communicate it with their parents.
       shouldDelete ? await deleteUser(user) : await Promise.resolve()
