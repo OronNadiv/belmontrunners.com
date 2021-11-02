@@ -1,6 +1,7 @@
 import { https } from 'firebase-functions'
 import * as Admin from 'firebase-admin'
 import { User } from './User'
+import StripeAPI from 'stripe'
 
 const moment = require('moment')
 const _ = require('underscore')
@@ -21,8 +22,13 @@ interface StripeConfig {
 }
 
 const Stripe = (admin: Admin.app.App, config: StripeConfig) => {
-  const stripeLive = require('stripe')(config.secretKeys.live)
-  const stripeTest = require('stripe')(config.secretKeys.test)
+  const stripeLive = new StripeAPI(config.secretKeys.live, {
+    apiVersion: '2020-08-27'
+  })
+  const stripeTest = new StripeAPI(config.secretKeys.test, {
+    apiVersion: '2020-08-27'
+  })
+
   const firestore = admin.firestore()
 
   return async (data: StripeParams, context?: https.CallableContext) => {

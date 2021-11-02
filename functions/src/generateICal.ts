@@ -1,9 +1,10 @@
 import Event from './Event'
+import ical from 'ical-generator'
+import * as moment from 'moment-timezone'
 
 const request = require('request')
 const csv = require('csvtojson')
-const moment = require('moment')
-const ical = require('ical-generator')
+const ICAL_LINK = 'https://www.belmontrunners.com/public/basic.ical'
 
 interface GetDescriptionParams {
   description: string
@@ -35,7 +36,7 @@ const GenerateICal = () =>
   async () => {
     try {
       const cal = ical({
-        domain: 'belmontrunners.com',
+        url: ICAL_LINK,
         prodId: { company: 'Belmont Runners', product: 'public-iCal' },
         name: 'Belmont Runners Calendar',
         timezone: 'America/Los_Angeles'
