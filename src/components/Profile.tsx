@@ -24,7 +24,6 @@ import initials  from 'initials'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 import { compose } from 'underscore'
 import gravatar from 'gravatar'
-import rp from 'request-promise'
 import { getAvatar, IRedisState, IUser } from '../entities/User'
 import { signOut } from 'firebase/auth'
 
@@ -79,8 +78,10 @@ function Profile({allowUsersPage, allowContactsPage, userData, history}: Props) 
           default: '404'
         })
         try {
-          await rp(uri)
-          setGravatarUrl(uri)
+          const res = await window.fetch(uri)
+          if (res.ok) {
+            setGravatarUrl(uri)
+          }
         } catch (error) {
           console.log('after RP-EXCEPTION', error)
         } finally {

@@ -4,7 +4,6 @@ import * as Sentry from '@sentry/browser'
 import { httpsCallable } from 'firebase/functions'
 import { IconButton, Snackbar } from '@material-ui/core'
 import { Close as CloseIcon } from '@material-ui/icons'
-import rp from 'request-promise'
 import { functions, auth } from '../../firebase';
 import { RecaptchaVerifier } from 'firebase/auth'
 
@@ -49,19 +48,20 @@ const Subscribe = () => {
       setMessage('Submitting...')
       setMessageLevel('alert-info')
       try {
-        await rp({
+        const res = await window.fetch('https://www.oronnadiv.com/contact', {
           method: 'POST',
-          uri:
-            'https://www.oronnadiv.com/contact',
-          body: {
+          body: JSON.stringify({
             name: email,
             email: email,
             subject: 'Subscription request',
             comments: `Please subscribe me to the weekly emails from the Belmont Runners club.
 My email address is: ${email}`
-          },
-          json: true
+          }),
+          headers: {'Content-Type': 'application/json'}
         })
+        if (!res.ok){
+          throw new Error(`response from /contact is not valid. res: ${res}`);
+        }
         const addContact = httpsCallable(functions, 'addContact')
 
         console.log('calling addContact')

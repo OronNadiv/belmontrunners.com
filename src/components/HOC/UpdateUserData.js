@@ -43,7 +43,7 @@ function UpdateUserData(WrappedComponent) {
         throw new Error('user was not loaded yet or unauthenticated.')
       }
       const context = uuid()
-      var promise = new Promise(function (resolve, reject) {
+      const promise = new Promise(function (resolve, reject) {
         deferreds.push({ resolve: resolve, reject: reject, context })
       })
 
