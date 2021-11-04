@@ -1,9 +1,9 @@
 import Contact from './Contact'
 import * as Admin from 'firebase-admin'
 import { each } from 'bluebird'
+import got from 'got'
 
 const { parseFullName } = require('parse-full-name')
-const rp = require('request-promise')
 const md5 = require('md5')
 
 interface MailChimpContactMergeFields {
@@ -47,13 +47,11 @@ const Contacts2MailChimp = (admin: Admin.app.App, apiKey: string) => {
     })
     await each(body, async (mailChimpContact: MailChimpContact) => {
       try {
-        await rp({
-          method: 'PUT',
-          uri: `https://username:${apiKey}@us3.api.mailchimp.com/3.0/lists/7cffd16da0/members/${md5(
+        const url = `https://username:${apiKey}@us3.api.mailchimp.com/3.0/lists/7cffd16da0/members/${md5(
             mailChimpContact.email_address.toLowerCase()
-          )}`,
-          body: { ...mailChimpContact, status_if_new: 'subscribed' },
-          json: true
+        )}`;
+        await got.put(url, {
+          json: { ...mailChimpContact, status_if_new: 'subscribed' }
         })
         console.info('done PUT:', mailChimpContact.email_address)
       } catch (err: any) {

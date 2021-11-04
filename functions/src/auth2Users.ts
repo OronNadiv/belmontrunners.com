@@ -2,10 +2,10 @@ import * as Admin from 'firebase-admin'
 import { UserRecord } from 'firebase-functions/lib/providers/auth'
 import { User } from './User'
 import { each } from 'bluebird'
+import got from 'got'
 
 const moment = require('moment')
 const gravatar = require('gravatar')
-const rp = require('request-promise')
 
 const Auth2Users = (admin: Admin.app.App) => {
   const firestore = admin.firestore()
@@ -27,14 +27,15 @@ const Auth2Users = (admin: Admin.app.App) => {
           protocol: 'https',
           default: '404'
         })
-        let hasGravatar
+        let hasGravatar = false
         try {
-          await rp(gravatarUrl)
-          console.log('found gravatar:', gravatarUrl)
+          await got.get(gravatarUrl)
+          console.log('found gravatar.', 'gravatarUrl:', gravatarUrl)
           hasGravatar = true
         } catch (error) {
-          console.log('did not find gravatar:', gravatarUrl)
-          hasGravatar = false
+          console.error('Error while fetching gravatar.',
+              'gravatarUrl:', gravatarUrl,
+              'error:', error)
         }
 
         const createdAt = moment(creationTime)

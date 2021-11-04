@@ -1,9 +1,9 @@
 import * as Admin from 'firebase-admin'
 import Contact from './Contact'
 import { ARRAY_KEY } from './fields'
+import got from 'got'
 
 const { reject } = require('underscore')
-const rp = require('request-promise')
 const md5 = require('md5')
 
 interface DeleteUserParam {
@@ -46,18 +46,16 @@ const DeleteUser =(admin: Admin.app.App, apiKey: string) => {
     const deleteFromMailChimp = async () => {
       try {
         console.info(`deleteFromMailChimp called.  email: ${email}`)
-        await rp({
-          method: 'DELETE',
-          uri: `https://username:${apiKey}@us3.api.mailchimp.com/3.0/lists/7cffd16da0/members/${md5(
+        const uri = `https://username:${apiKey}@us3.api.mailchimp.com/3.0/lists/7cffd16da0/members/${md5(
             email.toLowerCase()
-          )}`
-        })
+        )}`
+        await got.delete(uri)
         console.info('deleteFromMailChimp complete successfully.')
-      } catch (err:any) {
-        if (err.statusCode === 404) {
-          console.warn('MailChimp returned 404.  message:', err.message)
+      } catch (err) {
+        if (err && err.response && err.response.statusCode === 404) {
+            console.warn('MailChimp returned 404.  message:', err.response.statusMessage)
         } else {
-          console.error('err from MailChimp:', err)
+          console.error('deleteFromMailChimp failed.', 'err:', err)
         }
       }
     }
