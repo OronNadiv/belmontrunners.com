@@ -1,7 +1,7 @@
 import Contact from './Contact'
 import * as Admin from 'firebase-admin'
 import { each } from 'bluebird'
-import fetch from 'node-fetch'
+import got from 'got'
 
 const { parseFullName } = require('parse-full-name')
 const md5 = require('md5')
@@ -50,16 +50,10 @@ const Contacts2MailChimp = (admin: Admin.app.App, apiKey: string) => {
         const url = `https://username:${apiKey}@us3.api.mailchimp.com/3.0/lists/7cffd16da0/members/${md5(
             mailChimpContact.email_address.toLowerCase()
         )}`;
-        const res = await fetch(url, {
-          method: 'PUT',
-          body: JSON.stringify({ ...mailChimpContact, status_if_new: 'subscribed' }),
-          headers: {'Content-Type': 'application/json'}
+        await got.put(url, {
+          json: { ...mailChimpContact, status_if_new: 'subscribed' }
         })
-        if (res.ok) {
-          console.info('done PUT:', mailChimpContact.email_address)
-        } else {
-          console.error('Invalid response.', 'res:', res)
-        }
+        console.info('done PUT:', mailChimpContact.email_address)
       } catch (err: any) {
         console.error(
           'error PUT:',

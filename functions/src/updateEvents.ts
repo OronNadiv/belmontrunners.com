@@ -1,6 +1,6 @@
 import * as Admin from 'firebase-admin'
 import { Moment } from 'moment'
-import fetch from 'node-fetch'
+import got from 'got'
 
 const csv = require('csvtojson')
 const request = require('request')
@@ -69,8 +69,9 @@ const getEvents = async (): Promise<CSVEvent[]> => {
 }
 
 const getRawWeather = async (appId: string, cityId: string): Promise<RawWeather[]> => {
-  const res = await fetch(`https://api.openweathermap.org/data/2.5/forecast?id=${cityId}&appid=${appId}&units=imperial`)
-  const data = await res.json() as {list:RawWeather[]}
+  type OpenWeatherMapResponse = { list: RawWeather[] };
+  const res = await got.get(`https://api.openweathermap.org/data/2.5/forecast?id=${cityId}&appid=${appId}&units=imperial`).json()
+  const data = res as OpenWeatherMapResponse
   return data.list
 }
 

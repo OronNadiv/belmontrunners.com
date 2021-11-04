@@ -2,7 +2,7 @@ import * as Admin from 'firebase-admin'
 import { UserRecord } from 'firebase-functions/lib/providers/auth'
 import { User } from './User'
 import { each } from 'bluebird'
-import fetch from 'node-fetch'
+import got from 'got'
 
 const moment = require('moment')
 const gravatar = require('gravatar')
@@ -29,13 +29,9 @@ const Auth2Users = (admin: Admin.app.App) => {
         })
         let hasGravatar = false
         try {
-          const res = await fetch(gravatarUrl)
-          if (res.ok) {
-            console.log('found gravatar.', 'gravatarUrl:', gravatarUrl)
-            hasGravatar = true
-          } else {
-            console.log('Did not find gravatar.', 'gravatarUrl:', gravatarUrl)
-          }
+          await got.get(gravatarUrl)
+          console.log('found gravatar.', 'gravatarUrl:', gravatarUrl)
+          hasGravatar = true
         } catch (error) {
           console.error('Error while fetching gravatar.',
               'gravatarUrl:', gravatarUrl,
