@@ -37,6 +37,7 @@ import { Redirect } from 'react-router-dom'
 import ConfirmDeletion from './ConfirmDeletion'
 import calc from '../../utilities/membershipUtils'
 import { firestore, functions } from '../../firebase'
+import getWindowDimensions, {useWindowDimensions} from '../../utilities/getWindowDimentions';
 
 const PNF = googleLibPhoneNumber.PhoneNumberFormat
 const phoneUtil = googleLibPhoneNumber.PhoneNumberUtil.getInstance()
@@ -134,6 +135,8 @@ function UsersPage({ firebaseUser, allowDelete, allowRead, allowWrite }: Props) 
   useEffect(() => {
     allowRead && loadMembers()
   }, [allowRead, loadMembers])
+
+  const { height, width } = useWindowDimensions();
 
   const handleNotInterested = async (userData: IUserWithMembershipStatus, isChecked: boolean) => {
     const userRef = doc(firestore, `users/${userData.uid}`)
@@ -354,6 +357,7 @@ function UsersPage({ firebaseUser, allowDelete, allowRead, allowWrite }: Props) 
               selectableRows: allowDelete ? 'single' : 'none',
               print: false,
               rowsPerPage: 100,
+              tableBodyMaxHeight: `${height/1.5}px`,
               // eslint-disable-next-line react/display-name
               customToolbarSelect: (selectedRows) => {
                 return allowDelete &&
