@@ -1,6 +1,19 @@
 import React from 'react'
-import {EVENTS_HASH, ROOT, SUBSCRIBE_HASH} from '../../urls';
-import {Link} from 'react-router-dom'
+import { EVENTS_HASH, ROOT, SUBSCRIBE_HASH } from '../../urls';
+import { Link } from 'react-router-dom'
+import SimpleImageSlider from "react-simple-image-slider";
+import _ from 'underscore'
+
+const images = _.shuffle([
+  { url: "img/welcome/back1-fixed-307.jpg" },
+  { url: "img/welcome/back2-fixed-307.jpg" },
+  { url: "img/welcome/back3-fixed-307.png" },
+  { url: "img/welcome/front1-fixed-307.jpg" },
+  { url: "img/welcome/front2-fixed-307.jpg" },
+  { url: "img/welcome/front3-fixed-307.jpg" },
+  { url: "img/welcome/front4-fixed-307.jpg" },
+  { url: "img/welcome/front5-fixed-307.jpg" }
+])
 
 function Welcome() {
   return (
@@ -8,17 +21,21 @@ function Welcome() {
       <div className="container">
         <div className="welcome_inner row">
           <div className="col-lg-5">
-            <div className="welcome_img">
-              <img
-                  className="img-fluid rounded shadow"
-                  src="img/welcome.png"
-                  alt=""
+            <div className="welcome_img rounded d-flex justify-content-center">
+              <SimpleImageSlider
+                  width={458}
+                  height={307}
+                  images={images}
+                  navSize={30}
+                  showBullets
+                  showNavs
+                  autoPlay
               />
             </div>
           </div>
           <div className="col-lg-6 offset-lg-1">
             <div className="welcome_text">
-              <h3>Welcome to Belmont Runners</h3>
+              <h3 className="text-lg-left text-center">Welcome to Belmont Runners</h3>
               <p>
                 The Belmont Runners are a casual group of runners looking to
                 build a community of friendly, active locals who enjoy fitness

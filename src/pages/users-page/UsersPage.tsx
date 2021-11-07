@@ -37,7 +37,7 @@ import { Redirect } from 'react-router-dom'
 import ConfirmDeletion from './ConfirmDeletion'
 import calc from '../../utilities/membershipUtils'
 import { firestore, functions } from '../../firebase'
-import getWindowDimensions, {useWindowDimensions} from '../../utilities/getWindowDimentions';
+import { useWindowDimensions } from '../../utilities/getWindowDimentions';
 
 const PNF = googleLibPhoneNumber.PhoneNumberFormat
 const phoneUtil = googleLibPhoneNumber.PhoneNumberUtil.getInstance()
@@ -136,7 +136,7 @@ function UsersPage({ firebaseUser, allowDelete, allowRead, allowWrite }: Props) 
     allowRead && loadMembers()
   }, [allowRead, loadMembers])
 
-  const { height, width } = useWindowDimensions();
+  const { height } = useWindowDimensions();
 
   const handleNotInterested = async (userData: IUserWithMembershipStatus, isChecked: boolean) => {
     const userRef = doc(firestore, `users/${userData.uid}`)
