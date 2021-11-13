@@ -1,18 +1,42 @@
 import React from 'react'
 import { EVENTS_HASH, ROOT, SUBSCRIBE_HASH } from '../../urls';
 import { Link } from 'react-router-dom'
-import SimpleImageSlider from "react-simple-image-slider";
+import ImageGallery from 'react-image-gallery'
 import _ from 'underscore'
 
 const images = _.shuffle([
-  { url: "img/welcome/back1-fixed-307.jpg" },
-  { url: "img/welcome/back2-fixed-307.jpg" },
-  { url: "img/welcome/back3-fixed-307.png" },
-  { url: "img/welcome/front1-fixed-307.jpg" },
-  { url: "img/welcome/front2-fixed-307.jpg" },
-  { url: "img/welcome/front3-fixed-307.jpg" },
-  { url: "img/welcome/front4-fixed-307.jpg" },
-  { url: "img/welcome/front5-fixed-307.jpg" }
+  {
+    original: "img/welcome/back1-fixed-307.jpg",
+    originalWeight: 458
+  },
+  {
+    original: "img/welcome/back2-fixed-307.jpg",
+    originalWeight: 458
+  },
+  {
+    original: "img/welcome/back3-fixed-307.png",
+    originalWeight: 458
+  },
+  {
+    original: "img/welcome/front1-fixed-307.jpg",
+    originalWeight: 458
+  },
+  {
+    original: "img/welcome/front2-fixed-307.jpg",
+    originalWeight: 458
+  },
+  {
+    original: "img/welcome/front3-fixed-307.jpg",
+    originalWeight: 458
+  },
+  {
+    original: "img/welcome/front4-fixed-307.jpg",
+    originalWeight: 458
+  },
+  {
+    original: "img/welcome/front5-fixed-307.jpg",
+    originalWeight: 458
+  }
 ])
 
 function Welcome() {
@@ -20,16 +44,15 @@ function Welcome() {
     <section className="welcome_area p_120">
       <div className="container">
         <div className="welcome_inner row">
-          <div className="col-lg-5">
+          <div className="col-lg-5 col-12" >
             <div className="welcome_img rounded d-flex justify-content-center">
-              <SimpleImageSlider
-                  width={458}
-                  height={307}
-                  images={images}
-                  navSize={30}
-                  showBullets
-                  showNavs
+              <ImageGallery
                   autoPlay
+                  items={images}
+                  showFullscreenButton={false}
+                  showNav={false}
+                  showPlayButton={false}
+                  showThumbnails={false}
               />
             </div>
           </div>
