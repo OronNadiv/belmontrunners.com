@@ -360,10 +360,11 @@ function UsersPage({ firebaseUser, allowDelete, allowRead, allowWrite }: Props) 
               tableBodyMaxHeight: `${height/1.5}px`,
               // eslint-disable-next-line react/display-name
               customToolbarSelect: (selectedRows) => {
+                const { dataIndex } = selectedRows.data[0]
+                const row = rows[dataIndex]
+                console.log("uid:", row[UID], "displayName:", row[DISPLAY_NAME])
                 return allowDelete &&
                   <IconButton aria-label="Delete" disabled={isSubmitting} onClick={() => {
-                    const { dataIndex } = selectedRows.data[0]
-                    const row = rows[dataIndex]
                     row && setRowToDelete(row)
                   }}>
                     <DeleteIcon />
