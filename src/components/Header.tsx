@@ -358,27 +358,27 @@ function Header({ location: { pathname }, isCurrentUserLoaded, firebaseUser, all
 
                   <a href={SCHEDULE} className={classes.menuItem}>
                     <div className='text-white d-flex align-items-center'>
-                      <span className='mx-2'>SCHEDULE</span>
+                      <span className='mx-2 text-with-shadow'>SCHEDULE</span>
                     </div>
                   </a>
                   <Link to={ABOUT_US} className={classes.menuItem}>
                     <div className='text-white d-flex align-items-center'>
-                      <span className='mx-2'>About Us</span>
+                      <span className='mx-2 text-with-shadow'>About Us</span>
                     </div>
                   </Link>
                   <Link to={FAQ} className={classes.menuItem}>
                     <div className='text-white d-flex align-items-center'>
-                      <span className='mx-2'>FAQ</span>
+                      <span className='mx-2 text-with-shadow'>FAQ</span>
                     </div>
                   </Link>
                   <a href={BLOG} className={classes.menuItem}>
                     <div className='text-white d-flex align-items-center'>
-                      <span className='mx-2'>Latest news</span>
+                      <span className='mx-2 text-with-shadow'>Latest news</span>
                     </div>
                   </a>
                   <a href={STORE} className={classes.menuItem}>
                     <div className='text-white d-flex align-items-center'>
-                      <span className='mx-2'>Store</span>
+                      <span className='mx-2 text-with-shadow'>Store</span>
                     </div>
                   </a>
                 </>
@@ -387,7 +387,7 @@ function Header({ location: { pathname }, isCurrentUserLoaded, firebaseUser, all
                 !isSmallDevice && isMember &&
                 <Link to={MEMBERS} className={classes.menuItem} /*style={{ marginLeft: '2em' }}*/>
                   <div className='text-white d-flex align-items-center'>
-                    <span className='mx-2'>Members</span>
+                    <span className='mx-2 text-with-shadow'>Members</span>
                   </div>
                 </Link>
               }
@@ -412,7 +412,7 @@ function Header({ location: { pathname }, isCurrentUserLoaded, firebaseUser, all
               <Link to={{
                 pathname: JOIN
               }}>
-                <Button variant='contained' color='primary' className='ml-5'>
+                <Button variant='contained' color='primary' className='ml-5 text-with-shadow'>
                   Join Us
                 </Button>
               </Link>
@@ -420,7 +420,7 @@ function Header({ location: { pathname }, isCurrentUserLoaded, firebaseUser, all
             {
               !isSmallDevice && isSignedOut &&
               <Link to={SIGN_IN} className='signin-btn text-white'>
-                <Button className='text-white'>
+                <Button className='text-white text-with-shadow'>
                   Sign in
                 </Button>
               </Link>
