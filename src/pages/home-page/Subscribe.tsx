@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import isEmail from 'isemail'
+import * as EmailValidator from 'email-validator'
 import * as Sentry from '@sentry/browser'
 import { httpsCallable } from 'firebase/functions'
 import { IconButton, Snackbar } from '@material-ui/core'
@@ -35,7 +35,7 @@ const Subscribe = () => {
         setIsSubmitting(false)
         return
       }
-      if (!isEmail.validate(email)) {
+      if (!EmailValidator.validate(email)) {
         console.warn('email is invalid.')
         setMessage(
           'You have entered an invalid e-mail address. Please try again.'

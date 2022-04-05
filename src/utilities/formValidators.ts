@@ -1,6 +1,6 @@
 import moment from 'moment'
 import { INVALID_EMAIL, INVALID_PASSWORD_LENGTH } from '../messages'
-import isEmailComponent from 'isemail'
+import * as EmailValidator from 'email-validator'
 
 const MAX_YEAR = moment().year() - 5
 const MIN_YEAR = moment().year() - 120
@@ -13,7 +13,7 @@ export const birthday = (value: string) => {
     ? 'Invalid birthday'
     : undefined
 }
-export const isEmail = (value:string) => !value || !isEmailComponent.validate(value) ? INVALID_EMAIL : undefined
+export const isEmail = (value:string) => !value || !EmailValidator.validate(value) ? INVALID_EMAIL : undefined
 
 export const minPasswordLength = (value: string) => {
   const res = value.length < 6 ? INVALID_PASSWORD_LENGTH(6) : undefined
