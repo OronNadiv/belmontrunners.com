@@ -92,6 +92,11 @@ export const updateEventsCronJob = functions.pubsub
   .schedule('*/20 * * * *')
   .onRun(async () => await updateEvents())
 
+export const waiver = functions
+  .https.onRequest(async (req: functions.https.Request, res: functions.Response) => {
+    res.redirect('https://docs.google.com/forms/d/e/1FAIpQLSfYxlbWAzK1jAcdE_5-ijxORNVz2YU4BdSVt2Dk-DByncIEkw/viewform')
+  })
+
 export const ical = functions
   .runWith({ memory: '512MB' })
   .https.onRequest(async (req: functions.https.Request, res: functions.Response) => {

@@ -14,6 +14,10 @@
         "function": "ical"
       },
       {
+        "source": "/waiver",
+        "function": "waiver"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
