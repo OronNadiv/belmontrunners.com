@@ -170,7 +170,7 @@ function CalendarSelector({ fullScreen }: { fullScreen?: boolean }) {
             <ListItemIcon>
               <GoogleCalendarIcon />
             </ListItemIcon>
-            <ListItemText primary="Google Calendar (Desktop)" />
+            <ListItemText primary="Google Calendar" />
           </MenuItem>
           <MenuItem onClick={() => handleClose(YAHOO)}>
             <ListItemIcon>
