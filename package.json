@@ -27,7 +27,7 @@
     "jquery": "^3.6.0",
     "logrocket": "^2.2.1",
     "logrocket-react": "^4.0.1",
-    "moment": "^2.29.1",
+    "moment": "^2.29.4",
     "mui-datatables": "^3.8.5",
     "normalize-email": "^1.1.1",
     "parse-full-name": "^1.2.6",
