@@ -33,7 +33,7 @@
     "ical-generator": "^3.2.1",
     "md5": "^2.3.0",
     "moment": "^2.29.1",
-    "moment-timezone": "^0.5.34",
+    "moment-timezone": "^0.5.35",
     "normalize-email": "^1.1.1",
     "parse-full-name": "^1.2.6",
     "request": "^2.88.2",
