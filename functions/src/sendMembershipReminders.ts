@@ -11,16 +11,18 @@ const SendMembershipReminders = (admin: Admin.app.App) => {
   const firestore = admin.firestore();
 
   async function wasEmailSent(user: User) {
-    const mailRef = firestore.collection('mail')
-    mailRef.where("toUids", "array-contains", user.uid)
+    const docs = await firestore.collection('mail')
+        .where("toUids", "array-contains", user.uid)
         .where("template.name", "==", "membershipExpiresSoon")
         .where("delivery.startTime", ">", moment().subtract(REMINDER_DURATION).toDate())
         .where("delivery.startTime", "<", moment().add(REMINDER_DURATION).toDate())
-    const docs = await mailRef.get();
+        .get()
     return !docs.empty
   }
 
   async function sendEmail(user: User) {
+    console.log('sendEmail called.  User:', user.uid)
+
     return await firestore.collection('mail').add({
       toUids: [user.uid],
       bcc: 'membership@belmontrunners.com',
@@ -47,11 +49,15 @@ const SendMembershipReminders = (admin: Admin.app.App) => {
       users.push(user);
     });
 
-    return filter(users, (user: User) =>
-        calc(user, REMINDER_DURATION).isMembershipExpiresSoon
-    )
+    return filter(users, (user: User) => {
+      const isMembershipExpiresSoon = calc(user, REMINDER_DURATION).isMembershipExpiresSoon
+      console.log("user.uid: ", user.uid,
+          "isMembershipExpiresSoon:", isMembershipExpiresSoon)
+      return isMembershipExpiresSoon
+    })
         .filter((user: User) =>
             resolve(wasEmailSent(user))
+                .tap((wasSent: boolean) => console.log('user.uid: ', user.uid, 'wasEmailSent:', wasSent))
                 .then((wasSent: boolean) => !wasSent))
         .each(sendEmail)
   }

@@ -13,16 +13,7 @@ interface CalcRes {
 
 const MembershipUtils = (userData: CalcParam, duration = moment.duration(1, 'month')): CalcRes => {
   const membershipExpiresAt = userData.membershipExpiresAt
-
   const isAMember = membershipExpiresAt && moment().isBefore(moment(membershipExpiresAt))
-
-  console.log(
-    'isAMember:',
-    isAMember,
-    'membershipExpiresAt:',
-    membershipExpiresAt
-  )
-
   const isMembershipExpired = membershipExpiresAt && moment(membershipExpiresAt).isBefore(moment())
   return {
     isAMember: Boolean(isAMember),
