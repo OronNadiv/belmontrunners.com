@@ -5,6 +5,7 @@ import calc from './membershipUtils'
 import {filter, resolve} from 'bluebird'
 
 const moment = require('moment')
+const MEMBERSHIP_EXPIRES_SOON_DURATION = moment.duration(14, 'days')
 const REMINDER_DURATION = moment.duration(11, 'days')
 
 const SendMembershipReminders = (admin: Admin.app.App) => {
@@ -15,7 +16,7 @@ const SendMembershipReminders = (admin: Admin.app.App) => {
         .where("toUids", "array-contains", user.uid)
         .where("template.name", "==", "membershipExpiresSoon")
         .where("delivery.startTime", ">", moment().subtract(REMINDER_DURATION).toDate())
-        .where("delivery.startTime", "<", moment().add(REMINDER_DURATION).toDate())
+        .where("delivery.startTime", "<", moment().toDate())
         .get()
     return !docs.empty
   }
@@ -50,14 +51,17 @@ const SendMembershipReminders = (admin: Admin.app.App) => {
     });
 
     return filter(users, (user: User) => {
-      const isMembershipExpiresSoon = calc(user, REMINDER_DURATION).isMembershipExpiresSoon
-      console.log("user.uid: ", user.uid,
-          "isMembershipExpiresSoon:", isMembershipExpiresSoon)
+      const isMembershipExpiresSoon = calc(user, MEMBERSHIP_EXPIRES_SOON_DURATION).isMembershipExpiresSoon
+      console.log('user.uid:', user.uid,
+          ', MEMBERSHIP_EXPIRES_SOON_DURATION in days:', MEMBERSHIP_EXPIRES_SOON_DURATION.days(),
+          ', isMembershipExpiresSoon:', isMembershipExpiresSoon)
       return isMembershipExpiresSoon
     })
         .filter((user: User) =>
             resolve(wasEmailSent(user))
-                .tap((wasSent: boolean) => console.log('user.uid: ', user.uid, 'wasEmailSent:', wasSent))
+                .tap((wasSent: boolean) => console.log('user.uid:', user.uid,
+                    ', REMINDER_DURATION in days:', REMINDER_DURATION.days(),
+                    ', wasEmailSent:', wasSent))
                 .then((wasSent: boolean) => !wasSent))
         .each(sendEmail)
   }
