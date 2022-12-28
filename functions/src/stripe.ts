@@ -117,14 +117,27 @@ const Stripe = (admin: Admin.app.App, config: StripeConfig) => {
     }
     userDataJS.notInterestedInBecomingAMember = false
     userDataJS.membershipExpiresAt = newMembershipExpiresAt.utc().format()
+
     await Promise.all([
-      transactionsRef.set(values),
-      transactionsLastRef.set(values),
-      userDataRef.set({
-        notInterestedInBecomingAMember: userDataJS.notInterestedInBecomingAMember,
-        membershipExpiresAt: userDataJS.membershipExpiresAt
-      }, { merge: true })
-    ])
+          transactionsRef.set(values),
+          transactionsLastRef.set(values),
+          userDataRef.set({
+            notInterestedInBecomingAMember: userDataJS.notInterestedInBecomingAMember,
+            membershipExpiresAt: userDataJS.membershipExpiresAt
+          }, {merge: true})
+        ])
+        .then(() =>
+            firestore.collection('mail').add({
+              toUids: [userDataJS.uid],
+              bcc: 'membership@belmontrunners.com',
+              template: {
+                name: "welcome",
+                data: {
+                  displayName: userDataJS.displayName,
+                },
+              },
+            })
+        )
     return charge
   }
 }
