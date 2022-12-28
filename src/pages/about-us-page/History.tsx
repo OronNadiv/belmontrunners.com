@@ -94,14 +94,12 @@ const History = () => {
                 className="ml-lg-auto col-lg-5 order-1 order-lg-0 pt-lg-3 pt-5">
               <p>
                 We were looking to bigger and better things for 2020, until the
-                Pandemic changed everything. As we are slowly starting to emerge
-                from these challenging times, we cannot wait to share the next
-                chapter of our story with you.
-              </p>
-              <p>
-                In the end, the most important key to our success is you. We are
-                incredibly thankful for the continued support we receive from
-                our community. Thank you all!
+                pandemic changed everything. All runs were suspended and many of
+                the local parks were closed. The club held a couple of virtual
+                happy hours and even a running-movie night to keep our members
+                engaged. We cautiously began to regroup in July as numbers
+                started decreasing, but that was short lived, and we suspended
+                runs again in November.
               </p>
             </div>
 
@@ -113,6 +111,50 @@ const History = () => {
               />
             </div>
           </div>
+
+          <div className="row row_odd pad_top">
+            <div className="ml-lg-auto col-lg-4">
+              <img
+                  className="img-fluid rounded d-block mx-auto"
+                  src="img/about-us/trail.png"
+                  alt=""
+              />
+            </div>
+
+            <div className="col-lg-5 offset-lg-1 mr-lg-auto pt-lg-3 pt-5">
+              <p>
+                Towards the end of 2020, our board saw its first major
+                shifts as Doug, Shelly, and Oron stepped down from their
+                board positions during the pandemic. Jon VanHorn
+                stepped in as club president and the Board was expanded
+                from five to seven members.
+              </p>
+              <p>
+                By June of 2021, our club was back in full swing. Our
+                events coordinator Erica began to reach out to running
+                product vendors and we actually began to receive
+                responses from them – with Spring Energy being the first
+                to come to one of our run club events! Since then, we have
+                had other reps from Hoka, Saucony and ON Running to
+                name a few!
+              </p>
+            </div>
+          </div>
+
+          <div className="row pad_top">
+            <p className="offset-lg-2 col-lg-8 text-center">
+              In the end, the most important key to our success is you. We are
+              incredibly thankful for the continued
+              support we receive from our community. Thank you all!
+            </p>
+
+            <img
+                className="img-fluid rounded d-block mx-auto"
+                src="img/about-us/social.png"
+                alt=""
+            />
+          </div>
+
 
         </div>
       </section>
