@@ -39,7 +39,10 @@ function Map({ google }: { google: any }) {
               </div>
               <div className="media-body">
                 <h4>
-                  info@belmontrunners.com
+                  <a
+                      href='mailto://info@belmontrunners.com'
+                      target='_blank'
+                      rel='noreferrer noopener'>info@belmontrunners.com</a>
                 </h4>
                 <p>Send us your query anytime!</p>
               </div>

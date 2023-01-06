@@ -14,7 +14,7 @@ const History = () => {
               <img
                   className="img-fluid rounded d-block mx-auto"
                   src="img/about-us/taco-run.png"
-                  alt=""
+                  alt="Taco run"
               />
             </div>
 
@@ -55,7 +55,7 @@ const History = () => {
               <img
                   className="img-fluid rounded d-block mx-auto"
                   src="img/about-us/library.png"
-                  alt=""
+                  alt="Library"
               />
             </div>
           </div>
@@ -66,7 +66,7 @@ const History = () => {
               <img
                   className="img-fluid rounded d-block mx-auto"
                   src="img/about-us/trail.png"
-                  alt=""
+                  alt="Trail"
               />
             </div>
 
@@ -106,8 +106,8 @@ const History = () => {
             <div className="col-lg-4 offset-lg-1 mr-lg-auto order-0 order-lg-1">
               <img
                   className="img-fluid rounded d-block mx-auto"
-                  src="img/about-us/social.png"
-                  alt=""
+                  src="img/about-us/happy-hour.png"
+                  alt="Happy hour"
               />
             </div>
           </div>
@@ -150,8 +150,8 @@ const History = () => {
 
             <img
                 className="img-fluid rounded d-block mx-auto"
-                src="img/about-us/social.png"
-                alt=""
+                src="img/about-us/summer2022.png"
+                alt="Summer 2022"
             />
           </div>
 
