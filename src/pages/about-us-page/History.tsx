@@ -116,8 +116,8 @@ const History = () => {
             <div className="ml-lg-auto col-lg-4">
               <img
                   className="img-fluid rounded d-block mx-auto"
-                  src="img/about-us/trail.png"
-                  alt=""
+                  src="img/about-us/two-runners.png"
+                  alt="Two runners"
               />
             </div>
 

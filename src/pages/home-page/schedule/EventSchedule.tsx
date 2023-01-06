@@ -144,7 +144,7 @@ function EventSchedule() {
                       <div key={index} className="media align-items-center">
                         {
                           !isSmallDevice && <div className="d-flex">
-                            <img src="img/schedule/schedule-3.png" alt="" />
+                            <img src="img/schedule/schedule-3.png" alt="Runner icon" />
                           </div>
                         }
                         <div className="media-body">
@@ -180,7 +180,7 @@ function EventSchedule() {
                             {filteredEvent['is-members-only-event'] === 'TRUE' && (
                               <img
                                 src="img/schedule/members-only-t.png"
-                                alt=""
+                                alt="Members only"
                                 style={{ width: '5em' }}
                               />
                             )}

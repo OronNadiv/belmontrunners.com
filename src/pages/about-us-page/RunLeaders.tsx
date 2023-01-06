@@ -25,7 +25,7 @@ const getTeam = () => {
               <img
                 className="img-fluid rounded-circle"
                 src={`img/team/${member.image}`}
-                alt=""
+                alt={member.name}
               />
             }
             <div className="hover">
