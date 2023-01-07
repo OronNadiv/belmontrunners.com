@@ -22,7 +22,11 @@ jobs:
           command: npm install --prefix=./firebase-deploy firebase-tools
       - run:
           name: Deploy to Firebase Hosting
-          command: ./firebase-deploy/node_modules/.bin/firebase deploy --token=$FIREBASE_DEPLOY_TOKEN --force --only hosting
+          command: ./firebase-deploy/node_modules/.bin/firebase deploy
+            --token=$FIREBASE_DEPLOY_TOKEN --force --only hosting
       - run:
           name: Deploy to Firebase Functions
-          command: ./firebase-deploy/node_modules/.bin/firebase deploy --token=$FIREBASE_DEPLOY_TOKEN --force --only functions
+          command: ./firebase-deploy/node_modules/.bin/firebase deploy
+            --token=$FIREBASE_DEPLOY_TOKEN --force --only functions
+    # The resource_class feature allows configuring CPU and RAM resources for each job. Different resource classes are available for different executors. https://circleci.com/docs/2.0/configuration-reference/#resourceclass
+    resource_class: large
