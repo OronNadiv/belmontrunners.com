@@ -1,28 +1,38 @@
-version: 2
+version: 2.1
 jobs:
   build:
-    branches:
-      only:
-        - master
     docker:
-      - image: cimg/node:16.14.2
+    - image: cimg/node:16.14.2
     steps:
-      - checkout
-      - run:
-          name: Install Dependencies
-          command: |
-            npm install
-            cd functions
-            npm install
-      - run:
-          name: Build Application
-          command: npm run build
-      - run:
-          name: Install Firebase Tools
-          command: npm install --prefix=./firebase-deploy firebase-tools
-      - run:
-          name: Deploy to Firebase Hosting
-          command: ./firebase-deploy/node_modules/.bin/firebase deploy --token=$FIREBASE_DEPLOY_TOKEN --force --only hosting
-      - run:
-          name: Deploy to Firebase Functions
-          command: ./firebase-deploy/node_modules/.bin/firebase deploy --token=$FIREBASE_DEPLOY_TOKEN --force --only functions
+    - checkout
+    - when:
+        condition:
+          equal: [ master, << pipeline.git.branch >> ]
+        steps:
+        - run:
+            name: Install Dependencies
+            command: |
+              npm install
+              cd functions
+              npm install
+        - run:
+            name: Build Application
+            command: npm run build
+        - run:
+            name: Install Firebase Tools
+            command: npm install --prefix=./firebase-deploy firebase-tools
+        - run:
+            name: Deploy to Firebase Hosting
+            command: ./firebase-deploy/node_modules/.bin/firebase deploy --token=$FIREBASE_DEPLOY_TOKEN --force --only hosting
+        - run:
+            name: Deploy to Firebase Functions
+            command: ./firebase-deploy/node_modules/.bin/firebase deploy --token=$FIREBASE_DEPLOY_TOKEN --force --only functions
+    # The resource_class feature allows configuring CPU and RAM resources for each job. Different resource classes are available for different executors. https://circleci.com/docs/2.0/configuration-reference/#resourceclass
+    resource_class: large
+
+workflows: # a single workflow with a single job called build
+  build:
+    jobs:
+    - build:
+        context: deploy-to-firebase
+
