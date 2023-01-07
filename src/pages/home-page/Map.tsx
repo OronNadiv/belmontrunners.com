@@ -66,6 +66,11 @@ function Map({ google }: { google: any }) {
 Map.propTypes = {
   google: PropTypes.object.isRequired
 }
+
+if (!process.env.REACT_APP_GOOGLE_MAPS_API_KEY) {
+  console.error('Missing REACT_APP_GOOGLE_MAPS_API_KEY')
+}
+
 export default GoogleApiWrapper({
-  apiKey: 'AIzaSyBPgHuk6L4BnzuKsTuyqGEDn6_JkK7meM4'
+  apiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || 'KEY_NOT_FOUND'
 })(Map)
