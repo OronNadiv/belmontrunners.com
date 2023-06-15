@@ -7,7 +7,7 @@ import SignUpStepper, {
 import * as PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { IRedisState } from '../../entities/User'
-import { User } from '../../../functions/src/User';
+import { User } from '../../../functions/src/User'
 
 interface Props {
   isCurrentUserLoaded: boolean
@@ -35,6 +35,7 @@ function SignUpPage({ isCurrentUserLoaded, firebaseUser }: Props) {
     // todo: show loading
     return <></>
   }
+
   return (
     <div style={{ maxWidth: 350 }} className="mx-auto">
       <SignUpStepper steps={steps} />
@@ -44,7 +45,7 @@ function SignUpPage({ isCurrentUserLoaded, firebaseUser }: Props) {
 
 SignUpPage.propTypes = {
   isCurrentUserLoaded: PropTypes.bool.isRequired,
-  firebaseUser: PropTypes.object
+  firebaseUser: PropTypes.object,
 }
 
 const mapStateToProps = ({ currentUser: { isCurrentUserLoaded, firebaseUser } }: IRedisState) => {

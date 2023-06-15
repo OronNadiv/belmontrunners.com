@@ -276,7 +276,7 @@ function SignUpStepPayment({
               ? isLast
               ? 'Finish'
               : 'Next'
-              : 'Pay Now'
+              : isSubmitting ? 'Processing payment...' : 'Pay Now'
           }
           primaryDisabled={isSubmitting}
           showPrimary
@@ -285,6 +285,14 @@ function SignUpStepPayment({
           secondaryDisabled={isSubmitting}
           showSecondary={needToPay && !confirmationNumber}
         />
+      }
+      {
+        isSubmitting && (<div className='text-center text-danger'>
+          <div>It may take up to 30 seconds to complete</div>
+          <div className='mt-0 font-weight-bold'>
+            Please do not refresh the page
+          </div>
+        </div>)
       }
     </div>
   )

@@ -2,7 +2,12 @@ import { https } from 'firebase-functions'
 import * as Admin from 'firebase-admin'
 import { User } from './User'
 import StripeAPI from 'stripe'
+import calc from './membershipUtils'
 
+const {
+  info,
+  warn,
+} = require("firebase-functions/logger");
 const moment = require('moment')
 const _ = require('underscore')
 
@@ -33,7 +38,7 @@ const Stripe = (admin: Admin.app.App, config: StripeConfig) => {
 
   return async (data: StripeParams, context?: https.CallableContext) => {
 
-    console.info('stripe() called.', 'data:', data)
+    info('stripe() called.', 'data:', data)
 
     if (!context || !context.auth || !context.auth.uid) {
       throw new https.HttpsError(
@@ -64,6 +69,20 @@ const Stripe = (admin: Admin.app.App, config: StripeConfig) => {
       )
     }
     const userDataJS: User = userDoc.data() as User
+    const isAMember = calc(userDataJS).isAMember
+    const isMembershipExpiresSoon = calc(userDataJS).isMembershipExpiresSoon
+    if (isAMember && !isMembershipExpiresSoon){
+      warn('member has a valid membership that does not expire soon.', {
+        membershipExpiresAt: userDataJS.membershipExpiresAt,
+        isAMember,
+        isMembershipExpiresSoon
+      })
+      throw new https.HttpsError(
+          'internal',
+          'Already a member.'
+      )
+    }
+
     const { membershipExpiresAt } = userDataJS
 
     let charge
@@ -73,7 +92,7 @@ const Stripe = (admin: Admin.app.App, config: StripeConfig) => {
         _.isString(origin) &&
         (origin.indexOf('localhost') > -1 || origin.indexOf('127.0.0.1') > -1)
       const isProduction = !isLocal
-      console.info('isProduction:', isProduction, 'origin:', origin)
+      info({isProduction,  origin})
       const stripe = isProduction ? stripeLive : stripeTest
       charge = await stripe.charges.create({
         amount,
@@ -82,13 +101,13 @@ const Stripe = (admin: Admin.app.App, config: StripeConfig) => {
         source: id
       })
     } catch (err) {
-      console.warn('charge error:', JSON.stringify(err))
+      warn('charge error.', {err})
       throw new https.HttpsError(
         'invalid-argument',
         JSON.stringify(err)
       )
     }
-    console.info('charge:', JSON.stringify(charge))
+    info('charge complete successfully.', {charge})
 
 
     const confirmationNumber = charge.id
