@@ -1,0 +1,55 @@
+{
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
+  "scripts": {
+    "auth2UsersCMD": "npm run build && node lib/auth2UsersCMD.js",
+    "build": "./node_modules/.bin/tslint --project tsconfig.json && ./node_modules/.bin/tsc",
+    "contacts2MailChimpCMD": "npm run build && node lib/contacts2MailChimpCMD.js",
+    "deploy": "firebase deploy --only functions",
+    "extendMembershipCMD": "npm run build && node lib/extendMembershipCMD.js",
+    "generateICalCMD": "npm run build && node lib/generateICalCMD.js",
+    "getMembersCMD": "npm run build && node lib/getMembersCMD.js",
+    "getPhotoURLCMD": "npm run build && node lib/getPhotoURLCMD.js",
+    "lint": "tslint --project tsconfig.json",
+    "logs": "firebase functions:log",
+    "serve": "npm run build && firebase serve --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "sendMembershipRemindersCMD": "npm run build && node lib/sendMembershipRemindersCMD.js",
+    "start": "npm run shell",
+    "users2ContactsCMD": "npm run build && node lib/users2ContactsCMD.js",
+    "updateEventsCMD": "npm run build && node lib/updateEventsCMD.js"
+  },
+  "main": "lib/index.js",
+  "engines": {
+    "node": "14"
+  },
+  "dependencies": {
+    "bluebird": "^3.7.2",
+    "csvtojson": "^2.0.10",
+    "exif-parser": "^0.1.12",
+    "firebase-admin": "^10.0.2",
+    "firebase-functions": "^3.19.0",
+    "got": "^11.8.3",
+    "gravatar": "^1.8.2",
+    "ical-generator": "^3.2.1",
+    "md5": "^2.3.0",
+    "moment": "^2.29.1",
+    "moment-timezone": "^0.5.34",
+    "normalize-email": "^1.1.1",
+    "parse-full-name": "^1.2.6",
+    "request": "^2.88.2",
+    "stripe": "^8.210.0",
+    "underscore": "^1.13.2"
+  },
+  "devDependencies": {
+    "@types/luxon": "^2.3.1",
+    "@types/node": "^14.18.12",
+    "dayjs": "^1.11.0",
+    "firebase-functions-test": "^0.3.3",
+    "json-to-ts": "^1.7.0",
+    "rrule": "^2.6.9",
+    "tslint": "^6.1.3",
+    "typescript": "~4.2.4"
+  },
+  "private": true
+}

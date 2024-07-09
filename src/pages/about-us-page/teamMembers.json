@@ -1,0 +1,65 @@
+[
+  {
+    "name": "Oron Nadiv",
+    "title": "Webmaster",
+    "image": "oron.jpg",
+    "email": "oron@belmontrunners.com",
+    "linkedin": "oronnadiv",
+    "website": "www.oronnadiv.com",
+    "strava": "339466"
+  },
+  {
+    "name": "Jon VanHorn",
+    "title": "President",
+    "image": "jon2.png",
+    "email": "jon@belmontrunners.com",
+    "facebook": "jon.vanhorn",
+    "instagram": "thisisjvh",
+    "strava": "6715637"
+  },
+  {
+    "name": "Kelsey Homyk",
+    "title": "Vice President",
+    "image": "kelsey.png",
+    "email": "kelsey@belmontrunners.com",
+    "strava": "23091577"
+  },
+  {
+    "name": "David Haimes",
+    "title": "Treasurer",
+    "image": "david.png",
+    "email": "david@belmontrunners.com",
+    "instagram": "david.j.haimes",
+    "strava": "7726519",
+    "twitter": "dhaimes"
+  },
+  {
+    "name": "Erica VanHorn",
+    "title": "Events Coordinator",
+    "image": "erica.png",
+    "email": "erica@belmontrunners.com",
+    "instagram": "ericagreer1",
+    "strava": "14346197"
+  },
+  {
+    "name": "Raimond Galicia",
+    "title": "Social Media",
+    "image": "raimond.png",
+    "email": "raimond@belmontrunners.com",
+    "instagram": "rairuns",
+    "strava": "48787944"
+  },
+  {
+    "name": "Clare Abram",
+    "title": "Secretary",
+    "image": "clare.png",
+    "email": "clare@belmontrunners.com",
+    "strava": "463444"
+  },
+  {
+    "name": "Victoria Banner",
+    "title": "Publications",
+    "image": "vikky.png",
+    "email": "victoria@belmontrunners.com"
+  }
+]

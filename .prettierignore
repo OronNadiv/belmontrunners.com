@@ -1,0 +1,12 @@
+.cache
+package.json
+package-lock.json
+
+
+.idea
+/build
+eventure
+**/node_modules
+**/deploy.sh
+public/js
+public/vendors

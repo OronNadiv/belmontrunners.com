@@ -1,0 +1,28 @@
+name: Deploy the main branch
+on:
+  push:
+    branches:
+      - main
+jobs:
+  main:
+    name: Deploy to Firebase
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+      - run: npm install --legacy-peer-deps
+      - name: "Run npm run build"
+        run: npm run build
+        env:
+          REACT_APP_GOOGLE_MAPS_API_KEY: ${{ secrets.REACT_APP_GOOGLE_MAPS_API_KEY }}
+          REACT_APP_STRIPE_PUBLIC_KEY: ${{ secrets.REACT_APP_STRIPE_PUBLIC_KEY }}
+      - run: cd functions && npm install --legacy-peer-deps && cd ..
+      - uses: w9jds/setup-firebase@main
+        with:
+          tools-version: 11.18.0
+          firebase_token: ${{ secrets.FIREBASE_TOKEN }}
+      - run: firebase deploy --force --only hosting
+      - run: firebase deploy --force --only functions
+      
