@@ -15,6 +15,8 @@ const firebaseConfig = {
   measurementId: process.env.FIREBASE_MEASUREMENT_ID
 }
 
+console.log("firebaseConfig:", firebaseConfig)
+
 const firebaseApp = initializeApp(firebaseConfig)
 export const analytics = getAnalytics(firebaseApp)
 export const auth = getAuth(firebaseApp)
