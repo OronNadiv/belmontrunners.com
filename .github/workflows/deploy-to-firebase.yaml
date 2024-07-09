@@ -1,2 +1,24 @@
-
-
+name: Deploy the main branch
+on:
+  push:
+    branches:
+      - main
+jobs:
+  main:
+    name: Deploy to Firebase
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm install
+      - run: npm run build
+      - run: cd functions && npm install && cd ..
+      - uses: w9jds/setup-firebase@main
+        with:
+          tools-version: 11.18.0
+          firebase_token: ${{ secrets.FIREBASE_TOKEN }}
+      - run: firebase deploy --force --only hosting
+      - run: firebase deploy --force --only functions
+      
