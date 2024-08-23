@@ -42,8 +42,10 @@
     "underscore": "^1.13.2"
   },
   "devDependencies": {
+    "@types/bluebird": "^3.5.42",
     "@types/luxon": "^2.3.1",
     "@types/node": "^14.18.12",
+    "@types/underscore": "^1.11.15",
     "dayjs": "^1.11.0",
     "firebase-functions-test": "^0.3.3",
     "json-to-ts": "^1.7.0",
