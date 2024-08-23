@@ -58,6 +58,16 @@ const GetMembers = (admin: Admin.app.App) => {
     }
 
     const applyFilters = (user: User) => {
+      if (!hasAuth) {
+        throw new https.HttpsError(
+          'permission-denied',
+          JSON.stringify({
+            status: 403,
+            message: 'user is not a member.'
+          })
+        )
+      }
+      
       if (context.auth.uid === user.uid) {
         foundCurrentUser = true
         if (!calc(user).isAMember) {
