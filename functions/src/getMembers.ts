@@ -18,10 +18,7 @@ import {
   ZIP
 } from './fields'
 import * as _ from 'underscore'
-
-const {
-  warn
-} = require("firebase-functions/logger")
+import { warn } from "firebase-functions/logger"
 
 const defaultVisibility: Visibility = {
   [UID]: VisibilityEnum.MEMBERS,
@@ -40,17 +37,19 @@ const defaultVisibility: Visibility = {
 }
 
 const GetMembers = (admin: Admin.app.App) => {
-  let foundCurrentUser = false
 
   const firestore = admin.firestore()
-  
+
   return async (data: any, context?: https.CallableContext) => {
-    const hasContext =  !!context
-    const hasAuth =  hasContext && !!context.auth
-    const hasUid = hasAuth && !!context.auth.uid
-    if (!hasContext || !hasAuth || !hasUid) {
-      warn("unauthenticated.", {hasContext, hasAuth, hasUid})
-      
+    let foundCurrentUser = false
+
+    if (!context || !context.auth || !context.auth.uid) {
+      warn("unauthenticated.", {
+        hasContext: !!context,
+        hasAuth: context && !!context.auth,
+        hasUid: context && context.auth && !!context.auth.uid
+      })
+
       throw new https.HttpsError(
         'unauthenticated',
         'unauthenticated.'
@@ -58,7 +57,7 @@ const GetMembers = (admin: Admin.app.App) => {
     }
 
     const applyFilters = (user: User) => {
-      if (!hasAuth) {
+      if (!context || !context.auth) {
         throw new https.HttpsError(
           'permission-denied',
           JSON.stringify({
@@ -67,12 +66,16 @@ const GetMembers = (admin: Admin.app.App) => {
           })
         )
       }
-      
+
       if (context.auth.uid === user.uid) {
         foundCurrentUser = true
         if (!calc(user).isAMember) {
-          warn("permission-denied. Current user is not a memeber.", {hasContext, hasAuth, hasUid})
-          
+          warn("permission-denied. Current user is not a memeber.", {
+            hasContext: context,
+            hasAuth: context && !!context.auth,
+            hasUid: context && context.auth && !!context.auth.uid
+          })
+
           throw new https.HttpsError(
             'permission-denied',
             JSON.stringify({
@@ -111,24 +114,35 @@ const GetMembers = (admin: Admin.app.App) => {
       users.push(user)
     })
 
-    if(!foundCurrentUser){
-      warn("permission-denied. Could not find current user.", {hasContext, hasAuth, hasUid})
-
-      throw new https.HttpsError(
-          'permission-denied',
-          JSON.stringify({
-            status: 403,
-            message: 'user is not a member.'
-          })
-      )
-    }
-
     users = _.chain(users)
       .filter((user: User) => {
         return calc(user).isAMember
       })
+      .filter((user: User) => {
+        if (!user.uid) {
+          warn("A memeber without a uid. ", { user })
+        }
+        return !!user.uid
+      })
       .map(applyFilters)
       .value()
+
+    if (!foundCurrentUser) {
+      warn("permission-denied. Could not find current user.", {
+        hasContext: !!context,
+        hasAuth: context && !!context.auth,
+        hasUid: context && context.auth && !!context.auth.uid
+      })
+
+      throw new https.HttpsError(
+        'permission-denied',
+        JSON.stringify({
+          status: 403,
+          message: 'user is not a member.'
+        })
+      )
+    }
+
     return users
   }
 }
