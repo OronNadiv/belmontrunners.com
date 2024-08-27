@@ -42,16 +42,13 @@
     "strava": "14346197"
   },
   {
-    "name": "Raimond Galicia",
+    "name": "Amanda Stanton-Geddes",
     "title": "Social Media",
-    "image": "raimond.png",
-    "email": "raimond@belmontrunners.com",
-    "instagram": "rairuns",
-    "strava": "48787944"
+    "email": "amanda@belmontrunners.com",
   },
   {
     "name": "Clare Abram",
-    "title": "Secretary",
+    "title": "Vice President",
     "image": "clare.png",
     "email": "clare@belmontrunners.com",
     "strava": "463444"
@@ -61,5 +58,12 @@
     "title": "Publications",
     "image": "vikky.png",
     "email": "victoria@belmontrunners.com"
+  },
+  {
+    "name": "Joy Ebertz",
+    "title": "Secretary",
+    "email": "joy@belmontrunners.com",
+    "image": "joy.png",
+    "strava": "1509231"
   }
 ]
