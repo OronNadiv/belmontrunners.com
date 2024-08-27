@@ -42,11 +42,6 @@
     "strava": "14346197"
   },
   {
-    "name": "Amanda Stanton-Geddes",
-    "title": "Social Media",
-    "email": "amanda@belmontrunners.com",
-  },
-  {
     "name": "Clare Abram",
     "title": "Vice President",
     "image": "clare.png",
@@ -62,8 +57,9 @@
   {
     "name": "Joy Ebertz",
     "title": "Secretary",
+    "image": "joy.png"
     "email": "joy@belmontrunners.com",
-    "image": "joy.png",
-    "strava": "1509231"
+    "strava": "1509231",
+    "medium": "jkebertz"
   }
 ]
