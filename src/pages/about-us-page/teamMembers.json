@@ -18,13 +18,6 @@
     "strava": "6715637"
   },
   {
-    "name": "Kelsey Homyk",
-    "title": "Vice President",
-    "image": "kelsey.png",
-    "email": "kelsey@belmontrunners.com",
-    "strava": "23091577"
-  },
-  {
     "name": "David Haimes",
     "title": "Treasurer",
     "image": "david.png",
@@ -42,16 +35,8 @@
     "strava": "14346197"
   },
   {
-    "name": "Raimond Galicia",
-    "title": "Social Media",
-    "image": "raimond.png",
-    "email": "raimond@belmontrunners.com",
-    "instagram": "rairuns",
-    "strava": "48787944"
-  },
-  {
     "name": "Clare Abram",
-    "title": "Secretary",
+    "title": "Vice President",
     "image": "clare.png",
     "email": "clare@belmontrunners.com",
     "strava": "463444"
@@ -61,5 +46,19 @@
     "title": "Publications",
     "image": "vikky.png",
     "email": "victoria@belmontrunners.com"
+  },
+  {
+    "name": "Joy Ebertz",
+    "title": "Secretary",
+    "image": "joy.png",
+    "email": "joy@belmontrunners.com",
+    "strava": "1509231",
+    "medium": "jkebertz"
+  },
+  {
+    "name": "Amanda Stanton-Geddes",
+    "title": "Social Media",
+    "image": "amanda.png",
+    "email": "amanda@belmontrunners.com"
   }
 ]

@@ -4,14 +4,15 @@ import _ from 'underscore'
 interface ITeamMember {
   name: string
   title: string
-  email: string
+  email?: string
   image: string
   instagram?: string
   strava?: string
   twitter?: string
   linkedin?: string
   facebook?: string
-  website: string
+  medium?: string
+  website?: string
 }
 
 const leadership: ITeamMember[] = _.shuffle(require('./teamMembers.json'))
@@ -91,6 +92,15 @@ const getTeam = () => {
                   href={`https://www.strava.com/athletes/${member.strava}`}
                 >
                   <i className="fab fa-strava" />
+                </a>
+              )}
+              {member.medium && (
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={`https://${member.medium}.medium.com`}
+                >
+                  <i className="fab fa-medium" />
                 </a>
               )}
             </div>
