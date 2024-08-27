@@ -93,6 +93,15 @@ const getTeam = () => {
                   <i className="fab fa-strava" />
                 </a>
               )}
+              {member.medium && (
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={`https://${member.medium}.medium.com`}
+                >
+                  <i className="fab fa-medium" />
+                </a>
+              )}
             </div>
           </div>
           <div className="team_name">
