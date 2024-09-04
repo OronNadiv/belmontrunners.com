@@ -1,5 +1,5 @@
 import AddContact from './addContact'
-import Auth2Users, { Auth2UsersOptions } from './auth2Users'
+import Auth2Users from './auth2Users'
 import Contacts2MailChimp from './contacts2MailChimp'
 import DeleteUser from './deleteUser'
 import GenerateICal from './generateICal'
@@ -11,12 +11,14 @@ import UpdateEvents from './updateEvents'
 import Users2Contacts from './users2Contacts'
 import * as functions from 'firebase-functions'
 import { info, error } from "firebase-functions/logger"
+import { UserRecord } from 'firebase-functions/lib/providers/auth'
 import * as Admin from 'firebase-admin'
 import { EMAIL } from './fields'
 import { props } from 'bluebird'
+import { Firestore } from 'firebase-admin/firestore'
 
 const admin: Admin.app.App = Admin.initializeApp()
-const firestore = admin.firestore()
+const firestore: Firestore = admin.firestore()
 
 const apiKey = functions.config().mailchimp.apikey
 const { app_id, city_id } = functions.config().openweathermap
@@ -26,7 +28,7 @@ const {
 } = functions.config().stripe
 
 const addContactImpl = AddContact(admin)
-const auth2Users = Auth2Users(admin)
+const auth2Users = new Auth2Users(admin)
 const contacts2MailChimp = Contacts2MailChimp(admin, apiKey)
 const deleteUserImpl = DeleteUser(admin, apiKey)
 const generateICal = GenerateICal()
@@ -40,38 +42,29 @@ const stripeImpl = Stripe(admin, {
 const users2Contacts = Users2Contacts(admin)
 const updateEvents = UpdateEvents(admin, app_id, city_id)
 
-const AUTH_2_USERS_TIMEOUT_IN_SECONDS = 180
+const ITERATION_ON_ACCOUNTS_TIMEOUT_IN_SECONDS = 180
 
-const auth2UsersExec = (options: Auth2UsersOptions) => async () => {
-  try {
-    await auth2Users(options)
-    info('Calling process.exit(0)')
-    setTimeout(function () {
-      process.exit(0)
-    }, 5000)
-  } catch (err) {
-    error('While calling auth2UsersExec', { err })
-    info('Calling process.exit(1)')
-    setTimeout(function () {
-      process.exit(1)
-    }, 5000)
-  }
-}
-
-export const purgeUsersUnder13CronJob = functions.pubsub
+export const purgeUsersUnder13CronJob = functions
+  .runWith({ timeoutSeconds: ITERATION_ON_ACCOUNTS_TIMEOUT_IN_SECONDS })
+  .pubsub
   .schedule('10 */6 * * *')
   .onRun(async () => await purgeUsersUnder13())
+
 export const auth2UsersCronJob = functions
-  .runWith({ timeoutSeconds: AUTH_2_USERS_TIMEOUT_IN_SECONDS })
+  .runWith({ timeoutSeconds: ITERATION_ON_ACCOUNTS_TIMEOUT_IN_SECONDS })
   .pubsub
   .schedule('20 */6 * * *')
-  .onRun(async () => await auth2UsersExec({ syncGravatar: true }))
-export const auth2UsersOnCreate = functions
-  .runWith({ timeoutSeconds: AUTH_2_USERS_TIMEOUT_IN_SECONDS })
-  .auth
-  .user().onCreate(auth2UsersExec({ syncGravatar: false }))
+  .onRun(async () => await auth2Users.SyncAll({ syncGravatar: true }))
 
-export const users2ContactsCronJob = functions.pubsub
+export const auth2UsersOnCreate = functions
+  .runWith({ timeoutSeconds: ITERATION_ON_ACCOUNTS_TIMEOUT_IN_SECONDS })
+  .auth
+  .user()
+  .onCreate(async (userRecord: UserRecord) => await auth2Users.Sync(userRecord, { syncGravatar: false }))
+
+export const users2ContactsCronJob = functions
+  .runWith({ timeoutSeconds: ITERATION_ON_ACCOUNTS_TIMEOUT_IN_SECONDS })
+  .pubsub
   .schedule('30 */6 * * *')
   .onRun(async () => {
     try {
@@ -83,8 +76,9 @@ export const users2ContactsCronJob = functions.pubsub
   })
 
 export const contacts2MailChimpCronJob = functions
-  .runWith({ timeoutSeconds: 180 })
-  .pubsub.schedule('40 */6 * * *')
+  .runWith({ timeoutSeconds: ITERATION_ON_ACCOUNTS_TIMEOUT_IN_SECONDS })
+  .pubsub
+  .schedule('40 */6 * * *')
   .onRun(async () => {
     try {
       await contacts2MailChimp()
@@ -101,18 +95,21 @@ export const contacts2MailChimpCronJob = functions
     }
   })
 
-export const updateEventsCronJob = functions.pubsub
+export const updateEventsCronJob = functions
+  .pubsub
   .schedule('*/20 * * * *')
   .onRun(async () => await updateEvents())
 
 export const waiver = functions
-  .https.onRequest(async (req: functions.https.Request, res: functions.Response) => {
+  .https
+  .onRequest(async (req: functions.https.Request, res: functions.Response) => {
     res.redirect('https://docs.google.com/forms/d/e/1FAIpQLSfYxlbWAzK1jAcdE_5-ijxORNVz2YU4BdSVt2Dk-DByncIEkw/viewform')
   })
 
 export const ical = functions
   .runWith({ memory: '512MB' })
-  .https.onRequest(async (req: functions.https.Request, res: functions.Response) => {
+  .https
+  .onRequest(async (req: functions.https.Request, res: functions.Response) => {
     try {
       const body = await generateICal()
       res.set({
@@ -136,19 +133,24 @@ export const ical = functions
     }
   })
 
-export const stripe = functions.runWith({ memory: '512MB' }).https.onCall(stripeImpl)
+export const stripe = functions
+  .runWith({ memory: '512MB' })
+  .https.onCall(stripeImpl)
 
 export const addContact = functions
   .runWith({ memory: '512MB' })
-  .https.onCall(addContactImpl)
+  .https
+  .onCall(addContactImpl)
 
 export const getMembers = functions
   .runWith({ timeoutSeconds: 30, memory: '512MB' })
-  .https.onCall(getMembersImpl)
+  .https
+  .onCall(getMembersImpl)
 
 export const deleteUser = functions
   .runWith({ timeoutSeconds: 30, memory: '512MB' })
-  .https.onCall(async (data, context) => {
+  .https
+  .onCall(async (data, context) => {
     if (!context || !context.auth || !context.auth.uid) {
       throw new functions.https.HttpsError(
         'unauthenticated',
@@ -182,6 +184,8 @@ export const deleteUser = functions
     await deleteUserImpl({ uid: targetUID, email: targetEmail })
   })
 
-export const sendMembershipRemindersCronJob = functions.pubsub
+export const sendMembershipRemindersCronJob = functions
+  .runWith({ timeoutSeconds: ITERATION_ON_ACCOUNTS_TIMEOUT_IN_SECONDS })
+  .pubsub
   .schedule('0 19 * * *')
   .onRun(async () => await sendMembershipReminders())

@@ -10,8 +10,8 @@ const admin: Admin.app.App = Admin.initializeApp({
   databaseURL: 'https://belmont-runners-1548537264040.firebaseio.com'
 })
 
-const auth2Users = Auth2Users(admin)
-auth2Users({ syncGravatar: true })
+const auth2Users = new Auth2Users(admin)
+auth2Users.SyncAll({ syncGravatar: true })
   .then((res) => {
     console.info('done', res)
     return

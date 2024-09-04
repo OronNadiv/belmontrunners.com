@@ -5,7 +5,6 @@ import calc from './membershipUtils'
 import { ARRAY_KEY, UID } from './fields'
 import { props } from 'bluebird'
 
-const normalizeEmail = require('normalize-email')
 const _ = require('underscore')
 
 const Users2Contacts = (admin: Admin.app.App) => {
@@ -55,7 +54,9 @@ const Users2Contacts = (admin: Admin.app.App) => {
      */
     contacts.forEach((contact: Contact) => {
       const foundUser: User | undefined = users.find(user => {
-        return normalizeEmail(contact.email) === normalizeEmail(user.email)
+        // Do not "normalize" the email addresses since some users may have
+        // created multiple different accounts with the same normalized email. 
+        return contact.email.trim().toLowerCase() === user.email.trim().toLowerCase()
       })
       if (foundUser) {
         contact.uid = foundUser.uid
