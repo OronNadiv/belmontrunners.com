@@ -1,5 +1,6 @@
 import * as Admin from 'firebase-admin'
 import { UserRecord } from 'firebase-functions/lib/providers/auth'
+import { info, error } from "firebase-functions/logger"
 import { User } from './User'
 import { each } from 'bluebird'
 import got from 'got'
@@ -30,12 +31,10 @@ const Auth2Users = (admin: Admin.app.App) => {
         let hasGravatar = false
         try {
           await got.get(gravatarUrl)
-          console.log('found gravatar.', 'gravatarUrl:', gravatarUrl)
+          info('found gravatar.', {gravatarUrl})
           hasGravatar = true
         } catch (error) {
-          console.error('Error while fetching gravatar.',
-              'gravatarUrl:', gravatarUrl,
-              'error:', error)
+          info('Error while fetching gravatar.', {gravatarUrl, error})
         }
 
         const createdAt = moment(creationTime)
@@ -55,21 +54,21 @@ const Auth2Users = (admin: Admin.app.App) => {
           gravatarUrl: hasGravatar ? gravatarUrl : null
         }
         await userRef.set(data, { merge: true })
-        console.info(`Updated ${uid} ${createdAt} ${lastSignedInAt}`)
+        info(`Updated ${uid} ${createdAt} ${lastSignedInAt}`)
       } catch (err) {
-        console.error('Error while syncing auth2user.',
-            'uid:', userRecord.uid,
-            'error:',err);
+        error('Error while syncing auth2user.',
+              {'uid': userRecord.uid,
+            'error':,err});
       }
     })
-    console.info(
+    info(
       'checking listUsersResult.pageToken:', listUsersResult.pageToken,
         'num of results previously found:', listUsersResult.users.length)
     if (listUsersResult.pageToken) {
       // List next batch of users.
       await listAllUsers(listUsersResult.pageToken)
     } else {
-      console.info('Done.  Exiting...')
+      info('Done.  Exiting...')
       return
     }
   }
