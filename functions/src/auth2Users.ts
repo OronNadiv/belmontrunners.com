@@ -60,8 +60,7 @@ const Auth2Users = (admin: Admin.app.App) => {
       }
     })
     info(
-      'checking listUsersResult.pageToken:', listUsersResult.pageToken,
-        'num of results previously found:', listUsersResult.users.length)
+      `checking listUsersResult.pageToken: ${listUsersResult.pageToken} num of results previously found: ${listUsersResult.users.length}`)
     if (listUsersResult.pageToken) {
       // List next batch of users.
       await listAllUsers(listUsersResult.pageToken)
