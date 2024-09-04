@@ -33,8 +33,8 @@ const Auth2Users = (admin: Admin.app.App) => {
           await got.get(gravatarUrl)
           info('found gravatar.', {gravatarUrl})
           hasGravatar = true
-        } catch (error) {
-          info('Error while fetching gravatar.', {gravatarUrl, error})
+        } catch (err) {
+          info('Error while fetching gravatar.', {gravatarUrl, error: err})
         }
 
         const createdAt = moment(creationTime)
@@ -56,9 +56,7 @@ const Auth2Users = (admin: Admin.app.App) => {
         await userRef.set(data, { merge: true })
         info(`Updated ${uid} ${createdAt} ${lastSignedInAt}`)
       } catch (err) {
-        error('Error while syncing auth2user.',
-              {'uid': userRecord.uid,
-            'error':,err});
+        error('Error while syncing auth2user.', {'uid': userRecord.uid, 'error': err});
       }
     })
     info(
