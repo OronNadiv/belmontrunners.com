@@ -11,7 +11,7 @@ const admin: Admin.app.App = Admin.initializeApp({
 })
 
 const auth2Users = Auth2Users(admin)
-auth2Users()
+auth2Users({ syncGravatar: true })
   .then((res) => {
     console.info('done', res)
     return
