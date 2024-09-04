@@ -39,6 +39,8 @@ const stripeImpl = Stripe(admin, {
 const users2Contacts = Users2Contacts(admin)
 const updateEvents = UpdateEvents(admin, app_id, city_id)
 
+const AUTH_2_USERS_TIMEOUT_IN_SECONDS = 180
+
 const auth2UsersExec = async () => {
   try {
     await auth2Users()
@@ -59,9 +61,12 @@ export const purgeUsersUnder13CronJob = functions.pubsub
     .schedule('10 */6 * * *')
     .onRun(async () => await purgeUsersUnder13())
 export const auth2UsersCronJob = functions.pubsub
+    .runWith({timeoutSeconds: AUTH_2_USERS_TIMEOUT_IN_SECONDS})
     .schedule('20 */6 * * *')
     .onRun(async () => await auth2UsersExec)
-export const auth2UsersOnCreate = functions.auth.user().onCreate(auth2UsersExec)
+export const auth2UsersOnCreate = functions.auth
+    .runWith({timeoutSeconds: AUTH_2_USERS_TIMEOUT_IN_SECONDS})
+    .user().onCreate(auth2UsersExec)
 
 export const users2ContactsCronJob = functions.pubsub
     .schedule('30 */6 * * *')
