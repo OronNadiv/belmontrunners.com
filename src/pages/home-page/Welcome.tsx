@@ -6,10 +6,6 @@ import _ from 'underscore'
 
 const images = _.shuffle([
   {
-    original: "img/welcome/back1-fixed-307.jpg",
-    originalWeight: 458
-  },
-  {
     original: "img/welcome/back2-fixed-307.jpg",
     originalWeight: 458
   },
