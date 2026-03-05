@@ -18,7 +18,8 @@ const context: https.CallableContext = {
   rawRequest,
   auth: {
     uid: 'jL4tNueYfwYlVo32j2ydXCtepXJ3',
-    token
+    token,
+    rawToken: ''
   }
 }
 

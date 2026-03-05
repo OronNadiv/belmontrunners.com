@@ -1,7 +1,6 @@
 import * as Admin from 'firebase-admin'
 import { Firestore } from 'firebase-admin/firestore'
-import { Auth } from 'firebase-admin/auth'
-import { UserRecord } from 'firebase-admin/auth'
+import { Auth, UserRecord } from 'firebase-admin/auth'
 import { info, error } from "firebase-functions/logger"
 import { User } from './User'
 import { each } from 'bluebird'
