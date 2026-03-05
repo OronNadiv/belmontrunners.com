@@ -10,7 +10,7 @@
     "@mui/styles": "^6.5.0",
     "@mui/x-date-pickers": "^8.27.2",
     "@reduxjs/toolkit": "^2.11.2",
-    "@sentry/browser": "^6.18.2",
+    "@sentry/browser": "^7.119.1",
     "@stripe/react-stripe-js": "^5.6.0",
     "@stripe/stripe-js": "^8.8.0",
     "@types/js-cookie": "^2.2.7",
