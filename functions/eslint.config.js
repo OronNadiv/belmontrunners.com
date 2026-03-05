@@ -37,7 +37,7 @@ module.exports = [
       '@typescript-eslint/no-empty-interface': 'warn',
       'no-var': 'warn',
       eqeqeq: 'warn',
-      'prefer-for-of': 'warn',
+      '@typescript-eslint/prefer-for-of': 'warn',
       'prefer-const': 'warn'
     }
   },
