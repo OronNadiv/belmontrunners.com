@@ -18,7 +18,15 @@ interface Props {
 }
 
 function SignUpStepper({ steps }: Props) {
-  const [activeStep, setActiveStep] = useState(0)
+  const [activeStep, setActiveStep] = useState(() => {
+    // When returning from Stripe checkout, skip directly to the Membership step
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('session_id')) {
+      const membershipIndex = steps.indexOf(STEP_MEMBERSHIP)
+      return membershipIndex >= 0 ? membershipIndex : 0
+    }
+    return 0
+  })
 
   const handleNext = () => {
     setActiveStep(activeStep + 1)
