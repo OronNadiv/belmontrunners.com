@@ -41,7 +41,7 @@ function Home({ isCurrentUserLoaded }: Props) {
 
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [isCurrentUserLoaded, hash])
 
   return (

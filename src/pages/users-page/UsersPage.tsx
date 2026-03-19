@@ -149,7 +149,7 @@ function UsersPage({ firebaseUser, allowDelete, allowRead, allowWrite }: Props) 
       options: {
         filter: false,
         searchable: false,
-        // eslint-disable-next-line react/display-name
+         
         customBodyRender: (value: any, tableMeta: any, updateValue: (s: any, c: any, p: any) => any) => {
           // console.log(tableMeta)
           return value ?
@@ -227,7 +227,7 @@ function UsersPage({ firebaseUser, allowDelete, allowRead, allowWrite }: Props) 
       options: {
         searchable: false,
 
-        // eslint-disable-next-line react/display-name
+         
         customBodyRender: (value: any, tableMeta: any, updateValue: (s: any, c: any, p: any) => any) => {
           // console.log(tableMeta)
 
@@ -289,7 +289,7 @@ function UsersPage({ firebaseUser, allowDelete, allowRead, allowWrite }: Props) 
       label: 'Email Verified',
       options: {
         searchable: false,
-        // eslint-disable-next-line react/display-name
+         
         customBodyRender: (value: any) => {
           return (
             <Checkbox
@@ -357,7 +357,7 @@ function UsersPage({ firebaseUser, allowDelete, allowRead, allowWrite }: Props) 
               print: false,
               rowsPerPage: 100,
               tableBodyMaxHeight: `${height/1.5}px`,
-              // eslint-disable-next-line react/display-name
+               
               customToolbarSelect: (selectedRows) => {
                 const { dataIndex } = selectedRows.data[0]
                 const row = rows[dataIndex]

@@ -1,8 +1,0 @@
-/public/js/**
-/public/vendors/**
-**/node_modules
-/dist/**
-/original/**
-/build/**
-eventure
-/functions/lib

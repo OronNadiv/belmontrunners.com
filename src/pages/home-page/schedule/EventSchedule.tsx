@@ -62,7 +62,7 @@ interface CSVEvent {
 }
 
 function EventSchedule() {
-  // eslint-disable-next-line
+   
   const [events, setEvents] = useState<CSVEvent[]>([])
   const [filteredEvents, setFilteredEvents] = useState<CSVEvent[]>([])
   const [daysAhead, setDaysAhead] = useState(15)
