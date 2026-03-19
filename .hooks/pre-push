@@ -1,0 +1,22 @@
+#!/bin/bash
+
+echo "Running functions lint and typecheck..."
+cd "$(git rev-parse --show-toplevel)/functions"
+
+npm run lint
+LINT_EXIT=$?
+
+if [ $LINT_EXIT -ne 0 ]; then
+  echo "❌ ESLint failed. Push aborted."
+  exit 1
+fi
+
+npx tsc --noEmit
+TSC_EXIT=$?
+
+if [ $TSC_EXIT -ne 0 ]; then
+  echo "❌ TypeScript check failed. Push aborted."
+  exit 1
+fi
+
+echo "✅ Lint and typecheck passed."
