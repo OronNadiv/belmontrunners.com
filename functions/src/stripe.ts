@@ -36,10 +36,10 @@ interface StripeConfig {
 
 const Stripe = (admin: Admin.app.App, config: StripeConfig) => {
   const stripeLive = new StripeAPI(config.secretKeys.live, {
-    apiVersion: '2020-08-27'
+    apiVersion: '2026-06-24.dahlia'
   })
   const stripeTest = new StripeAPI(config.secretKeys.test, {
-    apiVersion: '2020-08-27'
+    apiVersion: '2026-06-24.dahlia'
   })
 
   const firestore = admin.firestore()
@@ -87,10 +87,8 @@ const Stripe = (admin: Admin.app.App, config: StripeConfig) => {
     const stripe = getStripeInstance(origin)
 
     try {
-      // Using 'as any' because stripe SDK v8 types don't include embedded checkout fields,
-      // but the Stripe API supports them at runtime
       const session = await stripe.checkout.sessions.create({
-        ui_mode: 'embedded',
+        ui_mode: 'embedded_page',
         mode: 'payment',
         line_items: [{
           price_data: {
@@ -106,9 +104,9 @@ const Stripe = (admin: Admin.app.App, config: StripeConfig) => {
         customer_email: customerEmail,
         metadata: { uid },
         return_url: returnUrl,
-      } as any)
+      })
       info('checkout session created.', { id: session.id })
-      return { clientSecret: (session as any).client_secret }
+      return { clientSecret: session.client_secret }
     } catch (err) {
       warn('checkout session create error.', { err })
       throw new https.HttpsError('invalid-argument', JSON.stringify(err))

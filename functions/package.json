@@ -37,7 +37,7 @@
     "normalize-email": "^1.1.1",
     "parse-full-name": "^1.2.6",
     "request": "^2.88.2",
-    "stripe": "^8.210.0",
+    "stripe": "^22.3.2",
     "underscore": "^1.13.8"
   },
   "devDependencies": {
