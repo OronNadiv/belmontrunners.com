@@ -19,8 +19,7 @@ import { IUpdateUserData } from '../../reducers/currentUser'
 import { User } from '../../../functions/src/User';
 import { FunctionsError, httpsCallable } from 'firebase/functions'
 
-const MEMBERSHIP_FEE_ADULT = 20
-const MEMBERSHIP_FEE_KID = 10
+const MEMBERSHIP_FEE = 20
 
 interface Props {
   firebaseUser: User
@@ -28,7 +27,6 @@ interface Props {
   totalAmount: number
   isLast: boolean
   onNextClicked: () => void
-  youngerThan13: boolean
   membershipExpiresAt?: string
   updateUserData: IUpdateUserData
 }
@@ -40,7 +38,6 @@ function SignUpStepPayment({
                              totalAmount,
                              membershipExpiresAt,
                              onNextClicked,
-                             youngerThan13,
                              updateUserData
                            }: Props) {
   const navigate = useNavigate()
@@ -173,36 +170,6 @@ function SignUpStepPayment({
     }
 
     if (!needToPay) {
-      if (youngerThan13) {
-        return (
-            <>
-              <div className="text-justify mt-4">
-                <p className="text-danger">
-                  Kids 12 and under are welcome to join the club, as long as
-                  they are accompanied by an Adult or Legal Guardian. However,
-                  due to the California CCPA and COPPA, the club cannot allow
-                  minors under 13 to register with our website.
-                </p>
-                <p>
-                  If you and your child would like to join us on a run, please
-                  talk to one of the Board Members or Run Leaders at a group run
-                  in order to sign the liability waiver in person.
-                </p>
-                <p>
-                  In order to keep your child&apos;s information safe, this account
-                  will be automatically disabled within 24 hours.
-                </p>
-                <p>
-                  Any questions, don&apos;t hesitate to contact us at <a
-                    href='mailto://info@belmontrunners.com'
-                    target='_blank'
-                    rel='noreferrer noopener'>info@belmontrunners.com</a>.
-                </p>
-              </div>
-            </>
-        )
-      }
-
       return (
         <>
           <div className="text-success text-center mt-4">
@@ -224,11 +191,7 @@ function SignUpStepPayment({
       <>
         {!checkoutMounted && (
           <>
-            <h6 className="mt-3">Membership fees</h6>
-            &bull; Adult (18 and over): $20
-            <br />
-            &bull; Kids: $10.
-            <br />
+            <h6 className="mt-3">Membership fee: ${MEMBERSHIP_FEE}</h6>
             <h4 className="my-4">
               Total amount: ${totalAmount > 0 ? totalAmount : ''}
             </h4>
@@ -326,7 +289,6 @@ SignUpStepPayment.propTypes = {
   needToPay: PropTypes.bool,
   membershipExpiresAt: PropTypes.string,
   totalAmount: PropTypes.number.isRequired,
-  youngerThan13: PropTypes.bool.isRequired,
 
   // from parent
   isLast: PropTypes.bool,
@@ -339,21 +301,9 @@ const mapStateToProps = ({ currentUser: { firebaseUser, userData } }: IRedisStat
   let membershipExpiresAt = null
   let needToPay = false
   let totalAmount = -1
-  let youngerThan13 = false
 
   if (firebaseUser) {
-    if (!userDataJS.dateOfBirth) {
-      console.error('missing userDataJS.dateOfBirth')
-      totalAmount = MEMBERSHIP_FEE_ADULT
-    } else {
-      const dateOfBirth = dayjs(userDataJS.dateOfBirth)
-      const isAdult = dayjs().diff(dateOfBirth, 'years') >= 18
-      if (isAdult) {
-        totalAmount = MEMBERSHIP_FEE_ADULT
-      } else {
-        totalAmount = MEMBERSHIP_FEE_KID
-      }
-    }
+    totalAmount = MEMBERSHIP_FEE
     const membershipData = calc(userDataJS)
     membershipExpiresAt = userDataJS.membershipExpiresAt
     if (
@@ -362,13 +312,6 @@ const mapStateToProps = ({ currentUser: { firebaseUser, userData } }: IRedisStat
     ) {
       needToPay = true
     }
-    youngerThan13 =
-      (userDataJS.dateOfBirth &&
-        dayjs().diff(dayjs(userDataJS.dateOfBirth), 'years') < 13) ||
-      false
-    if (youngerThan13) {
-      needToPay = false
-    }
   }
 
   return {
@@ -376,9 +319,7 @@ const mapStateToProps = ({ currentUser: { firebaseUser, userData } }: IRedisStat
 
     needToPay,
     membershipExpiresAt,
-    totalAmount,
-
-    youngerThan13
+    totalAmount
   }
 }
 

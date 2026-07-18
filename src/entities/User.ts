@@ -20,7 +20,6 @@ export interface IUserOptionalProps {
   zip?: string | null
   displayName?: string
   photoURL?: string | null
-  dateOfBirth?: string | null
   phone?: string | null
   didReceivedShirt?: boolean | null
   gender?: string | null

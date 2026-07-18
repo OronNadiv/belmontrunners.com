@@ -10,7 +10,6 @@ export const CITY = 'city'
 export const ZIP = 'zip'
 export const STATE = 'state'
 export const PHONE = 'phone'
-export const DATE_OF_BIRTH = 'dateOfBirth'
 export const GENDER = 'gender'
 export const GRAVATAR_URL = 'gravatarUrl'
 
