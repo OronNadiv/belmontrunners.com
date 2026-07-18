@@ -10,7 +10,6 @@ import {
   ADDRESS2,
   CITY,
   CREATED_AT,
-  DATE_OF_BIRTH,
   DISPLAY_NAME,
   EMAIL,
   EMAIL_VERIFIED,
@@ -41,7 +40,6 @@ import { useWindowDimensions } from '../../utilities/getWindowDimentions';
 const PNF = googleLibPhoneNumber.PhoneNumberFormat
 const phoneUtil = googleLibPhoneNumber.PhoneNumberUtil.getInstance()
 
-const DATE_OF_BIRTH_FORMAT = 'MM/DD'
 const MEMBERSHIP_EXPIRES_AT_FORMAT = 'YYYY-MM-DD HH:mm'
 const MEMBERSHIP_STATUS = 'MEMBERSHIP_STATUS'
 
@@ -92,7 +90,6 @@ function UsersPage({ firebaseUser, allowDelete, allowRead, allowWrite }: Props) 
           [STATE]: data.state || '',
           [ZIP]: data.zip || '',
           [GENDER]: data.gender || '',
-          [DATE_OF_BIRTH]: data.dateOfBirth ? dayjs(data.dateOfBirth).format(DATE_OF_BIRTH_FORMAT) : '',
           [CREATED_AT]: data.createdAt ? dayjs(data.createdAt).format(MEMBERSHIP_EXPIRES_AT_FORMAT) : '',
           [MEMBERSHIP_EXPIRES_AT]: data.membershipExpiresAt ? dayjs(data.membershipExpiresAt).format(MEMBERSHIP_EXPIRES_AT_FORMAT) : '',
           [MEMBERSHIP_STATUS]: '',
@@ -206,13 +203,6 @@ function UsersPage({ firebaseUser, allowDelete, allowRead, allowWrite }: Props) 
     {
       name: ZIP,
       label: 'Zip'
-    },
-    {
-      name: DATE_OF_BIRTH,
-      label: 'Birthday',
-      options: {
-        filter: false
-      }
     },
     {
       name: GENDER,

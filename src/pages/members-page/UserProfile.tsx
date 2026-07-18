@@ -1,12 +1,10 @@
 import * as PropTypes from 'prop-types'
 import React, { useState } from 'react'
 import initials from 'initials'
-import dayjs from 'dayjs'
 import {
   ADDRESS1,
   ADDRESS2,
   CITY,
-  DATE_OF_BIRTH,
   DISPLAY_NAME,
   EMAIL,
   GRAVATAR_URL,
@@ -19,7 +17,6 @@ import {
 } from '../../fields'
 import googleLibPhoneNumber from 'google-libphonenumber'
 import {
-  Cake as CakeIcon,
   Close as CloseIcon,
   Email as EmailIcon,
   Group as GroupIcon,
@@ -53,8 +50,7 @@ import { compose } from 'redux'
 const defaultVisibility = {
   [EMAIL]: ONLY_ME,
   [PHONE]: ONLY_ME,
-  [ADDRESS1]: ONLY_ME,
-  [DATE_OF_BIRTH]: ONLY_ME
+  [ADDRESS1]: ONLY_ME
 }
 
 const PNF = googleLibPhoneNumber.PhoneNumberFormat
@@ -313,13 +309,6 @@ function UserProfile({ onClose, user, userData, updateUserData, firebaseUser }: 
             (val: VisibilityEnum) =>
               handleVisibilityChanged([ADDRESS1, ADDRESS2, CITY, STATE, ZIP])(val),
             getAddress()
-          )}
-          {getKeyVal(
-            'Birthday',
-            <CakeIcon className="mr-2" style={{ fill: '#D2D6DB' }} />,
-            visibility[DATE_OF_BIRTH] || defaultVisibility[DATE_OF_BIRTH],
-            (val: VisibilityEnum) => handleVisibilityChanged([DATE_OF_BIRTH])(val),
-            user.dateOfBirth ? dayjs(user.dateOfBirth).format('MMMM D') : undefined
           )}
         </div>
       </div>

@@ -1,20 +1,8 @@
-import dayjs from 'dayjs'
-import customParseFormat from 'dayjs/plugin/customParseFormat'
-dayjs.extend(customParseFormat)
 import { INVALID_EMAIL, INVALID_PASSWORD_LENGTH } from '../messages'
 import * as EmailValidator from 'email-validator'
 
-const MAX_YEAR = dayjs().year() - 5
-const MIN_YEAR = dayjs().year() - 120
-
 export const required = (value: string) => (value ? undefined : 'Required')
 export const mustBeNumber = (value: any) => (isNaN(value) ? 'Must be a number' : undefined)
-export const birthday = (value: string) => {
-  const val = dayjs(value, 'YYYY-MM-DD')
-  return !val.isValid() || val.year() < MIN_YEAR || val.year() > MAX_YEAR
-    ? 'Invalid birthday'
-    : undefined
-}
 export const isEmail = (value:string) => !value || !EmailValidator.validate(value) ? INVALID_EMAIL : undefined
 
 export const minPasswordLength = (value: string) => {

@@ -6,7 +6,6 @@ import {
   ADDRESS1,
   ADDRESS2,
   CITY,
-  DATE_OF_BIRTH,
   DISPLAY_NAME,
   EMAIL,
   GENDER,
@@ -32,7 +31,6 @@ const defaultVisibility: Visibility = {
   [STATE]: VisibilityEnum.ONLY_ME,
   [ZIP]: VisibilityEnum.ONLY_ME,
   [GENDER]: VisibilityEnum.ONLY_ME,
-  [DATE_OF_BIRTH]: VisibilityEnum.ONLY_ME,
   [GRAVATAR_URL]: VisibilityEnum.MEMBERS
 }
 

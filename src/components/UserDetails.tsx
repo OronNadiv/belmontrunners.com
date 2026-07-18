@@ -1,22 +1,19 @@
 import React from 'react'
 import { Select, TextField } from './FinalFormMuiAdapters'
-import dayjs from 'dayjs'
 import { Field } from 'react-final-form'
 import MenuItem from '@mui/material/MenuItem'
 import {
   ADDRESS1,
   ADDRESS2,
   CITY,
-  DATE_OF_BIRTH,
   DISPLAY_NAME,
   GENDER,
   PHONE,
   STATE,
   ZIP
 } from '../fields'
-import DatePickerWrapper from './DatePickerWrapper'
 import * as PropTypes from 'prop-types'
-import { mustBeNumber, required, birthday, composeValidators } from '../utilities/formValidators'
+import { mustBeNumber, required, composeValidators } from '../utilities/formValidators'
 import statesData from './states_titlecase.json'
 
 const states: { name: string, abbreviation: string }[] = statesData
@@ -119,7 +116,7 @@ function UserDetails({ showDisplayName = false }) {
         </div>
       </div>
 
-      <div className="row d-flex justify-content-between align-items-center">
+      <div className="row">
         <Field
           style={{ width: 120 }}
           name={PHONE}
@@ -128,34 +125,6 @@ function UserDetails({ showDisplayName = false }) {
           type="tel"
           label="Phone"
           margin="normal"
-          InputLabelProps={{
-            shrink: true
-          }}
-        />
-        {spacer}
-        <Field
-          style={{ width: 150 }}
-          label="Birthday"
-          margin="normal"
-          name={DATE_OF_BIRTH}
-          type="date"
-          component={DatePickerWrapper}
-          disableFuture
-          openTo="year"
-          views={['year', 'month', 'date']}
-          validate={composeValidators(required, birthday)}
-          emptyLabel={''}
-          format={value => {
-            // to field
-            if (!value) {
-              return null
-            }
-            return dayjs(value, 'YYYY-MM-DD')
-          }}
-          parse={value => {
-            // to json
-            return value.format('YYYY-MM-DD')
-          }}
           InputLabelProps={{
             shrink: true
           }}

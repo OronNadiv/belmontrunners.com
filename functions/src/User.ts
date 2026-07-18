@@ -1,7 +1,7 @@
 import {
   ADDRESS1,
   ADDRESS2,
-  CITY, DATE_OF_BIRTH,
+  CITY,
   DISPLAY_NAME,
   EMAIL, GENDER, GRAVATAR_URL,
   PHONE,
@@ -28,7 +28,6 @@ export interface Visibility {
   [STATE]?: VisibilityEnum,
   [ZIP]?: VisibilityEnum,
   [GENDER]?: VisibilityEnum,
-  [DATE_OF_BIRTH]?: VisibilityEnum,
   [GRAVATAR_URL]?: VisibilityEnum
 }
 
@@ -42,7 +41,6 @@ export interface User {
   displayName?: string
   email: string
   photoURL?: string
-  dateOfBirth?: string
   phone?: string,
   didReceivedShirt?: boolean,
   gender?: string

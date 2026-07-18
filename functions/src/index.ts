@@ -4,7 +4,6 @@ import Contacts2MailChimp from './contacts2MailChimp'
 import DeleteUser from './deleteUser'
 import GenerateICal from './generateICal'
 import GetMembers from './getMembers'
-import PurgeUsersUnder13 from './purgeUsersUnder13'
 import SendMembershipReminders from './sendMembershipReminders'
 import Stripe from './stripe'
 import UpdateEvents from './updateEvents'
@@ -33,15 +32,6 @@ const auth2Users = new Auth2Users(admin)
 const generateICal = GenerateICal()
 
 const ITERATION_ON_ACCOUNTS_TIMEOUT_IN_SECONDS = 180
-
-export const purgeUsersUnder13CronJob = functions
-  .runWith({ timeoutSeconds: ITERATION_ON_ACCOUNTS_TIMEOUT_IN_SECONDS, secrets: [mailchimpApiKey] })
-  .pubsub
-  .schedule('10 */6 * * *')
-  .onRun(async () => {
-    const purgeUsersUnder13 = PurgeUsersUnder13(admin, mailchimpApiKey.value(), false)
-    await purgeUsersUnder13()
-  })
 
 export const auth2UsersCronJob = functions
   .runWith({ timeoutSeconds: ITERATION_ON_ACCOUNTS_TIMEOUT_IN_SECONDS })
