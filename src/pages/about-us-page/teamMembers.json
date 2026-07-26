@@ -1,21 +1,18 @@
 [
   {
-    "name": "Oron Nadiv",
-    "title": "Webmaster",
-    "image": "oron.jpg",
-    "email": "oron@belmontrunners.com",
-    "linkedin": "oronnadiv",
-    "website": "www.oronnadiv.com",
-    "strava": "339466"
+    "name": "Clare Abram",
+    "title": "President",
+    "image": "clare.png",
+    "email": "clare@belmontrunners.com",
+    "strava": "463444"
   },
   {
-    "name": "Jon VanHorn",
-    "title": "President",
-    "image": "jon2.png",
-    "email": "jon@belmontrunners.com",
-    "facebook": "jon.vanhorn",
-    "instagram": "thisisjvh",
-    "strava": "6715637"
+    "name": "Joy Ebertz",
+    "title": "Vice President",
+    "image": "joy.png",
+    "email": "joy@belmontrunners.com",
+    "strava": "1509231",
+    "medium": "jkebertz"
   },
   {
     "name": "David Haimes",
@@ -27,38 +24,42 @@
     "twitter": "dhaimes"
   },
   {
-    "name": "Erica VanHorn",
-    "title": "Events Coordinator",
-    "image": "erica.png",
-    "email": "erica@belmontrunners.com",
-    "instagram": "ericagreer1",
-    "strava": "14346197"
-  },
-  {
-    "name": "Clare Abram",
-    "title": "Vice President",
-    "image": "clare.png",
-    "email": "clare@belmontrunners.com",
-    "strava": "463444"
-  },
-  {
-    "name": "Victoria Banner",
+    "name": "Vikky Banner",
     "title": "Publications",
     "image": "vikky.png",
     "email": "victoria@belmontrunners.com"
   },
   {
-    "name": "Joy Ebertz",
+    "name": "Heidi Lopez",
     "title": "Secretary",
-    "image": "joy.png",
-    "email": "joy@belmontrunners.com",
-    "strava": "1509231",
-    "medium": "jkebertz"
+    "image": ""
   },
   {
-    "name": "Amanda Stanton-Geddes",
+    "name": "Janet Bryant",
     "title": "Social Media",
-    "image": "amanda.png",
-    "email": "amanda@belmontrunners.com"
+    "image": ""
+  },
+  {
+    "name": "Soojin Wong",
+    "title": "Events Coordinator",
+    "image": ""
+  },
+  {
+    "name": "Shawn Wang",
+    "title": "Webmaster",
+    "image": "shawn.jpg",
+    "email": "shawn.wang.photo@gmail.com",
+    "instagram": "shawn.wang.photography",
+    "strava": "75952030"
+  },
+  {
+    "name": "Kelsey Homyk",
+    "title": "Membership",
+    "image": "kelsey.png"
+  },
+  {
+    "name": "Jon Bratton",
+    "title": "Member at large",
+    "image": ""
   }
 ]
