@@ -24,7 +24,7 @@ const getTeam = () => {
           <div className="team_img">
             {
               <img
-                className="img-fluid rounded-circle"
+                className="rounded-circle"
                 src={`img/team/${member.image}`}
                 alt={member.name}
               />

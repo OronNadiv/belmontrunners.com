@@ -1,12 +1,11 @@
 import React from 'react'
-import _ from 'underscore'
 import teamMembers from './teamMembers.json'
 
 interface ITeamMember {
   name: string
   title: string
   email?: string
-  image: string
+  image?: string
   instagram?: string
   strava?: string
   twitter?: string
@@ -16,21 +15,34 @@ interface ITeamMember {
   website?: string
 }
 
-const leadership: ITeamMember[] = _.shuffle(teamMembers as ITeamMember[])
+const leadership: ITeamMember[] = teamMembers as ITeamMember[]
+
+const getInitials = (name: string) =>
+  name
+    .split(/\s+/)
+    .filter(Boolean)
+    .map(part => part[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase()
 
 const getTeam = () => {
   return leadership.map((member, index) => {
     return (
-      <div className="col-3 mx-auto" key={index}>
-        <div className="team_item  mx-lg-5">
+      <div className="col-6 col-md-4 col-lg-3" key={index}>
+        <div className="team_item">
           <div className="team_img">
-            {
+            {member.image ? (
               <img
-                className="img-fluid rounded-circle"
+                className="rounded-circle"
                 src={`img/team/${member.image}`}
                 alt={member.name}
               />
-            }
+            ) : (
+              <div className="team_img_placeholder rounded-circle" aria-hidden="true">
+                {getInitials(member.name)}
+              </div>
+            )}
             <div className="hover">
               {member.website && (
                 <a
